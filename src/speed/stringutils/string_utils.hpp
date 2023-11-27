@@ -53,9 +53,9 @@ get_string_length(const TpChar* str) noexcept
     
     if (str != nullptr)
     {
-        for (; *str != '\0'; str++)
+        for (; *str != '\0'; ++str)
         {
-            len++;
+            ++len;
         }
     }
     

@@ -157,9 +157,18 @@ public:
      * @brief       Get the key in a character string.
      * @return      The key in a character stirng.
      */
-    inline const string_type& get_key() const noexcept
+    inline const string_type& get_string() const noexcept
     {
         return ky_;
+    }
+    
+    /**
+     * @brief       Get the key lenght in number of characters.
+     * @return      The key lenght in number of characters.
+     */
+    inline std::size_t get_string_length() const noexcept
+    {
+        return ky_.length();
     }
     
     /**
@@ -196,7 +205,7 @@ std::basic_ostream<TpChar, TpCharTraits>& operator <<(
         const basic_arg_key<TpAllocator>& arg_ky
 )
 {
-    os << arg_ky.get_key();
+    os << arg_ky.get_string();
     
     return os;
 }

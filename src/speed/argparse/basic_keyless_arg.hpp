@@ -77,9 +77,9 @@ public:
      * @param       vals_types : Collection that has the values types that must have the values.
      * @param       regx_vector : Regular expressions that the values have to match. If the string
      *              is empty all values will match.
-     * @param       usage_ky : The key used to reference an arguments during the help usage
+     * @param       usage_id : The id used to reference an arguments during the help usage
      *              sentence display.
-     * @param       help_ky : The key used to reference an arguments during the help display.
+     * @param       help_id : The id used to reference an arguments during the help display.
      * @param       compo : The composite object of this class.
      */
     template<
@@ -98,8 +98,8 @@ public:
             std::size_t max_vals,
             TpArgValueTypesVector_&& vals_types,
             TpStringVector_&& regx_vector,
-            TpString3_&& usage_ky,
-            TpString4_&& help_ky,
+            TpString3_&& usage_id,
+            TpString4_&& help_id,
             arg_parser_type* compo
     )
             : base_arg_type(std::forward<TpString1_>(desc),
@@ -114,13 +114,13 @@ public:
                              std::forward<TpArgValueTypesVector_>(vals_types),
                              std::forward<TpStringVector_>(regx_vector),
                              compo)
-            , usage_ky_(std::forward<TpString3_>(usage_ky))
-            , help_ky_(std::forward<TpString4_>(help_ky))
+            , usage_id_(std::forward<TpString3_>(usage_id))
+            , help_id_(std::forward<TpString4_>(help_id))
     {
         if (base_arg_type::error_id_is_empty() &&
             base_arg_type::flag_is_set(arg_flags::USE_FIRST_KEY_IF_ERROR_ID_EMPTY))
         {
-            base_arg_type::set_error_id(help_ky_);
+            base_arg_type::set_error_id(help_id_);
         }
     }
     
@@ -156,68 +156,68 @@ public:
     basic_keyless_arg& operator =(basic_keyless_arg&& rhs) noexcept = default;
     
     /**
-     * @brief       Get the usage key of the argument.
-     * @return      The usage key of the argument.
+     * @brief       Get the usage id of the argument.
+     * @return      The usage id of the argument.
      */
-    inline const string_type& get_usage_key() const noexcept
+    inline const string_type& get_usage_id() const noexcept
     {
-        return usage_ky_;
+        return usage_id_;
     }
     
     /**
-     * @brief       Get the help key of the argument.
-     * @return      The help key of the argument.
+     * @brief       Get the help id of the argument.
+     * @return      The help id of the argument.
      */
-    inline const string_type& get_help_key() const noexcept
+    inline const string_type& get_help_id() const noexcept
     {
-        return help_ky_;
+        return help_id_;
     }
     
     /**
-     * @brief       Allows knowing whether an keyless argument has a specified key.
-     * @param       ky : The key to check.
+     * @brief       Allows knowing whether an keyless argument has a specified id.
+     * @param       id : The id to check.
      * @return      If function was successfull true is returned, otherwise false is returned.
      */
-    bool check_key(const string_type& ky) const noexcept override
+    bool has_id(const string_type& id) const noexcept override
     {
-        return usage_ky_ == ky || help_ky_ == ky;
+        return usage_id_ == id || help_id_ == id;
     }
     
     /**
-     * @brief       Get the necessary length to print the help keys in standard output.
-     * @return      The necessary length to print the help keys in standard output.
+     * @brief       Get the necessary length to print the help IDs in standard output.
+     * @return      The necessary length to print the help IDs in standard output.
      */
-    inline std::size_t get_short_keys_length() const noexcept override
+    inline std::size_t get_short_ids_length() const noexcept override
     {
         if (base_arg_type::description_is_empty())
         {
             return 0;
         }
         
-        return lowlevel::addm(help_ky_.length(), 2);
+        return lowlevel::addm(help_id_.length(), 2);
     }
     
     /**
      * @brief       Only used for polymorphic propose.
      * @return      0 is returned always.
      */
-    inline std::size_t get_long_keys_length() const noexcept override
+    inline std::size_t get_long_ids_length() const noexcept override
     {
         return 0;
     }
     
     /**
-     * @brief       Print the argument usage key in standard output for usage sentence.
+     * @brief       Print the argument usage ID in standard output for usage sentence.
      */
-    inline void print_usage_key() const
+    inline void print_usage_id() const
     {
         if (base_arg_type::flag_is_set(arg_flags::ALLWAYS_REQUIRED))
         {
-            std::cout << " " << usage_ky_;
+            std::cout << " " << usage_id_;
         }
         else
         {
-            std::cout << " [" << usage_ky_ << "]";
+            std::cout << " [" << usage_id_ << "]";
         }
         
         if (value_arg_type::get_max_values() > 1)
@@ -249,7 +249,7 @@ public:
             return;
         }
         
-        std::size_t current_id_len = speed::lowlevel::addm(help_ky_.length(), 2);
+        std::size_t current_id_len = speed::lowlevel::addm(help_id_.length(), 2);
         std::size_t total_id_len = speed::lowlevel::addm(short_id_len, long_id_len);
         std::size_t i;
     
@@ -258,7 +258,7 @@ public:
             std::cout << ' ';
         }
     
-        std::cout << help_ky_ << "  ";
+        std::cout << help_id_ << "  ";
         
         if (current_id_len < total_id_len)
         {
@@ -285,11 +285,11 @@ public:
     }
 
 private:
-    /** The key used to reference an arguments during the help usage sentence display. */
-    string_type usage_ky_;
+    /** The id used to reference an arguments during the help usage sentence display. */
+    string_type usage_id_;
     
-    /** The key used to reference an arguments during the help display. */
-    string_type help_ky_;
+    /** The id used to reference an arguments during the help display. */
+    string_type help_id_;
     
     friend class basic_arg_parser<TpAllocator>;
 };

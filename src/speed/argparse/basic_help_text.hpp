@@ -168,7 +168,7 @@ private:
 };
 
 
-/** Class that represents a text in the help information with 8 bits characters. */
+/** Class that represents a text a the help menu. */
 using help_text = basic_help_text<std::allocator<int>>;
 
 

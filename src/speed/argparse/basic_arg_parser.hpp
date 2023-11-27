@@ -58,7 +58,7 @@ public:
     using allocator_type = typename TpAllocator::template rebind<T>::other;
     
     /** Class that represents a text in the help information.*/
-    using ihelp_text_type = i_help_text;
+    using i_help_text_type = i_help_text;
     
     /** Class that represents a text in the help information.*/
     using help_text_type = basic_help_text<TpAllocator>;
@@ -173,7 +173,7 @@ public:
             , arg_desc_indentation_(arg_desc_indentation)
             , max_desc_line_length_(max_desc_line_length)
             , desc_new_line_indentation_(desc_new_line_indentation)
-            , ihlp_text_list_()
+            , i_hlp_text_list_()
             , default_hlp_menu_id_(std::forward<TpString2_>(default_hlp_menu_id))
             , hlp_arg_map_()
             , hlp_menus_()
@@ -186,13 +186,19 @@ public:
             , relational_constrs_()
             , flgs_(flgs)
             , err_flgs_(arg_parser_error_flags::NIL)
+            , help_text_type_alloc_()
+            , key_arg_type_alloc_()
+            , help_arg_type_alloc_()
+            , version_arg_type_alloc_()
+            , key_value_arg_type_alloc_()
+            , keyless_arg_type_alloc_()
     {
         if (default_hlp_menu_id_.empty())
         {
             throw default_help_menu_id_empty_exception();
         }
     
-        hlp_menus_.insert(std::make_pair(default_hlp_menu_id_, vector_type<ihelp_text_type*>()));
+        hlp_menus_.insert(std::make_pair(default_hlp_menu_id_, vector_type<i_help_text_type*>()));
     }
     
     /**
@@ -212,7 +218,7 @@ public:
             , arg_desc_indentation_(std::move(rhs.arg_desc_indentation_))
             , max_desc_line_length_(std::move(rhs.max_desc_line_length_))
             , desc_new_line_indentation_(std::move(rhs.desc_new_line_indentation_))
-            , ihlp_text_list_(std::move(rhs.ihlp_text_list_))
+            , i_hlp_text_list_(std::move(rhs.i_hlp_text_list_))
             , default_hlp_menu_id_(std::move(rhs.default_hlp_menu_id_))
             , hlp_arg_map_(std::move(rhs.hlp_arg_map_))
             , hlp_menus_ (std::move(rhs.hlp_menus_))
@@ -225,6 +231,12 @@ public:
             , relational_constrs_(std::move(relational_constrs_))
             , flgs_(std::move(rhs.flgs_))
             , err_flgs_(std::move(rhs.err_flgs_))
+            , help_text_type_alloc_(std::move(rhs.help_text_type_alloc_))
+            , key_arg_type_alloc_(std::move(rhs.key_arg_type_alloc_))
+            , help_arg_type_alloc_(std::move(rhs.help_arg_type_alloc_))
+            , version_arg_type_alloc_(std::move(rhs.version_arg_type_alloc_))
+            , key_value_arg_type_alloc_(std::move(rhs.key_value_arg_type_alloc_))
+            , keyless_arg_type_alloc_(std::move(rhs.keyless_arg_type_alloc_))
     {
         rhs.arg_desc_indentation_ = 0;
         rhs.current_vers_arg_ = nullptr;
@@ -236,9 +248,9 @@ public:
      */
     ~basic_arg_parser()
     {
-        for (auto& x : ihlp_text_list_)
+        for (auto& x : i_hlp_text_list_)
         {
-            delete_ihelp_text(x);
+            delete_i_help_text(x);
         }
     
         current_vers_arg_ = nullptr;
@@ -264,7 +276,7 @@ public:
             std::swap(arg_desc_indentation_, rhs.arg_desc_indentation_);
             std::swap(max_desc_line_length_, rhs.max_desc_line_length_);
             std::swap(desc_new_line_indentation_, rhs.desc_new_line_indentation_);
-            ihlp_text_list_ = std::move(rhs.ihlp_text_list_);
+            i_hlp_text_list_ = std::move(rhs.i_hlp_text_list_);
             default_hlp_menu_id_ = std::move(rhs.default_hlp_menu_id_);
             hlp_arg_map_ = std::move(rhs.hlp_arg_map_);
             hlp_menus_ = std::move(rhs.hlp_menus_);
@@ -276,24 +288,40 @@ public:
             std::swap(max_unrecog_args_, rhs.max_unrecog_args_);
             flgs_ = std::move(rhs.flgs_);
             err_flgs_ = std::move(rhs.err_flgs_);
+            help_text_type_alloc_ = std::move(rhs.help_text_type_alloc_);
+            key_arg_type_alloc_ = std::move(rhs.key_arg_type_alloc_);
+            help_arg_type_alloc_ = std::move(rhs.help_arg_type_alloc_);
+            version_arg_type_alloc_ = std::move(rhs.version_arg_type_alloc_);
+            key_value_arg_type_alloc_ = std::move(rhs.key_value_arg_type_alloc_);
+            keyless_arg_type_alloc_ = std::move(rhs.keyless_arg_type_alloc_);
         }
         
         return *this;
     }
     
     /**
-     * @brief       Add a string that represents a text in the help information.
+     * @brief       Add the description text of the program.
      * @param       desc : Argument description content.
      * @param       hlp_menus_ids : The help menus ids in which insert the description.
+     */
+    // TODO[P1](KillianValverde@gmail.com): Implement the description concept.
+    // template<typename TpString1_, typename TpStringVector_ = vector_type<string_type>>
+    // void add_description(TpString1_&& desc, TpStringVector_&& hlp_menus_ids = {})
+    // {
+    // }
+    
+    /**
+     * @brief       Add a string that represents a text in the help information.
+     * @param       desc : Argument description content.
+     * @param       hlp_menus_ids : The help menus ids in which insert the text.
      */
     template<typename TpString1_, typename TpStringVector_ = vector_type<string_type>>
     void add_help_text(TpString1_&& desc, TpStringVector_&& hlp_menus_ids = {})
     {
-        allocator_type<help_text_type> help_text_type_alloc;
-        help_text_type* help_text = help_text_type_alloc.allocate(1);
-        help_text_type_alloc.construct(help_text, std::forward<TpString1_>(desc));
+        help_text_type* help_text = help_text_type_alloc_.allocate(1);
+        help_text_type_alloc_.construct(help_text, std::forward<TpString1_>(desc));
         
-        ihlp_text_list_.push_back(help_text);
+        i_hlp_text_list_.push_back(help_text);
         add_help_menu_entry(std::forward<TpStringVector_>(hlp_menus_ids), help_text);
     }
     
@@ -338,34 +366,21 @@ public:
             }
         }
     
-        allocator_type<key_arg_type> key_arg_type_alloc;
-        key_arg_type* ky_arg = key_arg_type_alloc.allocate(1);
-        key_arg_type_alloc.construct(ky_arg,
-                                     std::forward<TpString1_>(desc),
-                                     std::forward<TpString2_>(err_id),
-                                     flgs,
-                                     get_arg_key_list_from_strings(kys),
-                                     this);
+        key_arg_type* ky_arg = key_arg_type_alloc_.allocate(1);
+        key_arg_type_alloc_.construct(ky_arg,
+                                      std::forward<TpString1_>(desc),
+                                      std::forward<TpString2_>(err_id),
+                                      flgs,
+                                      get_arg_key_list_from_strings(kys),
+                                      this);
         
         for (auto& x : kys)
         {
-            // TODO(KillianValverde@gmail.com): Check this if.
-            if (std::is_rvalue_reference<TpStringVector1_&&>::value)
-            {
-                bse_arg_map_.insert(std::make_pair(std::move(x),
-                                                   static_cast<base_arg_type*>(ky_arg)));
-            }
-            else
-            {
-                bse_arg_map_.insert(std::make_pair(x, static_cast<base_arg_type*>(ky_arg)));
-            }
-        }
-        if (std::is_rvalue_reference<TpStringVector1_&&>::value)
-        {
-            kys.clear();
+            bse_arg_map_.emplace(std::is_rvalue_reference<TpStringVector1_&&>::value ?
+                                         std::move(x) : x, static_cast<base_arg_type*>(ky_arg));
         }
         
-        ihlp_text_list_.push_back(ky_arg);
+        i_hlp_text_list_.push_back(ky_arg);
         if (!ky_arg->description_is_empty())
         {
             add_help_menu_entry(std::forward<TpStringVector2_>(hlp_menus_ids), ky_arg);
@@ -416,44 +431,28 @@ public:
             }
         }
         
-        auto arg_ky_list = get_arg_key_list_from_strings(kys);
-        
         if (flgs_.is_set(arg_parser_flags::EXIT_ON_PRINT_HELP))
         {
             flgs |= arg_flags::IS_TERMINAL;
         }
     
-        allocator_type<help_arg_type> help_arg_type_alloc;
-        help_arg_type* help_arg = help_arg_type_alloc.allocate(1);
-        help_arg_type_alloc.construct(help_arg,
-                                      std::forward<TpString1_>(desc),
-                                      std::forward<TpString2_>(err_id),
-                                      flgs,
-                                      std::move(arg_ky_list),
-                                      this);
+        help_arg_type* help_arg = help_arg_type_alloc_.allocate(1);
+        help_arg_type_alloc_.construct(help_arg,
+                                       std::forward<TpString1_>(desc),
+                                       std::forward<TpString2_>(err_id),
+                                       flgs,
+                                       get_arg_key_list_from_strings(kys),
+                                       this);
     
         for (auto& x : kys)
         {
             hlp_arg_map_.insert(std::make_pair(x, help_arg));
-            
-            if (std::is_rvalue_reference<TpStringVector1_&&>::value)
-            {
-                bse_arg_map_.insert(std::make_pair(std::move(x),
-                                                   static_cast<base_arg_type*>(help_arg)));
-            }
-            else
-            {
-                bse_arg_map_.insert(std::make_pair(x, static_cast<base_arg_type*>(help_arg)));
-            }
-        }
-    
-        if (std::is_rvalue_reference<TpStringVector1_&&>::value)
-        {
-            kys.clear();
+
+            bse_arg_map_.emplace(std::is_rvalue_reference<TpStringVector1_&&>::value ?
+                                         std::move(x) : x, static_cast<base_arg_type*>(help_arg));
         }
         
-        ihlp_text_list_.push_back(help_arg);
-    
+        i_hlp_text_list_.push_back(help_arg);
         if (!help_arg->description_is_empty())
         {
             add_help_menu_entry(std::forward<TpStringVector2_>(hlp_menus_ids), help_arg);
@@ -511,42 +510,27 @@ public:
             throw version_arg_already_exists_exception();
         }
     
-        auto arg_ky_list = get_arg_key_list_from_strings(kys);
-    
         if (flgs_.is_set(arg_parser_flags::EXIT_ON_PRINT_VERSION))
         {
             flgs |= arg_flags::IS_TERMINAL;
         }
     
-        allocator_type<version_arg_type> version_arg_type_alloc;
-        version_arg_type* vers_arg = version_arg_type_alloc.allocate(1);
-        version_arg_type_alloc.construct(vers_arg,
-                                         std::forward<TpString1_>(desc),
-                                         std::forward<TpString3_>(err_id),
-                                         flgs,
-                                         std::move(arg_ky_list),
-                                         std::forward<TpString2_>(vers_information),
-                                         this);
+        version_arg_type* vers_arg = version_arg_type_alloc_.allocate(1);
+        version_arg_type_alloc_.construct(vers_arg,
+                                          std::forward<TpString1_>(desc),
+                                          std::forward<TpString3_>(err_id),
+                                          flgs,
+                                          get_arg_key_list_from_strings(kys),
+                                          std::forward<TpString2_>(vers_information),
+                                          this);
     
         for (auto& x : kys)
         {
-            if (std::is_rvalue_reference<TpStringVector1_&&>::value)
-            {
-                bse_arg_map_.insert(std::make_pair(std::move(x),
-                                                   static_cast<base_arg_type*>(vers_arg)));
-            }
-            else
-            {
-                bse_arg_map_.insert(std::make_pair(x, static_cast<base_arg_type*>(vers_arg)));
-            }
-        }
-    
-        if (std::is_rvalue_reference<TpStringVector1_&&>::value)
-        {
-            kys.clear();
+            bse_arg_map_.emplace(std::is_rvalue_reference<TpStringVector1_&&>::value ?
+                                         std::move(x) : x, static_cast<base_arg_type*>(vers_arg));
         }
         
-        ihlp_text_list_.push_back(vers_arg);
+        i_hlp_text_list_.push_back(vers_arg);
         current_vers_arg_ = vers_arg;
     
         if (!vers_arg->description_is_empty())
@@ -672,41 +656,25 @@ public:
             }
         }
     
-        auto arg_ky_list = get_arg_key_list_from_strings(kys);
-    
-        allocator_type<key_value_arg_type> key_value_arg_type_alloc;
-        key_value_arg_type* ky_val_arg = key_value_arg_type_alloc.allocate(1);
-        key_value_arg_type_alloc.construct(ky_val_arg,
-                                           std::forward<TpString1_>(desc),
-                                           std::forward<TpString2_>(err_id),
-                                           flgs,
-                                           std::move(arg_ky_list),
-                                           min_vals,
-                                           max_vals,
-                                           std::forward<TpArgValueTypesVector_>(vals_types),
-                                           std::forward<TpStringVector2_>(regx_collection),
-                                           this);
+        key_value_arg_type* ky_val_arg = key_value_arg_type_alloc_.allocate(1);
+        key_value_arg_type_alloc_.construct(ky_val_arg,
+                                            std::forward<TpString1_>(desc),
+                                            std::forward<TpString2_>(err_id),
+                                            flgs,
+                                            get_arg_key_list_from_strings(kys),
+                                            min_vals,
+                                            max_vals,
+                                            std::forward<TpArgValueTypesVector_>(vals_types),
+                                            std::forward<TpStringVector2_>(regx_collection),
+                                            this);
     
         for (auto& x : kys)
         {
-            if (std::is_rvalue_reference<TpStringVector1_&&>::value)
-            {
-                bse_arg_map_.insert(std::make_pair(std::move(x),
-                                                   static_cast<base_arg_type*>(ky_val_arg)));
-            }
-            else
-            {
-                bse_arg_map_.insert(std::make_pair(x, static_cast<base_arg_type*>(ky_val_arg)));
-            }
-        }
-    
-        if (std::is_rvalue_reference<TpStringVector1_&&>::value)
-        {
-            kys.clear();
+            bse_arg_map_.emplace(std::is_rvalue_reference<TpStringVector1_&&>::value ?
+                                         std::move(x) : x, static_cast<base_arg_type*>(ky_val_arg));
         }
         
-        ihlp_text_list_.push_back(ky_val_arg);
-    
+        i_hlp_text_list_.push_back(ky_val_arg);
         if (!ky_val_arg->description_is_empty())
         {
             add_help_menu_entry(std::forward<TpStringVector3_>(hlp_menus_ids), ky_val_arg);
@@ -767,31 +735,30 @@ public:
             throw key_already_exists_exception();
         }
     
-        allocator_type<keyless_arg_type> foreign_arg_type_alloc;
-        keyless_arg_type* forgn_arg = foreign_arg_type_alloc.allocate(1);
-        foreign_arg_type_alloc.construct(forgn_arg,
-                                         std::forward<TpString3_>(desc),
-                                         std::forward<TpString4_>(err_id),
-                                         flgs,
-                                         min_vals,
-                                         max_vals,
-                                         std::forward<TpArgValueTypesVector_>(vals_types),
-                                         std::forward<TpStringVector1_>(regx_collection),
-                                         usage_ky,
-                                         help_ky,
-                                         this);
+        keyless_arg_type* kyless_arg = keyless_arg_type_alloc_.allocate(1);
+        keyless_arg_type_alloc_.construct(kyless_arg,
+                                          std::forward<TpString3_>(desc),
+                                          std::forward<TpString4_>(err_id),
+                                          flgs,
+                                          min_vals,
+                                          max_vals,
+                                          std::forward<TpArgValueTypesVector_>(vals_types),
+                                          std::forward<TpStringVector1_>(regx_collection),
+                                          usage_ky,
+                                          help_ky,
+                                          this);
         
-        bse_arg_map_.insert(std::make_pair(std::forward<TpString1_>(usage_ky),
-                                           static_cast<base_arg_type*>(forgn_arg)));
-        bse_arg_map_.insert(std::make_pair(std::forward<TpString2_>(help_ky),
-                                           static_cast<base_arg_type*>(forgn_arg)));
+        bse_arg_map_.emplace(std::forward<TpString1_>(usage_ky),
+                             static_cast<base_arg_type*>(kyless_arg));
+        bse_arg_map_.emplace(std::forward<TpString2_>(help_ky),
+                             static_cast<base_arg_type*>(kyless_arg));
         
-        ihlp_text_list_.push_back(forgn_arg);
-        kyless_args_list_.push_back(forgn_arg);
-    
-        if (!forgn_arg->description_is_empty())
+        kyless_args_list_.push_back(kyless_arg);
+
+        i_hlp_text_list_.push_back(kyless_arg);
+        if (!kyless_arg->description_is_empty())
         {
-            add_help_menu_entry(std::forward<TpStringVector2_>(hlp_menus_ids), forgn_arg);
+            add_help_menu_entry(std::forward<TpStringVector2_>(hlp_menus_ids), kyless_arg);
         }
     }
     
@@ -1042,7 +1009,7 @@ public:
         }
         
         // Set all arguments as parsed.
-        for (auto& x : ihlp_text_list_)
+        for (auto& x : i_hlp_text_list_)
         {
             if ((bse_arg = dynamic_cast<base_arg_type*>(x)) != nullptr)
             {
@@ -1464,9 +1431,9 @@ public:
      */
     void print_help(const string_type& hlp_menu_id = string_type()) const
     {
-        typename unordered_map_type<string_type, vector_type<ihelp_text_type*>>::const_iterator
+        typename unordered_map_type<string_type, vector_type<i_help_text_type*>>::const_iterator
                 help_menus_it;
-        const vector_type<ihelp_text_type*> *hlp_menu_entries;
+        const vector_type<i_help_text_type*> *hlp_menu_entries;
         base_arg_type* bse_arg;
         key_arg_type* ky_arg;
         std::size_t n_ky_args = 0;
@@ -1503,13 +1470,13 @@ public:
                 bse_arg = dynamic_cast<base_arg_type*>(x);
                 if (bse_arg != nullptr)
                 {
-                    curr_id_length = bse_arg->get_short_keys_length();
+                    curr_id_length = bse_arg->get_short_ids_length();
                     if (shrt_id_length < curr_id_length)
                     {
                         shrt_id_length = curr_id_length;
                     }
     
-                    curr_id_length = bse_arg->get_long_keys_length();
+                    curr_id_length = bse_arg->get_long_ids_length();
                     if (lng_id_length < curr_id_length)
                     {
                         lng_id_length = curr_id_length;
@@ -1522,7 +1489,7 @@ public:
         if (flgs_.is_set(arg_parser_flags::PRINT_USAGE_WHEN_PRINT_HELP))
         {
             // Get the number of no terminal key arguments.
-            for (auto& x : ihlp_text_list_)
+            for (auto& x : i_hlp_text_list_)
             {
                 ky_arg = dynamic_cast<key_arg_type*>(x);
                 
@@ -1591,7 +1558,7 @@ public:
     
             for (auto& x : kyless_args_list_)
             {
-                x->print_usage_key();
+                x->print_usage_id();
             }
     
             std::cout << "\n\n";
@@ -1660,7 +1627,7 @@ public:
             
             if (err_flgs_.is_set(arg_parser_error_flags::ARGS_ERROR))
             {
-                for (auto& x : ihlp_text_list_)
+                for (auto& x : i_hlp_text_list_)
                 {
                     base_arg = dynamic_cast<base_arg_type*>(x);
                     if (base_arg != nullptr && base_arg->there_are_errors())
@@ -1916,7 +1883,7 @@ private:
      * @param       ihlp_text : The entry to add in the help menu.
      */
     template<typename TpStringVector_ = vector_type<string_type>>
-    void add_help_menu_entry(TpStringVector_&& hlp_menus_ids, ihelp_text_type *ihlp_text)
+    void add_help_menu_entry(TpStringVector_&& hlp_menus_ids, i_help_text_type *ihlp_text)
     {
         if (hlp_menus_ids.empty())
         {
@@ -1938,12 +1905,12 @@ private:
                     if (std::is_rvalue_reference<TpStringVector_&&>::value)
                     {
                         res = hlp_menus_.insert(std::make_pair(std::move(hlp_menu_id),
-                                                               vector_type<ihelp_text_type*>()));
+                                                               vector_type<i_help_text_type*>()));
                     }
                     else
                     {
                         res = hlp_menus_.insert(std::make_pair(hlp_menu_id,
-                                                               vector_type<ihelp_text_type*>()));
+                                                               vector_type<i_help_text_type*>()));
                     }
                     
                     if (res.second)
@@ -2188,7 +2155,7 @@ private:
         base_arg_type* bse_arg;
         bool in = false;
         
-        for (auto& x : ihlp_text_list_)
+        for (auto& x : i_hlp_text_list_)
         {
             if ((bse_arg = dynamic_cast<base_arg_type*>(x)) != nullptr)
             {
@@ -2239,7 +2206,7 @@ private:
     {
         key_arg_type* key_arg;
         
-        for (auto& x : ihlp_text_list_)
+        for (auto& x : i_hlp_text_list_)
         {
             if ((key_arg = dynamic_cast<key_arg_type*>(x)) != nullptr)
             {
@@ -2290,7 +2257,7 @@ private:
      * @brief       Destroy and deallocate the specified argument.
      * @param       arg : The specified argument.
      */
-    inline void delete_ihelp_text(ihelp_text_type *&arg) noexcept
+    inline void delete_i_help_text(i_help_text_type *&arg) noexcept
     {
         help_text_type* hlp_text;
         key_arg_type* ky_arg;
@@ -2369,7 +2336,7 @@ private:
     std::size_t desc_new_line_indentation_;
     
     /** Collection that contains all the arguments. */
-    vector_type<ihelp_text_type*> ihlp_text_list_;
+    vector_type<i_help_text_type*> i_hlp_text_list_;
     
     /** The default help menu id. */
     string_type default_hlp_menu_id_;
@@ -2378,7 +2345,7 @@ private:
     unordered_map_type<string_type, help_arg_type*> hlp_arg_map_;
     
     /** Contains all help menus. */
-    unordered_map_type<string_type, vector_type<ihelp_text_type*>> hlp_menus_;
+    unordered_map_type<string_type, vector_type<i_help_text_type*>> hlp_menus_;
     
     /** Contains the current version argument. */
     version_arg_type* current_vers_arg_;
@@ -2406,6 +2373,24 @@ private:
     
     /** Error flags that allows knowing whether there are errors. */
     flags_type<arg_parser_error_flags> err_flgs_;
+
+    /** Alocator of the help_text_type. */
+    allocator_type<help_text_type> help_text_type_alloc_;
+
+    /** Alocator of the key_arg_type. */
+    allocator_type<key_arg_type> key_arg_type_alloc_;
+
+    /** Alocator of the help_arg_type. */
+    allocator_type<help_arg_type> help_arg_type_alloc_;
+
+    /** Alocator of the version_arg_type. */
+    allocator_type<version_arg_type> version_arg_type_alloc_;
+
+    /** Alocator of the key_value_arg_type. */
+    allocator_type<key_value_arg_type> key_value_arg_type_alloc_;
+
+    /** Alocator of the keyless_arg_type. */
+    allocator_type<keyless_arg_type> keyless_arg_type_alloc_;
     
     friend class basic_base_arg<TpAllocator>;
     friend class basic_key_arg<TpAllocator>;

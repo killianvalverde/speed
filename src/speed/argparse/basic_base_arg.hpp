@@ -286,71 +286,53 @@ public:
     {
         if (error_flag_is_set(arg_error_flags::ALLWAYS_REQUIRED_ERROR))
         {
-            std::cout << prog_name << ": ";
-            if (!get_error_id().empty())
-            {
-                if (colrs_enable)
-                {
-                    std::cout << speed::iostream::set_light_red_text
-                              << get_error_id() << ": "
-                              << speed::iostream::set_default_text;
-                }
-                else
-                {
-                    std::cout << get_error_id() << ": ";
-                }
-            }
-            std::cout << "Option is allways required\n";
+            print_error_message("Option is allways required", prog_name, colrs_enable);
         }
         if (error_flag_is_set(arg_error_flags::APPEAR_JUST_ONCE_ERROR))
         {
-            std::cout << prog_name << ": ";
-            if (!get_error_id().empty())
-            {
-                if (colrs_enable)
-                {
-                    std::cout << speed::iostream::set_light_red_text
-                              << get_error_id() << ": "
-                              << speed::iostream::set_default_text;
-                }
-                else
-                {
-                    std::cout << get_error_id() << ": ";
-                }
-            }
-            std::cout << "Option has appeared more than once\n";
+            print_error_message("Option has appeared more than once", prog_name, colrs_enable);
         }
     }
     
     /**
-     * @brief       Allows throwing an error to the user using the arguent and its syntax. This
-     *              method has been made for particular occasions in which an argument error can't
-     *              be detected by the argument parser.
+     * @brief       Allows throwing an error to the user using the argument and its syntax.
      * @param       err_message : The message to print in the standard output.
      * @param       prog_name : The name of the program.
      * @param       colrs_enable : If it is true, colors will be used during the print.
+     * @param       print_new_line : If it is true, a new line will be printed at the end of the 
+     *              error message.
      */
     void print_error_message(
             const string_type& err_message,
             const string_type& prog_name,
-            bool colrs_enable
+            bool colrs_enable,
+            bool print_new_line = true
     ) const
     {
         std::cout << prog_name << ": ";
-        if (!get_error_id().empty())
+        if (!err_id_.empty())
         {
             if (colrs_enable)
             {
                 std::cout << speed::iostream::set_light_red_text
-                          << get_error_id() << ": "
+                          << err_id_ << ": "
                           << speed::iostream::set_default_text;
             }
             else
             {
-                std::cout << get_error_id() << ": ";
+                std::cout << err_id_ << ": ";
             }
         }
-        std::cout << err_message << '\n';
+
+        if (!err_message.empty())
+        {
+            std::cout << err_message;
+        }
+
+        if (print_new_line)
+        {
+            std::cout << '\n';
+        }
     }
     
     /**
@@ -379,23 +361,23 @@ public:
     }
     
     /**
-     * @brief       Allows knowing whether an argument has a specified key.
-     * @param       ky : The key to check.
+     * @brief       Allows knowing whether an argument has a specified id.
+     * @param       id : The id to check.
      * @return      If function was successfull true is returned, otherwise false is returned.
      */
-    virtual bool check_key(const string_type& ky) const noexcept = 0;
+    virtual bool has_id(const string_type& id) const noexcept = 0;
     
     /**
-     * @brief       Get the necessary length to print short arguments keys in standard output.
-     * @return      The necessary length to print short arguments keys in standard output.
+     * @brief       Get the necessary length to print short arguments IDs in standard output.
+     * @return      The necessary length to print short arguments IDs in standard output.
      */
-    virtual std::size_t get_short_keys_length() const noexcept = 0;
+    virtual std::size_t get_short_ids_length() const noexcept = 0;
     
     /**
-     * @brief       Get the necessary length to print long arguments keys in standard output.
-     * @return      The necessary length to print long arguments keys in standard output.
+     * @brief       Get the necessary length to print long arguments IDs in standard output.
+     * @return      The necessary length to print long arguments IDs in standard output.
      */
-    virtual std::size_t get_long_keys_length() const noexcept = 0;
+    virtual std::size_t get_long_ids_length() const noexcept = 0;
     
     /**
      * @brief       Print the argument information for help menu.

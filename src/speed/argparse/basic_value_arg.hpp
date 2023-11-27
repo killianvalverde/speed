@@ -437,40 +437,14 @@ public:
         
         if (base_arg_type::error_flag_is_set(arg_error_flags::MIN_VALUES_ERROR))
         {
-            std::cout << prog_name << ": ";
-            if (!base_arg_type::get_error_id().empty())
-            {
-                if (colrs_enable)
-                {
-                    std::cout << speed::iostream::set_light_red_text
-                              << base_arg_type::get_error_id() << ": "
-                              << speed::iostream::set_default_text;
-                }
-                else
-                {
-                    std::cout << base_arg_type::get_error_id() << ": ";
-                }
-            }
+            base_arg_type::print_error_message(string_type(), prog_name, colrs_enable, false);
             std::cout << "Option requires at least " << min_vals_
                       << (min_vals_ > 1 ? " arguments" : " argument") << '\n';
         }
         
         if (base_arg_type::error_flag_is_set(arg_error_flags::MAX_VALUES_ERROR))
         {
-            std::cout << prog_name << ": ";
-            if (!base_arg_type::get_error_id().empty())
-            {
-                if (colrs_enable)
-                {
-                    std::cout << speed::iostream::set_light_red_text
-                              << base_arg_type::get_error_id() << ": "
-                              << speed::iostream::set_default_text;
-                }
-                else
-                {
-                    std::cout << base_arg_type::get_error_id() << ": ";
-                }
-            }
+            base_arg_type::print_error_message(string_type(), prog_name, colrs_enable, false);
             std::cout << "Option must have a maximum of " << max_vals_
                       << (max_vals_ > 1 ? " arguments" : " argument") << '\n';
         }

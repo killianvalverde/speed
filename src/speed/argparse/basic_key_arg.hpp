@@ -92,7 +92,7 @@ public:
                             std::forward<TpString2_>(err_id),
                             flgs,
                             compo)
-            , kys_vector_(std::forward<TpArgKeyVector_>(kys))
+            , kys_(std::forward<TpArgKeyVector_>(kys))
     {
         if (base_arg_type::error_id_is_empty() &&
             base_arg_type::flag_is_set(arg_flags::USE_FIRST_KEY_IF_ERROR_ID_EMPTY))
@@ -135,20 +135,20 @@ public:
         if (this != &rhs)
         {
             base_arg_type::operator =(std::move(rhs));
-            kys_vector_ = std::move(rhs.kys_vector_);
+            kys_ = std::move(rhs.kys_);
         }
     
         return *this;
     }
     
     /**
-     * @brief       Allows knowing whether an argument has a specified key.
-     * @param       ky : The key to check.
+     * @brief       Allows knowing whether an argument has a specified id.
+     * @param       id : The id to check.
      * @return      If function was successfull true is returned, otherwise false is returned.
      */
-    bool check_key(const string_type& ky) const noexcept override
+    bool has_id(const string_type& id) const noexcept override
     {
-        return std::find(kys_vector_.begin(), kys_vector_.end(), ky) != kys_vector_.end();
+        return std::find(kys_.begin(), kys_.end(), id) != kys_.end();
     }
     
     /**
@@ -159,12 +159,12 @@ public:
      */
     const arg_key_type& get_front_key() const
     {
-        if (kys_vector_.empty())
+        if (kys_.empty())
         {
             throw value_not_found_exception();
         }
         
-        return kys_vector_.front();
+        return kys_.front();
     }
     
     /**
@@ -176,19 +176,19 @@ public:
      */
     const arg_key_type& get_key_at(std::size_t indx) const
     {
-        if (kys_vector_.size() <= indx)
+        if (kys_.size() <= indx)
         {
             throw value_not_found_exception();
         }
         
-        return kys_vector_.at(indx);
+        return kys_.at(indx);
     }
     
     /**
-     * @brief       Get the necessary length to print short arguments key in standard output.
-     * @return      The necessary length to print short arguments key in standard output.
+     * @brief       Get the necessary length to print short arguments IDs in standard output.
+     * @return      The necessary length to print short arguments IDs in standard output.
      */
-    std::size_t get_short_keys_length() const noexcept override
+    std::size_t get_short_ids_length() const noexcept override
     {
         if (base_arg_type::description_is_empty())
         {
@@ -197,11 +197,11 @@ public:
         
         std::size_t kys_len = 0;
         
-        for (auto& x : kys_vector_)
+        for (auto& x : kys_)
         {
             if (!x.is_prefix_long())
             {
-                speed::lowlevel::try_addml(&kys_len, x.get_key().length(), 2);
+                speed::lowlevel::try_addml(&kys_len, x.get_string_length(), 2);
             }
         }
         
@@ -209,10 +209,10 @@ public:
     }
     
     /**
-     * @brief       Get the necessary length to print long arguments key in standard output.
-     * @return      The necessary length to print long arguments key in standard output.
+     * @brief       Get the necessary length to print long arguments IDs in standard output.
+     * @return      The necessary length to print long arguments IDs in standard output.
      */
-    std::size_t get_long_keys_length() const noexcept override
+    std::size_t get_long_ids_length() const noexcept override
     {
         if (base_arg_type::description_is_empty())
         {
@@ -221,11 +221,11 @@ public:
         
         std::size_t kys_len = 0;
         
-        for (auto& x : kys_vector_)
+        for (auto& x : kys_)
         {
             if (x.is_prefix_long())
             {
-                speed::lowlevel::try_addml(&kys_len, x.get_key().length(), 2);
+                speed::lowlevel::try_addml(&kys_len, x.get_string_length(), 2);
             }
         }
         
@@ -264,26 +264,26 @@ public:
             std::cout << ' ';
         }
         
-        for (auto it = kys_vector_.cbegin(); it != kys_vector_.cend(); it++)
+        for (auto it = kys_.cbegin(); it != kys_.cend(); it++)
         {
             if (!it->is_prefix_long())
             {
                 if (n_args_printd > 0)
                 {
                     std::cout << ", " << *it;
-                    speed::lowlevel::try_addml(&current_id_len, it->get_key().length(), 2);
+                    speed::lowlevel::try_addml(&current_id_len, it->get_string_length(), 2);
                 }
                 else
                 {
                     std::cout << *it;
-                    speed::lowlevel::try_addm(&current_id_len, it->get_key().length());
+                    speed::lowlevel::try_addm(&current_id_len, it->get_string_length());
                 }
     
                 speed::lowlevel::try_addm(&n_args_printd, 1);
             }
         }
         
-        if (n_args_printd < kys_vector_.size() && n_args_printd > 0)
+        if (n_args_printd < kys_.size() && n_args_printd > 0)
         {
             std::cout << ", ";
             speed::lowlevel::try_addm(&current_id_len, 2);
@@ -299,19 +299,19 @@ public:
         
         n_args_printd = 0;
         current_id_len = 0;
-        for (auto it = kys_vector_.cbegin(); it != kys_vector_.cend(); it++)
+        for (auto it = kys_.cbegin(); it != kys_.cend(); it++)
         {
             if (it->is_prefix_long())
             {
                 if (n_args_printd > 0)
                 {
                     std::cout << ", " << *it;
-                    speed::lowlevel::try_addml(&current_id_len, it->get_key().length(), 2);
+                    speed::lowlevel::try_addml(&current_id_len, it->get_string_length(), 2);
                 }
                 else
                 {
                     std::cout << *it;
-                    speed::lowlevel::try_addm(&current_id_len, it->get_key().length());
+                    speed::lowlevel::try_addm(&current_id_len, it->get_string_length());
                 }
     
                 speed::lowlevel::try_addm(&n_args_printd, 1);
@@ -354,7 +354,7 @@ protected:
     {
         if (this != &rhs)
         {
-            kys_vector_ = rhs.kys_vector_;
+            kys_ = rhs.kys_;
         }
         
         return *this;
@@ -369,7 +369,7 @@ protected:
     {
         if (this != &rhs)
         {
-            kys_vector_ = std::move(rhs.kys_vector_);
+            kys_ = std::move(rhs.kys_);
         }
         
         return *this;
@@ -377,7 +377,7 @@ protected:
 
 private:
     /** Argument keys collection. */
-    vector_type<arg_key_type> kys_vector_;
+    vector_type<arg_key_type> kys_;
     
     friend class basic_arg_parser<TpAllocator>;
 };
