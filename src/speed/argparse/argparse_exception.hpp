@@ -121,9 +121,9 @@ public:
 
 
 /**
- * @brief       Class used to thrown exceptions when an argument is not found.
+ * @brief       Class used to thrown exceptions when an argument spedified doesn't exists.
  */
-class arg_not_found_exception : public argparse_exception
+class arg_doesnt_exists_exception : public argparse_exception
 {
 public:
     /**

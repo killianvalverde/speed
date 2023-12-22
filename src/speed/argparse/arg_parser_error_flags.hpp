@@ -49,7 +49,7 @@ enum class arg_parser_error_flags : std::uint8_t
     UNRECOGNIZED_ARGS_ERROR = 0x2,
     
     /** The argument parser has arguments whose relational constraints are violated. */
-    ARGS_RELATIONAL_CONSTRAINTS_ERROR = 0x4,
+    ARGS_DEPENDENCIES_ERROR = 0x4,
     
     /** All argument parser error flags. */
     ALL = 0x7

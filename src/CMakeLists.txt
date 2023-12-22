@@ -12,20 +12,20 @@ set(SPEED_ARGPARSE_SOURCE_FILES
         speed/argparse/arg_value_types.hpp
         speed/argparse/argparse_exception.hpp
         speed/argparse/argparse_forward_declarations.hpp
+        speed/argparse/args_dependencies_flags.hpp
         speed/argparse/basic_arg_key.hpp
         speed/argparse/basic_arg_parser.hpp
         speed/argparse/basic_arg_value.hpp
+        speed/argparse/basic_args_dependencies.hpp
         speed/argparse/basic_base_arg.hpp
         speed/argparse/basic_keyless_arg.hpp
         speed/argparse/basic_help_arg.hpp
         speed/argparse/basic_help_text.hpp
         speed/argparse/basic_key_arg.hpp
         speed/argparse/basic_key_value_arg.hpp
-        speed/argparse/basic_relational_constraint.hpp
         speed/argparse/basic_value_arg.hpp
         speed/argparse/basic_version_arg.hpp
         speed/argparse/i_help_text.hpp
-        speed/argparse/relational_constraint_types.hpp
         speed/argparse.hpp
 )
 

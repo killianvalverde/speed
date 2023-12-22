@@ -34,12 +34,12 @@
 #include "../stringutils.hpp"
 #include "arg_parser_error_flags.hpp"
 #include "arg_parser_flags.hpp"
-#include "relational_constraint_types.hpp"
+#include "args_dependencies_flags.hpp"
+#include "basic_args_dependencies.hpp"
 #include "basic_keyless_arg.hpp"
 #include "basic_help_arg.hpp"
 #include "basic_help_text.hpp"
 #include "basic_key_value_arg.hpp"
-#include "basic_relational_constraint.hpp"
 #include "basic_version_arg.hpp"
 
 
@@ -91,7 +91,7 @@ public:
     using arg_value_type = basic_arg_value<TpAllocator>;
     
     /** Class that represents a relational constraint for a set of arguments. */
-    using relational_constraint_type = basic_relational_constraint<TpAllocator>;
+    using args_dependencies_type = basic_args_dependencies<TpAllocator>;
     
     /** Class that represents a bit field */
     template<typename T>
@@ -183,7 +183,7 @@ public:
             , err_id_(std::forward<TpString3_>(err_id))
             , unrecog_args_()
             , max_unrecog_args_(max_unrecog_args)
-            , relational_constrs_()
+            , arg_dependencs_()
             , flgs_(flgs)
             , err_flgs_(arg_parser_error_flags::NIL)
             , help_text_type_alloc_()
@@ -228,7 +228,7 @@ public:
             , err_id_(std::move(rhs.err_id_))
             , unrecog_args_(std::move(rhs.unrecog_args_))
             , max_unrecog_args_(std::move(rhs.max_unrecog_args_))
-            , relational_constrs_(std::move(relational_constrs_))
+            , arg_dependencs_(std::move(arg_dependencs_))
             , flgs_(std::move(rhs.flgs_))
             , err_flgs_(std::move(rhs.err_flgs_))
             , help_text_type_alloc_(std::move(rhs.help_text_type_alloc_))
@@ -766,13 +766,13 @@ public:
      * @brief       Add arguments relational constraints to the parser.
      * @param       args : Arguments in which apply the constaints.
      * @param       constrs : Argument relational constraints to apply.
-     * @throw       speed::argparse::argument_not_found_exception : If there isn't any argument with
+     * @throw       speed::argparse::arg_doesnt_exists_exception : If there isn't any argument with
      *              one of the specified keys an exception is thrown.
      */
     template<typename TpStringVector = vector_type<string_type>>
-    void add_args_relational_constraints(
+    void add_args_dependencies(
             const TpStringVector& args,
-            relational_constraint_types constrs
+            args_dependencies_flags dependencs
     )
     {
         vector_type<base_arg_type*> bse_arg_vector;
@@ -780,145 +780,17 @@ public:
         
         for (auto& x : args)
         {
-            bse_arg = get_base_arg_reference(x);
+            bse_arg = get_base_arg(x);
             
             if (bse_arg == nullptr)
             {
-                throw arg_not_found_exception();
+                throw arg_doesnt_exists_exception();
             }
     
             bse_arg_vector.push_back(bse_arg);
         }
         
-        relational_constrs_.push_back(
-                relational_constraint_type(std::move(bse_arg_vector), constrs));
-    }
-    
-    /**
-     * @brief       Get a reference to a base argument.
-     * @param       ky : Id of the argument to get.
-     * @return      If function was successful the argument found is returned.
-     * @throw       speed::argparse::argument_not_found_exception : If there isn't any argument with
-     *              the specified key an exception is thrown.
-     */
-    const base_arg_type& get_base_arg(const string_type& ky) const
-    {
-        auto it = bse_arg_map_.find(ky);
-        
-        if (it != bse_arg_map_.end())
-        {
-            return *(it->second);
-        }
-        
-        throw arg_not_found_exception();
-    }
-    
-    /**
-     * @brief       Get a reference to a key argument.
-     * @param       ky : Key of the argument to get.
-     * @return      If function was successful the argument found is returned.
-     * @throw       speed::argparse::argument_not_found_exception : If there isn't any argument with
-     *              the specified key an exception is thrown.
-     * @throw       speed::argparse::bad_argument_type_exception : If the argument can't be cast to
-     *              the specified type an exception is thrown.
-     */
-    const key_arg_type& get_key_arg(const string_type& ky) const
-    {
-        auto it = bse_arg_map_.find(ky);
-        
-        if (it != bse_arg_map_.end())
-        {
-            key_arg_type* ky_arg = dynamic_cast<key_arg_type*>(it->second);
-            if (ky_arg == nullptr)
-            {
-                throw bad_arg_type_exception();
-            }
-            
-            return *ky_arg;
-        }
-    
-        throw arg_not_found_exception();
-    }
-    
-    /**
-     * @brief       Get a reference to a value argument.
-     * @param       ky : Key of the argument to get.
-     * @return      If function was successful the argument found is returned.
-     * @throw       speed::argparse::argument_not_found_exception : If there isn't any argument with
-     *              the specified key an exception is thrown.
-     * @throw       speed::argparse::bad_argument_type_exception : If the argument can't be cast to
-     *              the specified type an exception is thrown.
-     */
-    const value_arg_type& get_value_arg(const string_type& ky) const
-    {
-        auto it = bse_arg_map_.find(ky);
-        
-        if (it != bse_arg_map_.end())
-        {
-            value_arg_type* val_arg = dynamic_cast<value_arg_type*>(it->second);
-            if (val_arg == nullptr)
-            {
-                throw bad_arg_type_exception();
-            }
-    
-            return *val_arg;
-        }
-    
-        throw arg_not_found_exception();
-    }
-    
-    /**
-     * @brief       Get a reference to a key value argument.
-     * @param       ky : Key of the argument to get.
-     * @return      If function was successful the argument found is returned.
-     * @throw       speed::argparse::argument_not_found_exception : If there isn't any argument with
-     *              the specified key an exception is thrown.
-     * @throw       speed::argparse::bad_argument_type_exception : If the argument can't be cast to
-     *              the specified type an exception is thrown.
-     */
-    const key_value_arg_type& get_key_value_arg(const string_type& ky) const
-    {
-        auto it = bse_arg_map_.find(ky);
-        
-        if (it != bse_arg_map_.end())
-        {
-            key_value_arg_type* key_value_arg = dynamic_cast<key_value_arg_type*>(it->second);
-            if (key_value_arg == nullptr)
-            {
-                throw bad_arg_type_exception();
-            }
-    
-            return *key_value_arg;
-        }
-    
-        throw arg_not_found_exception();
-    }
-    
-    /**
-     * @brief       Get a reference to an keyless argument.
-     * @param       ky : Key of the argument to get.
-     * @return      If function was successful the argument found is returned.
-     * @throw       speed::argparse::argument_not_found_exception : If there isn't any argument with
-     *              the specified key an exception is thrown.
-     * @throw       speed::argparse::bad_argument_type_exception : If the argument can't be cast to
-     *              the specified type an exception is thrown.
-     */
-    const keyless_arg_type& get_keyless_arg(const string_type& ky) const
-    {
-        auto it = bse_arg_map_.find(ky);
-        
-        if (it != bse_arg_map_.end())
-        {
-            keyless_arg_type* foreign_arg = dynamic_cast<keyless_arg_type*>(it->second);
-            if (foreign_arg == nullptr)
-            {
-                throw bad_arg_type_exception();
-            }
-    
-            return *foreign_arg;
-        }
-    
-        throw arg_not_found_exception();
+        arg_dependencs_.push_back(args_dependencies_type(std::move(bse_arg_vector), dependencs));
     }
     
     /**
@@ -955,7 +827,7 @@ public:
             cur_argv = argv[i];
             
             // Normal arguments
-            if ((ky_arg = get_key_arg_reference(cur_argv)) != nullptr)
+            if ((ky_arg = get_key_arg(cur_argv)) != nullptr)
             {
                 ky_val_arg = dynamic_cast<key_value_arg_type*>(ky_arg);
                 if (ky_val_arg != nullptr)
@@ -1054,20 +926,35 @@ public:
      * @brief       Allows knowing whether an argument has been found in the program call.
      * @param       ky : Argument key to check.
      * @return      If function was successful true is returned, otherwise false is returned.
+     * @throw       speed::argparse::arg_doesnt_exists_exception : If there isn't any argument with
+     *              the specified key an exception is thrown.
      */
-    bool arg_found(const string_type& ky) const noexcept
+    bool arg_found(const string_type& ky) const
     {
-        base_arg_type* bse_arg = get_base_arg_reference(ky);
-        return bse_arg != nullptr && bse_arg->was_found();
+        base_arg_type* bse_arg = get_base_arg(ky);
+
+        if (bse_arg == nullptr)
+        {
+            throw arg_doesnt_exists_exception();
+        }
+
+        return bse_arg->was_found();
     }
     
     /**
      * @brief       Allows knowing whether the argument that represents the option to get the help
      *              information has been found in the program call.
      * @return      If function was successful true is returned, otherwise false is returned.
+     * @throw       speed::argparse::arg_doesnt_exists_exception : If there isn't any help argument 
+     *              with an exception is thrown.
      */
-    bool help_arg_found() const noexcept
+    bool help_arg_found() const
     {
+        if (hlp_arg_map_.empty())
+        {
+            throw arg_doesnt_exists_exception();
+        }
+
         for (auto& x : hlp_arg_map_)
         {
             if (x.second->was_found())
@@ -1083,28 +970,35 @@ public:
      * @brief       Allows knowing whether the argument that represents the option to get the
      *              version information has been found in the program call.
      * @return      If function was successful true is returned, otherwise false is returned.
+     * @throw       speed::argparse::arg_doesnt_exists_exception : If there isn't any version 
+     *              argument with an exception is thrown.
      */
-    bool version_arg_found() const noexcept
+    bool version_arg_found() const
     {
-        return (current_vers_arg_ != nullptr && current_vers_arg_->was_found());
+        if (current_vers_arg_ == nullptr)
+        {
+            throw arg_doesnt_exists_exception();
+        }
+
+        return current_vers_arg_->was_found();
     }
     
     /**
      * @brief       Get the first argument value with the specified key.
      * @param       ky : Key of the argument to get the value.
      * @return      The argument first value found.
-     * @throw       speed::argparse::argument_not_found_exception : If there isn't any argument with
-     *              the specified key an exception is thrown.
+     * @throw       speed::argparse::arg_doesnt_exists_exception : If there isn't any value argument 
+     *              with the specified key an exception is thrown.
      * @throw       speed::argparse::value_not_found_exception : If argument hasn't any value an
      *              exception is thrown.
      */
     const arg_value_type& get_front_arg_value(const string_type& ky) const
     {
-        value_arg_type* val_arg = get_value_arg_reference(ky);
+        value_arg_type* val_arg = get_value_arg(ky);
         
         if (val_arg == nullptr)
         {
-            throw arg_not_found_exception();
+            throw arg_doesnt_exists_exception();
         }
         
         return val_arg->get_front_value();
@@ -1117,8 +1011,8 @@ public:
      *              value.
      * @return      If function was successful the first argument value is returned, otherwise an
      *              argument value constructed with the default value is returned.
-     * @throw       speed::argparse::argument_not_found_exception : If there isn't any argument with
-     *              the specified key an exception is thrown.
+     * @throw       speed::argparse::arg_doesnt_exists_exception : If there isn't any value argument
+     *              with the specified key an exception is thrown.
      */
     template<typename TpString_>
     const arg_value_type& get_front_arg_value(
@@ -1126,11 +1020,11 @@ public:
             TpString_&& default_val
     ) const
     {
-        value_arg_type* val_arg = get_value_arg_reference(ky);
+        value_arg_type* val_arg = get_value_arg(ky);
         
         if (val_arg == nullptr)
         {
-            throw arg_not_found_exception();
+            throw arg_doesnt_exists_exception();
         }
         
         return val_arg->get_front_value(std::forward<TpString_>(default_val));
@@ -1140,7 +1034,7 @@ public:
      * @brief       Get the first argument value converted to target with the specified key.
      * @param       ky : Key of the argument to get the value.
      * @return      The argument first value found.
-     * @throw       speed::argparse::argument_not_found_exception : If there isn't any argument with
+     * @throw       speed::argparse::arg_doesnt_exists_exception : If there isn't any argument with
      *              the specified key an exception is thrown.
      * @throw       speed::argparse::value_not_found_exception : If argument hasn't any value an
      *              exception is thrown.
@@ -1150,11 +1044,11 @@ public:
     template<typename TpTarget_>
     TpTarget_ get_front_arg_value_as(const string_type& ky) const
     {
-        value_arg_type* val_arg = get_value_arg_reference(ky);
+        value_arg_type* val_arg = get_value_arg(ky);
         
         if (val_arg == nullptr)
         {
-            throw arg_not_found_exception();
+            throw arg_doesnt_exists_exception();
         }
         
         return val_arg->get_front_value().template as<TpTarget_>();
@@ -1166,7 +1060,7 @@ public:
      * @param       default_val : The value returned if the operatin fails.
      * @return      If function was successful the first argument value is returned, otherwise an
      *              argument value constructed with the default value is returned.
-     * @throw       speed::argparse::argument_not_found_exception : If there isn't any argument with
+     * @throw       speed::argparse::arg_doesnt_exists_exception : If there isn't any argument with
      *              the specified key an exception is thrown.
      */
     template<typename TpTarget_, typename TpDefaultValue_>
@@ -1175,11 +1069,11 @@ public:
             TpDefaultValue_&& default_val
     ) const
     {
-        value_arg_type* val_arg = get_value_arg_reference(ky);
+        value_arg_type* val_arg = get_value_arg(ky);
         
         if (val_arg == nullptr)
         {
-            throw arg_not_found_exception();
+            throw arg_doesnt_exists_exception();
         }
         
         if (val_arg->there_are_values())
@@ -1196,7 +1090,7 @@ public:
      * @param       ky : Key of the argument to get the value.
      * @param       indx : Position of the element.
      * @return      The element specified.
-     * @throw       speed::argparse::argument_not_found_exception : If there isn't any argument with
+     * @throw       speed::argparse::arg_doesnt_exists_exception : If there isn't any argument with
      *              the specified key an exception is thrown.
      * @throw       speed::argparse::value_not_found_exception : If there isn't any element in the
      *              specified position an exception is thrown.
@@ -1206,11 +1100,11 @@ public:
             std::size_t indx
     ) const
     {
-        value_arg_type* val_arg = get_value_arg_reference(ky);
+        value_arg_type* val_arg = get_value_arg(ky);
         
         if (val_arg == nullptr)
         {
-            throw arg_not_found_exception();
+            throw arg_doesnt_exists_exception();
         }
         
         return val_arg->get_value_at(indx);
@@ -1225,7 +1119,7 @@ public:
      * @return      If function was successful the argument value in the specified position is
      *              returned, otherwise an argument value constructed with the default value is
      *              returned.
-     * @throw       speed::argparse::argument_not_found_exception : If there isn't any argument with
+     * @throw       speed::argparse::arg_doesnt_exists_exception : If there isn't any argument with
      *              the specified key an exception is thrown.
      */
     template<typename TpString_>
@@ -1235,11 +1129,11 @@ public:
             TpString_&& default_val
     ) const
     {
-        value_arg_type* val_arg = get_value_arg_reference(ky);
+        value_arg_type* val_arg = get_value_arg(ky);
         
         if (val_arg == nullptr)
         {
-            throw arg_not_found_exception();
+            throw arg_doesnt_exists_exception();
         }
         
         return val_arg->get_value_at(indx, std::forward<TpString_>(default_val));
@@ -1250,7 +1144,7 @@ public:
      * @param       ky : Key of the argument to get the value.
      * @param       indx : Position of the element.
      * @return      The element specified.
-     * @throw       speed::argparse::argument_not_found_exception : If there isn't any argument with
+     * @throw       speed::argparse::arg_doesnt_exists_exception : If there isn't any argument with
      *              the specified key an exception is thrown.
      * @throw       speed::argparse::value_not_found_exception : If there isn't any element in the
      *              specified position an exception is thrown.
@@ -1261,11 +1155,11 @@ public:
             std::size_t indx
     ) const
     {
-        value_arg_type* val_arg = get_value_arg_reference(ky);
+        value_arg_type* val_arg = get_value_arg(ky);
         
         if (val_arg == nullptr)
         {
-            throw arg_not_found_exception();
+            throw arg_doesnt_exists_exception();
         }
         
         return val_arg->get_value_at(indx).template as<TpTarger_>();
@@ -1280,7 +1174,7 @@ public:
      * @return      If function was successful the argument value in the specified position is
      *              returned, otherwise an argument value constructed with the default value is
      *              returned.
-     * @throw       speed::argparse::argument_not_found_exception : If there isn't any argument with
+     * @throw       speed::argparse::arg_doesnt_exists_exception : If there isn't any argument with
      *              the specified key an exception is thrown.
      */
     template<typename TpTarget_, typename TpDefaultValue_>
@@ -1290,11 +1184,11 @@ public:
             TpDefaultValue_&& default_val
     ) const
     {
-        value_arg_type* val_arg = get_value_arg_reference(ky);
+        value_arg_type* val_arg = get_value_arg(ky);
         
         if (val_arg == nullptr)
         {
-            throw arg_not_found_exception();
+            throw arg_doesnt_exists_exception();
         }
     
         if (val_arg->there_are_n_values(indx + 1))
@@ -1310,16 +1204,16 @@ public:
      * @brief       Get all the argument values with the specified key.
      * @param       ky : Key of the argument to get the values.
      * @return      All arguments values found.
-     * @throw       speed::argparse::argument_not_found_exception : If there isn't any argument with
+     * @throw       speed::argparse::arg_doesnt_exists_exception : If there isn't any argument with
      *              the specified key an exception is thrown.
      */
     const vector_type<arg_value_type>& get_arg_values(const string_type& ky) const
     {
-        value_arg_type* val_arg = get_value_arg_reference(ky);
+        value_arg_type* val_arg = get_value_arg(ky);
         
         if (val_arg == nullptr)
         {
-            throw arg_not_found_exception();
+            throw arg_doesnt_exists_exception();
         }
         
         return val_arg->get_values();
@@ -1329,7 +1223,7 @@ public:
      * @brief       Get all the argument values with the specified key.
      * @param       ky : Key of the argument to get the values.
      * @return      All arguments values found.
-     * @throw       speed::argparse::argument_not_found_exception : If there isn't any argument with
+     * @throw       speed::argparse::arg_doesnt_exists_exception : If there isn't any argument with
      *              the specified key an exception is thrown.
      * @throw       speed::type_casting::type_casting_exception : If no conversion could be
      *              performed an exception is thrown.
@@ -1337,11 +1231,11 @@ public:
     template<typename TpTarget_>
     vector_type<TpTarget_> get_arg_values_as(const string_type& ky) const
     {
-        value_arg_type* val_arg = get_value_arg_reference(ky);
+        value_arg_type* val_arg = get_value_arg(ky);
         
         if (val_arg == nullptr)
         {
-            throw arg_not_found_exception();
+            throw arg_doesnt_exists_exception();
         }
     
         vector_type<TpTarget_> res;
@@ -1358,7 +1252,7 @@ public:
      * @param       ky : Key of the argument to get the values.
      * @param       default_val : The value returned if the operation fails.
      * @return      All arguments values found.
-     * @throw       speed::argparse::argument_not_found_exception : If there isn't any argument with
+     * @throw       speed::argparse::arg_doesnt_exists_exception : If there isn't any argument with
      *              the specified key an exception is thrown.
      */
     template<typename TpTarget_, typename TpDefaultValue_ = vector_type<TpTarget_>>
@@ -1367,11 +1261,11 @@ public:
             TpDefaultValue_&& default_val
     ) const
     {
-        value_arg_type* val_arg = get_value_arg_reference(ky);
+        value_arg_type* val_arg = get_value_arg(ky);
         
         if (val_arg == nullptr)
         {
-            throw arg_not_found_exception();
+            throw arg_doesnt_exists_exception();
         }
     
         if (!val_arg->there_are_values())
@@ -1526,7 +1420,7 @@ public:
             // Check if the relational constraints imply that a key argument is always required.
             if (!allways_requird_args)
             {
-                for (auto& x : relational_constrs_)
+                for (auto& x : arg_dependencs_)
                 {
                     if (x.key_arg_always_required())
                     {
@@ -1638,10 +1532,9 @@ public:
                 }
             }
             
-            if (err_flgs_.is_set(
-                    arg_parser_error_flags::ARGS_RELATIONAL_CONSTRAINTS_ERROR))
+            if (err_flgs_.is_set(arg_parser_error_flags::ARGS_DEPENDENCIES_ERROR))
             {
-                for (auto& x : relational_constrs_)
+                for (auto& x : arg_dependencs_)
                 {
                     x.print_errors(prog_name_, flgs_.is_set(
                             arg_parser_flags::USE_COLORS_WHEN_PRINT_ERRORS));
@@ -1705,7 +1598,7 @@ public:
             const string_type& arg_ky = string_type()
     ) const
     {
-        base_arg_type* bse_arg = get_base_arg_reference(arg_ky);
+        base_arg_type* bse_arg = get_base_arg(arg_ky);
         
         if (bse_arg != nullptr)
         {
@@ -1742,7 +1635,7 @@ private:
      * @return      If function was successful a reference to the argument found is returned,
      *              otherwise a null pointer is returned.
      */
-    base_arg_type* get_base_arg_reference(const string_type& ky) const noexcept
+    base_arg_type* get_base_arg(const string_type& ky) const noexcept
     {
         auto it = bse_arg_map_.find(ky);
         
@@ -1760,7 +1653,7 @@ private:
      * @return      If function was successful a reference to the argument found is returned, if not
      *              a null pointer is returned.
      */
-    key_arg_type* get_key_arg_reference(const string_type& ky) const noexcept
+    key_arg_type* get_key_arg(const string_type& ky) const noexcept
     {
         auto it = bse_arg_map_.find(ky);
         
@@ -1778,7 +1671,7 @@ private:
      * @return      If function was successful a reference to the argument found is returned, if not
      *              a null pointer is returned.
      */
-    value_arg_type* get_value_arg_reference(const string_type& ky) const noexcept
+    value_arg_type* get_value_arg(const string_type& ky) const noexcept
     {
         auto it = bse_arg_map_.find(ky);
         
@@ -1796,7 +1689,7 @@ private:
      * @return      If function was successful a reference to the argument found is returned, if not
      *              a null pointer is returned.
      */
-    key_value_arg_type* get_key_value_arg_reference(const string_type& ky) const noexcept
+    key_value_arg_type* get_key_value_arg(const string_type& ky) const noexcept
     {
         auto it = bse_arg_map_.find(ky);
         
@@ -1814,7 +1707,7 @@ private:
      * @return      If function was successful a reference to the argument found is returned, if not
      *              a null pointer is returned.
      */
-    keyless_arg_type* get_keyless_arg_reference(const string_type& ky) const noexcept
+    keyless_arg_type* get_keyless_arg(const string_type& ky) const noexcept
     {
         auto it = bse_arg_map_.find(ky);
         
@@ -1984,7 +1877,7 @@ private:
             ky_builder = ky_prefix;
             ky_builder += str[i];
             
-            ky_arg = get_key_arg_reference(ky_builder);
+            ky_arg = get_key_arg(ky_builder);
             if (ky_arg == nullptr || !ky_arg->flag_is_set(arg_flags::ALLOW_CHAIN))
             {
                 return false;
@@ -2011,7 +1904,7 @@ private:
             eq_pos = str.find('=', 1);
             if (eq_pos != string_type::npos)
             {
-                ky_arg = get_key_arg_reference(str.substr(0, eq_pos));
+                ky_arg = get_key_arg(str.substr(0, eq_pos));
                 return ky_arg != nullptr && ky_arg->flag_is_set(arg_flags::ALLOW_EQ_OPERATOR);
             }
         }
@@ -2052,7 +1945,7 @@ private:
             ky_builder = ky_prefix;
             ky_builder += str[i];
             
-            ky_arg = get_key_arg_reference(ky_builder);
+            ky_arg = get_key_arg(ky_builder);
             
             if (ky_arg != nullptr && ky_arg->flag_is_set(arg_flags::ALLOW_CHAIN))
             {
@@ -2093,7 +1986,7 @@ private:
                 *val = cur_argv.substr(eq_pos + 1);
                 if (!ky.empty() && !val->empty())
                 {
-                    *ky_val_arg = get_key_value_arg_reference(ky);
+                    *ky_val_arg = get_key_value_arg(ky);
                     
                     return *ky_val_arg != nullptr &&
                            (*ky_val_arg)->flag_is_set(arg_flags::ALLOW_EQ_OPERATOR);
@@ -2183,18 +2076,18 @@ private:
         
         // Update realation constraints errors.
         in = false;
-        for (auto& x : relational_constrs_)
+        for (auto& x : arg_dependencs_)
         {
-            if (x.is_relational_constraint_violed())
+            if (x.arg_dependencies_violed())
             {
                 in = true;
-                err_flgs_.set(arg_parser_error_flags::ARGS_RELATIONAL_CONSTRAINTS_ERROR);
+                err_flgs_.set(arg_parser_error_flags::ARGS_DEPENDENCIES_ERROR);
                 break;
             }
         }
         if (!in)
         {
-            err_flgs_.erase(arg_parser_error_flags::ARGS_RELATIONAL_CONSTRAINTS_ERROR);
+            err_flgs_.erase(arg_parser_error_flags::ARGS_DEPENDENCIES_ERROR);
         }
     }
     
@@ -2365,8 +2258,8 @@ private:
     /** Contains the maximum number of unrecognized args to be catched. */
     std::size_t max_unrecog_args_;
     
-    /** Flags that dictates the argument parser behavior. */
-    vector_type<relational_constraint_type> relational_constrs_;
+    /** Collection of dependencies between arguments. */
+    vector_type<args_dependencies_type> arg_dependencs_;
     
     /** Flags that dictates the argument parser behavior. */
     flags_type<arg_parser_flags> flgs_;

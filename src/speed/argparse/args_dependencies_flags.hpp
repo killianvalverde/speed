@@ -18,14 +18,14 @@
  */
 
 /**
- * @file        speed/argparse/relational_constraint_types.hpp
- * @brief       relational_constraint_types enum header.
- * @author      Killian Green
+ * @file        speed/argparse/args_dependencies_flags.hpp
+ * @brief       args_dependencies_flags enum header.
+ * @author      Killian
  * @date        2017/10/21 - 01:21
  */
 
-#ifndef SPEED_ARGPARSE_RELATIONAL_CONSTRAINT_TYPES_HPP
-#define SPEED_ARGPARSE_RELATIONAL_CONSTRAINT_TYPES_HPP
+#ifndef SPEED_ARGPARSE_ARGS_DEPENDENCIES_FLAGS_HPP
+#define SPEED_ARGPARSE_ARGS_DEPENDENCIES_FLAGS_HPP
 
 #include "../lowlevel.hpp"
 
@@ -36,7 +36,7 @@ namespace speed::argparse {
 /**
  * @brief       Contains all arguments relational constraints types.
  */
-enum class relational_constraint_types : std::uint8_t
+enum class args_dependencies_flags : std::uint8_t
 {
     /** Null flag. */
     NIL = 0x0,
@@ -49,9 +49,9 @@ enum class relational_constraint_types : std::uint8_t
 };
 
 
-/** Contains all arguments relational constraints types. Alias of 'args_relational_constraints'
+/** Contains all arguments relational constraints types. Alias of 'args_dependencies_flags'
  * enumeration. */
-using rct_t = relational_constraint_types;
+using adf_t = args_dependencies_flags;
 
 
 }
@@ -60,7 +60,7 @@ using rct_t = relational_constraint_types;
 /** @cond */
 namespace speed::lowlevel {
 template<>
-struct enable_bitwise_operators<speed::argparse::relational_constraint_types>
+struct enable_bitwise_operators<speed::argparse::args_dependencies_flags>
 {
     static constexpr bool enable_with_same_type = true;
 };

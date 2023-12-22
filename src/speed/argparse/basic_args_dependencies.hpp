@@ -18,32 +18,32 @@
  */
 
 /**
- *  @file       speed/argparse/basic_relational_constraint.hpp
- *  @brief      basic_relational_constraint class header.
+ *  @file       speed/argparse/basic_args_dependencies.hpp
+ *  @brief      basic_args_dependencies class header.
  *  @author     Killian
  *  @date       2017/10/21 - 14:39
  */
 
-#ifndef SPEED_ARGPARSE_BASIC_RELATIONAL_CONSTRAINT_HPP
-#define SPEED_ARGPARSE_BASIC_RELATIONAL_CONSTRAINT_HPP
+#ifndef SPEED_ARGPARSE_BASIC_ARGS_DEPENDENCIES_HPP
+#define SPEED_ARGPARSE_BASIC_ARGS_DEPENDENCIES_HPP
 
 #include <memory>
 
+#include "args_dependencies_flags.hpp"
 #include "basic_keyless_arg.hpp"
 #include "basic_help_arg.hpp"
 #include "basic_key_value_arg.hpp"
 #include "basic_version_arg.hpp"
-#include "relational_constraint_types.hpp"
 
 
 namespace speed::argparse {
 
 
 /**
- * @brief       Class used to parse arguments.
+ * @brief       Class used to represent a set of argument dependencies.
  */
 template<typename TpAllocator>
-class basic_relational_constraint
+class basic_args_dependencies
 {
 public:
     /** Class that represents the allocator used in the class. */
@@ -91,15 +91,15 @@ public:
     /**
      * @brief       Perfect forwarding constructor.
      * @param       bse_args : The arguments in which appy the constraint.
-     * @param       contrs : Type of constraint to apply.
+     * @param       dependencs : Type of dependency to apply.
      */
     template<typename TpBaseArgPointerVector_ = vector_type<base_arg_type*>>
-    basic_relational_constraint(
+    basic_args_dependencies(
             TpBaseArgPointerVector_&& bse_args,
-            relational_constraint_types contrs
+            args_dependencies_flags dependencs
     )
             : bse_args_(std::forward<TpBaseArgPointerVector_>(bse_args))
-            , contrs_(contrs)
+            , dependencs_(dependencs)
     {
     }
     
@@ -107,32 +107,32 @@ public:
      * @brief       Copy constructor.
      * @param       rhs : Object to copy.
      */
-    basic_relational_constraint(const basic_relational_constraint& rhs) = delete;
+    basic_args_dependencies(const basic_args_dependencies& rhs) = delete;
     
     /**
      * @brief       Move constructor.
      * @param       rhs : Object to move.
      */
-    basic_relational_constraint(basic_relational_constraint&& rhs) noexcept = default;
+    basic_args_dependencies(basic_args_dependencies&& rhs) noexcept = default;
     
     /**
      * @brief       Destructor.
      */
-    ~basic_relational_constraint() = default;
+    ~basic_args_dependencies() = default;
     
     /**
      * @brief       Copy assignment operator.
      * @param       rhs : Object to copy.
      * @return      The object who call the method.
      */
-    basic_relational_constraint& operator =(const basic_relational_constraint& rhs) = delete;
+    basic_args_dependencies& operator =(const basic_args_dependencies& rhs) = delete;
     
     /**
      * @brief       Move assignment operator.
      * @param       rhs : Object to move.
      * @return      The object who call the method.
      */
-    basic_relational_constraint& operator =(basic_relational_constraint&& rhs) noexcept = default;
+    basic_args_dependencies& operator =(basic_args_dependencies&& rhs) noexcept = default;
     
     // TODO(kKillianValverde@gmail.com): Delete this method?
     /**
@@ -149,20 +149,20 @@ public:
      * @brief       Get the relational constraints.
      * @return      The relational constraints.
      */
-    relational_constraint_types get_contraints() const noexcept
+    args_dependencies_flags get_dependencies() const noexcept
     {
-        return contrs_.get_value();
+        return dependencs_.get_value();
     }
     
     /**
      * @brief       Allows knowing whether a relational constraint is violed.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    bool is_relational_constraint_violed() const noexcept
+    bool arg_dependencies_violed() const noexcept
     {
         bool fnd = false;
         
-        if (contrs_.is_set(relational_constraint_types::AT_LEAST_ONE_FOUND))
+        if (dependencs_.is_set(args_dependencies_flags::AT_LEAST_ONE_FOUND))
         {
             for (auto& x : bse_args_)
             {
@@ -187,13 +187,13 @@ public:
      * @param       constr : Constraint to check.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    bool is_relational_constraint_violed(relational_constraint_types constr) const noexcept
+    bool arg_dependencies_violed(args_dependencies_flags dependencs) const noexcept
     {
         bool fnd = false;
         
-        if ((constr & relational_constraint_types::AT_LEAST_ONE_FOUND) !=
-                    relational_constraint_types::NIL &&
-            contrs_.is_set(relational_constraint_types::AT_LEAST_ONE_FOUND))
+        if ((dependencs & args_dependencies_flags::AT_LEAST_ONE_FOUND) != 
+                 args_dependencies_flags::NIL && 
+             dependencs_.is_set(args_dependencies_flags::AT_LEAST_ONE_FOUND))
         {
             for (auto& x : bse_args_)
             {
@@ -221,7 +221,7 @@ public:
      */
     bool key_arg_always_required() const noexcept
     {
-        if (!contrs_.is_set(relational_constraint_types::AT_LEAST_ONE_FOUND))
+        if (!dependencs_.is_set(args_dependencies_flags::AT_LEAST_ONE_FOUND))
         {
             return false;
         }
@@ -245,7 +245,7 @@ public:
      */
     void print_errors(const string_type& prog_name, bool colrs_enable) const
     {
-        if (is_relational_constraint_violed(relational_constraint_types::AT_LEAST_ONE_FOUND))
+        if (arg_dependencies_violed(args_dependencies_flags::AT_LEAST_ONE_FOUND))
         {
             std::cout << prog_name << ": ";
             
@@ -283,16 +283,16 @@ public:
     }
 
 private:
-    /** The arguments in which apply the constraint. */
+    /** The arguments in which apply the dependencies. */
     vector_type<base_arg_type*> bse_args_;
     
-    /** Type of constraint to apply. */
-    flags_type<relational_constraint_types> contrs_;
+    /** Set of dependencies to apply. */
+    flags_type<args_dependencies_flags> dependencs_;
 };
 
 
-/** Class used to parse arguments. */
-using relational_constraint = basic_relational_constraint<std::allocator<int>>;
+/** Class used to represent a set of argument dependencies. */
+using args_dependencies = basic_args_dependencies<std::allocator<int>>;
 
 
 }

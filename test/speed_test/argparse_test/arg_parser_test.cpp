@@ -280,79 +280,28 @@ TEST(argparse_arg_parser, add_foreign_arg)
 }
 
 
-TEST(argparse_arg_parser, add_args_relational_constraints_t1)
+TEST(argparse_arg_parser, add_arg_dependencies_t1)
 {
     speed::argparse::arg_parser ap;
     
     ap.add_key_arg({"-r", "--recursive"}, "Recursive");
     ap.add_key_arg({"-a", "--all"}, "All");
     ap.add_key_arg({"-f", "--force"}, "Force");
-    EXPECT_NO_THROW(ap.add_args_relational_constraints(
-            {"-r", "-a"}, speed::argparse::rct_t::AT_LEAST_ONE_FOUND));
+    EXPECT_NO_THROW(ap.add_args_dependencies(
+            {"-r", "-a"}, speed::argparse::adf_t::AT_LEAST_ONE_FOUND));
 }
 
 
-TEST(argparse_arg_parser, add_args_relational_constraints_t2)
+TEST(argparse_arg_parser, add_arg_dependencies_t2)
 {
     speed::argparse::arg_parser ap;
     
     ap.add_key_arg({"-r", "--recursive"}, "Recursive");
     ap.add_key_arg({"-a", "--all"}, "All");
     ap.add_key_arg({"-f", "--force"}, "Force");
-    EXPECT_THROW(ap.add_args_relational_constraints(
-            {"-m", "-a"}, speed::argparse::rct_t::AT_LEAST_ONE_FOUND),
+    EXPECT_THROW(ap.add_args_dependencies(
+            {"-m", "-a"}, speed::argparse::adf_t::AT_LEAST_ONE_FOUND),
             speed::argparse::argparse_exception);
-}
-
-
-TEST(argparse_arg_parser, get_base_arg)
-{
-    speed::argparse::arg_parser ap;
-    ap.add_key_arg({"-a"}, "All");
-    EXPECT_NO_THROW(ap.get_base_arg("-a"));
-    EXPECT_THROW(ap.get_base_arg("-l"), speed::argparse::argparse_exception);
-}
-
-
-TEST(argparse_arg_parser, get_key_arg)
-{
-    speed::argparse::arg_parser ap;
-    ap.add_key_arg({"-a"}, "All");
-    EXPECT_NO_THROW(ap.get_base_arg("-a"));
-    EXPECT_NO_THROW(ap.get_key_arg("-a"));
-}
-
-
-TEST(argparse_arg_parser, get_value_arg)
-{
-    speed::argparse::arg_parser ap;
-    ap.add_key_value_arg({"-s"}, "Seconds");
-    EXPECT_NO_THROW(ap.get_base_arg("-s"));
-    EXPECT_NO_THROW(ap.get_value_arg("-s"));
-}
-
-
-TEST(argparse_arg_parser, get_key_value_arg)
-{
-    speed::argparse::arg_parser ap;
-    ap.add_key_value_arg({"-s"}, "Seconds");
-    EXPECT_NO_THROW(ap.get_base_arg("-s"));
-    EXPECT_NO_THROW(ap.get_key_arg("-s"));
-    EXPECT_NO_THROW(ap.get_value_arg("-s"));
-    EXPECT_NO_THROW(ap.get_key_value_arg("-s"));
-}
-
-
-TEST(argparse_arg_parser, get_foreign_arg)
-{
-    speed::argparse::arg_parser ap;
-    ap.add_keyless_arg("FILE", "File", "The file path");
-    EXPECT_NO_THROW(ap.get_base_arg("FILE"));
-    EXPECT_NO_THROW(ap.get_base_arg("File"));
-    EXPECT_NO_THROW(ap.get_value_arg("FILE"));
-    EXPECT_NO_THROW(ap.get_value_arg("File"));
-    EXPECT_NO_THROW(ap.get_keyless_arg("FILE"));
-    EXPECT_NO_THROW(ap.get_keyless_arg("File"));
 }
 
 
@@ -531,7 +480,7 @@ TEST(argparse_arg_parser, parse_args_t10)
     ap.add_key_arg({"-r", "--recursive"}, "Recursive");
     ap.add_key_arg({"-a", "--all"}, "All");
     ap.add_key_arg({"-f", "--force"}, "Force");
-    ap.add_args_relational_constraints({"-r", "-a"}, speed::argparse::rct_t::AT_LEAST_ONE_FOUND);
+    ap.add_args_dependencies({"-r", "-a"}, speed::argparse::adf_t::AT_LEAST_ONE_FOUND);
     
     ap.parse_args(argv.size(), argv);
     
@@ -556,7 +505,7 @@ TEST(argparse_arg_parser, parse_args_t11)
     ap.add_key_arg({"-r", "--recursive"}, "Recursive");
     ap.add_key_arg({"-a", "--all"}, "All");
     ap.add_key_arg({"-f", "--force"}, "Force");
-    ap.add_args_relational_constraints({"-r", "-a"}, speed::argparse::rct_t::AT_LEAST_ONE_FOUND);
+    ap.add_args_dependencies({"-r", "-a"}, speed::argparse::adf_t::AT_LEAST_ONE_FOUND);
     
     ap.parse_args(argv.size(), argv);
     
