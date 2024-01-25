@@ -1,4 +1,4 @@
-/* Copyright (C) 2017 Killian Green.
+/* Copyright (C) 2017 Killian Valverde.
    This file is part of speed.
 
    speed is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 /**
  * @file        speed_test/stringutils_test/c_string_utils_test.cpp
  * @brief       c_string_utils unit test.
- * @author      Killian Green
+ * @author      Killian Valverde
  * @date        2017/12/24 - 03:16
  */
 

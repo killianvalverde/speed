@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2023 Killian Valverde.
+ * Copyright (C) 2015-2024 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -20,7 +20,7 @@
 /**
  * @file        speed_test/system_test/cpu_chono_test.cpp
  * @brief       cpu_chono unit test.
- * @author      Killian Green
+ * @author      Killian Valverde
  * @date        2018/06/06 - 09:35
  */
 

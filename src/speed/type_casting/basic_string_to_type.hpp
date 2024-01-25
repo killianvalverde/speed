@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2023 Killian Valverde.
+ * Copyright (C) 2015-2024 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -20,7 +20,7 @@
 /**
  * @file        speed/type_casting/basic_string_to_type.hpp
  * @brief       basic_string_to_type main header.
- * @author      Killian Green
+ * @author      Killian Valverde
  * @date        2016/08/23 - 20:41
  */
 

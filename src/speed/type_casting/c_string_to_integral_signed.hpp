@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2023 Killian Valverde.
+ * Copyright (C) 2015-2024 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -20,7 +20,7 @@
 /**
  * @file        speed/type_casting/c_string_to_integral_signed.hpp
  * @brief       c_string_to_integral_signed main header.
- * @author      Killian Green
+ * @author      Killian Valverde
  * @date        2016/08/19 - 17:35
  */
 

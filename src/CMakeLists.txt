@@ -145,11 +145,13 @@ set(SPEED_TIME_SOURCE_FILES
 
 set(SPEED_TYPE_CASTING_SOURCE_FILES
         speed/type_casting/basic_string_to_type.hpp
+        speed/type_casting/basic_type_caster.hpp
         speed/type_casting/c_string_to_basic_string.hpp
         speed/type_casting/c_string_to_floating_point.hpp
         speed/type_casting/c_string_to_integral_signed.hpp
         speed/type_casting/c_string_to_integral_unsigned.hpp
         speed/type_casting/c_string_to_path.hpp
+        speed/type_casting/i_type_caster.hpp
         speed/type_casting/type_cast.hpp
         speed/type_casting/type_casting_exception.hpp
         speed/type_casting.hpp

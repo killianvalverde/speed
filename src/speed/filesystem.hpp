@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2023 Killian Valverde.
+ * Copyright (C) 2015-2024 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -20,7 +20,7 @@
 /**
  * @file        speed/filesystem.hpp
  * @brief       filesystem main header.
- * @author      Killian Green
+ * @author      Killian Valverde
  * @date        2018/11/25 - 16:34
  */
 

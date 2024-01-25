@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2023 Killian Valverde.
+ * Copyright (C) 2015-2024 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -20,7 +20,7 @@
 /**
  * @file        speed/stringutils/string_utils.hpp
  * @brief       string_utils functions header.
- * @author      Killian Green
+ * @author      Killian Valverde
  * @date        2017/12/24 - 17:50
  */
 

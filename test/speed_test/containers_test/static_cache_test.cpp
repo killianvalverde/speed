@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2023 Killian Valverde.
+ * Copyright (C) 2015-2024 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -20,7 +20,7 @@
 /**
  * @file        speed_test/containers_test/static_cache_test.cpp
  * @brief       static_cache unit test.
- * @author      Killian Green
+ * @author      Killian Valverde
  * @date        2018/01/12 - 19:48
  */
 

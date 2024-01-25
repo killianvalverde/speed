@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2023 Killian Valverde.
+ * Copyright (C) 2015-2024 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -20,13 +20,14 @@
 /**
  * @file        speed/type_traits.hpp
  * @brief       type_traits main header.
- * @author      Killian Green
+ * @author      Killian Valverde
  * @date        2016/08/05 - 04:44
  */
 
 #ifndef SPEED_TYPE_CASTING_HPP
 #define SPEED_TYPE_CASTING_HPP
 
+#include "type_casting/i_type_caster.hpp"
 #include "type_casting/type_cast.hpp"
 
 

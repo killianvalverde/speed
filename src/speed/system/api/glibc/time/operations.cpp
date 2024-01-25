@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2023 Killian Valverde.
+ * Copyright (C) 2015-2024 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -20,7 +20,7 @@
 /**
  * @file        speed/system/api/glibc/time/operations.hpp
  * @brief       time operations definitions.
- * @author      Killian Green
+ * @author      Killian Valverde
  * @date        2017/10/18 - 22:26
  */
 

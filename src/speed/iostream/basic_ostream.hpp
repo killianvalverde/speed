@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2023 Killian Valverde.
+ * Copyright (C) 2015-2024 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -20,7 +20,7 @@
 /**
  * @file        speed/iostream/basic_ostream.hpp
  * @brief       basic_ostream related functions header.
- * @author      Killian Green
+ * @author      Killian Valverde
  * @date        2016/08/24 - 09:50
  */
 
