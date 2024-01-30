@@ -77,6 +77,12 @@ TEST(argparse_arg_parser, add_key_arg)
                     speed::argparse::af_t::DEFAULT_ARG_FLAGS,
                     std::move(help_menus_ids), std::move(error_id));
     EXPECT_TRUE(keys.empty());
+
+    for (auto x : keys)
+    {
+        std::cout << x << std::endl;
+    }
+
     EXPECT_TRUE(description.empty());
     EXPECT_TRUE(help_menus_ids.empty());
     EXPECT_TRUE(error_id.empty());

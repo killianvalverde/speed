@@ -379,6 +379,15 @@ public:
             bse_arg_map_.emplace(std::is_rvalue_reference<TpStringVector1_&&>::value ?
                                          std::move(x) : x, static_cast<base_arg_type*>(ky_arg));
         }
+        /* Moving the strings from a string_vector doesn't remve the existance of the string 
+         *  objects. Because of that, if the elements are moved, it is necessary to clear the vector
+         *  in order to keep a coherent use of the meaning of the moving of vecotors. That means
+         *  that if I move vector1 into vector2, vector1 should not have any value. 
+         */
+        if (std::is_rvalue_reference<TpStringVector1_&&>::value)
+        {
+            kys.clear();
+        }
         
         i_hlp_text_list_.push_back(ky_arg);
         if (!ky_arg->description_is_empty())
@@ -446,10 +455,13 @@ public:
     
         for (auto& x : kys)
         {
-            hlp_arg_map_.insert(std::make_pair(x, help_arg));
-
+            hlp_arg_map_.emplace(x, help_arg);
             bse_arg_map_.emplace(std::is_rvalue_reference<TpStringVector1_&&>::value ?
                                          std::move(x) : x, static_cast<base_arg_type*>(help_arg));
+        }
+        if (std::is_rvalue_reference<TpStringVector1_&&>::value)
+        {
+            kys.clear();
         }
         
         i_hlp_text_list_.push_back(help_arg);
@@ -528,6 +540,10 @@ public:
         {
             bse_arg_map_.emplace(std::is_rvalue_reference<TpStringVector1_&&>::value ?
                                          std::move(x) : x, static_cast<base_arg_type*>(vers_arg));
+        }
+        if (std::is_rvalue_reference<TpStringVector1_&&>::value)
+        {
+            kys.clear();
         }
         
         i_hlp_text_list_.push_back(vers_arg);
@@ -672,6 +688,10 @@ public:
         {
             bse_arg_map_.emplace(std::is_rvalue_reference<TpStringVector1_&&>::value ?
                                          std::move(x) : x, static_cast<base_arg_type*>(ky_val_arg));
+        }
+        if (std::is_rvalue_reference<TpStringVector1_&&>::value)
+        {
+            kys.clear();
         }
         
         i_hlp_text_list_.push_back(ky_val_arg);
@@ -2157,43 +2177,37 @@ private:
         help_arg_type* hlp_arg;
         version_arg_type* vers_arg;
         key_value_arg_type* ky_val_arg;
-        keyless_arg_type* forgn_arg;
+        keyless_arg_type* kyless_arg;
         
-        if ((forgn_arg = dynamic_cast<keyless_arg_type*>(arg)) != nullptr)
+        if ((kyless_arg = dynamic_cast<keyless_arg_type*>(arg)) != nullptr)
         {
-            allocator_type<keyless_arg_type> foreign_arg_type_alloc;
-            foreign_arg_type_alloc.destroy(forgn_arg);
-            foreign_arg_type_alloc.deallocate(forgn_arg, 1);
+            keyless_arg_type_alloc_.destroy(kyless_arg);
+            keyless_arg_type_alloc_.deallocate(kyless_arg, 1);
         }
         else if ((ky_val_arg = dynamic_cast<key_value_arg_type*>(arg)) != nullptr)
         {
-            allocator_type<key_value_arg_type> key_value_arg_type_alloc;
-            key_value_arg_type_alloc.destroy(ky_val_arg);
-            key_value_arg_type_alloc.deallocate(ky_val_arg, 1);
+            key_value_arg_type_alloc_.destroy(ky_val_arg);
+            key_value_arg_type_alloc_.deallocate(ky_val_arg, 1);
         }
         else if ((vers_arg = dynamic_cast<version_arg_type*>(arg)) != nullptr)
         {
-            allocator_type<version_arg_type> version_arg_type_alloc;
-            version_arg_type_alloc.destroy(vers_arg);
-            version_arg_type_alloc.deallocate(vers_arg, 1);
+            version_arg_type_alloc_.destroy(vers_arg);
+            version_arg_type_alloc_.deallocate(vers_arg, 1);
         }
         else if ((hlp_arg = dynamic_cast<help_arg_type*>(arg)) != nullptr)
         {
-            allocator_type<help_arg_type> help_arg_type_alloc;
-            help_arg_type_alloc.destroy(hlp_arg);
-            help_arg_type_alloc.deallocate(hlp_arg, 1);
+            help_arg_type_alloc_.destroy(hlp_arg);
+            help_arg_type_alloc_.deallocate(hlp_arg, 1);
         }
         else if ((ky_arg = dynamic_cast<key_arg_type*>(arg)) != nullptr)
         {
-            allocator_type<key_arg_type> key_arg_type_alloc;
-            key_arg_type_alloc.destroy(ky_arg);
-            key_arg_type_alloc.deallocate(ky_arg, 1);
+            key_arg_type_alloc_.destroy(ky_arg);
+            key_arg_type_alloc_.deallocate(ky_arg, 1);
         }
         else if ((hlp_text = dynamic_cast<help_text_type*>(arg)) != nullptr)
         {
-            allocator_type<help_text_type> help_text_type_alloc;
-            help_text_type_alloc.destroy(hlp_text);
-            help_text_type_alloc.deallocate(hlp_text, 1);
+            help_text_type_alloc_.destroy(hlp_text);
+            help_text_type_alloc_.deallocate(hlp_text, 1);
         }
         
         arg = nullptr;

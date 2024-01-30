@@ -18,28 +18,27 @@
  */
 
 /**
- * @file        speed/type_traits.hpp
- * @brief       type_traits main header.
+ * @file        speed/type_casting/string_caster.hpp
+ * @brief       string_caster main header.
  * @author      Killian Valverde
- * @date        2016/08/05 - 04:44
+ * @date        2024/01/30
  */
 
-#ifndef SPEED_TYPE_CASTING_HPP
-#define SPEED_TYPE_CASTING_HPP
-
-#include "type_casting/basic_type_caster.hpp"
-#include "type_casting/i_type_caster.hpp"
-#include "type_casting/string_caster.hpp"
-#include "type_casting/type_cast.hpp"
+#ifndef SPEED_TYPE_CASTING_STRING_CASTER_HPP
+#define SPEED_TYPE_CASTING_STRING_CASTER_HPP
 
 
-namespace speed {
+#include "basic_type_caster.hpp"
+
+
+namespace speed::type_casting {
 
 
 /**
- * @brief       Contains utilities for type casting.
+ * @brief       Classs used as a string casting strategy holder.
  */
-namespace type_casting {}
+template<typename TpTarget, typename TpComponent = i_type_caster<std::string>>
+using string_caster = basic_type_caster<TpTarget, std::string, TpComponent>;
 
 
 }

@@ -12,6 +12,8 @@ set(SPEED_ARGPARSE_SOURCE_FILES
         speed/argparse/arg_value_types.hpp
         speed/argparse/argparse_exception.hpp
         speed/argparse/argparse_forward_declarations.hpp
+        speed/argparse/argparse_type_casters.cpp
+        speed/argparse/argparse_type_casters.hpp
         speed/argparse/args_dependencies_flags.hpp
         speed/argparse/basic_arg_key.hpp
         speed/argparse/basic_arg_parser.hpp
@@ -152,6 +154,7 @@ set(SPEED_TYPE_CASTING_SOURCE_FILES
         speed/type_casting/c_string_to_integral_unsigned.hpp
         speed/type_casting/c_string_to_path.hpp
         speed/type_casting/i_type_caster.hpp
+        speed/type_casting/string_caster.hpp
         speed/type_casting/type_cast.hpp
         speed/type_casting/type_casting_exception.hpp
         speed/type_casting.hpp
