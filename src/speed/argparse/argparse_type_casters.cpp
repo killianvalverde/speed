@@ -70,5 +70,7 @@ speed::type_casting::string_caster<std::int32_t> str_to_int32;
 
 speed::type_casting::string_caster<std::int64_t> str_to_int64;
 
+speed::type_casting::string_caster<std::string> str_to_str;
+
 
 }

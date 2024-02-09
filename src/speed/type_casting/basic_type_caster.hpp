@@ -63,6 +63,13 @@ public:
 };
 
 
+/**
+ * @brief       Classs used as a string casting strategy holder.
+ */
+template<typename TpTarget, typename TpComponent = i_string_caster>
+using string_caster = basic_type_caster<TpTarget, std::string, TpComponent>;
+
+
 }
 
 

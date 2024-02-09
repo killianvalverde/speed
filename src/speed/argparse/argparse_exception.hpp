@@ -188,6 +188,23 @@ public:
 };
 
 
+/**
+ * @brief       Class used to thrown exceptions when a specified regex syntax is not valid.
+ */
+class regex_syntax_error_exception : public argparse_exception
+{
+public:
+    /**
+     * @brief       Get the message of the exception.
+     * @return      The exception message.
+     */
+    char const* what() const noexcept override
+    {
+        return "regex syntax error exception";
+    }
+};
+
+
 }
 
 

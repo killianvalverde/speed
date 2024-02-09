@@ -29,7 +29,6 @@
 
 #include "type_casting/basic_type_caster.hpp"
 #include "type_casting/i_type_caster.hpp"
-#include "type_casting/string_caster.hpp"
 #include "type_casting/type_cast.hpp"
 
 

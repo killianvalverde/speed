@@ -68,6 +68,12 @@ public:
 };
 
 
+/**
+ * @brief       Interface used as base of string casting strategies holders.
+ */
+using i_string_caster = i_type_caster<std::string>;
+
+
 }
 
 

@@ -36,6 +36,7 @@
 #include "../containers.hpp"
 #include "../system.hpp"
 #include "../type_casting.hpp"
+#include "argparse_type_casters.hpp"
 #include "arg_error_flags.hpp"
 #include "arg_flags.hpp"
 #include "arg_value_error_flags.hpp"
@@ -73,7 +74,7 @@ public:
      */
     basic_arg_value()
             : val_()
-            , typ_(arg_value_types::NIL)
+            , str_cstr_(nullptr)
             , regx_to_match_()
             , err_flgs_(arg_value_error_flags::NIL)
             , invalid_pth_(false)
@@ -90,6 +91,8 @@ public:
      * @param       regx_to_match : Regex that the value has to match. If the string is empty the
      *              value will always match.
      * @param       compo : The composite object.
+     * @throw       speed::argparse::regex_syntax_error_exception : An exception is thrown if a 
+     *              regex with a syntax error is specified.
      */
     template<
             typename TpString1_,
@@ -100,12 +103,12 @@ public:
     >
     basic_arg_value(
             TpString1_&& val,
-            arg_value_types typ = arg_value_types::STRING,
+            speed::type_casting::i_string_caster* str_cstr = &str_to_str,
             TpString2_&& regx_to_match = string_type(),
             const value_arg_type* compo = nullptr
     )
             : val_(std::forward<TpString1_>(val))
-            , typ_(typ)
+            , str_cstr_(str_cstr)
             , regx_to_match_(std::forward<TpString2_>(regx_to_match))
             , err_flgs_(arg_value_error_flags::NIL)
             , invalid_pth_(false)
@@ -113,17 +116,19 @@ public:
             , fles_created_(false)
             , compo_(compo)
     {
-        for (auto& x : typ_)
+        if (str_cstr_ == nullptr)
         {
-            if (!(this->*avt_to_check_value[get_avt_index(x)])(x))
-            {
-                err_flgs_.set(arg_value_error_flags::WRONG_VALUE_ERROR);
-            }
+            str_cstr_ = &str_to_str;
+        }
+
+        if (!str_cstr_->is_valid(&val_))
+        {
+            err_flgs_.set(arg_value_error_flags::WRONG_VALUE_ERROR);
         }
         
-        try
+        if (!regx_to_match.empty())
         {
-            if (!regx_to_match.empty())
+            try
             {
                 if (!std::regex_match(val_, std::regex(regx_to_match)))
                 {
@@ -131,9 +136,10 @@ public:
                     err_message_ = "Invalid argument";
                 }
             }
-        }
-        catch (const std::regex_error& re)
-        {
+            catch (const std::regex_error& re)
+            {
+                throw regex_syntax_error_exception(); /// ?
+            }
         }
     }
 
@@ -598,6 +604,8 @@ private:
 private:
     /** Argument value container. */
     string_type val_;
+
+    speed::type_casting::i_string_caster* str_cstr_;
     
     /** Type of the value. */
     flags_type<arg_value_types> typ_;

@@ -27,6 +27,8 @@
 #ifndef SPEED_ARGPARSE_ARGPARSE_TYPE_CASTERS_HPP
 #define SPEED_ARGPARSE_ARGPARSE_TYPE_CASTERS_HPP
 
+#include <string>
+
 #include "../type_casting.hpp"
 
 
@@ -92,6 +94,9 @@ extern speed::type_casting::string_caster<std::int32_t> str_to_int32;
 
 /** Classs used as a string to int64 casting strategy holder. */
 extern speed::type_casting::string_caster<std::int64_t> str_to_int64;
+
+/** Classs used as a string to int64 casting strategy holder. */
+extern speed::type_casting::string_caster<std::string> str_to_str;
 
 
 }
