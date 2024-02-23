@@ -63,7 +63,7 @@ public:
     template<typename TpTarget_>
     [[nodiscard]] bool try_type_cast(const source_type& arg, TpTarget_* res) const noexcept
     {
-        return try_type_cast(arg, res);
+        return speed::type_casting::try_type_cast(arg, res);
     }
 };
 

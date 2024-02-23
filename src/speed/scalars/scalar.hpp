@@ -43,6 +43,9 @@ template<
 class scalar
 {
 public:
+    /** Class that represents the underlying scalar type. */
+    using scalar_type = TpScalar;
+
     /**
      * @brief       Default constructor.
      */
@@ -52,7 +55,7 @@ public:
      * @brief       Constructor with parameters.
      * @param       value : Value for the scalar type.
      */
-    scalar(TpScalar value)
+    scalar(scalar_type value)
             : value_(value)
     {
     }
@@ -71,13 +74,13 @@ public:
      * @param       rhs : Object to move.
      */
     template<
-            typename TpScalar_ = TpScalar,
+            typename TpScalar_ = scalar_type,
             typename = std::enable_if_t<!std::is_const<TpScalar_>::value>
     >
     scalar(scalar&& rhs) noexcept
             : value_(rhs.value_)
     {
-        rhs.value_ = static_cast<TpScalar>(0);
+        rhs.value_ = static_cast<scalar_type>(0);
     }
     
     /**
@@ -91,12 +94,12 @@ public:
      * @return      The object who call the method.
      */
     template<
-            typename TpScalar_ = TpScalar,
+            typename TpScalar_ = scalar_type,
             typename = std::enable_if_t<!std::is_const<TpScalar_>::value>
     >
     scalar& operator =(const scalar& rhs)
     {
-        if (&value_ != &rhs)
+        if (this != &rhs)
         {
             value_ = rhs.value_;
         }
@@ -110,14 +113,14 @@ public:
      * @return      The object who call the method.
      */
     template<
-            typename TpScalar_ = TpScalar,
+            typename TpScalar_ = scalar_type,
             typename = std::enable_if_t<!std::is_const<TpScalar_>::value>
     >
     scalar& operator =(scalar&& rhs) noexcept
     {
-        if (&value_ != &rhs)
+        if (this != &rhs)
         {
-            TpScalar aux = value_;
+            scalar_type aux = value_;
             value_ = rhs.value_;
             rhs.value_ = aux;
         }
@@ -129,7 +132,7 @@ public:
      * @brief       Allows access to the underlying value.
      * @return      A reference to the underlying value.
      */
-    TpScalar& value() noexcept
+    scalar_type& value() noexcept
     {
         return value_;
     }
@@ -138,49 +141,50 @@ public:
      * @brief       Implicit conversion to the underlying type.
      * @return      A reference to the underlying value.
      */
-    operator TpScalar&() noexcept
+    operator scalar_type&() noexcept
     {
         return value_;
     }
     
+    // TODO(KillianValverde@gmail.com): Clean all of this.
     /**
      * @brief       Overloading of the reference operator.
      * @return      A pointer to the underlying scalar value.
      */
-    TpScalar* operator &() noexcept
-    {
-        return &value_;
-    }
+    // scalar_type* operator &() noexcept
+    // {
+    //     return &value_;
+    // }
     
     /**
      * @brief       Overloading of the indirection operator.
      * @return      A reference to the value pointed by the scalar value.
      */
-    template<
-            typename TpScalar_ = TpScalar,
-            typename = std::enable_if_t<std::is_pointer<TpScalar_>::value>
-    >
-    std::remove_pointer_t<TpScalar>& operator *() noexcept
-    {
-        return *value_;
-    }
+    // template<
+    //         typename TpScalar_ = scalar_type,
+    //         typename = std::enable_if_t<std::is_pointer<TpScalar_>::value>
+    // >
+    // std::remove_pointer_t<scalar_type>& operator *() noexcept
+    // {
+    //     return *value_;
+    // }
     
     /**
      * @brief       Overloading of the indirection operator.
      * @return      A reference to the value pointed by the scalar value.
      */
-    template<
-            typename TpScalar_ = TpScalar,
-            typename = std::enable_if_t<std::is_pointer<TpScalar_>::value>
-    >
-    TpScalar operator ->() noexcept
-    {
-        return value_;
-    }
+    // template<
+    //         typename TpScalar_ = scalar_type,
+    //         typename = std::enable_if_t<std::is_pointer<TpScalar_>::value>
+    // >
+    // scalar_type operator ->() noexcept
+    // {
+    //     return value_;
+    // }
 
 private:
     /** The underlying value. */
-    TpScalar value_;
+    scalar_type value_;
 };
 
 

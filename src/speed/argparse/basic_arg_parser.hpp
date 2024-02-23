@@ -304,7 +304,7 @@ public:
      * @param       desc : Argument description content.
      * @param       hlp_menus_ids : The help menus ids in which insert the description.
      */
-    // TODO[P1](KillianValverde@gmail.com): Implement the description concept.
+    // TODO(KillianValverde@gmail.com): Implement the description concept.
     // template<typename TpString1_, typename TpStringVector_ = vector_type<string_type>>
     // void add_description(TpString1_&& desc, TpStringVector_&& hlp_menus_ids = {})
     // {

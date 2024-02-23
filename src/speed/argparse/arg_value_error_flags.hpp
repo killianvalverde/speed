@@ -41,14 +41,17 @@ enum class arg_value_error_flags : std::uint8_t
     /** Null flag. */
     NIL = 0x0,
     
-    /** The value specified is not correct. */
-    WRONG_VALUE_ERROR = 0x1,
-    
     /** The argument value has not matched the regex. */
-    REGEX_TO_MATCH_ERROR = 0x2,
+    REGEX_TO_MATCH_ERROR = 0x1,
+    
+    /** The value specified is not correct. */
+    WRONG_VALUE_ERROR = 0x2,
+
+    /** The specified value is not correct and the error comes from an invalide specified path. */
+    INVALID_PATH_ERROR = 0X4,
     
     /** All the argument value error flags. */
-    ALL = 0x3
+    ALL = 0x7
 };
 
 

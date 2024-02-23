@@ -205,7 +205,11 @@ inline bool is_fifo(const char* fle_path, std::error_code* err_code = nullptr) n
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool is_file_type(const char* fle_path, file_type fle_type, std::error_code* err_code) noexcept
+inline bool is_file_type(
+        const char* fle_path, 
+        file_type fle_type, 
+        std::error_code* err_code
+) noexcept
 {
     return SPEED_SELECT_API(filesystem::is_file_type, false, fle_path, fle_type, err_code);
 }

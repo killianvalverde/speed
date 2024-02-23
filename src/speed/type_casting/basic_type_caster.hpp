@@ -57,8 +57,18 @@ public:
      */
     [[nodiscard]] bool is_valid(const void* arg) const noexcept override
     {
-        target_type res;
-        return try_type_cast(*(const source_type*)arg, &res) ? component_type::is_valid(arg) : false;
+        try
+        {
+            target_type res;
+            
+            return try_type_cast(*(const source_type*)arg, &res) ? 
+                    component_type::is_valid(arg) : 
+                    false;
+        }
+        catch (...)
+        {
+            return false;
+        }
     }
 };
 
