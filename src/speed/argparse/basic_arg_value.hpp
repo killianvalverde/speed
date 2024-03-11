@@ -310,6 +310,7 @@ private:
     bool check_validity()
     {
         bool succs;
+        std::size_t fnd;
 
         if (!regx_to_match.empty())
         {
@@ -327,7 +328,7 @@ private:
             }
         }
 
-        succs = str_cstr_->is_valid(&val_);
+        succs = str_cstr_->is_valid(&val_, &err_message_);
         if (!succs)
         {
             err_flgs_.set(arg_value_error_flags::WRONG_VALUE_ERROR);
@@ -338,6 +339,17 @@ private:
             }
             else
             {
+                fnd = err_message->find(" exception");
+                if (fnd != string_type::npos)
+                {
+                    err_message->erase(fnd, 10);
+                }
+
+                if (speed::type_traits::is_path<TpTarget_>::value)
+                {
+                    err_flgs_.set(arg_value_error_flags::INVALID_PATH_ERROR);
+                }
+
                 err_message_ = "Invalid argument";
             }
         }

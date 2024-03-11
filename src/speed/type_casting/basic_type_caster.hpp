@@ -53,22 +53,48 @@ public:
     /**
      * @brief       Allows knowing whether or not an argument is valid.
      * @param       arg : The value to check.
+     * @param       err_message : If the value is not valid it contains the error message thrown by 
+     *              the exception.
      * @return      If the argument is valid true is returned, otherwise false is returned.
      */
-    [[nodiscard]] bool is_valid(const void* arg) const noexcept override
+    [[nodiscard]] bool is_valid(
+            const void* arg, 
+            std::string* err_message = nullptr
+    ) const noexcept override
     {
         try
         {
             target_type res;
+
+            if (err_message != nullptr)
+            {
+                err_message->clear();
+            }
             
-            return try_type_cast(*(const source_type*)arg, &res) ? 
+            return type_cast(*(const source_type*)arg, &res) ? 
                     component_type::is_valid(arg) : 
                     false;
         }
+        catch (const type_casting_exception& tce)
+        {
+            if (err_message != nullptr)
+            {
+                size_t fnd;
+
+                *err_message = tce.what();
+
+                fnd = err_message->find(" exception");
+                if (fnd != std::string::npos) 
+                {
+                    err_message->erase(fnd, 10);
+                }
+            }
+        }
         catch (...)
         {
-            return false;
         }
+
+        return false;
     }
 };
 

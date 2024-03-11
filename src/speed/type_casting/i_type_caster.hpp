@@ -47,9 +47,14 @@ public:
     /**
      * @brief       Allows knowing whether or not an argument is valid.
      * @param       arg : The value to check.
+     * @param       err_message : If the value is not valid it contains the error message thrown by 
+     *              the exception.
      * @return      If the argument is valid true is returned, otherwise false is returned.
      */
-    [[nodiscard]] virtual bool is_valid(const void* arg) const noexcept
+    [[nodiscard]] virtual bool is_valid(
+            const void* arg, 
+            std::string* err_message = nullptr
+    ) const noexcept
     {
         return true;
     }
