@@ -79,7 +79,7 @@ public:
         {
             if (err_message != nullptr)
             {
-                size_t fnd;
+                std::size_t fnd;
 
                 *err_message = tce.what();
 
