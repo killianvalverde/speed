@@ -75,6 +75,9 @@ std::string error_category::message(int val) const
         case error_codes::ARITHMETIC_UNDERFLOW_RANGE:
             return "Underflow range";
 
+        case error_codes::OTHER:
+            return "Invalid syntax";
+
         default:
             return "Unknown error";
     }
