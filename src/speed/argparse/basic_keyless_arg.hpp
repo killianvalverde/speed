@@ -142,6 +142,15 @@ public:
 
         return lowlevel::addm(usage_ky_.length(), 2);
     }
+
+    /**
+     * @brief       Get a string that represents the kind of argument it is.
+     * @return      A string that represents the kind of argument it is.
+     */
+    [[nodiscard]] inline string_type get_tittle() const override
+    {
+        return "Value";
+    }
     
     /**
      * @brief       Print the argument usage ID in standard output for usage sentence.
