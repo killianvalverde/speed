@@ -501,6 +501,10 @@ public:
                         x->try_add_value(cur_argv))
                     {
                         kyless_arg = x;
+                        if (static_cast<base_arg_type*>(kyless_arg) !=  prev_arg)
+                        {
+                            kyless_arg->set_found(true);
+                        }
                         break;
                     }
                 }
@@ -1134,7 +1138,17 @@ private:
                          string_can_be_value(ky_val_arg, argv[cur_idx + *pos_increment]);
                  ++*pos_increment)
             {
-                ky_val_arg->add_value(argv[cur_idx + *pos_increment]);
+                if (ky_val_arg->min_values_reached())
+                {
+                    if (!ky_val_arg->try_add_value(argv[cur_idx + *pos_increment]))
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    ky_val_arg->add_value(argv[cur_idx + *pos_increment]);
+                }
             }
 
             --*pos_increment;
