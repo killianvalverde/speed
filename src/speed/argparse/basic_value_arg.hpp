@@ -533,8 +533,8 @@ public:
     {
         castrs_.clear();
 
-        int foreach[sizeof...(Ts_)] = { (castrs_.push_back(
-                std::allocate_shared<caster_type<Ts_>>(
+        int foreach[sizeof...(Ts_)] = { (
+                castrs_.push_back(std::allocate_shared<caster_type<Ts_>>(
                         allocator_type<caster_type<Ts_>>())), 0)... };
 
         update_max_values(castrs_.size());
@@ -573,7 +573,10 @@ public:
     {
         holdrs_.clear();
 
-        int foreach[sizeof...(Ts_)] = { (holdrs_.push_back(holdrs), 0)... };
+        int foreach[sizeof...(Ts_)] = { (
+                holdrs_.push_back(holdrs),
+                castrs_.empty() ? (set_casters<Ts_>(), 0) : 0,
+                0)... };
 
         update_max_values(holdrs_.size());
     }
