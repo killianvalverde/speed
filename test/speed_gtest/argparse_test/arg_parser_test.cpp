@@ -317,12 +317,14 @@ TEST_F(argparse_arg_parser, parse_keyless_args)
         "/home/user/Videos"
     };
 
+    std::vector<std::size_t> secs;
     std::vector<std::string> pths;
 
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>();
+            .minmax_values(1, ~0ull)
+            .store_into(&secs);
 
     ap.add_keyless_arg("DESTINATION1")
             .description("Destination directory.")
@@ -339,6 +341,7 @@ TEST_F(argparse_arg_parser, parse_keyless_args)
     EXPECT_TRUE(ap.count_values_found("DESTINATION2") == 1);
     EXPECT_TRUE(pths[1] == "/home/user/Pictures");
     EXPECT_TRUE(ap.get_front_as<std::string>("DESTINATION2") == "/home/user/Pictures");
+    EXPECT_TRUE(secs[0] == 45);
 }
 
 
