@@ -173,11 +173,13 @@ set(SPEED_TYPE_CASTING_SOURCE_FILES
         type_casting/error_conditions.hpp
         type_casting/exception.hpp
         type_casting/try_cast_basic_string_to_type.hpp
+        type_casting/try_cast_c_string_to_basic_regex.hpp
         type_casting/try_cast_c_string_to_basic_string.hpp
         type_casting/try_cast_c_string_to_floating_point.hpp
         type_casting/try_cast_c_string_to_integral_signed.hpp
         type_casting/try_cast_c_string_to_integral_unsigned.hpp
         type_casting/try_cast_c_string_to_path.hpp
+        type_casting/try_cast_c_string_to_secure_path.hpp
         type_casting/try_type_cast.hpp
         type_casting/type_cast.hpp
         type_casting/type_caster_base.hpp
