@@ -62,6 +62,12 @@ enum class error_codes : std::uint8_t
     /** System error codes begin. */
     SYSTEM_CODES_BEGINS = 0x5,
 
+    /** Filesystem error codes begin. */
+    FILESYSTEM_CODES_BEGINS = 0x5,
+
+    /** Filesystem invalid path. */
+    FILESYSTEM_INVALID_PATH = 0x6,
+
     /** System error codes end. */
     SYSTEM_CODES_ENDS = 0x6,
 

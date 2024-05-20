@@ -52,17 +52,17 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 {
     try
     {
-        *res = std::filesystem::path(arg);
+        res->assign(arg);
         return true;
     }
     catch (...)
     {
         assign_type_casting_error_code(
-                static_cast<int>(error_codes::SYSTEM_CODES_BEGINS),
+                static_cast<int>(error_codes::FILESYSTEM_INVALID_PATH),
                 err_code);
-    }
 
-    return false;
+        return false;
+    }
 }
 
 

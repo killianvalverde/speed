@@ -75,6 +75,9 @@ std::string error_category::message(int val) const
         case error_codes::ARITHMETIC_UNDERFLOW_RANGE:
             return "Underflow range";
 
+        case error_codes::FILESYSTEM_INVALID_PATH:
+            return "Invalid path";
+
         case error_codes::OTHER:
             return "Invalid syntax";
 
