@@ -25,8 +25,10 @@
  */
 
 #include <filesystem>
+#include <regex>
 
 #include "gtest/gtest.h"
+#include "speed/filesystem/filesystem.hpp"
 #include "speed/type_casting/type_casting.hpp"
 
 
@@ -84,9 +86,29 @@ TEST(type_casting_try_type_cast, c_string_to_integral_unsigned)
 }
 
 
+TEST(type_casting_try_type_cast, c_string_to_regex)
+{
+    std::regex rgx;
+
+    ASSERT_TRUE(speed::type_casting::try_type_cast<std::regex>("^.*$", &rgx));
+}
+
+
 TEST(type_casting_try_type_cast, c_string_to_path)
 {
     std::filesystem::path pth;
     
     ASSERT_TRUE(speed::type_casting::try_type_cast<std::filesystem::path>(".", &pth));
+}
+
+
+TEST(type_casting_try_type_cast, c_string_to_secure_path)
+{
+    speed::filesystem::r_regular_file_path reg_pth;
+    speed::filesystem::r_directory_path dir_pth;
+
+    ASSERT_TRUE(!speed::type_casting::try_type_cast<speed::filesystem::r_regular_file_path>(
+            "./", &reg_pth));
+    ASSERT_TRUE(speed::type_casting::try_type_cast<speed::filesystem::r_directory_path>(
+            "./", &dir_pth));
 }
