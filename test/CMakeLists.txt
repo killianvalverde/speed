@@ -1,1 +1,1 @@
-add_subdirectory(speed_test)
+add_subdirectory(speed_gtest)

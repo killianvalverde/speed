@@ -385,7 +385,6 @@ public:
         string_type cur_argv;
         string_type ky_builder;
         string_type eq_val;
-        string_type ky_prefix;
         std::size_t cur_idx;
         std::size_t pos_increment;
         std::size_t eq_pos;
@@ -433,7 +432,7 @@ public:
             case dfa_t::PARSE_KEY_ARG:
                 parse_key_arg(argc, argv, ky_arg, cur_idx, &pos_increment);
                 cur_idx += pos_increment + 1;
-                prev_arg = static_cast<base_arg_type*>(ky_arg);
+                prev_arg = ky_arg;
                 cur_state = dfa_t::READ_ARG;
                 continue;
 
@@ -450,7 +449,7 @@ public:
                             ky_val_arg->is_flag_set(arg_flags::ASSIGNMENT_OPERATOR))
                     {
                         ky_val_arg->add_value(std::move(eq_val));
-                        ky_arg = static_cast<key_arg_type*>(ky_val_arg);
+                        ky_arg = ky_val_arg;
                         cur_state = dfa_t::PARSE_KEY_ARG;
                         continue;
                     }
@@ -459,13 +458,12 @@ public:
                 continue;
 
             case dfa_t::PARSE_GROUPING_ARGS:
-                ky_prefix = get_key_prefix(cur_argv);
                 chaind_args.clear();
-                for (auto i = ky_prefix.size(); i < cur_argv.size(); ++i)
+                ky_builder = get_key_prefix(cur_argv);
+                ky_builder += ' ';
+                for (auto i = ky_builder.size() - 1; i < cur_argv.size(); ++i)
                 {
-                    ky_builder = ky_prefix;
-                    ky_builder += cur_argv[i];
-
+                    ky_builder[ky_builder.size() - 1] = cur_argv[i];
                     ky_arg = get_key_arg(ky_builder);
                     if (ky_arg != nullptr && ky_arg->is_flag_set(arg_flags::GROUPING))
                     {
@@ -501,6 +499,10 @@ public:
                         x->try_add_value(cur_argv))
                     {
                         kyless_arg = x;
+                        if (static_cast<base_arg_type*>(kyless_arg) !=  prev_arg)
+                        {
+                            kyless_arg->set_found(true);
+                        }
                         break;
                     }
                 }
@@ -524,7 +526,7 @@ public:
                 {
                     ++cur_idx;
                     cur_state = dfa_t::READ_ARG;
-                    prev_arg = static_cast<base_arg_type*>(kyless_arg);
+                    prev_arg = kyless_arg;
                     continue;
                 }
                 cur_state = dfa_t::PARSE_UNRECOGNIZED_ARG;
@@ -1134,7 +1136,17 @@ private:
                          string_can_be_value(ky_val_arg, argv[cur_idx + *pos_increment]);
                  ++*pos_increment)
             {
-                ky_val_arg->add_value(argv[cur_idx + *pos_increment]);
+                if (ky_val_arg->min_values_reached())
+                {
+                    if (!ky_val_arg->try_add_value(argv[cur_idx + *pos_increment]))
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    ky_val_arg->add_value(argv[cur_idx + *pos_increment]);
+                }
             }
 
             --*pos_increment;

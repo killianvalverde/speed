@@ -18,25 +18,29 @@
  */
 
 /**
- * @file        speed/version.hpp
- * @brief       File that include the library version macros.
+ * @file        speed_gtest/algorithm_test/algorithm_test.cpp
+ * @brief       algorithm_test unit test.
  * @author      Killian Valverde
- * @date        2018/06/09
+ * @date        2018/08/07
  */
 
-#ifndef SPEED_VERSION_HPP
-#define SPEED_VERSION_HPP
+#include <vector>
 
-/** The major version number. */
-#define SPEED_VERSION_MAJOR 0
+#include "gtest/gtest.h"
+#include "speed/algorithm/algorithm.hpp"
 
-/** The minor version number. */
-#define SPEED_VERSION_MINOR 2
 
-/** The patch version number */
-#define SPEED_VERSION_PATCH 0
-
-/** The hole version number in string type. */
-#define SPEED_VERSION ("0.2.0")
-
-#endif
+TEST(algorithm_algorithm, quicksort)
+{
+    std::vector<std::size_t> vec = {12, 34553, 1, 90, 124124};
+    
+    speed::algorithm::quicksort(vec, vec.size());
+    
+    std::size_t min = 0;
+    
+    for (auto& x : vec)
+    {
+        EXPECT_TRUE(min < x);
+        min = x;
+    }
+}

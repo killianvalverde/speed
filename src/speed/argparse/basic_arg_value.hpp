@@ -182,18 +182,19 @@ public:
             {
                 err_message_ = "Invalid number";
             }
-            else if (err_code == speed::type_casting::error_conditions::SYSTEM_ERROR)
-            {
-                err_message_ = "Invalid path";
-                err_flgs_.set(arg_value_error_flags::INVALID_PATH_ERROR);
-            }
             else
             {
                 err_message_ = err_code.message();
-                if (err_message_.empty())
+
+                if (err_code.category() == std::system_category())
                 {
-                    err_message_ = "Unknown error";
+                    err_flgs_.set(arg_value_error_flags::INVALID_PATH_ERROR);
                 }
+            }
+
+            if (err_message_.empty())
+            {
+                err_message_ = "Unknown error";
             }
 
             return false;

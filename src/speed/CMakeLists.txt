@@ -65,7 +65,15 @@ set(SPEED_EXCEPTIONS_SOURCE_FILES
 set(SPEED_FILESYSTEM_SOURCE_FILES
         filesystem/directory_iteration.cpp
         filesystem/directory_iteration.hpp
+        filesystem/directory_path_decorator.hpp
+        filesystem/execute_path_decorator.hpp
         filesystem/filesystem.hpp
+        filesystem/paths_declarations.hpp
+        filesystem/regular_file_path_decorator.hpp
+        filesystem/read_path_decorator.hpp
+        filesystem/secure_path.hpp
+        filesystem/touch_path_decorator.hpp
+        filesystem/write_path_decorator.hpp
 )
 
 set(SPEED_IOSTREAM_SOURCE_FILES
@@ -165,11 +173,13 @@ set(SPEED_TYPE_CASTING_SOURCE_FILES
         type_casting/error_conditions.hpp
         type_casting/exception.hpp
         type_casting/try_cast_basic_string_to_type.hpp
+        type_casting/try_cast_c_string_to_basic_regex.hpp
         type_casting/try_cast_c_string_to_basic_string.hpp
         type_casting/try_cast_c_string_to_floating_point.hpp
         type_casting/try_cast_c_string_to_integral_signed.hpp
         type_casting/try_cast_c_string_to_integral_unsigned.hpp
         type_casting/try_cast_c_string_to_path.hpp
+        type_casting/try_cast_c_string_to_secure_path.hpp
         type_casting/try_type_cast.hpp
         type_casting/type_cast.hpp
         type_casting/type_caster_base.hpp
@@ -242,8 +252,7 @@ target_link_libraries(speed_argparse
         speed_lowlevel 
         speed_stringutils 
         speed_system 
-        speed_type_casting 
-        -lstdc++fs
+        speed_type_casting
 )
 
 target_link_libraries(speed_containers 
@@ -272,8 +281,7 @@ target_link_libraries(speed_stringutils
 
 target_link_libraries(speed_system 
         speed_exception 
-        speed_lowlevel 
-        -lstdc++fs
+        speed_lowlevel
 )
 
 target_link_libraries(speed_time 
@@ -283,12 +291,10 @@ target_link_libraries(speed_time
 target_link_libraries(speed_type_casting 
         speed_exception 
         speed_stringutils 
-        speed_type_traits 
-        -lstdc++fs
+        speed_type_traits
 )
 
-target_link_libraries(speed_type_traits 
-        -lstdc++fs
+target_link_libraries(speed_type_traits
 )
 
 target_link_libraries(speed

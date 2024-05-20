@@ -18,16 +18,16 @@
  */
 
 /**
- * @file        speed/type_casting/try_cast_c_string_to_basic_string.hpp
- * @brief       try_cast_c_string_to_basic_string main header.
+ * @file        speed/type_casting/try_cast_c_string_to_basic_regex.hpp
+ * @brief       try_cast_c_string_to_basic_regex main header.
  * @author      Killian Valverde
- * @date        2016/08/19
+ * @date        2024/05/20
  */
 
-#ifndef SPEED_TYPE_CASTING_TRY_CAST_C_STRING_TO_BASIC_STRING_HPP
-#define SPEED_TYPE_CASTING_TRY_CAST_C_STRING_TO_BASIC_STRING_HPP
+#ifndef SPEED_TYPE_CASTING_TRY_CAST_C_STRING_TO_BASIC_REGEX_HPP
+#define SPEED_TYPE_CASTING_TRY_CAST_C_STRING_TO_BASIC_REGEX_HPP
 
-#include <string>
+#include <regex>
 #include <type_traits>
 
 #include "../stringutils/stringutils.hpp"
@@ -45,7 +45,7 @@ namespace __private {
 
 template<typename TpTarget, typename TpSource>
 std::enable_if_t<
-        speed::type_traits::is_basic_string<TpTarget>::value &&
+        speed::type_traits::is_basic_regex<TpTarget>::value &&
                 speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value,
         bool
 >

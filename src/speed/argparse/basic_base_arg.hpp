@@ -177,7 +177,7 @@ public:
      * @brief       Get a string that represents the kind of argument it is.
      * @return      A string that represents the kind of argument it is.
      */
-    [[nodiscard]] inline string_type get_tittle() const
+    [[nodiscard]] inline virtual string_type get_tittle() const
     {
         return is_option() ? "Option" : "Command";
     }

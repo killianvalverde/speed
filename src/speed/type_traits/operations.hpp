@@ -28,6 +28,7 @@
 #define SPEED_TYPE_TRAITS_OPERATIONS_HPP
 
 #include <filesystem>
+#include <regex>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -244,6 +245,35 @@ struct is_basic_string
 /** @cond */
 namespace __private {
 template<typename>
+struct __is_basic_regex_helper : public std::false_type {};
+
+template<
+        typename TpChar,
+        typename TpRegexTraits
+>
+struct __is_basic_regex_helper<std::basic_regex<TpChar, TpRegexTraits>>
+        : public is_character<TpChar>
+{
+};
+} /* __private */
+/** @endcond */
+
+
+/**
+ * @brief       Trait class that identifies whether T is a 'std::basic_regex' type.
+ */
+template<typename Tp>
+struct is_basic_regex
+        : public __private::__is_basic_regex_helper<
+                typename std::remove_cv<Tp>::type
+          >::type
+{
+};
+
+
+/** @cond */
+namespace __private {
+template<typename>
 struct __is_basic_string_vector_helper : public std::false_type {};
 
 template<
@@ -311,7 +341,7 @@ struct __is_path_helper<std::filesystem::path> : public std::true_type {};
 
 
 /**
- * @brief       Trait class that identifies whether T is a 'std::basic_ostream' type.
+ * @brief       Trait class that identifies whether T is a 'std::filesystem::path' type.
  */
 template<typename Tp>
 struct is_path

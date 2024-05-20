@@ -28,11 +28,13 @@
 #define SPEED_TYPE_CASTING_TRY_CAST_BASIC_STRING_TO_TYPE_HPP
 
 #include "error_category.hpp"
+#include "try_cast_c_string_to_basic_regex.hpp"
 #include "try_cast_c_string_to_basic_string.hpp"
 #include "try_cast_c_string_to_floating_point.hpp"
 #include "try_cast_c_string_to_integral_signed.hpp"
 #include "try_cast_c_string_to_integral_unsigned.hpp"
 #include "try_cast_c_string_to_path.hpp"
+#include "try_cast_c_string_to_secure_path.hpp"
 
 
 namespace speed::type_casting {
