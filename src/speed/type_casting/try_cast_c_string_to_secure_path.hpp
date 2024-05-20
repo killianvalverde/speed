@@ -18,19 +18,19 @@
  */
 
 /**
- * @file        speed/type_casting/try_cast_c_string_to_basic_string.hpp
- * @brief       try_cast_c_string_to_basic_string main header.
+ * @file        speed/type_casting/try_cast_c_string_to_secure_path.hpp
+ * @brief       try_cast_c_string_to_secure_path main header.
  * @author      Killian Valverde
- * @date        2016/08/19
+ * @date        2024/05/20
  */
 
-#ifndef SPEED_TYPE_CASTING_TRY_CAST_C_STRING_TO_BASIC_STRING_HPP
-#define SPEED_TYPE_CASTING_TRY_CAST_C_STRING_TO_BASIC_STRING_HPP
+#ifndef SPEED_TYPE_CASTING_TRY_CAST_C_STRING_TO_SECURE_PATH_HPP
+#define SPEED_TYPE_CASTING_TRY_CAST_C_STRING_TO_SECURE_PATH_HPP
 
-#include <string>
+#include <filesystem>
 #include <type_traits>
 
-#include "../stringutils/stringutils.hpp"
+#include "../filesystem/filesystem.hpp"
 #include "../type_traits/type_traits.hpp"
 #include "error_category.hpp"
 #include "error_codes.hpp"
@@ -45,26 +45,25 @@ namespace __private {
 
 template<typename TpTarget, typename TpSource>
 std::enable_if_t<
-        speed::type_traits::is_basic_string<TpTarget>::value &&
-                speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value,
+        speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
+                std::is_base_of_v<speed::filesystem::secure_path, TpTarget>,
         bool
 >
 __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) noexcept
 {
     try
     {
-        std::size_t len = speed::stringutils::strlen(arg);
-        res->assign(arg, arg + len);
-        return true;
+        res->assign(arg);
+        return res->is_valid(err_code);
     }
     catch (...)
     {
         assign_type_casting_error_code(
-                static_cast<int>(error_codes::OTHER),
+                static_cast<int>(error_codes::FILESYSTEM_INVALID_PATH),
                 err_code);
-    }
 
-    return false;
+        return false;
+    }
 }
 
 

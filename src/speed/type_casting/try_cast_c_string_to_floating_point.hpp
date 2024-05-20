@@ -34,6 +34,7 @@
 #include <type_traits>
 
 #include "../type_traits/type_traits.hpp"
+#include "error_category.hpp"
 #include "error_codes.hpp"
 
 
