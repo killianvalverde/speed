@@ -242,8 +242,7 @@ target_link_libraries(speed_argparse
         speed_lowlevel 
         speed_stringutils 
         speed_system 
-        speed_type_casting 
-        -lstdc++fs
+        speed_type_casting
 )
 
 target_link_libraries(speed_containers 
@@ -272,8 +271,7 @@ target_link_libraries(speed_stringutils
 
 target_link_libraries(speed_system 
         speed_exception 
-        speed_lowlevel 
-        -lstdc++fs
+        speed_lowlevel
 )
 
 target_link_libraries(speed_time 
@@ -283,12 +281,10 @@ target_link_libraries(speed_time
 target_link_libraries(speed_type_casting 
         speed_exception 
         speed_stringutils 
-        speed_type_traits 
-        -lstdc++fs
+        speed_type_traits
 )
 
-target_link_libraries(speed_type_traits 
-        -lstdc++fs
+target_link_libraries(speed_type_traits
 )
 
 target_link_libraries(speed
