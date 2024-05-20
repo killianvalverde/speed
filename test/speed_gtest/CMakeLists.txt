@@ -19,6 +19,10 @@ set(SPEED_CONTAINERS_TEST_SOURCE_FILES
         containers_test/static_cache_test.cpp
 )
 
+set(SPEED_FILESYSTEM_TEST_SOURCE_FILES
+        filesystem_test/secure_path_test.cpp
+)
+
 set(SPEED_IOSTREAM_TEST_SOURCE_FILES
         iostream_test/indentation_test.cpp
 )
@@ -63,6 +67,7 @@ set(SPEED_TYPE_TRAITS_TEST_SOURCE_FILES
 add_executable(speed_algorithm_test main.cpp ${SPEED_ALGORITHM_TEST_SOURCE_FILES})
 add_executable(speed_argparse_test main.cpp ${SPEED_ARGPARSE_TEST_SOURCE_FILES})
 add_executable(speed_containers_test main.cpp ${SPEED_CONTAINERS_TEST_SOURCE_FILES})
+add_executable(speed_filesystem_test main.cpp ${SPEED_FILESYSTEM_TEST_SOURCE_FILES})
 add_executable(speed_iostream_test main.cpp ${SPEED_IOSTREAM_TEST_SOURCE_FILES})
 add_executable(speed_lowlevel_test main.cpp ${SPEED_LOWLEVEL_TEST_SOURCE_FILES})
 add_executable(speed_scalars_test main.cpp ${SPEED_SCALARS_TEST_SOURCE_FILES})
@@ -76,6 +81,7 @@ add_executable(speed_test
         main.cpp
         ${SPEED_ARGPARSE_TEST_SOURCE_FILES}
         ${SPEED_CONTAINERS_TEST_SOURCE_FILES}
+        ${SPEED_FILESYSTEM_TEST_SOURCE_FILES}
         ${SPEED_IOSTREAM_TEST_SOURCE_FILES}
         ${SPEED_LOWLEVEL_TEST_SOURCE_FILES}
         ${SPEED_SCALARS_TEST_SOURCE_FILES}
