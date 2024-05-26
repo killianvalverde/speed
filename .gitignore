@@ -1,9 +1,26 @@
-bin
-cmake-build-debug
-cmake-build
-build
-doc
-include
-lib
-.idea
-.vscode
+# Compiled binaries
+bin/
+
+# CMake build directories
+build/
+cmake-build/
+cmake-build-debug/
+
+# Documentation output
+doc/
+docs/html/
+docs/latex/
+
+# Libraries (assuming these are build outputs, not source)
+lib/
+
+# IDE directories
+.idea/
+.vscode/
+
+# macOS files
+.DS_Store
+
+# Windows files
+Desktop.ini
+Thumbs.db
