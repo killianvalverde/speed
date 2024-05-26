@@ -18,8 +18,8 @@
  */
 
 /**
- * @file        speed/filesystem/touch_path_decorator.hpp
- * @brief       touch_path_decorator main header.
+ * @file        speed/filesystem/output_path_decorator.hpp
+ * @brief       output_path_decorator main header.
  * @author      Killian Valverde
  * @date        2024/05/20
  */
@@ -37,10 +37,10 @@ namespace speed::filesystem {
 
 
 /**
- * @brief       Path class decorator that checks whether the path can be touched.
+ * @brief       Path class decorator that checks whether the path can be used as an output file.
  */
 template<typename TpComponent>
-class touch_path_decorator : public TpComponent
+class output_path_decorator : public TpComponent
 {
 public:
     /** Component type. */
