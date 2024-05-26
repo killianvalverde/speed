@@ -32,7 +32,7 @@
 #include "read_path_decorator.hpp"
 #include "regular_file_path_decorator.hpp"
 #include "secure_path.hpp"
-#include "touch_path_decorator.hpp"
+#include "output_path_decorator.hpp"
 #include "write_path_decorator.hpp"
 
 
@@ -89,8 +89,8 @@ using rw_directory_path = read_path_decorator<write_path_decorator<directory_pat
 using rwx_directory_path = read_path_decorator<
         write_path_decorator<execute_path_decorator<directory_path>>>;
 
-/** Regular file path type that can be touched. */
-using touch_path = touch_path_decorator<secure_path>;
+/** Regular file path type that can be used as an output file. */
+using output_regular_file_path = output_path_decorator<secure_path>;
 
 
 }

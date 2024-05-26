@@ -72,7 +72,7 @@ set(SPEED_FILESYSTEM_SOURCE_FILES
         filesystem/regular_file_path_decorator.hpp
         filesystem/read_path_decorator.hpp
         filesystem/secure_path.hpp
-        filesystem/touch_path_decorator.hpp
+        filesystem/output_path_decorator.hpp
         filesystem/write_path_decorator.hpp
 )
 

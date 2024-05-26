@@ -34,7 +34,7 @@
 #include "read_path_decorator.hpp"
 #include "regular_file_path_decorator.hpp"
 #include "secure_path.hpp"
-#include "touch_path_decorator.hpp"
+#include "output_path_decorator.hpp"
 #include "write_path_decorator.hpp"
 
 
