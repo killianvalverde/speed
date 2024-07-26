@@ -74,9 +74,8 @@ set(SPEED_IOSTREAM_SOURCE_FILES
         iostream/indentation.cpp
         iostream/indentation.hpp
         iostream/basic_ios_redirect.hpp
-        iostream/basic_ostream.hpp
-        iostream/stdio.cpp
-        iostream/stdio.hpp
+        iostream/operations.cpp
+        iostream/operations.hpp
         iostream/iostream.hpp
 )
 
