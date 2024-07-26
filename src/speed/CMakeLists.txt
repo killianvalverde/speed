@@ -1,5 +1,6 @@
 set(SPEED_ALGORITHM_SOURCE_FILES
         algorithm/operations.hpp
+        algorithm/simple_compare.hpp
         algorithm/algorithm.hpp
 )
 

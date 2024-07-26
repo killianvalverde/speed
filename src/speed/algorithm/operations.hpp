@@ -30,28 +30,10 @@
 #include <cstdlib>
 #include <type_traits>
 
+#include "simple_compare.hpp"
+
 
 namespace speed::algorithm {
-
-
-/**
- * @brief       Class used to compare easily two objects.
- */
-template<typename TpComparable>
-struct simple_compare
-{
-    /**
-     * @brief       Compare two elements.
-     * @param       rhs : First element to compare.
-     * @param       lhs : Second element to compare
-     * @return      True is returned whether the element passed as first argument is considered to
-     *              go before the second.
-     */
-    [[nodiscard]] bool operator()(const TpComparable& rhs, const TpComparable& lhs) const
-    {
-        return rhs < lhs;
-    }
-};
 
 
 /** @cond */
