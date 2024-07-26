@@ -256,6 +256,148 @@ public:
 };
 
 
+/**
+ * @brief       Class that represents the interface for a constant iterator.
+ */
+template<typename TpValue, typename TpIterator>
+class const_iterator_base : public virtual iterator_base<TpValue, TpIterator>
+{
+public:
+    /** The value encapsulated by the iterator. */
+    using value_type = TpValue;
+
+    /** The iterator derived type. */
+    using iterator_type = TpIterator;
+
+    /** The class itself. */
+    using self_type = const_iterator_base<value_type, iterator_type>;
+
+    /** The base class. */
+    using base_type = iterator_base<value_type, iterator_type>;
+
+    /**
+     * @brief       Get the reference of the current node value.
+     * @return      The reference of the current node value.
+     */
+    virtual const value_type& operator *() const = 0;
+
+    /**
+     * @brief       Get the address of the current node value.
+     * @return      The address of the current node value.
+     */
+    virtual const value_type* operator ->() const = 0;
+
+    /**
+     * @brief       Move to the forward node n times.
+     * @param       n : The number of times to move.
+     * @return      A reference to the resulting node.
+     */
+    virtual const value_type& operator [](std::size_t n) const
+    {
+        iterator_type old_it(dynamic_cast<const iterator_type&>(*this));
+
+        old_it.self_type::operator +=(n);
+
+        return *old_it;
+    }
+};
+
+
+/**
+ * @brief       Class that represents the interface for a mutable iterator.
+ */
+template<typename TpValue, typename TpIterator>
+class mutable_iterator_base : public virtual iterator_base<TpValue, TpIterator>
+{
+public:
+    /** The value encapsulated by the iterator. */
+    using value_type = TpValue;
+
+    /** The iterator derived type. */
+    using iterator_type = TpIterator;
+
+    /** The class itself. */
+    using self_type = mutable_iterator_base<value_type, iterator_type>;
+
+    /** The base class. */
+    using base_type = iterator_base<value_type, iterator_type>;
+
+    /**
+     * @brief       Get the reference of the current node value.
+     * @return      The reference of the current node value.
+     */
+    virtual value_type& operator *() = 0;
+
+    /**
+     * @brief       Get the address of the current node value.
+     * @return      The address of the current node value.
+     */
+    virtual value_type* operator ->() = 0;
+
+    /**
+     * @brief       Move to the forward node n times.
+     * @param       n : The number of times to move.
+     * @return      A reference to the resulting node.
+     */
+    virtual value_type& operator [](std::size_t n)
+    {
+        iterator_type old_it(dynamic_cast<const iterator_type&>(*this));
+
+        old_it.self_type::operator +=(n);
+
+        return *old_it;
+    }
+};
+
+
+/**
+ * @brief       Class that represents the interface for a constant mutable iterator.
+ */
+template<typename TpValue, typename TpConstIterator, typename TpMutableIterator>
+class const_mutable_iterator_base
+        : public TpConstIterator
+        , public mutable_iterator_base<TpValue, TpMutableIterator>
+{
+public:
+    /** The value encapsulated by the iterator. */
+    using value_type = TpValue;
+
+    /** The const iterator derived type. */
+    using const_iterator_type = TpConstIterator;
+
+    /** The mutable iterator derived type. */
+    using mutable_iterator_type = TpMutableIterator;
+
+    /** The class itself. */
+    using self_type = const_mutable_iterator_base<TpValue, TpConstIterator, TpMutableIterator>;
+
+    /** The base class. */
+    using base_type = mutable_iterator_base<value_type, TpMutableIterator>;
+
+    /**
+     * @brief       Perfect worwarding constructor.
+     * @param       args : The variadic arguments to forward to the base class.
+     */
+    template<typename... TpArgs>
+    const_mutable_iterator_base(TpArgs&&... args)
+            : const_iterator_type(std::forward<TpArgs>(args)...)
+    {
+    }
+
+    using base_type::operator ++;
+    using base_type::operator --;
+    using base_type::operator +;
+    using base_type::operator -;
+    using base_type::operator +=;
+    using base_type::operator -=;
+    using base_type::operator !=;
+    using base_type::operator <;
+    using base_type::operator >;
+    using base_type::operator <=;
+    using base_type::operator >=;
+};
+
+
 }
 
 

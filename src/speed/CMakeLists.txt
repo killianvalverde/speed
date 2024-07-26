@@ -41,13 +41,10 @@ set(SPEED_ARGPARSE_SOURCE_FILES
 
 set(SPEED_CONTAINERS_SOURCE_FILES
         containers/circular_doubly_linked_list.hpp
-        containers/const_iterator_base.hpp
-        containers/const_mutable_iterator_base.hpp
         containers/doubly_linked_node.hpp
         containers/exception.hpp
         containers/flags.hpp
         containers/iterator_base.hpp
-        containers/mutable_iterator_base.hpp
         containers/static_cache.hpp
         containers/containers.hpp
 )
