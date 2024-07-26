@@ -77,7 +77,7 @@ public:
      * @brief       Allows knowing whether the iterator is past-the-end or not.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    virtual bool end() const noexcept = 0;
+    [[nodiscard]] virtual bool end() const noexcept = 0;
     
     /**
      * @brief       Move to the forward node.

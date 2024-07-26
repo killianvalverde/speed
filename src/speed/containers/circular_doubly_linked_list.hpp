@@ -124,7 +124,7 @@ public:
          * @brief       Allows knowing whether the iterator is past-the-end or not.
          * @return      If function was successful true is returned, otherwise false is returned.
          */
-        bool end() const noexcept override
+        [[nodiscard]] bool end() const noexcept override
         {
             return cur_ == nullptr;
         }
@@ -222,7 +222,7 @@ public:
          * @brief       Allows knowing whether the iterator is past-the-end or not.
          * @return      If function was successful true is returned, otherwise false is returned.
          */
-        bool end() const noexcept override
+        [[nodiscard]] bool end() const noexcept override
         {
             return const_self_type::end();
         }
