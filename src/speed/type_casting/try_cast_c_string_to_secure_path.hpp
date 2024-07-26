@@ -46,7 +46,7 @@ namespace __private {
 template<typename TpTarget, typename TpSource>
 std::enable_if_t<
         speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
-                std::is_base_of_v<speed::filesystem::secure_path, TpTarget>,
+                std::is_base_of_v<speed::filesystem::valid_path, TpTarget>,
         bool
 >
 __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) noexcept

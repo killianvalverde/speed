@@ -66,15 +66,8 @@ set(SPEED_EXCEPTIONS_SOURCE_FILES
 set(SPEED_FILESYSTEM_SOURCE_FILES
         filesystem/directory_iteration.cpp
         filesystem/directory_iteration.hpp
-        filesystem/directory_path_decorator.hpp
-        filesystem/execute_path_decorator.hpp
         filesystem/filesystem.hpp
-        filesystem/paths_declarations.hpp
-        filesystem/regular_file_path_decorator.hpp
-        filesystem/read_path_decorator.hpp
-        filesystem/secure_path.hpp
-        filesystem/output_path_decorator.hpp
-        filesystem/write_path_decorator.hpp
+        filesystem/valid_path.hpp
 )
 
 set(SPEED_IOSTREAM_SOURCE_FILES
