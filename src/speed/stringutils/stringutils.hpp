@@ -27,8 +27,7 @@
 #ifndef SPEED_STRINGUTILS_STRINGUTILS_HPP
 #define SPEED_STRINGUTILS_STRINGUTILS_HPP
 
-#include "c_string_utils.hpp"
-#include "string_utils.hpp"
+#include "operations.hpp"
 
 
 namespace speed {

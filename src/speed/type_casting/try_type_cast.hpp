@@ -27,20 +27,476 @@
 #ifndef SPEED_TYPE_CASTING_TRY_TYPE_CAST_HPP
 #define SPEED_TYPE_CASTING_TRY_TYPE_CAST_HPP
 
+#include <cctype>
+#include <cmath>
+#include <limits>
 #include <system_error>
+#include <type_traits>
 
+#include "../filesystem/filesystem.hpp"
+#include "../stringutils/stringutils.hpp"
+#include "../type_traits/type_traits.hpp"
 #include "error_category.hpp"
-#include "try_cast_basic_string_to_type.hpp"
-#include "try_cast_c_string_to_basic_regex.hpp"
-#include "try_cast_c_string_to_basic_string.hpp"
-#include "try_cast_c_string_to_floating_point.hpp"
-#include "try_cast_c_string_to_integral_signed.hpp"
-#include "try_cast_c_string_to_integral_unsigned.hpp"
-#include "try_cast_c_string_to_path.hpp"
-#include "try_cast_c_string_to_secure_path.hpp"
+#include "error_codes.hpp"
 
 
 namespace speed::type_casting {
+
+
+/** @cond */
+namespace __private {
+
+
+template<typename TpTarget, typename TpSource>
+std::enable_if_t<
+        speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
+                std::is_integral<TpTarget>::value &&
+                std::is_unsigned<TpTarget>::value,
+        bool
+>
+__try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) noexcept
+{
+    using unsigned_type = TpTarget;
+    using char_type = std::remove_const_t<std::remove_pointer_t<std::decay_t<TpSource>>>;
+    using string_pointer_type = const char_type*;
+
+    constexpr unsigned_type max_unsigned = std::numeric_limits<unsigned_type>::max();
+
+    string_pointer_type str = arg;
+    unsigned_type res_bldr = 0;
+    char_type sgn;
+    char_type digt;
+
+    if (str == nullptr)
+    {
+        assign_type_casting_error_code(
+            static_cast<int>(error_codes::ARITHMETIC_CONVERSION_FAILS),
+            err_code);
+
+        return false;
+    }
+
+    while (isspace(*str))
+    {
+        ++str;
+    }
+
+    sgn = *str;
+    if (sgn == '+')
+    {
+        ++str;
+    }
+
+    if (*str == '\0')
+    {
+        assign_type_casting_error_code(
+            static_cast<int>(error_codes::ARITHMETIC_INVALID_SYNTAX),
+            err_code);
+
+        return false;
+    }
+
+    while ((digt = *str) != '\0')
+    {
+        if (!isdigit(digt))
+        {
+            assign_type_casting_error_code(
+                static_cast<int>(error_codes::ARITHMETIC_INVALID_SYNTAX),
+                err_code);
+
+            return false;
+        }
+
+        digt -= '0';
+
+        if ((res_bldr > max_unsigned / 10) ||
+            (res_bldr == max_unsigned / 10 && digt > (max_unsigned % 10)))
+        {
+            assign_type_casting_error_code(
+                static_cast<int>(error_codes::ARITHMETIC_OVERFLOW_RANGE),
+                err_code);
+
+            return false;
+        }
+
+        res_bldr = res_bldr * 10 + digt;
+        ++str;
+    }
+
+    *res = res_bldr;
+
+    return true;
+}
+
+
+template<typename TpTarget, typename TpSource>
+std::enable_if_t<
+        speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
+                std::is_integral<TpTarget>::value &&
+                std::is_signed<TpTarget>::value,
+        bool
+>
+__try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) noexcept
+{
+    using signed_type = TpTarget;
+    using char_type = std::remove_const_t<std::remove_pointer_t<std::decay_t<TpSource>>>;
+    using string_pointer_type = const char_type*;
+
+    constexpr signed_type min_signed = std::numeric_limits<signed_type>::min();
+    constexpr signed_type max_signed = std::numeric_limits<signed_type>::max();
+
+    string_pointer_type str = arg;
+    signed_type res_bldr = 0;
+    char_type sgn;
+    char_type digt;
+
+    if (str == nullptr)
+    {
+        assign_type_casting_error_code(
+            static_cast<int>(error_codes::ARITHMETIC_CONVERSION_FAILS),
+            err_code);
+
+        return false;
+    }
+
+    while (isspace(*str))
+    {
+        ++str;
+    }
+
+    sgn = *str;
+    if (sgn == '-' || sgn == '+')
+    {
+        ++str;
+    }
+
+    if (*str == '\0')
+    {
+        assign_type_casting_error_code(
+            static_cast<int>(error_codes::ARITHMETIC_INVALID_SYNTAX),
+            err_code);
+
+        return false;
+    }
+
+    while ((digt = *str) != '\0')
+    {
+        if (!isdigit(digt))
+        {
+            assign_type_casting_error_code(
+                static_cast<int>(error_codes::ARITHMETIC_INVALID_SYNTAX),
+                err_code);
+
+            return false;
+        }
+
+        digt -= '0';
+
+        if ((res_bldr < min_signed / 10) ||
+            (res_bldr == min_signed / 10 && digt > -(min_signed % 10)))
+        {
+            assign_type_casting_error_code(
+                static_cast<int>(error_codes::ARITHMETIC_OVERFLOW_RANGE),
+                err_code);
+
+            return false;
+        }
+
+        res_bldr = res_bldr * 10 - digt;
+        ++str;
+    }
+
+    if (sgn != '-')
+    {
+        if (res_bldr < -max_signed)
+        {
+            assign_type_casting_error_code(
+                static_cast<int>(error_codes::ARITHMETIC_OVERFLOW_RANGE),
+                err_code);
+
+            return false;
+        }
+
+        res_bldr *= -1;
+    }
+
+    *res = res_bldr;
+
+    return true;
+}
+
+
+// TODO: The conditions for the generation are kinda weird.
+template<typename TpTarget, typename TpSource>
+std::enable_if_t<
+        speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
+                speed::type_traits::is_char<
+                        std::remove_pointer_t<
+                        std::decay_t<
+                        typename std::remove_extent<TpSource>::type>>>::value &&
+                speed::type_traits::is_float<TpTarget>::value,
+        bool
+>
+__try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) noexcept
+{
+    using floating_point_type = TpTarget;
+
+    errno = 0;
+    char* endptr;
+    floating_point_type res_bldr;
+
+    res_bldr = strtof(arg, &endptr);
+
+    if (endptr == arg || *endptr != '\0')
+    {
+        assign_type_casting_error_code(
+            static_cast<int>(error_codes::ARITHMETIC_CONVERSION_FAILS),
+            err_code);
+
+        return false;
+    }
+
+    if (res_bldr == HUGE_VALF && errno == ERANGE)
+    {
+        assign_type_casting_error_code(
+            static_cast<int>(error_codes::ARITHMETIC_OVERFLOW_RANGE),
+            err_code);
+
+        return false;
+    }
+
+    if (errno == ERANGE)
+    {
+        assign_type_casting_error_code(
+            static_cast<int>(error_codes::ARITHMETIC_UNDERFLOW_RANGE),
+            err_code);
+
+        return false;
+    }
+
+    *res = res_bldr;
+
+    return true;
+}
+
+
+template<typename TpTarget, typename TpSource>
+std::enable_if_t<
+        speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
+                speed::type_traits::is_char<
+                       std::remove_pointer_t<
+                       std::decay_t<
+                       typename std::remove_extent<TpSource>::type>>>::value &&
+                speed::type_traits::is_double<TpTarget>::value,
+        bool
+>
+__try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) noexcept
+{
+    using floating_point_type = TpTarget;
+
+    errno = 0;
+    char* endptr;
+    floating_point_type res_bldr;
+
+    res_bldr = strtod(arg, &endptr);
+
+    if (endptr == arg || *endptr != '\0')
+    {
+        assign_type_casting_error_code(
+            static_cast<int>(error_codes::ARITHMETIC_CONVERSION_FAILS),
+            err_code);
+
+        return false;
+    }
+
+    if (res_bldr == HUGE_VAL && errno == ERANGE)
+    {
+        assign_type_casting_error_code(
+            static_cast<int>(error_codes::ARITHMETIC_OVERFLOW_RANGE),
+            err_code);
+
+        return false;
+    }
+
+    if (errno == ERANGE)
+    {
+        assign_type_casting_error_code(
+            static_cast<int>(error_codes::ARITHMETIC_UNDERFLOW_RANGE),
+            err_code);
+
+        return false;
+    }
+
+    *res = res_bldr;
+
+    return true;
+}
+
+
+template<typename TpTarget, typename TpSource>
+std::enable_if_t<
+        speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
+                speed::type_traits::is_char<
+                        std::remove_pointer_t<
+                        std::decay_t<
+                        typename std::remove_extent<TpSource>::type>>>::value &&
+                speed::type_traits::is_long_double<TpTarget>::value,
+        bool
+>
+__try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) noexcept
+{
+    using floating_point_type = TpTarget;
+
+    errno = 0;
+    char* endptr;
+    floating_point_type res_bldr;
+
+    res_bldr = strtold(arg, &endptr);
+
+    if (endptr == arg || *endptr != '\0')
+    {
+        assign_type_casting_error_code(
+            static_cast<int>(error_codes::ARITHMETIC_CONVERSION_FAILS),
+            err_code);
+
+        return false;
+    }
+
+    if (res_bldr == HUGE_VALL && errno == ERANGE)
+    {
+        assign_type_casting_error_code(
+            static_cast<int>(error_codes::ARITHMETIC_OVERFLOW_RANGE),
+            err_code);
+
+        return false;
+    }
+
+    if (errno == ERANGE)
+    {
+        assign_type_casting_error_code(
+            static_cast<int>(error_codes::ARITHMETIC_UNDERFLOW_RANGE),
+            err_code);
+
+        return false;
+    }
+
+    *res = res_bldr;
+
+    return true;
+}
+
+
+template<typename TpTarget, typename TpSource>
+std::enable_if_t<
+        speed::type_traits::is_basic_string<TpTarget>::value &&
+                speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value,
+        bool
+>
+__try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) noexcept
+{
+    try
+    {
+        std::size_t len = speed::stringutils::strlen(arg);
+        res->assign(arg, arg + len);
+        return true;
+    }
+    catch (...)
+    {
+        assign_type_casting_error_code(
+                static_cast<int>(error_codes::OTHER),
+                err_code);
+    }
+
+    return false;
+}
+
+
+template<typename TpTarget, typename TpSource>
+std::enable_if_t<
+        speed::type_traits::is_basic_regex<TpTarget>::value &&
+                speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value,
+        bool
+>
+__try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) noexcept
+{
+    try
+    {
+        std::size_t len = speed::stringutils::strlen(arg);
+        res->assign(arg, arg + len);
+        return true;
+    }
+    catch (...)
+    {
+        assign_type_casting_error_code(
+                static_cast<int>(error_codes::OTHER),
+                err_code);
+    }
+
+    return false;
+}
+
+
+template<typename TpTarget, typename TpSource>
+std::enable_if_t<
+        speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
+                speed::type_traits::is_path<TpTarget>::value,
+        bool
+>
+__try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) noexcept
+{
+    try
+    {
+        res->assign(arg);
+        return true;
+    }
+    catch (...)
+    {
+        assign_type_casting_error_code(
+                static_cast<int>(error_codes::FILESYSTEM_INVALID_PATH),
+                err_code);
+
+        return false;
+    }
+}
+
+
+template<typename TpTarget, typename TpSource>
+std::enable_if_t<
+        speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
+                std::is_base_of_v<speed::filesystem::valid_path, TpTarget>,
+        bool
+>
+__try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) noexcept
+{
+    try
+    {
+        res->assign(arg);
+        return res->is_valid(err_code);
+    }
+    catch (...)
+    {
+        assign_type_casting_error_code(
+                static_cast<int>(error_codes::FILESYSTEM_INVALID_PATH),
+                err_code);
+
+        return false;
+    }
+}
+
+
+template<typename TpTarget, typename TpChar, typename TpCharTraits, typename TpCharAlloc>
+inline bool __try_type_cast(
+        const std::basic_string<TpChar, TpCharTraits, TpCharAlloc>& arg,
+        TpTarget* res,
+        std::error_code* err_code
+) noexcept
+{
+    return __try_type_cast(arg.c_str(), res, err_code);
+}
+
+
+} /* __private */
+/** @endcond */
 
 
 /**

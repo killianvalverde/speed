@@ -18,14 +18,14 @@
  */
 
 /**
- * @file        speed/iostream/basic_ostream.hpp
- * @brief       basic_ostream related functions header.
+ * @file        speed/iostream/operations.hpp
+ * @brief       operations functions header.
  * @author      Killian Valverde
  * @date        2016/08/24
  */
 
-#ifndef SPEED_IOSTREAM_BASIC_OSTREAM_HPP
-#define SPEED_IOSTREAM_BASIC_OSTREAM_HPP
+#ifndef SPEED_IOSTREAM_OPERATIONS_HPP
+#define SPEED_IOSTREAM_OPERATIONS_HPP
 
 #include <iostream>
 
@@ -34,6 +34,16 @@
 
 
 namespace speed::iostream {
+
+
+/**
+ * @brief       Clears the buffers of the given stream. For output streams this discards any
+ *              unwritten output. For input streams this discards any input read from the
+ *              underlying object but not yet obtained via getc(3); this includes any text pushed
+ *              back via ungetc(3).
+ * @param       fp : Pointer to the FILE structure to purge.
+ */
+void fpurge(::FILE* fp) noexcept;
 
 
 /**
@@ -75,6 +85,111 @@ template<typename TpChar, typename TpTraits>
 inline std::basic_ostream<TpChar, TpTraits>& newl(std::basic_ostream<TpChar, TpTraits>& os)
 {
     return os.put(os.widen('\n'));
+}
+
+
+/**
+ * @brief       Writes the C string pointed by format to the standard output (stdout). If format
+ *              includes format specifiers (subsequences beginning with %), the additional arguments
+ *              following format are formatted and inserted in the resulting string replacing their
+ *              respective specifiers.
+ * @param       formt : C string that contains the text to be written to stdout. It can optionally
+ *              contain embedded format specifiers that are replaced by the values specified in
+ *              subsequent additional arguments and formatted as requested.
+ * @return      On success, the total number of characters written is returned. If a writing error
+ *              occurs, the error indicator (ferror) is set and a negative number is returned. If a
+ *              multibyte character encoding error occurs while writing wide characters, errno is
+ *              set to EILSEQ and a negative number is returned.
+ */
+int printf(const char* formt, ...) noexcept;
+
+
+/**
+ * @brief       Writes the C string pointed by format to the standard output (stdout). If format
+ *              includes format specifiers (subsequences beginning with %), the additional arguments
+ *              following format are formatted and inserted in the resulting string replacing their
+ *              respective specifiers.
+ * @param       formt : C string that contains the text to be written to stdout. It can optionally
+ *              contain embedded format specifiers that are replaced by the values specified in
+ *              subsequent additional arguments and formatted as requested.
+ * @return      On success, the total number of characters written is returned. If a writing error
+ *              occurs, the error indicator (ferror) is set and a negative number is returned. If a
+ *              multibyte character encoding error occurs while writing wide characters, errno is
+ *              set to EILSEQ and a negative number is returned.
+ */
+int printf(const wchar_t* formt, ...) noexcept;
+
+
+/**
+ * @brief       Print a string wrapping if necessary.
+ * @param       os : Ostrem used to print.
+ * @param       txt : Text to print.
+ * @param       max_line_len : The maximum line length that will be printed.
+ * @param       new_line_indent : The indentation used after a newline is printed.
+ * @param       current_line_len : The current length of the current line.
+ * @return
+ */
+template<typename TpChar, typename TpCharTraits, typename TpCharAlloc>
+std::basic_ostream<TpChar, TpCharTraits>& print_wrapped(
+        std::basic_ostream<TpChar, TpCharTraits>& os,
+        const std::basic_string<TpChar, TpCharTraits, TpCharAlloc>& txt,
+        std::size_t max_line_len,
+        std::size_t new_line_indent,
+        std::size_t current_line_len = 0
+)
+{
+    using string_type = std::basic_string<TpChar, TpCharTraits, TpCharAlloc>;
+
+    typename string_type::const_iterator str_it;
+    typename string_type::const_iterator aux_str_it;
+    std::size_t len_to_next;
+
+    for (str_it = txt.cbegin(); str_it != txt.cend(); ++str_it)
+    {
+        if (*str_it == '\n')
+        {
+            os << '\n';
+            for (std::size_t i = 0; i < new_line_indent; ++i)
+            {
+                os << ' ';
+            }
+            current_line_len = new_line_indent;
+        }
+        else if (*str_it == ' ')
+        {
+            aux_str_it = str_it;
+            len_to_next = 0;
+
+            do
+            {
+                ++aux_str_it;
+                ++len_to_next;
+            } while (aux_str_it != txt.cend() && *aux_str_it != ' ');
+
+            speed::lowlevel::try_addm(&len_to_next, current_line_len);
+            if (len_to_next > max_line_len)
+            {
+                os << '\n';
+                for (std::size_t i = 0; i < new_line_indent; ++i)
+                {
+                    os << ' ';
+                }
+                current_line_len = new_line_indent;
+            }
+            else
+            {
+                os << ' ';
+                ++current_line_len;
+            }
+        }
+        else
+        {
+            os << *str_it;
+            ++current_line_len;
+        }
+    }
+
+    return os;
 }
 
 
@@ -346,79 +461,6 @@ inline std::basic_ostream<TpChar, TpTraits>& set_white_text(
 {
     speed::system::terminal::set_text_attribute(
             os, speed::system::terminal::text_attribute::WHITE);
-    return os;
-}
-
-
-/**
- * @brief       Print a string wrapping if necessary.
- * @param       os : Ostrem used to print.
- * @param       txt : Text to print.
- * @param       max_line_len : The maximum line length that will be printed.
- * @param       new_line_indent : The indentation used after a newline is printed.
- * @param       current_line_len : The current length of the current line.
- * @return
- */
-template<typename TpChar, typename TpCharTraits, typename TpCharAlloc>
-std::basic_ostream<TpChar, TpCharTraits>& print_wrapped(
-        std::basic_ostream<TpChar, TpCharTraits>& os,
-        const std::basic_string<TpChar, TpCharTraits, TpCharAlloc>& txt,
-        std::size_t max_line_len,
-        std::size_t new_line_indent,
-        std::size_t current_line_len = 0
-)
-{
-    using string_type = std::basic_string<TpChar, TpCharTraits, TpCharAlloc>;
-
-    typename string_type::const_iterator str_it;
-    typename string_type::const_iterator aux_str_it;
-    std::size_t len_to_next;
-
-    for (str_it = txt.cbegin(); str_it != txt.cend(); ++str_it)
-    {
-        if (*str_it == '\n')
-        {
-            os << '\n';
-            for (std::size_t i = 0; i < new_line_indent; ++i)
-            {
-                os << ' ';
-            }
-            current_line_len = new_line_indent;
-        }
-        else if (*str_it == ' ')
-        {
-            aux_str_it = str_it;
-            len_to_next = 0;
-
-            do
-            {
-                ++aux_str_it;
-                ++len_to_next;
-            } while (aux_str_it != txt.cend() && *aux_str_it != ' ');
-
-            speed::lowlevel::try_addm(&len_to_next, current_line_len);
-            if (len_to_next > max_line_len)
-            {
-                os << '\n';
-                for (std::size_t i = 0; i < new_line_indent; ++i)
-                {
-                    os << ' ';
-                }
-                current_line_len = new_line_indent;
-            }
-            else
-            {
-                os << ' ';
-                ++current_line_len;
-            }
-        }
-        else
-        {
-            os << *str_it;
-            ++current_line_len;
-        }
-    }
-
     return os;
 }
 

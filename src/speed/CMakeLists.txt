@@ -1,5 +1,6 @@
 set(SPEED_ALGORITHM_SOURCE_FILES
         algorithm/operations.hpp
+        algorithm/simple_compare.hpp
         algorithm/algorithm.hpp
 )
 
@@ -40,13 +41,10 @@ set(SPEED_ARGPARSE_SOURCE_FILES
 
 set(SPEED_CONTAINERS_SOURCE_FILES
         containers/circular_doubly_linked_list.hpp
-        containers/const_iterator_base.hpp
-        containers/const_mutable_iterator_base.hpp
         containers/doubly_linked_node.hpp
         containers/exception.hpp
         containers/flags.hpp
         containers/iterator_base.hpp
-        containers/mutable_iterator_base.hpp
         containers/static_cache.hpp
         containers/containers.hpp
 )
@@ -65,24 +63,16 @@ set(SPEED_EXCEPTIONS_SOURCE_FILES
 set(SPEED_FILESYSTEM_SOURCE_FILES
         filesystem/directory_iteration.cpp
         filesystem/directory_iteration.hpp
-        filesystem/directory_path_decorator.hpp
-        filesystem/execute_path_decorator.hpp
         filesystem/filesystem.hpp
-        filesystem/paths_declarations.hpp
-        filesystem/regular_file_path_decorator.hpp
-        filesystem/read_path_decorator.hpp
-        filesystem/secure_path.hpp
-        filesystem/output_path_decorator.hpp
-        filesystem/write_path_decorator.hpp
+        filesystem/valid_path.hpp
 )
 
 set(SPEED_IOSTREAM_SOURCE_FILES
         iostream/indentation.cpp
         iostream/indentation.hpp
         iostream/basic_ios_redirect.hpp
-        iostream/basic_ostream.hpp
-        iostream/stdio.cpp
-        iostream/stdio.hpp
+        iostream/operations.cpp
+        iostream/operations.hpp
         iostream/iostream.hpp
 )
 
@@ -106,9 +96,8 @@ set(SPEED_SCALARS_SOURCE_FILES
 )
 
 set(SPEED_STRINGUTILS_SOURCE_FILES
-        stringutils/c_string_utils.hpp
-        stringutils/string_utils.hpp
         stringutils/stringutils.hpp
+        stringutils/operations.hpp
 )
 
 set(SPEED_SYSTEM_SOURCE_FILES
@@ -172,14 +161,6 @@ set(SPEED_TYPE_CASTING_SOURCE_FILES
         type_casting/error_codes.hpp
         type_casting/error_conditions.hpp
         type_casting/exception.hpp
-        type_casting/try_cast_basic_string_to_type.hpp
-        type_casting/try_cast_c_string_to_basic_regex.hpp
-        type_casting/try_cast_c_string_to_basic_string.hpp
-        type_casting/try_cast_c_string_to_floating_point.hpp
-        type_casting/try_cast_c_string_to_integral_signed.hpp
-        type_casting/try_cast_c_string_to_integral_unsigned.hpp
-        type_casting/try_cast_c_string_to_path.hpp
-        type_casting/try_cast_c_string_to_secure_path.hpp
         type_casting/try_type_cast.hpp
         type_casting/type_cast.hpp
         type_casting/type_caster_base.hpp

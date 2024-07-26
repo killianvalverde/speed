@@ -18,26 +18,40 @@
  */
 
 /**
- * @file        speed/algorithm/algorithm.hpp
- * @brief       algorithm main header
+ * @file        speed/algorithm/simple_compare.hpp
+ * @brief       simple_compare class header.
  * @author      Killian Valverde
  * @date        2018/08/07
  */
 
-#ifndef SPEED_ALGORITHM_ALGORITHM_HPP
-#define SPEED_ALGORITHM_ALGORITHM_HPP
+#ifndef SPEED_ALGORITHM_SIMPLE_COMPARE_HPP
+#define SPEED_ALGORITHM_SIMPLE_COMPARE_HPP
 
-#include "operations.hpp"
-#include "simple_compare.hpp"
+#include <cstdlib>
+#include <type_traits>
 
 
-namespace speed {
+namespace speed::algorithm {
 
 
 /**
- * @brief       Contians a set of algorithms.
+ * @brief       Class used to compare easily two objects.
  */
-namespace algorithm {}
+template<typename TpComparable>
+struct simple_compare
+{
+    /**
+     * @brief       Compare two elements.
+     * @param       rhs : First element to compare.
+     * @param       lhs : Second element to compare
+     * @return      True is returned whether the element passed as first argument is considered to
+     *              go before the second.
+     */
+    [[nodiscard]] bool operator()(const TpComparable& rhs, const TpComparable& lhs) const
+    {
+        return rhs < lhs;
+    }
+};
 
 
 }

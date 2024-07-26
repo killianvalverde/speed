@@ -30,9 +30,9 @@
 #include <cstdlib>
 #include <functional>
 
-#include "const_mutable_iterator_base.hpp"
 #include "exception.hpp"
 #include "flags.hpp"
+#include "iterator_base.hpp"
 
 
 namespace speed::containers {
@@ -252,7 +252,7 @@ public:
          * @brief       Allows knowing whether the iterator is past-the-end or not.
          * @return      If function was successful true is returned, otherwise false is returned.
          */
-        bool end() const noexcept override
+        [[nodiscard]] bool end() const noexcept override
         {
             return current_hb_buf_ == nullptr;
         }
@@ -374,7 +374,7 @@ public:
          * @brief       Allows knowing whether the iterator is past-the-end or not.
          * @return      If function was successful true is returned, otherwise false is returned.
          */
-        bool end() const noexcept override
+        [[nodiscard]] bool end() const noexcept override
         {
             return const_self_type::end();
         }
@@ -633,7 +633,7 @@ public:
      * @brief       Check whether the least recently used element is free (never used).
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    inline bool is_least_recently_used_free() const
+    [[nodiscard]] inline bool is_least_recently_used_free() const
     {
         return !get_least_recently_used_buffer()->flgs_.is_set(scbf_t::INSERTED_IN_HASH_BUFFER);
     }
@@ -791,7 +791,7 @@ protected:
      * @brief       Get the hash buffer size.
      * @return      The hash buffer size.
      */
-    constexpr std::size_t get_hash_buffer_size() const noexcept
+    [[nodiscard]] constexpr std::size_t get_hash_buffer_size() const noexcept
     {
         return sizeof(hbuf_) / sizeof(hash_buffer);
     }

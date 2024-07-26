@@ -28,9 +28,8 @@
 #define SPEED_IOSTREAM_IOSTREAM_HPP
 
 #include "basic_ios_redirect.hpp"
-#include "basic_ostream.hpp"
 #include "indentation.hpp"
-#include "stdio.hpp"
+#include "operations.hpp"
 
 
 namespace speed {

@@ -27,9 +27,9 @@
 #ifndef SPEED_CONTAINERS_CIRCULAR_DOUBLY_LINKED_LIST_HPP
 #define SPEED_CONTAINERS_CIRCULAR_DOUBLY_LINKED_LIST_HPP
 
-#include "const_mutable_iterator_base.hpp"
 #include "doubly_linked_node.hpp"
 #include "exception.hpp"
+#include "iterator_base.hpp"
 
 
 namespace speed::containers {
@@ -124,7 +124,7 @@ public:
          * @brief       Allows knowing whether the iterator is past-the-end or not.
          * @return      If function was successful true is returned, otherwise false is returned.
          */
-        bool end() const noexcept override
+        [[nodiscard]] bool end() const noexcept override
         {
             return cur_ == nullptr;
         }
@@ -222,7 +222,7 @@ public:
          * @brief       Allows knowing whether the iterator is past-the-end or not.
          * @return      If function was successful true is returned, otherwise false is returned.
          */
-        bool end() const noexcept override
+        [[nodiscard]] bool end() const noexcept override
         {
             return const_self_type::end();
         }

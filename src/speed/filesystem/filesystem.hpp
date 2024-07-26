@@ -28,14 +28,7 @@
 #define SPEED_FILESYSTEM_FILESYSTEM_HPP
 
 #include "directory_iteration.hpp"
-#include "directory_path_decorator.hpp"
-#include "execute_path_decorator.hpp"
-#include "paths_declarations.hpp"
-#include "read_path_decorator.hpp"
-#include "regular_file_path_decorator.hpp"
-#include "secure_path.hpp"
-#include "output_path_decorator.hpp"
-#include "write_path_decorator.hpp"
+#include "valid_path.hpp"
 
 
 namespace speed {

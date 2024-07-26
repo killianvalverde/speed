@@ -1,4 +1,4 @@
-<p style="text-align: center;">
+<p align="center">
   <img height="90" src="docs/images/speed.png" alt="speed"/>
 </p>
 
@@ -11,22 +11,15 @@
 
 ## Introduction
 
-Hello everyone using C++,
+Speed is my personal, free, and generic C++ library. Its goal is to complement the standard library 
+with useful and flexible resources to enhance the smoothness of working with the C++ language.
 
-Speed is my personal, free, and generic C++ library. Its goal is to enhance the speed and 
-smoothness of working with the C++ language.
-
-I began working on Speed in 2015, initially as an argument parser. As I developed this argument 
-parser, I found that it required several additional tools to meet my requirements. Consequently, I 
-created various additional resources organized into their own namespaces. Over time, this small 
-project evolved into a library with a wide range of useful resources.
-
-Speed is a static library that currently relies on the STL and a system API for proper 
-functionality. Currently, it exclusively supports the glibc and cygwin, although adding support 
-for the WinAPI would not be particularly complex due to the library's organization.
+Speed currently relies on the STL and a system API for proper functionality. At present, it 
+exclusively supports glibc and Cygwin, although adding support for the WinAPI would not be 
+particularly complex due to the library's organization.
 
 Feel free to continue reading to learn about the library's main features and how to build it for 
-use in your own projects. 
+use in your own projects.
 
 ## Features
 
@@ -43,7 +36,7 @@ library is exclusively compatible with Linux systems using the glibc as the API.
 If you are using APT as your package management system, you can install CMake with the following 
 command:
 
-    $ sudo apt-get install cmake
+    sudo apt-get install cmake
 
 You can also get the package by visiting the official website: <http://www.cmake.org/>.
 
@@ -65,15 +58,15 @@ When building Speed as a standalone project, the typical workflow starts with:
 
 1. Create a directory to hold the build output and generate the native build scripts:
 
-        $ cmake -H. -Bbuild
+        cmake -H. -Bbuild
 
 2. Compile the project directly from CMake using the native build scripts:
 
-        $ cmake --build build
+        cmake --build build
 
 3. Install the library in your environment:
 
-        $ sudo cmake --install build
+        sudo cmake --install build
 
 #### Incorporating Into An Existing CMake Project
 

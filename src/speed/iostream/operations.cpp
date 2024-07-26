@@ -18,8 +18,8 @@
  */
 
 /**
- * @file        speed/iostream/stdio.cpp
- * @brief       stdio functions source.
+ * @file        speed/iostream/operations.cpp
+ * @brief       operations functions source.
  * @author      Killian Valverde
  * @date        2016/08/24
  */
@@ -30,6 +30,8 @@
 #ifdef __GLIBC__
 #include <stdio_ext.h>
 #endif
+
+#include "operations.hpp"
 
 
 namespace speed::iostream {

@@ -43,7 +43,7 @@ public:
      * @brief       Get the message of the exception.
      * @return      The exception message.
      */
-    char const* what() const noexcept override
+    [[nodiscard]] char const* what() const noexcept override
     {
         return "lowlevel exception";
     }
@@ -60,7 +60,7 @@ public:
      * @brief       Get the message of the exception.
      * @return      The exception message.
      */
-    char const* what() const noexcept override
+    [[nodiscard]] char const* what() const noexcept override
     {
         return "overflow exception";
     }
