@@ -18,17 +18,20 @@
  */
 
 /**
- * @file        speed/stringutils/c_string_utils.hpp
- * @brief       c_string_utils functions header.
+ * @file        speed/stringutils/operations.hpp
+ * @brief       stringutils operations functions header.
  * @author      Killian Valverde
  * @date        2016/01/08
  */
 
-#ifndef SPEED_STRINGUTILS_C_STRING_UTILS_HPP
-#define SPEED_STRINGUTILS_C_STRING_UTILS_HPP
+#ifndef SPEED_STRINGUTILS_OPERATIONS_HPP
+#define SPEED_STRINGUTILS_OPERATIONS_HPP
 
 #include <string>
+#include <type_traits>
 #include <vector>
+
+#include "../type_traits/type_traits.hpp"
 
 
 namespace speed::stringutils {
@@ -501,6 +504,34 @@ bool strdisclastif(TpChar* str, const TpIntegral val) noexcept
     }
     
     return false;
+}
+
+
+/**
+ * @brief       Returns the length of a C string str.
+ * @param       str : A C string.
+ * @return      The length of the C string.
+ */
+template<typename TpChar>
+[[nodiscard]] inline std::enable_if_t<
+        speed::type_traits::is_character<TpChar>::value,
+        std::size_t
+>
+get_string_length(const TpChar* str) noexcept
+{
+    return speed::stringutils::strlen(str);
+}
+
+
+/**
+ * @brief       Returns the length of a string.
+ * @param       str : A string.
+ * @return      The length of the string.
+ */
+template<typename TpString>
+[[nodiscard]] inline typename TpString::size_type get_string_length(const TpString& str) noexcept
+{
+    return str.length();
 }
     
     

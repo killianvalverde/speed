@@ -99,9 +99,8 @@ set(SPEED_SCALARS_SOURCE_FILES
 )
 
 set(SPEED_STRINGUTILS_SOURCE_FILES
-        stringutils/c_string_utils.hpp
-        stringutils/string_utils.hpp
         stringutils/stringutils.hpp
+        stringutils/operations.hpp
 )
 
 set(SPEED_SYSTEM_SOURCE_FILES
