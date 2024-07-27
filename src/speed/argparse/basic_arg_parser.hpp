@@ -176,7 +176,7 @@ public:
             >
     >
     explicit basic_arg_parser(TpString_&& prog_name = string_type())
-            : max_unrecog_args_(16)
+            : max_unrecog_args_(1)
             , default_hlp_arg_(nullptr)
             , current_vers_arg_(nullptr)
             , prog_name_(std::forward<TpString_>(prog_name))
