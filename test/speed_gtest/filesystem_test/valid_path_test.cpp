@@ -28,7 +28,7 @@
 #include "speed/filesystem/filesystem.hpp"
 
 
-TEST(filesystem_secure_path, basic)
+TEST(filesystem_valid_path, basic)
 {
     // std::error_code err_code;
     // speed::filesystem::rw_regular_file_path rfle("./file.txt");

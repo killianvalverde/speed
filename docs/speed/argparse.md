@@ -32,8 +32,8 @@ To start using argparse in your project, simply include the Speed library header
 #include <speed/speed.hpp>
 ```
 
-Now create an arg_parser object. The argument parser takes the name of your project as a parameter; 
-if you don't specify any, it will try to get it from parsing argv during its execution.
+Now create an `arg_parser` object. The argument parser takes the name of your project as a 
+parameter; if you don't specify any, it will try to get it from parsing argv during its execution.
 
 ```cpp
 speed::argparse::arg_parser ap("project_name");
@@ -218,7 +218,7 @@ Furthermore, help and version information will be displayed if `help_arg` or `ve
 are found.
 
 On the other hand, if you didn't specify a presence holder, a value holder, or a vector holder for 
-the argument values, you will be able to use the arg_parser get methods to retrieve and convert 
+the argument values, you will be able to use the `arg_parser` get methods to retrieve and convert 
 the desired values.
 
 ```cpp
@@ -234,10 +234,10 @@ auto secs = ap.get_front_as<std::uint64_t>("-s", 0);
 
 The implementation of this argument parser has been influenced by many projects and people.
 
-I want to thank the programmers who worked on the Python module 
-[argparse](URL "https://docs.python.org/3/library/argparse.html"), as discovering and using 
+I want to thank the programmers who worked on the Python module
+<a href="https://docs.python.org/3/library/argparse.html">argparse</a>, as discovering and using 
 this library in 2015 inspired me to start this project.
 
-I also want to specially thank [p-ranav](URL "https://github.com/p-ranav") for their work on their 
-argument parser, as discovering their project gave me many ideas and insights into how to make a 
-good argument parser.
+I also want to specially thank <a href="https://github.com/p-ranav">p-ranav</a> for their work on 
+their argument parser, as discovering their project gave me many ideas and insights into how to 
+make a good argument parser.
