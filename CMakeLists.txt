@@ -13,5 +13,5 @@ option(BUILD_TESTS "Build tests" OFF)
 add_subdirectory(src)
 
 if(BUILD_TESTS)
-    add_subdirectory(test)
+    add_subdirectory(tests)
 endif()
