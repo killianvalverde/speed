@@ -18,25 +18,17 @@
  */
 
 /**
- * @file        speed/version.hpp
- * @brief       File that include the library version macros.
+ * @file        speed_gtest/main.cpp
+ * @brief       speed_gtest entry point.
  * @author      Killian Valverde
- * @date        2018/06/09
+ * @date        2017/05/15
  */
 
-#ifndef SPEED_VERSION_HPP
-#define SPEED_VERSION_HPP
+#include <gtest/gtest.h>
 
-/** The major version number. */
-#define SPEED_VERSION_MAJOR 0
 
-/** The minor version number. */
-#define SPEED_VERSION_MINOR 2
-
-/** The patch version number */
-#define SPEED_VERSION_PATCH 3
-
-/** The hole version number in string type. */
-#define SPEED_VERSION ("0.2.3")
-
-#endif
+int main(int argc, char* argv[])
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

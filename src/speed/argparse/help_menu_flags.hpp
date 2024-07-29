@@ -70,6 +70,7 @@ enum class help_menu_flags : std::uint16_t
             PRINT_USAGE |
             PRINT_DESCRIPTION |
             PRINT_OPTIONS |
+            PRINT_COMMANDS |
             PRINT_ARGS_KEYS |
             PRINT_EPILOGUE
     )

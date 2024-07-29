@@ -18,25 +18,20 @@
  */
 
 /**
- * @file        speed/version.hpp
- * @brief       File that include the library version macros.
+ * @file        speed_gtest/iostream_test/indentation_test.cpp
+ * @brief       indentation unit test.
  * @author      Killian Valverde
  * @date        2018/06/09
  */
 
-#ifndef SPEED_VERSION_HPP
-#define SPEED_VERSION_HPP
+#include <gtest/gtest.h>
 
-/** The major version number. */
-#define SPEED_VERSION_MAJOR 0
+#include "speed/filesystem/filesystem.hpp"
 
-/** The minor version number. */
-#define SPEED_VERSION_MINOR 2
 
-/** The patch version number */
-#define SPEED_VERSION_PATCH 3
-
-/** The hole version number in string type. */
-#define SPEED_VERSION ("0.2.3")
-
-#endif
+TEST(filesystem_valid_path, basic)
+{
+    // std::error_code err_code;
+    // speed::filesystem::rw_regular_file_path rfle("./file.txt");
+    // EXPECT_TRUE(rfle.is_valid(&err_code));
+}

@@ -18,25 +18,21 @@
  */
 
 /**
- * @file        speed/version.hpp
- * @brief       File that include the library version macros.
+ * @file        speed_gtest/lowlevel_test/lowlevel_operations_test.cpp
+ * @brief       lowlevel_operations unit test.
  * @author      Killian Valverde
- * @date        2018/06/09
+ * @date        2018/10/10
  */
 
-#ifndef SPEED_VERSION_HPP
-#define SPEED_VERSION_HPP
+#include <gtest/gtest.h>
 
-/** The major version number. */
-#define SPEED_VERSION_MAJOR 0
+#include "speed/lowlevel/lowlevel.hpp"
 
-/** The minor version number. */
-#define SPEED_VERSION_MINOR 2
 
-/** The patch version number */
-#define SPEED_VERSION_PATCH 3
-
-/** The hole version number in string type. */
-#define SPEED_VERSION ("0.2.3")
-
-#endif
+TEST(lowlevel_logical_operations, onehot_to_binary)
+{
+    for (std::size_t i = 0; i < 32; ++i)
+    {
+        EXPECT_TRUE(speed::lowlevel::onehot_to_binary((std::uint32_t)0x1 << i) == i + 1);
+    }
+}

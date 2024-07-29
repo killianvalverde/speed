@@ -18,25 +18,30 @@
  */
 
 /**
- * @file        speed/version.hpp
- * @brief       File that include the library version macros.
+ * @file        speed_gtest/scalars_test/scalars_test.cpp
+ * @brief       scalars unit test.
  * @author      Killian Valverde
- * @date        2018/06/09
+ * @date        2018/04/28
  */
 
-#ifndef SPEED_VERSION_HPP
-#define SPEED_VERSION_HPP
+#include <type_traits>
 
-/** The major version number. */
-#define SPEED_VERSION_MAJOR 0
+#include <gtest/gtest.h>
 
-/** The minor version number. */
-#define SPEED_VERSION_MINOR 2
+#include "speed/scalars/scalars.hpp"
 
-/** The patch version number */
-#define SPEED_VERSION_PATCH 3
 
-/** The hole version number in string type. */
-#define SPEED_VERSION ("0.2.3")
-
-#endif
+TEST(scalars_scalars, get_n_digits)
+{
+    int i1 = 0;
+    int i2 = 4;
+    int i3 = 32;
+    int i4 = 948;
+    int i5 = 92384;
+    
+    EXPECT_TRUE(speed::scalars::get_n_digits(i1) == 1);
+    EXPECT_TRUE(speed::scalars::get_n_digits(i2) == 1);
+    EXPECT_TRUE(speed::scalars::get_n_digits(i3) == 2);
+    EXPECT_TRUE(speed::scalars::get_n_digits(i4) == 3);
+    EXPECT_TRUE(speed::scalars::get_n_digits(i5) == 5);
+}
