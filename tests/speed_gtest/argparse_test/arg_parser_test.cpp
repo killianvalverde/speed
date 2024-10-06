@@ -104,7 +104,6 @@ TEST_F(argparse_arg_parser, add_key_value_arg)
             .minmax_values(1, 1)
             .store_into(&vals)
             .regexes("^.*$")
-            .scan<std::uint64_t, double>()
             .store_into(&holdr1, &holdr2)
             .store_presence(&presnc)
             .terminal(false)
@@ -135,7 +134,6 @@ TEST_F(argparse_arg_parser, add_keyless_arg)
             .minmax_values(1, 1)
             .store_into(&vals)
             .regexes("^.*$")
-            .scan<std::uint64_t, double>()
             .store_into(&holdr1, &holdr2)
             .store_presence(&presnc)
             .terminal(false)
@@ -168,7 +166,6 @@ TEST_F(argparse_arg_parser, add_help_arg)
             .pkill_after_triggering(true)
             .store_into(&vals)
             .regexes("^.*$")
-            .scan<std::uint64_t, double>()
             .store_into(&holdr1, &holdr2)
             .store_presence(&presnc)
             .terminal(false)
@@ -275,7 +272,6 @@ TEST_F(argparse_arg_parser, parse_key_value_args)
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .store_into(&secs);
 
     ap.add_key_value_arg("--minutes", "-m")
@@ -287,7 +283,6 @@ TEST_F(argparse_arg_parser, parse_key_value_args)
     ap.add_key_value_arg("--hours", "-h")
             .description("Set hours.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .store_into(&hrs);
 
     EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
@@ -410,20 +405,17 @@ TEST_F(argparse_arg_parser, parse_eq_operator)
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .store_into(&secs);
 
     ap.add_key_value_arg("--minutes", "-m")
             .description("Set minutes.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .minmax_values(2, 2)
             .store_into(&mins_vec);
 
     ap.add_key_value_arg("--hours", "-h")
             .description("Set hours.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .store_into(&hrs);
 
     EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
@@ -459,19 +451,17 @@ TEST_F(argparse_arg_parser, parse_grouping)
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .store_into(&secs);
 
     ap.add_key_value_arg("--minutes", "-m")
             .description("Set minutes.")
             .values_names("INTEGER")
-            .scan<std::uint64_t, std::uint64_t>()
-            .store_into(&mins_vec);
+            .store_into(&mins_vec)
+            .minmax_values(2, 2);
 
     ap.add_key_value_arg("--hours", "-h")
             .description("Set hours.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .store_into(&hrs);
 
     EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
@@ -677,20 +667,17 @@ TEST_F(argparse_arg_parser, print_usage)
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true);
 
     ap.add_key_value_arg("--minutes", "-m")
             .description("Set minutes.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true)
             .minmax_values(2, 4);
 
     ap.add_key_value_arg("--hours", "-h")
             .description("Set hours.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true)
             .minmax_values(0, 4);
 
@@ -769,20 +756,17 @@ TEST_F(argparse_arg_parser, print_options)
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true);
 
     ap.add_key_value_arg("--minutes", "-m")
             .description("Set minutes.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true)
             .minmax_values(2, 4);
 
     ap.add_key_value_arg("--hours", "-h")
             .description("Set hours.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .minmax_values(0, 4);
 
     ap.add_keyless_arg("DESTINATION")
@@ -835,20 +819,17 @@ TEST_F(argparse_arg_parser, print_commands)
                          "Quisque sollicitudin enim a felis vehicula, quis faucibus mi molestie. "
                          "Fusce id justo et tortor vehicula porttitor.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true)
             .minmax_values(2, 4);
 
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true);
 
     ap.add_key_value_arg("--hours", "-h")
             .description("Set hours.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .minmax_values(0, 4);
 
     ap.add_keyless_arg("DESTINATION")
@@ -890,20 +871,17 @@ TEST_F(argparse_arg_parser, print_values)
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true);
 
     ap.add_key_value_arg("--minutes", "-m")
             .description("Set minutes.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true)
             .minmax_values(2, 4);
 
     ap.add_key_value_arg("--hours", "-h")
             .description("Set hours.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true)
             .minmax_values(0, 4);
 
@@ -1013,19 +991,16 @@ TEST_F(argparse_arg_parser, print_help)
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true);
 
     ap.add_key_value_arg("--minutes", "-m")
             .description("Set minutes.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .minmax_values(2, 4);
 
     ap.add_key_value_arg("--hours", "-h")
             .description("Set hours.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true)
             .minmax_values(0, 4);
 
@@ -1061,6 +1036,7 @@ TEST_F(argparse_arg_parser, print_version)
 TEST_F(argparse_arg_parser, print_number_errors)
 {
     std::string expected_res = "speed: --seconds: Invalid number '4896K'\n";
+    std::uint32_t val;
 
     std::vector<const char*> argv = {
             "speed",
@@ -1073,7 +1049,7 @@ TEST_F(argparse_arg_parser, print_number_errors)
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>();
+            .store_into(&val);
 
     ap.parse_args(argv.size(), argv);
     ap.print_errors();
@@ -1145,19 +1121,16 @@ TEST_F(argparse_arg_parser, change_prefix)
     ap.add_key_value_arg("##seconds", "/s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true);
 
     ap.add_key_value_arg("##minutes", "/m")
             .description("Set minutes.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .minmax_values(2, 4);
 
     ap.add_key_value_arg("##hours", "/h")
             .description("Set hours.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true)
             .minmax_values(0, 4);
 
