@@ -27,7 +27,7 @@
 #ifndef SPEED_TYPE_CASTING_TYPE_CASTER_BASE_HPP
 #define SPEED_TYPE_CASTING_TYPE_CASTER_BASE_HPP
 
-#include <vector>
+#include <any>
 
 #include "try_type_cast.hpp"
 
@@ -45,6 +45,10 @@ public:
      /** Type that represents the source type. */
      using source_type = TpSource;
 
+     /** Default constructor. */
+     type_caster_base() = default;
+
+     /** Default destructor. */
     virtual ~type_caster_base() = default;
     
     /**
@@ -60,6 +64,21 @@ public:
     {
         return true;
     }
+
+
+    /**
+     * @brief       Try to convert the source to the target.
+     * @param       arg : The value to convert.
+     * @param       err_code : If function fails it holds the error code.
+     * @return      If function was successful true is returned, otherwise false is returned.
+     */
+    [[nodiscard]] virtual bool try_type_cast(
+            const source_type& arg,
+            std::error_code* err_code = nullptr
+    ) noexcept
+    {
+        return false;
+    }
     
     /**
      * @brief       Try to convert the source to the target.
@@ -70,9 +89,9 @@ public:
      */
     [[nodiscard]] virtual bool try_type_cast(
             const source_type& arg, 
-            void* res, 
+            std::any res,
             std::error_code* err_code = nullptr
-    ) const noexcept
+    ) noexcept
     {
         return false;
     }
