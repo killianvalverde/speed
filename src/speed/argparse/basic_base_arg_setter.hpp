@@ -99,6 +99,20 @@ public:
     basic_base_arg_setter& operator =(basic_base_arg_setter&& rhs) noexcept = delete;
 
     /**
+     * @brief       Allows to specify a function to be called when the argument is found during
+     *              the program call.
+     * @param       callabl : Function to be called when the argument is found during
+     *              the program call.
+     * @return      The object who call the method.
+     */
+    template<typename TpCallable>
+    self_type& action(TpCallable&& callabl)
+    {
+        bse_arg_->set_action(std::forward<TpCallable>(callabl));
+        return dynamic_cast<self_type&>(*this);
+    }
+
+    /**
      * @brief       Allows to specify the argument description. The description is a string that
      *              describes what the argument does. If there is no description set for an
      *              argument, this argument will not be printed in the associated help menu.
@@ -167,7 +181,7 @@ public:
      */
     self_type& store_presence(bool* presence_sync)
     {
-        bse_arg_->set_presence_synchronizer(presence_sync);
+        bse_arg_->set_presence_holder(presence_sync);
         return dynamic_cast<self_type&>(*this);
     }
 

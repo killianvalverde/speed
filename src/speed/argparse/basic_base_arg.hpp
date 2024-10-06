@@ -80,8 +80,9 @@ public:
             : hlp_menus_ids_assignd_()
             , desc_()
             , err_name_()
+            , actn_()
             , arg_parsr_(arg_parsr)
-            , presence_sync_(nullptr)
+            , presence_holdr_(nullptr)
             , flgs_(arg_flags::NIL)
             , err_flgs_(arg_error_flags::NIL)
             , nr_fnd_(0)
@@ -118,6 +119,17 @@ public:
      * @return      The object who call the method.
      */
     basic_base_arg& operator =(basic_base_arg&& rhs) noexcept = default;
+
+    /**
+     * @brief       Execute the action if there is one.
+     */
+    void execute_action()
+    {
+        if (actn_)
+        {
+            actn_();
+        }
+    }
 
     /**
      * @brief       Set errors flags if required.
@@ -183,6 +195,17 @@ public:
     }
 
     /**
+     * @brief       Set the action to execute when the arguement is found in the program call.
+     * @param       callable_actn : Action to execute when the arguement is found in the program
+     *              call.
+     */
+    template<typename TpCallable>
+    inline void set_action(TpCallable&& callabl)
+    {
+        actn_ = std::forward<TpCallable>(callabl);
+    }
+
+    /**
      * @brief       Set the argument description.
      * @param       desc : The description to set.
      */
@@ -244,9 +267,9 @@ public:
         {
             fnd ? speed::safety::try_addm(&nr_fnd_, 1) : nr_fnd_ = 0;
 
-            if (presence_sync_ != nullptr)
+            if (presence_holdr_ != nullptr)
             {
-                *presence_sync_ = fnd;
+                *presence_holdr_ = fnd;
             }
 
             err_flgs_.unset(arg_error_flags::APPEAR_JUST_ONCE_ERROR);
@@ -271,15 +294,15 @@ public:
 
     /**
      * @brief       Set the presence synchronizer.
-     * @param       presence_sync : The presence synchronizer.
+     * @param       presence_holdr : The presence synchronizer.
      */
-    inline void set_presence_synchronizer(bool* presence_sync) noexcept
+    inline void set_presence_holder(bool* presence_holdr) noexcept
     {
-        presence_sync_ = presence_sync;
+        presence_holdr_ = presence_holdr;
 
-        if (presence_sync_ != nullptr)
+        if (presence_holdr_ != nullptr)
         {
-            *presence_sync_ = nr_fnd_ == 0;
+            *presence_holdr_ = nr_fnd_ == 0;
         }
     }
 
@@ -480,11 +503,14 @@ private:
     /** The name used to reference an arguments during the error display. */
     string_type err_name_;
 
+    /** Function to execute if the arguement is found during the program call. */
+    std::function<void()> actn_;
+
     /** Reference to the argument parser that holds this object. */
     arg_parser_type* arg_parsr_;
 
     /** Reference to a boolen that will be set to indicate whether the argument has been found. */
-    bool* presence_sync_;
+    bool* presence_holdr_;
 
     /** Number of times the argument has been found. */
     std::size_t nr_fnd_;

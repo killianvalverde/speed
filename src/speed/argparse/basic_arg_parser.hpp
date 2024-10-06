@@ -1152,6 +1152,7 @@ private:
             --*pos_increment;
         }
 
+        ky_arg->execute_action();
         ky_arg->set_found(true);
     }
 
