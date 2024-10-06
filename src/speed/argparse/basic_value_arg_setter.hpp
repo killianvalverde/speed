@@ -27,7 +27,18 @@
 #ifndef SPEED_ARGPARSE_BASIC_VALUE_ARG_SETTER_HPP
 #define SPEED_ARGPARSE_BASIC_VALUE_ARG_SETTER_HPP
 
+#include <array>
+#include <deque>
+#include <forward_list>
+#include <list>
+#include <map>
+#include <queue>
+#include <set>
+#include <stack>
+#include <unordered_map>
+#include <unordered_set>
 #include <utility>
+#include <vector>
 
 #include "../type_traits/type_traits.hpp"
 #include "arg_flags.hpp"
@@ -48,10 +59,52 @@ public:
     /** Allocator type used in the class. */
     template<typename T>
     using allocator_type = typename TpAllocator::template rebind<T>::other;
-    
+
+    /** Array type used in the class. */
+    template<typename T, std::size_t N>
+    using array_type = std::array<T, N>;
+
     /** Vector type used in the class. */
     template<typename T>
     using vector_type = std::vector<T, allocator_type<T>>;
+
+    /** Double ended queue type used in the class. */
+    template<typename T>
+    using deque_type = std::deque<T, allocator_type<T>>;
+
+    /** Queue type used in the class. */
+    template<typename T>
+    using queue_type = std::queue<T, deque_type<T>>;
+
+    /** Priority queue type used in the class. */
+    template<typename T>
+    using priority_queue_type = std::priority_queue<T, vector_type<T>>;
+
+    /** Stack type used in the class. */
+    template<typename T>
+    using stack_type = std::stack<T, deque_type<T>>;
+
+    /** Forward list type used in the class. */
+    template<typename T>
+    using forward_list_type = std::forward_list<T, allocator_type<T>>;
+
+    /** Forward list type used in the class. */
+    template<typename T>
+    using list_type = std::list<T, allocator_type<T>>;
+
+    /** Set type used in the class. */
+    template<typename T>
+    using set_type = std::set<T, std::less<T>, allocator_type<T>>;
+
+    /** Unordered set type used in the class. */
+    template<typename T>
+    using unordered_set_type = std::unordered_set<
+            T, std::hash<T>, std::equal_to<T>, allocator_type<T>>;
+
+    /** Unordered multi set type used in the class. */
+    template<typename T>
+    using unordered_multiset_type = std::unordered_multiset<
+            T, std::hash<T>, std::equal_to<T>, allocator_type<T>>;
 
     /** Type that represents the base of the arguments hierarchy. */
     using base_arg_type = basic_base_arg<TpAllocator>;
@@ -170,18 +223,20 @@ public:
      * @tparam      Ts_ : The types in which cast the values.
      * @return      The object who call the method.
      */
-    template<typename... Ts_>
-    self_type& scan()
-    {
-        dynamic_cast<value_arg_type*>(base_arg_setter_type::bse_arg_)
-                ->template set_casters<Ts_...>();
-        return dynamic_cast<self_type&>(*this);
-    }
+    // template<typename... Ts_>
+    // self_type& scan()
+    // {
+    //     dynamic_cast<value_arg_type*>(base_arg_setter_type::bse_arg_)
+    //             ->template set_casters<Ts_...>();
+    //     return dynamic_cast<self_type&>(*this);
+    // }
 
     /**
      * @brief       Allows to specify the holders that will be assigned to each value. Each value
      *              will have assigned the holder that corresponds to their index. If there is more
      *              values than holders, the remaining values will not be assigned to any holder.
+     *              Calling the store_into method will wipe the previous pecified holders of the
+     *              argument.
      * @param       holdrs : Set of holders in which the values will store their cast results.
      * @return      The object who call the method.
      */
@@ -194,19 +249,161 @@ public:
     }
 
     /**
-     * @brief       Allows to specify a vector in which every cast result will be stored. If you
-     *              specify a vector, and you haven't yet specified any casting type, the type of
-     *              the vector elements will be assigned as the first casting type. Specifying
-     *              other types while having a vector set, will corrupt the vector during the
-     *              parsing.
-     * @param       holdr : Vector in which the values will push back their cast results.
+     * @brief       Allows to specify an array in which every cast result will be stored. Calling
+     *              the store_into method will wipe the previous pecified holders of the argument.
+     * @param       holdr : Array in which the cast results will be inserted.
+     * @return      The object who call the method.
+     */
+    template<typename TpValue_, std::size_t N_>
+    self_type& store_into(array_type<TpValue_, N_>* holdr)
+    {
+        dynamic_cast<value_arg_type*>(base_arg_setter_type::bse_arg_)
+                ->set_holder(holdr);
+        return dynamic_cast<self_type&>(*this);
+    }
+
+    /**
+     * @brief       Allows to specify a vector in which every cast result will be stored. Calling
+     *              the store_into method will wipe the previous pecified holders of the argument.
+     * @param       holdr : Vector in which the cast results will be inserted.
      * @return      The object who call the method.
      */
     template<typename TpValue_>
     self_type& store_into(vector_type<TpValue_>* holdr)
     {
         dynamic_cast<value_arg_type*>(base_arg_setter_type::bse_arg_)
-                ->set_collection_holder(holdr);
+                ->set_holder(holdr);
+        return dynamic_cast<self_type&>(*this);
+    }
+
+    /**
+     * @brief       Allows to specify a Double ended queue in which every cast result will be
+     *              stored. Calling the store_into method will wipe the previous pecified holders
+     *              of the argument.
+     * @param       holdr : Double ended queue in which the cast results will be inserted.
+     * @return      The object who call the method.
+     */
+    template<typename TpValue_>
+    self_type& store_into(deque_type<TpValue_>* holdr)
+    {
+        dynamic_cast<value_arg_type*>(base_arg_setter_type::bse_arg_)
+                ->set_holder(holdr);
+        return dynamic_cast<self_type&>(*this);
+    }
+
+    /**
+     * @brief       Allows to specify a queue in which every cast result will be stored. Calling
+     *              the store_into method will wipe the previous pecified holders of the argument.
+     * @param       holdr : Queue in which the cast results will be inserted.
+     * @return      The object who call the method.
+     */
+    template<typename TpValue_>
+    self_type& store_into(queue_type<TpValue_>* holdr)
+    {
+        dynamic_cast<value_arg_type*>(base_arg_setter_type::bse_arg_)
+                ->set_holder(holdr);
+        return dynamic_cast<self_type&>(*this);
+    }
+
+    /**
+     * @brief       Allows to specify a priority queue in which every cast result will be stored.
+     *              Calling the store_into method will wipe the previous pecified holders of the
+     *              argument.
+     * @param       holdr : Priority queue in which the cast results will be inserted.
+     * @return      The object who call the method.
+     */
+    template<typename TpValue_>
+    self_type& store_into(priority_queue_type<TpValue_>* holdr)
+    {
+        dynamic_cast<value_arg_type*>(base_arg_setter_type::bse_arg_)
+                ->set_holder(holdr);
+        return dynamic_cast<self_type&>(*this);
+    }
+
+    /**
+     * @brief       Allows to specify a stack in which every cast result will be stored. Calling
+     *              the store_into method will wipe the previous pecified holders of the argument.
+     * @param       holdr : Stack in which the cast results will be inserted.
+     * @return      The object who call the method.
+     */
+    template<typename TpValue_>
+    self_type& store_into(stack_type<TpValue_>* holdr)
+    {
+        dynamic_cast<value_arg_type*>(base_arg_setter_type::bse_arg_)
+                ->set_holder(holdr);
+        return dynamic_cast<self_type&>(*this);
+    }
+
+    /**
+     * @brief       Allows to specify a forward list in which every cast result will be stored.
+     *              Calling the store_into method will wipe the previous pecified holders of the
+     *              argument.
+     * @param       holdr : Forward list in which the cast results will be inserted.
+     * @return      The object who call the method.
+     */
+    template<typename TpValue_>
+    self_type& store_into(forward_list_type<TpValue_>* holdr)
+    {
+        dynamic_cast<value_arg_type*>(base_arg_setter_type::bse_arg_)
+                ->set_holder(holdr);
+        return dynamic_cast<self_type&>(*this);
+    }
+
+    /**
+     * @brief       Allows to specify a list in which every cast result will be stored. Calling the
+     *              store_into method will wipe the previous pecified holders of the argument.
+     * @param       holdr : List in which the cast results will be inserted.
+     * @return      The object who call the method.
+     */
+    template<typename TpValue_>
+    self_type& store_into(list_type<TpValue_>* holdr)
+    {
+        dynamic_cast<value_arg_type*>(base_arg_setter_type::bse_arg_)
+                ->set_holder(holdr);
+        return dynamic_cast<self_type&>(*this);
+    }
+
+    /**
+     * @brief       Allows to specify a set in which every cast result will be stored. Calling the
+     *              store_into method will wipe the previous pecified holders of the argument.
+     * @param       holdr : Set in which the cast results will be inserted.
+     * @return      The object who call the method.
+     */
+    template<typename TpValue_>
+    self_type& store_into(set_type<TpValue_>* holdr)
+    {
+        dynamic_cast<value_arg_type*>(base_arg_setter_type::bse_arg_)
+                ->set_holder(holdr);
+        return dynamic_cast<self_type&>(*this);
+    }
+
+    /**
+     * @brief       Allows to specify an unordered set in which every cast result will be stored.
+     *              Calling the store_into method will wipe the previous pecified holders of the
+     *              argument.
+     * @param       holdr : Unordered set in which the cast results will be inserted.
+     * @return      The object who call the method.
+     */
+    template<typename TpValue_>
+    self_type& store_into(unordered_set_type<TpValue_>* holdr)
+    {
+        dynamic_cast<value_arg_type*>(base_arg_setter_type::bse_arg_)
+                ->set_holder(holdr);
+        return dynamic_cast<self_type&>(*this);
+    }
+
+    /**
+     * @brief       Allows to specify an unordered multiset in which every cast result will be
+     *              stored. Calling the store_into method will wipe the previous pecified holders
+     *              of the argument.
+     * @param       holdr : Unordered multiset in which the cast results will be inserted.
+     * @return      The object who call the method.
+     */
+    template<typename TpValue_>
+    self_type& store_into(unordered_multiset_type<TpValue_>* holdr)
+    {
+        dynamic_cast<value_arg_type*>(base_arg_setter_type::bse_arg_)
+                ->set_holder(holdr);
         return dynamic_cast<self_type&>(*this);
     }
 
