@@ -70,6 +70,7 @@ TEST_F(argparse_arg_parser, add_key_arg)
     bool presnc;
 
     ap.add_key_arg("-l", "--long")
+            .action([&]() {})
             .description("Recursive behavior.")
             .error_name("error")
             .grouping(true)
@@ -95,6 +96,7 @@ TEST_F(argparse_arg_parser, add_key_value_arg)
     bool presnc;
 
     ap.add_key_value_arg("-s", "--seconds")
+            .action([&]() {})
             .assignment_operator(true)
             .description("The number of seconds.")
             .error_name("error")
@@ -127,6 +129,7 @@ TEST_F(argparse_arg_parser, add_keyless_arg)
     bool presnc;
 
     ap.add_keyless_arg("FILE")
+            .action([&]() {})
             .description("The file path.")
             .error_name("error")
             .help_menus_assigned("help1", "help2")
@@ -155,6 +158,7 @@ TEST_F(argparse_arg_parser, add_help_arg)
     bool presnc;
 
     ap.add_help_arg("-h", "--help")
+            .action([&]() {})
             .assignment_operator(false)
             .description("Display this help and exit.")
             .error_name("error")
@@ -187,6 +191,7 @@ TEST_F(argparse_arg_parser, add_version_arg)
     bool presnc;
 
     ap.add_version_arg("-v", "--version")
+            .action([&]() {})
             .description("Display version information.")
             .error_name("error")
             .gplv3_version_information("v1.0.1", "2024", "Killian Valverde")
@@ -233,6 +238,7 @@ TEST_F(argparse_arg_parser, parse_key_args)
     bool flg_all;
     bool flg_long;
     bool flg_recursive;
+    std::size_t dee = 0;
 
     ap.add_key_arg("-a", "--all")
             .description("Display all the information.")
@@ -244,7 +250,8 @@ TEST_F(argparse_arg_parser, parse_key_args)
 
     ap.add_key_arg("-r", "--recursive")
             .description("Execute the process in a recursive way.")
-            .store_presence(&flg_recursive);
+            .store_presence(&flg_recursive)
+            .action([&]() { ++dee; });
 
     EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
     EXPECT_TRUE(flg_all);
@@ -253,6 +260,7 @@ TEST_F(argparse_arg_parser, parse_key_args)
     EXPECT_TRUE(ap.was_found("-a"));
     EXPECT_TRUE(!ap.was_found("-l"));
     EXPECT_TRUE(ap.was_found("-r"));
+    EXPECT_TRUE(dee == 1);
 }
 
 
