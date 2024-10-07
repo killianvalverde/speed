@@ -607,6 +607,63 @@ TEST_F(argparse_arg_parser, parse_all_constraints)
 }
 
 
+TEST_F(argparse_arg_parser, parse_sub_parser)
+{
+    std::vector<const char*> argv1 = {
+        "git",
+        "add",
+        "src/speed/argparse/basic_arg_parser.hpp"
+    };
+
+    std::vector<const char*> argv2 = {
+        "git",
+        "commit",
+        "-m",
+        "test: argparse: add test"
+    };
+
+    std::vector<const char*> argv3 = {
+        "git",
+        "rebase",
+        "--interactive"
+    };
+
+    speed::argparse::arg_parser add_parsr;
+    speed::argparse::arg_parser commit_parsr;
+    speed::argparse::arg_parser rebase_parsr;
+    std::filesystem::path pth;
+    std::string messag;
+    bool interactv = false;
+
+    add_parsr.add_keyless_arg("FILE")
+            .store_into(&pth);
+
+    commit_parsr.add_key_value_arg("-m")
+            .store_into(&messag);
+
+    rebase_parsr.add_key_arg("-i", "--interactive")
+            .store_presence(&interactv);
+
+    ap.add_key_arg("add")
+            .sub_parser(&add_parsr);
+
+    ap.add_key_arg("commit")
+            .sub_parser(&commit_parsr);
+
+    ap.add_key_arg("rebase")
+            .sub_parser(&rebase_parsr);
+
+    ap.parse_args(argv1.size(), argv1);
+    EXPECT_TRUE(pth == argv1[2]);
+
+    ap.parse_args(argv2.size(), argv2);
+    EXPECT_TRUE(messag == argv2[3]);
+
+    ap.parse_args(argv3.size(), argv3);
+    EXPECT_TRUE(interactv);
+}
+
+
 TEST_F(argparse_arg_parser, check_errors)
 {
     std::vector<const char*> argv = {
