@@ -501,6 +501,7 @@ public:
                         kyless_arg = x;
                         if (static_cast<base_arg_type*>(kyless_arg) !=  prev_arg)
                         {
+                            kyless_arg->execute_action();
                             kyless_arg->set_found(true);
                         }
                         break;
@@ -516,6 +517,7 @@ public:
                             kyless_arg = x;
                             if (static_cast<base_arg_type*>(kyless_arg) !=  prev_arg)
                             {
+                                kyless_arg->execute_action();
                                 kyless_arg->set_found(true);
                             }
                             break;
@@ -1114,7 +1116,7 @@ private:
      * @param       argv : Arguments found in the program call.
      * @param       ky_arg : The key arg to parse.
      * @param       cur_idx : The current index checked in argv.
-     * @param       pos_increment : How much the index will more afther the parsing.
+     * @param       pos_increment : How much the index will be increased afther the parsing.
      */
     template<typename TpArgc_, typename TpArgv_>
     void parse_key_arg(
@@ -1154,6 +1156,7 @@ private:
 
         ky_arg->execute_action();
         ky_arg->set_found(true);
+        ky_arg->parse_sub_arg_parser(argc, argv, cur_idx, pos_increment);
     }
 
     /**
