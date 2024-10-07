@@ -195,10 +195,11 @@ public:
 
 
 /**
- * @brief       Path class decorator that checks whether the path can be used as an output file.
+ * @brief       Path class decorator that checks whether the regular file path can be used as an
+ *              output.
  */
 template<typename TpComponent>
-class output_path_decorator : public TpComponent
+class output_regular_file_path_decorator : public TpComponent
 {
 public:
     /** Component type. */
@@ -215,6 +216,37 @@ public:
                         speed::system::filesystem::access_modes::WRITE,
                         speed::system::filesystem::file_type::REGULAR_FILE, err_code) ||
             speed::system::filesystem::touch(TpComponent::c_str(), 0755, err_code))
+        {
+            return TpComponent::is_valid(err_code);
+        }
+
+        return false;
+    }
+};
+
+
+/**
+ * @brief       Path class decorator that checks whether the directory path can be used as an
+ *              output.
+ */
+template<typename TpComponent>
+class output_directory_path_decorator : public TpComponent
+{
+public:
+    /** Component type. */
+    using TpComponent::TpComponent;
+
+    /**
+     * @brief       Allows knowing whether the path is valid.
+     * @param       err_code : If function fails it holds the platform-dependent error code.
+     * @return      If function is successful true is returned, otherwise false is returned.
+     */
+    [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) override
+    {
+        if (speed::system::filesystem::access(TpComponent::c_str(),
+                        speed::system::filesystem::access_modes::WRITE,
+                        speed::system::filesystem::file_type::DIRECTORY, err_code) ||
+            speed::system::filesystem::mkdir(TpComponent::c_str(), 0755, err_code))
         {
             return TpComponent::is_valid(err_code);
         }
@@ -275,7 +307,10 @@ using rwx_directory_path = read_path_decorator<
         write_path_decorator<execute_path_decorator<directory_path>>>;
 
 /** Regular file path type that can be used as an output file. */
-using output_regular_file_path = output_path_decorator<valid_path>;
+using output_regular_file_path = output_regular_file_path_decorator<valid_path>;
+
+/** Directory path type that can be used as an output file. */
+using output_directory_path = output_directory_path_decorator<valid_path>;
 
 
 }
