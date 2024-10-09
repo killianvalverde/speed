@@ -29,7 +29,7 @@
 #include "speed/lowlevel/lowlevel.hpp"
 
 
-TEST(lowlevel_logical_operations, onehot_to_binary)
+TEST(lowlevel_operations, onehot_to_binary)
 {
     for (std::size_t i = 0; i < 32; ++i)
     {

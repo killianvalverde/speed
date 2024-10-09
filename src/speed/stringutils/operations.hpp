@@ -60,6 +60,21 @@ template<typename TpChar>
 
 
 /**
+ * @brief       Returns the length of a string.
+ * @param       str : A string.
+ * @return      The length of the string.
+ */
+template<typename TpChar, typename TpCharTraits, typename TpCharAlloc>
+[[nodiscard]] typename std::basic_string<TpChar, TpCharTraits, TpCharAlloc>::size_type
+strlen(
+        const std::basic_string<TpChar, TpCharTraits, TpCharAlloc>& str
+) noexcept
+{
+    return str.length();
+}
+
+
+/**
  * @brief       Copies the C string pointed by source into the array pointed by destination,
  *              including the terminating null character (and stopping at that point).
  * @param       dest : Pointer to the destination array where the content is to be copied.
@@ -504,34 +519,6 @@ bool strdisclastif(TpChar* str, const TpIntegral val) noexcept
     }
     
     return false;
-}
-
-
-/**
- * @brief       Returns the length of a C string str.
- * @param       str : A C string.
- * @return      The length of the C string.
- */
-template<typename TpChar>
-[[nodiscard]] inline std::enable_if_t<
-        speed::type_traits::is_character<TpChar>::value,
-        std::size_t
->
-get_string_length(const TpChar* str) noexcept
-{
-    return speed::stringutils::strlen(str);
-}
-
-
-/**
- * @brief       Returns the length of a string.
- * @param       str : A string.
- * @return      The length of the string.
- */
-template<typename TpString>
-[[nodiscard]] inline typename TpString::size_type get_string_length(const TpString& str) noexcept
-{
-    return str.length();
 }
     
     

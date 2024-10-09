@@ -15,8 +15,8 @@
    along with speed. If not, see <http://www.gnu.org/licenses/>. */
 
 /**
- * @file        speed_gtest/stringutils_test/c_string_utils_test.cpp
- * @brief       c_string_utils unit test.
+ * @file        speed_gtest/stringutils_test/operations.cpp
+ * @brief       operations unit test.
  * @author      Killian Valverde
  * @date        2017/12/24
  */
@@ -26,23 +26,27 @@
 #include "speed/stringutils/stringutils.hpp"
 
 
-TEST(stringutils_c_string_utils, strlen)
+TEST(stringutils_operations, strlen)
 {
     const char* str1 = "hello, world";
     const wchar_t* str2 = L"hello, world";
     char str3[] = "hello, world";
     wchar_t str4[] = L"hello, world";
     char* str5 = nullptr;
+    std::string str6 = "12345";
+    std::wstring str7 = L"12345";
     
     EXPECT_TRUE(speed::stringutils::strlen(str1) == 12);
     EXPECT_TRUE(speed::stringutils::strlen(str2) == 12);
     EXPECT_TRUE(speed::stringutils::strlen(str3) == 12);
     EXPECT_TRUE(speed::stringutils::strlen(str4) == 12);
     EXPECT_TRUE(speed::stringutils::strlen(str5) == 0);
+    EXPECT_TRUE(speed::stringutils::strlen(str6) == 5);
+    EXPECT_TRUE(speed::stringutils::strlen(str7) == 5);
 }
 
 
-TEST(stringutils_c_string_utils, strcpy)
+TEST(stringutils_operations, strcpy)
 {
     char str1[32] = "hello";
     wchar_t str2[32] = L"world";
@@ -54,7 +58,7 @@ TEST(stringutils_c_string_utils, strcpy)
 }
 
 
-TEST(stringutils_c_string_utils, strncpy)
+TEST(stringutils_operations, strncpy)
 {
     char str1[32] = "hello";
     wchar_t str2[32] = L"world";
@@ -66,7 +70,7 @@ TEST(stringutils_c_string_utils, strncpy)
 }
 
 
-TEST(stringutils_c_string_utils, strcmp)
+TEST(stringutils_operations, strcmp)
 {
     char str1[32] = "kkk";
     wchar_t str2[32] = L"kkk";
@@ -79,7 +83,7 @@ TEST(stringutils_c_string_utils, strcmp)
 }
 
 
-TEST(stringutils_c_string_utils, strncmp)
+TEST(stringutils_operations, strncmp)
 {
     char str1[32] = "kkbb";
     wchar_t str2[32] = L"kkzz";
@@ -93,7 +97,7 @@ TEST(stringutils_c_string_utils, strncmp)
 }
 
 
-TEST(stringutils_c_string_utils, strchr)
+TEST(stringutils_operations, strchr)
 {
     char str1[32] = "kkbb";
     wchar_t str2[32] = L"kkzz";
@@ -105,7 +109,7 @@ TEST(stringutils_c_string_utils, strchr)
 }
 
 
-TEST(stringutils_c_string_utils, strnchr)
+TEST(stringutils_operations, strnchr)
 {
     char str1[32] = "kkbb";
     wchar_t str2[32] = L"kkzz";
@@ -119,7 +123,7 @@ TEST(stringutils_c_string_utils, strnchr)
 }
 
 
-TEST(stringutils_c_string_utils, strrchr)
+TEST(stringutils_operations, strrchr)
 {
     char str1[32] = "kkbb";
     wchar_t str2[32] = L"kkzz";
@@ -131,7 +135,7 @@ TEST(stringutils_c_string_utils, strrchr)
 }
 
 
-TEST(stringutils_c_string_utils, strrnchr)
+TEST(stringutils_operations, strrnchr)
 {
     char str1[32] = "kkbb";
     wchar_t str2[32] = L"kkzz";
@@ -145,7 +149,7 @@ TEST(stringutils_c_string_utils, strrnchr)
 }
 
 
-TEST(stringutils_c_string_utils, strsplit)
+TEST(stringutils_operations, strsplit)
 {
     char str1[32] = "1;2;3;4;5;6";
     wchar_t str2[32] = L"1;2;3;4;5;6";
@@ -169,7 +173,7 @@ TEST(stringutils_c_string_utils, strsplit)
 }
 
 
-TEST(stringutils_c_string_utils, strdisclower)
+TEST(stringutils_operations, strdisclower)
 {
     char str1[32] = "123456";
     wchar_t str2[32] = L"123456";
