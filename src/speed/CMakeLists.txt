@@ -89,6 +89,10 @@ set(SPEED_MATH_SOURCE_FILES
         math/math.hpp
 )
 
+set(SPEED_SAFETY_SOURCE_FILES
+        safety/safety.hpp
+)
+
 set(SPEED_SCALARS_SOURCE_FILES
         scalars/operations.hpp
         scalars/scalar.hpp
@@ -182,6 +186,7 @@ set(SPEED_SOURCE_FILES
         ${SPEED_IOSTREAM_SOURCE_FILES}
         ${SPEED_LOWLEVEL_SOURCE_FILES}
         ${SPEED_MATH_SOURCE_FILES}
+        ${SPEED_SAFETY_SOURCE_FILES}
         ${SPEED_SCALARS_SOURCE_FILES}
         ${SPEED_STRINGUTILS_SOURCE_FILES}
         ${SPEED_SYSTEM_SOURCE_FILES}
@@ -202,6 +207,7 @@ add_library(speed_filesystem STATIC ${SPEED_FILESYSTEM_SOURCE_FILES})
 add_library(speed_iostream STATIC ${SPEED_IOSTREAM_SOURCE_FILES})
 add_library(speed_lowlevel STATIC ${SPEED_LOWLEVEL_SOURCE_FILES})
 add_library(speed_math STATIC ${SPEED_MATH_SOURCE_FILES})
+add_library(speed_safety STATIC ${SPEED_SAFETY_SOURCE_FILES})
 add_library(speed_scalars STATIC ${SPEED_SCALARS_SOURCE_FILES})
 add_library(speed_stringutils STATIC ${SPEED_STRINGUTILS_SOURCE_FILES})
 add_library(speed_system STATIC ${SPEED_SYSTEM_SOURCE_FILES})
@@ -219,6 +225,7 @@ set_target_properties(speed_filesystem PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(speed_iostream PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(speed_lowlevel PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(speed_math PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(speed_safety PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(speed_scalars PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(speed_stringutils PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(speed_system PROPERTIES LINKER_LANGUAGE CXX)
@@ -288,6 +295,7 @@ target_link_libraries(speed
         speed_iostream
         speed_lowlevel
         speed_math
+        speed_safety
         speed_scalars
         speed_stringutils
         speed_system
@@ -305,6 +313,7 @@ install(TARGETS speed_filesystem LIBRARY DESTINATION lib)
 install(TARGETS speed_iostream LIBRARY DESTINATION lib)
 install(TARGETS speed_lowlevel LIBRARY DESTINATION lib)
 install(TARGETS speed_math LIBRARY DESTINATION lib)
+install(TARGETS speed_safety LIBRARY DESTINATION lib)
 install(TARGETS speed_scalars LIBRARY DESTINATION lib)
 install(TARGETS speed_stringutils LIBRARY DESTINATION lib)
 install(TARGETS speed_system LIBRARY DESTINATION lib)
