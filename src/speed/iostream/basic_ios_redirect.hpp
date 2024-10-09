@@ -75,6 +75,7 @@ public:
             : ios_(&ios)
             , old_streambuf_(nullptr)
             , stringstream_(nullptr)
+            , stringstream_alloc_()
             , stringstream_constructed_(false)
     {
     }
@@ -91,8 +92,7 @@ public:
         
         if (stringstream_ != nullptr)
         {
-            allocator_type<stringstream_type> stringstream_alloc;
-            stringstream_alloc.deallocate(stringstream_, 1);
+            stringstream_alloc_.deallocate(stringstream_, 1);
             stringstream_ = nullptr;
         }
     }
@@ -114,18 +114,16 @@ public:
      * @brief       Use the class embedded lazy stringstream to redirect the current input/output
      *              stream buffer.
      */
-    void redirect_to_embedded_stringstream()
+    void redirect_to_internal_stream()
     {
         unredirect();
         
-        allocator_type<stringstream_type> stringstream_alloc;
-        
         if (stringstream_ == nullptr)
         {
-            stringstream_ = stringstream_alloc.allocate(1);
+            stringstream_ = stringstream_alloc_.allocate(1);
         }
         
-        stringstream_alloc.construct(stringstream_);
+        stringstream_alloc_.construct(stringstream_);
         stringstream_constructed_ = true;
         
         old_streambuf_ = ios_->rdbuf(stringstream_->rdbuf());
@@ -144,8 +142,7 @@ public:
         
         if (stringstream_constructed_)
         {
-            allocator_type<stringstream_type> stringstream_alloc;
-            stringstream_alloc.destroy(stringstream_);
+            stringstream_alloc_.destroy(stringstream_);
             stringstream_constructed_ = false;
         }
     }
@@ -154,7 +151,7 @@ public:
      * @brief       Get the embedded string stream buffer as a string.
      * @return      The embedded string stream buffer as a string.
      */
-    string_type get_embedded_stringstream_str()
+    string_type get_internal_string()
     {
         if (stringstream_constructed_)
         {
@@ -167,13 +164,12 @@ public:
     /**
      * @brief       Clear the embedded string stream buffer.
      */
-    void clear_embedded_stringstream()
+    void clear_internal_stream()
     {
         if (stringstream_constructed_)
         {
-            allocator_type<stringstream_type> stringstream_alloc;
-            stringstream_alloc.destroy(stringstream_);
-            stringstream_alloc.construct(stringstream_);
+            stringstream_alloc_.destroy(stringstream_);
+            stringstream_alloc_.construct(stringstream_);
         }
     }
 
@@ -186,6 +182,9 @@ private:
     
     /** The embedded string stream. */
     stringstream_type* stringstream_;
+
+    /** Stringstream allocator. */
+    allocator_type<stringstream_type> stringstream_alloc_;
     
     /** Allows to knowing whether the embedded string stream has been constructed. */
     bool stringstream_constructed_;

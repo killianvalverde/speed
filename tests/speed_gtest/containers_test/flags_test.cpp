@@ -205,14 +205,14 @@ TEST(containers_flags, print)
     speed::containers::flags<colors> clrs;
     speed::iostream::ios_redirect ios_redirect(std::cout);
     std::string expected_result("00000101\n");
-    
-    ios_redirect.redirect_to_embedded_stringstream();
+
+    ios_redirect.redirect_to_internal_stream();
     
     clrs.set(colors::BLUE);
     clrs.set(colors::YELLOW);
     clrs.print(std::cout);
     
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_result);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_result);
 }
 
 
@@ -239,12 +239,12 @@ TEST(containers_flags, operator_left_shift)
     speed::containers::flags<colors> clrs;
     speed::iostream::ios_redirect ios_redirect(std::cout);
     std::string expected_result("00000101\n");
-    
-    ios_redirect.redirect_to_embedded_stringstream();
+
+    ios_redirect.redirect_to_internal_stream();
     
     clrs.set(colors::BLUE);
     clrs.set(colors::YELLOW);
     std::cout << clrs << std::endl;
     
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_result);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_result);
 }

@@ -655,7 +655,7 @@ TEST_F(argparse_arg_parser, print_usage)
         "--hours[=INTEGER]... DESTINATION\n\n";
 
     speed::iostream::ios_redirect ios_redirect(std::cout);
-    ios_redirect.redirect_to_embedded_stringstream();
+    ios_redirect.redirect_to_internal_stream();
 
     ap.configure()
             .program_name("speed");
@@ -699,7 +699,7 @@ TEST_F(argparse_arg_parser, print_usage)
 
     ap.print_help();
 
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_res);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
 
@@ -712,7 +712,7 @@ TEST_F(argparse_arg_parser, print_description)
             "porttitor.\n\n";
 
     speed::iostream::ios_redirect ios_redirect(std::cout);
-    ios_redirect.redirect_to_embedded_stringstream();
+    ios_redirect.redirect_to_internal_stream();
 
     ap.configure()
             .program_name("speed");
@@ -733,7 +733,7 @@ TEST_F(argparse_arg_parser, print_description)
 
     ap.print_help();
 
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_res);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
 
@@ -746,7 +746,7 @@ TEST_F(argparse_arg_parser, print_options)
         "  -h, --hours[=INTEGER]...  Set hours.\n\n";
 
     speed::iostream::ios_redirect ios_redirect(std::cout);
-    ios_redirect.redirect_to_embedded_stringstream();
+    ios_redirect.redirect_to_internal_stream();
 
     ap.configure()
             .program_name("speed");
@@ -790,7 +790,7 @@ TEST_F(argparse_arg_parser, print_options)
 
     ap.print_help();
 
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_res);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
 
@@ -808,7 +808,7 @@ TEST_F(argparse_arg_parser, print_commands)
             "  -s, --seconds=INTEGER     Set seconds.\n\n";
 
     speed::iostream::ios_redirect ios_redirect(std::cout);
-    ios_redirect.redirect_to_embedded_stringstream();
+    ios_redirect.redirect_to_internal_stream();
 
     ap.configure()
             .program_name("speed");
@@ -856,7 +856,7 @@ TEST_F(argparse_arg_parser, print_commands)
 
     ap.print_help();
 
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_res);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
 
@@ -867,7 +867,7 @@ TEST_F(argparse_arg_parser, print_values)
         "  DESTINATION  Destination directory.\n\n";
 
     speed::iostream::ios_redirect ios_redirect(std::cout);
-    ios_redirect.redirect_to_embedded_stringstream();
+    ios_redirect.redirect_to_internal_stream();
 
     ap.configure()
             .program_name("speed");
@@ -912,7 +912,7 @@ TEST_F(argparse_arg_parser, print_values)
 
     ap.print_help();
 
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_res);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
 
@@ -925,7 +925,7 @@ TEST_F(argparse_arg_parser, print_epilogue)
             "porttitor.\n\n";
 
     speed::iostream::ios_redirect ios_redirect(std::cout);
-    ios_redirect.redirect_to_embedded_stringstream();
+    ios_redirect.redirect_to_internal_stream();
 
     ap.configure()
             .program_name("speed");
@@ -946,7 +946,7 @@ TEST_F(argparse_arg_parser, print_epilogue)
 
     ap.print_help();
 
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_res);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
 
@@ -979,7 +979,7 @@ TEST_F(argparse_arg_parser, print_help)
             "porttitor.\n\n";
 
     speed::iostream::ios_redirect ios_redirect(std::cout);
-    ios_redirect.redirect_to_embedded_stringstream();
+    ios_redirect.redirect_to_internal_stream();
 
     ap.configure()
             .program_name("speed");
@@ -1034,7 +1034,7 @@ TEST_F(argparse_arg_parser, print_help)
 
     ap.print_help();
 
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_res);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
 
@@ -1043,7 +1043,7 @@ TEST_F(argparse_arg_parser, print_version)
     std::string expected_res = "v1.0.0\n";
 
     speed::iostream::ios_redirect ios_redirect(std::cout);
-    ios_redirect.redirect_to_embedded_stringstream();
+    ios_redirect.redirect_to_internal_stream();
 
     ap.configure()
             .program_name("speed");
@@ -1054,7 +1054,7 @@ TEST_F(argparse_arg_parser, print_version)
 
     ap.print_version();
 
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_res);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
 
@@ -1068,7 +1068,7 @@ TEST_F(argparse_arg_parser, print_number_errors)
     };
 
     speed::iostream::ios_redirect ios_redirect(std::cout);
-    ios_redirect.redirect_to_embedded_stringstream();
+    ios_redirect.redirect_to_internal_stream();
 
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
@@ -1078,7 +1078,7 @@ TEST_F(argparse_arg_parser, print_number_errors)
     ap.parse_args(argv.size(), argv);
     ap.print_errors();
 
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_res);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
 
@@ -1111,7 +1111,7 @@ TEST_F(argparse_arg_parser, change_prefix)
             "porttitor.\n\n";
 
     speed::iostream::ios_redirect ios_redirect(std::cout);
-    ios_redirect.redirect_to_embedded_stringstream();
+    ios_redirect.redirect_to_internal_stream();
 
     ap.configure()
             .program_name("speed");
@@ -1170,5 +1170,5 @@ TEST_F(argparse_arg_parser, change_prefix)
 
     ap.print_help();
 
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_res);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
