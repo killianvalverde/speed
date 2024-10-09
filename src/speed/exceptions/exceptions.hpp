@@ -28,7 +28,7 @@
 #define SPEED_EXCEPTIONS_EXCEPTIONS_HPP
 
 #include "exception_base.hpp"
-#include "message_exception.hpp"
+#include "basic_message_exception.hpp"
 
 
 namespace speed {

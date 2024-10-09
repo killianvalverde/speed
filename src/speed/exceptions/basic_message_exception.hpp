@@ -18,14 +18,14 @@
  */
 
 /**
- * @file        speed/exceptions/message_exception.hpp
- * @brief       message_exception class header.
+ * @file        speed/exceptions/basic_message_exception.hpp
+ * @brief       basic_message_exception class header.
  * @author      Killian Valverde
  * @date        2016/08/19
  */
 
-#ifndef SPEED_EXCEPTIONS_MESSAGE_EXCEPTION_HPP
-#define SPEED_EXCEPTIONS_MESSAGE_EXCEPTION_HPP
+#ifndef SPEED_EXCEPTIONS_BASIC_MESSAGE_EXCEPTION_HPP
+#define SPEED_EXCEPTIONS_BASIC_MESSAGE_EXCEPTION_HPP
 
 #include <type_traits>
 
@@ -38,11 +38,16 @@ namespace speed::exceptions {
 /**
  * @brief       Base for any speed exception class that needs to have a customizable message.
  */
-class message_exception : public exception_base
+template<typename TpAllocator>
+class basic_message_exception : public exception_base
 {
 public:
+    /** Allocator type used in the class. */
+    template<typename T>
+    using allocator_type = typename TpAllocator::template rebind<T>::other;
+
     /** String type used in the class. */
-    using string_type = std::basic_string<char, std::char_traits<char>, std::allocator<char>>;
+    using string_type = std::basic_string<char, std::char_traits<char>, allocator_type<char>>;
 
     /**
      * @brief       Constructor with parameters.
@@ -51,10 +56,10 @@ public:
     template<
             typename TpString_,
             typename = std::enable_if_t<
-                    !std::is_base_of<message_exception, std::decay_t<TpString_>>::value
+                    !std::is_base_of<basic_message_exception, std::decay_t<TpString_>>::value
             >
     >
-    explicit inline message_exception(TpString_&& mess) noexcept
+    explicit inline basic_message_exception(TpString_&& mess) noexcept
             : mess_(std::forward<TpString_>(mess))
     {
     }
@@ -63,32 +68,32 @@ public:
      * @brief       Copy constructor.
      * @param       rhs : Object to copy.
      */
-    message_exception(const message_exception& rhs) = default;
+    basic_message_exception(const basic_message_exception& rhs) = default;
     
     /**
      * @brief       Move constructor.
      * @param       rhs : Object to move.
      */
-    message_exception(message_exception&& rhs) = default;
+    basic_message_exception(basic_message_exception&& rhs) = default;
     
     /**
      * @brief       Destructor.
      */
-    ~message_exception() override = default;
+    ~basic_message_exception() override = default;
     
     /**
      * @brief       Copy assignment operator.
      * @param       rhs : Object to copy.
      * @return      The object who call the method.
      */
-    message_exception& operator =(const message_exception& rhs) = default;
+    basic_message_exception& operator =(const basic_message_exception& rhs) = default;
     
     /**
      * @brief       Move assignment operator.
      * @param       rhs : Object to move.
      * @return      The object who call the method.
      */
-    message_exception& operator =(message_exception&& rhs) = default;
+    basic_message_exception& operator =(basic_message_exception&& rhs) = default;
     
     /**
      * @brief       Get the message of the exception.
@@ -103,6 +108,10 @@ protected:
     /** Message of the exception. */
     string_type mess_;
 };
+
+
+/** Class used to parse arguments. */
+using message_exception = basic_message_exception<std::allocator<char>>;
 
 
 }
