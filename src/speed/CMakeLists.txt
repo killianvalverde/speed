@@ -146,16 +146,12 @@ set(SPEED_SYSTEM_SOURCE_FILES
 )
 
 set(SPEED_TIME_SOURCE_FILES
-        time/child_cpu_chrono.cpp
         time/child_cpu_chrono.hpp
+        time/chrono_base.cpp
         time/chrono_base.hpp
         time/chrono_states.hpp
-        time/cpu_chrono.cpp
         time/cpu_chrono.hpp
-        time/monotonic_chrono.cpp
         time/monotonic_chrono.hpp
-        time/monotonic_timer.cpp
-        time/monotonic_timer.hpp
         time/time.hpp
 )
 

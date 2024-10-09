@@ -32,7 +32,6 @@
 #include "chrono_states.hpp"
 #include "cpu_chrono.hpp"
 #include "monotonic_chrono.hpp"
-#include "monotonic_timer.hpp"
 
 
 namespace speed {

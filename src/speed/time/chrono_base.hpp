@@ -37,7 +37,6 @@
 namespace speed::time {
 
 
-// TODO: Implement some of the functions in the base class.
 /**
  * @brief       Class that represents the base of all chronos.
  */
@@ -45,47 +44,56 @@ class chrono_base
 {
 public:
     /**
+     * @brief       Default constructor.
+     */
+    chrono_base() noexcept;
+
+    /**
      * @brief       Start the process.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    virtual bool start() noexcept = 0;
+    virtual bool start() noexcept;
     
     /**
      * @brief       Stop the process.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    virtual bool stop() noexcept = 0;
+    virtual bool stop() noexcept;
     
     /**
      * @brief       Resume the process.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    virtual bool resume() noexcept = 0;
+    virtual bool resume() noexcept;
     
     /**
      * @brief       Restart the process.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    virtual bool restart() noexcept = 0;
+    virtual bool restart() noexcept;
     
     /**
      * @brief       Get the elapsed time since the process has begun.
      * @return      The elapsed time converted to long double.
      */
-    virtual long double get_elapsed_time() const noexcept = 0;
+    [[nodiscard]] virtual long double get_elapsed_time() const noexcept;
     
     /**
      * @brief       Get the elapsed time since the process has begun.
      * @return      The elapsed time in a time_specification type.
      */
-    virtual speed::system::time::time_specification get_elapsed_raw_time() const noexcept = 0;
+    [[nodiscard]] virtual speed::system::time::time_specification
+    get_elapsed_raw_time() const noexcept;
     
     /**
      * @brief       Allows knowing whether the chrono is in a specified state.
      * @param       chrn_state : The state to check.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    virtual inline bool is(chrono_states chrn_state) const noexcept = 0;
+    [[nodiscard]] virtual inline bool is(chrono_states chrn_state) const noexcept
+    {
+        return chrn_state_ == chrn_state;
+    }
     
     /**
      * @brief       Print the elapsed time with the object specified.
@@ -109,34 +117,7 @@ public:
     std::basic_ostream<TpChar, TpCharTraits>& print(
             std::basic_ostream<TpChar, TpCharTraits>& os,
             std::uint8_t fixd_precision
-    ) const
-    {
-        char decimls[10] = {0};
-        std::uint32_t cur_divider = 100'000'000;
-        std::uint8_t i = 0;
-        speed::system::time::time_specification elapsd_time = get_elapsed_raw_time();
-        auto nsec_bldr = elapsd_time.get_nseconds();
-        
-        if (fixd_precision > 9)
-        {
-            fixd_precision = 9;
-        }
-        
-        for (i = 0; i < fixd_precision; i++)
-        {
-            decimls[i] = (char)(nsec_bldr / cur_divider) + '0';
-            nsec_bldr %= cur_divider;
-            cur_divider /= 10;
-        }
-        
-        os << elapsd_time.get_seconds();
-        if (decimls[0] != '\0')
-        {
-            os << "." << decimls;
-        }
-        
-        return os;
-    }
+    ) const;
     
     /**
      * @brief       Print the elapsed time and a new line with the object specified.
@@ -163,6 +144,23 @@ public:
         print(os, fixd_precesion);
         os << '\n';
     };
+
+protected:
+    /**
+     * @brief       Get the specific implementation time since some unspecified starting point.
+     * @return      The specific implementation time since some unspecified starting point.
+     */
+    [[nodiscard]] virtual speed::system::time::time_specification get_time() const noexcept = 0;
+
+private:
+    /** The process start time. */
+    speed::system::time::time_specification start_time_spec_;
+
+    /** The process elapsed time. */
+    speed::system::time::time_specification elapsed_time_spec_;
+
+    /** The state of the chrono. */
+    chrono_states chrn_state_;
 };
 
 
