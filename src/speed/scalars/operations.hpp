@@ -35,22 +35,22 @@ namespace speed::scalars {
 
 /**
  * @brief       Get the number of digits of the given scalar.
- * @param       scalr : The scalar to get the number of digits.
+ * @param       val : The scalar to get the number of digits.
  * @return      The number of digits of the given scalar.
  */
 template<typename TpScalar>
-TpScalar get_n_digits(TpScalar scalr) noexcept
+TpScalar count_digits(TpScalar val) noexcept
 {
-    TpScalar cur_n_digits = 1;
-    TpScalar abs_value = std::abs(scalr);
+    TpScalar n_digits = 1;
+    TpScalar abs_val = std::abs(val);
     
-    while (abs_value > 9)
+    while (abs_val > 9)
     {
-        ++cur_n_digits;
-        abs_value /= 10;
+        ++n_digits;
+        abs_val /= 10;
     }
     
-    return cur_n_digits;
+    return n_digits;
 }
 
 

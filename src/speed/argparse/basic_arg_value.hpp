@@ -90,8 +90,6 @@ public:
      * @param       castr : Caster object used to parse the value.
      * @param       arg_parsr : Argument parser that holds this object.
      * @param       val_arg : Value arg that holds this object.
-     * @param       holdr : Pointer to the holder that will strore the result of the parsing.
-     * @param       vec_holdr : Vector that will get the result of the parsing.
      */
     template<
             typename TpString_,

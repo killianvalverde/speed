@@ -6,7 +6,7 @@ include_directories(${GTEST_INCLUDE_DIRS})
 include_directories(${PROJECT_SOURCE_DIR}/../../src)
 
 set(SPEED_ALGORITHM_TEST_SOURCE_FILES
-        algorithm_test/algorithm_test.cpp
+        algorithm_test/operations_test.cpp
 )
 
 set(SPEED_ARGPARSE_TEST_SOURCE_FILES
@@ -38,7 +38,7 @@ set(SPEED_SAFETY_TEST_SOURCE_FILES
 
 set(SPEED_SCALARS_TEST_SOURCE_FILES
         scalars_test/scalar_test.cpp
-        scalars_test/scalars_test.cpp
+        scalars_test/operations_test.cpp
 )
 
 set(SPEED_STRINGUTILS_TEST_SOURCE_FILES
@@ -63,7 +63,7 @@ set(SPEED_TYPE_CASTING_TEST_SOURCE_FILES
 )
 
 set(SPEED_TYPE_TRAITS_TEST_SOURCE_FILES
-        type_traits_test/type_traits_test.cpp
+        type_traits_test/operations_test.cpp
 )
 
 add_executable(speed_algorithm_test main.cpp ${SPEED_ALGORITHM_TEST_SOURCE_FILES})

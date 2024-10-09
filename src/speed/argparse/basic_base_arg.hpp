@@ -196,7 +196,7 @@ public:
 
     /**
      * @brief       Set the action to execute when the arguement is found in the program call.
-     * @param       callable_actn : Action to execute when the arguement is found in the program
+     * @param       callabl : Action to execute when the arguement is found in the program
      *              call.
      */
     template<typename TpCallable>

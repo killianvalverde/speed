@@ -18,8 +18,8 @@
  */
 
 /**
- * @file        speed_gtest/type_traits_test/type_traits_test.cpp
- * @brief       type_traits unit test.
+ * @file        speed_gtest/type_traits_test/operations_test.cpp
+ * @brief       operations unit test.
  * @author      Killian Valverde
  * @date        2018/06/08
  */
@@ -31,21 +31,21 @@
 #include "speed/type_traits/type_traits.hpp"
 
 
-TEST(type_traits_type_traits, is_char)
+TEST(type_traits_operations, is_char)
 {
     EXPECT_TRUE(speed::type_traits::is_char<char>::value);
     EXPECT_TRUE(!speed::type_traits::is_char<wchar_t>::value);
 }
 
 
-TEST(type_traits_type_traits, is_wchar)
+TEST(type_traits_operations, is_wchar)
 {
     EXPECT_TRUE(!speed::type_traits::is_wchar<char>::value);
     EXPECT_TRUE(speed::type_traits::is_wchar<wchar_t>::value);
 }
 
 
-TEST(type_traits_type_traits, is_character)
+TEST(type_traits_operations, is_character)
 {
     EXPECT_TRUE(speed::type_traits::is_character<char>::value);
     EXPECT_TRUE(speed::type_traits::is_character<wchar_t>::value);
@@ -55,7 +55,7 @@ TEST(type_traits_type_traits, is_character)
 }
 
 
-TEST(type_traits_type_traits, is_character_pointer)
+TEST(type_traits_operations, is_character_pointer)
 {
     EXPECT_TRUE(speed::type_traits::is_character_pointer<char*>::value);
     EXPECT_TRUE(speed::type_traits::is_character_pointer<const wchar_t*>::value);
@@ -66,7 +66,7 @@ TEST(type_traits_type_traits, is_character_pointer)
 }
 
 
-TEST(type_traits_type_traits, is_stdio_character)
+TEST(type_traits_operations, is_stdio_character)
 {
     EXPECT_TRUE(speed::type_traits::is_stdio_character<char>::value);
     EXPECT_TRUE(speed::type_traits::is_stdio_character<wchar_t>::value);
@@ -75,21 +75,21 @@ TEST(type_traits_type_traits, is_stdio_character)
 }
 
 
-TEST(type_traits_type_traits, is_float)
+TEST(type_traits_operations, is_float)
 {
     EXPECT_TRUE(speed::type_traits::is_float<float>::value);
     EXPECT_TRUE(!speed::type_traits::is_float<double>::value);
 }
 
 
-TEST(type_traits_type_traits, is_double)
+TEST(type_traits_operations, is_double)
 {
     EXPECT_TRUE(!speed::type_traits::is_double<float>::value);
     EXPECT_TRUE(speed::type_traits::is_double<double>::value);
 }
 
 
-TEST(type_traits_type_traits, is_long_double)
+TEST(type_traits_operations, is_long_double)
 {
     EXPECT_TRUE(!speed::type_traits::is_long_double<float>::value);
     EXPECT_TRUE(!speed::type_traits::is_long_double<double>::value);
@@ -97,7 +97,7 @@ TEST(type_traits_type_traits, is_long_double)
 }
 
 
-TEST(type_traits_type_traits, is_basic_string)
+TEST(type_traits_operations, is_basic_string)
 {
     EXPECT_TRUE(speed::type_traits::is_basic_string<std::string>::value);
     EXPECT_TRUE(speed::type_traits::is_basic_string<std::wstring>::value);
@@ -105,7 +105,7 @@ TEST(type_traits_type_traits, is_basic_string)
 }
 
 
-TEST(type_traits_type_traits, is_basic_string_vector)
+TEST(type_traits_operations, is_basic_string_vector)
 {
     EXPECT_TRUE(speed::type_traits::is_basic_string_vector<std::vector<std::string>>::value);
     EXPECT_TRUE(speed::type_traits::is_basic_string_vector<std::vector<std::wstring>>::value);
@@ -114,7 +114,7 @@ TEST(type_traits_type_traits, is_basic_string_vector)
 }
 
 
-TEST(type_traits_type_traits, is_basic_ostream)
+TEST(type_traits_operations, is_basic_ostream)
 {
     EXPECT_TRUE(speed::type_traits::is_basic_ostream<std::ostream>::value);
     EXPECT_TRUE(speed::type_traits::is_basic_ostream<std::wostream>::value);
@@ -122,21 +122,24 @@ TEST(type_traits_type_traits, is_basic_ostream)
 }
 
 
-TEST(type_traits_type_traits, is_path)
+TEST(type_traits_operations, is_path)
 {
     EXPECT_TRUE(speed::type_traits::is_path<std::filesystem::path>::value);
     EXPECT_TRUE(!speed::type_traits::is_path<int>::value);
 }
 
 
-TEST(type_traits_type_traits, try_underlying_type)
+TEST(type_traits_operations, try_underlying_type)
 {
     enum class item : char
     {
         POTION = 'P'
     };
     
-    EXPECT_TRUE(speed::type_traits::is_char<speed::type_traits::try_underlying_type_t<item>>::value);
-    EXPECT_TRUE(speed::type_traits::is_char<speed::type_traits::try_underlying_type_t<char>>::value);
-    EXPECT_TRUE(!speed::type_traits::is_char<speed::type_traits::try_underlying_type_t<int>>::value);
+    EXPECT_TRUE(speed::type_traits::is_char<
+            speed::type_traits::try_underlying_type_t<item>>::value);
+    EXPECT_TRUE(speed::type_traits::is_char<
+            speed::type_traits::try_underlying_type_t<char>>::value);
+    EXPECT_TRUE(!speed::type_traits::is_char<
+            speed::type_traits::try_underlying_type_t<int>>::value);
 }

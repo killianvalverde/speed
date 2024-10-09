@@ -99,7 +99,6 @@ public:
     /**
      * @brief       Try to convert the source to the target.
      * @param       arg : The value to convert.
-     * @param       res : The result of the operation if it was successful.
      * @param       err_code : If function fails it holds the error code.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
@@ -185,7 +184,6 @@ public:
     /**
      * @brief       Try to convert the source to the target.
      * @param       arg : The value to convert.
-     * @param       res : The result of the operation if it was successful.
      * @param       err_code : If function fails it holds the error code.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
@@ -276,7 +274,6 @@ public:
     /**
      * @brief       Try to convert the source to the target.
      * @param       arg : The value to convert.
-     * @param       res : The result of the operation if it was successful.
      * @param       err_code : If function fails it holds the error code.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
@@ -364,7 +361,6 @@ public:
     /**
      * @brief       Try to convert the source to the target.
      * @param       arg : The value to convert.
-     * @param       res : The result of the operation if it was successful.
      * @param       err_code : If function fails it holds the error code.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
@@ -455,7 +451,6 @@ public:
     /**
      * @brief       Try to convert the source to the target.
      * @param       arg : The value to convert.
-     * @param       res : The result of the operation if it was successful.
      * @param       err_code : If function fails it holds the error code.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
@@ -546,7 +541,6 @@ public:
     /**
      * @brief       Try to convert the source to the target.
      * @param       arg : The value to convert.
-     * @param       res : The result of the operation if it was successful.
      * @param       err_code : If function fails it holds the error code.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
@@ -637,7 +631,6 @@ public:
     /**
      * @brief       Try to convert the source to the target.
      * @param       arg : The value to convert.
-     * @param       res : The result of the operation if it was successful.
      * @param       err_code : If function fails it holds the error code.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
@@ -726,7 +719,6 @@ public:
     /**
      * @brief       Try to convert the source to the target.
      * @param       arg : The value to convert.
-     * @param       res : The result of the operation if it was successful.
      * @param       err_code : If function fails it holds the error code.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
@@ -817,7 +809,6 @@ public:
     /**
      * @brief       Try to convert the source to the target.
      * @param       arg : The value to convert.
-     * @param       res : The result of the operation if it was successful.
      * @param       err_code : If function fails it holds the error code.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
@@ -905,7 +896,6 @@ public:
     /**
      * @brief       Try to convert the source to the target.
      * @param       arg : The value to convert.
-     * @param       res : The result of the operation if it was successful.
      * @param       err_code : If function fails it holds the error code.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
@@ -995,7 +985,6 @@ public:
     /**
      * @brief       Try to convert the source to the target.
      * @param       arg : The value to convert.
-     * @param       res : The result of the operation if it was successful.
      * @param       err_code : If function fails it holds the error code.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
@@ -1085,7 +1074,6 @@ public:
     /**
      * @brief       Try to convert the source to the target.
      * @param       arg : The value to convert.
-     * @param       res : The result of the operation if it was successful.
      * @param       err_code : If function fails it holds the error code.
      * @return      If function was successful true is returned, otherwise false is returned.
      */

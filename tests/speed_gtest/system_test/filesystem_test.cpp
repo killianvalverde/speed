@@ -37,8 +37,7 @@ TEST(system_filesystem, access_1)
 
 TEST(system_filesystem, access_2)
 {
-    ASSERT_TRUE(speed::system::filesystem::access(".", 
-                                                  speed::system::filesystem::am_t::EXISTS, 
+    ASSERT_TRUE(speed::system::filesystem::access(".", speed::system::filesystem::am_t::EXISTS,
                                                   speed::system::filesystem::ft_t::DIRECTORY));
 }
 

@@ -18,30 +18,30 @@
  */
 
 /**
- * @file        speed_gtest/scalars_test/scalars_test.cpp
- * @brief       scalars unit test.
+ * @file        speed_gtest/algorithm_test/operations_test.cpp
+ * @brief       operations_test unit test.
  * @author      Killian Valverde
- * @date        2018/04/28
+ * @date        2018/08/07
  */
 
-#include <type_traits>
+#include <vector>
 
 #include <gtest/gtest.h>
 
-#include "speed/scalars/scalars.hpp"
+#include "speed/algorithm/algorithm.hpp"
 
 
-TEST(scalars_scalars, get_n_digits)
+TEST(algorithm_operations, quicksort)
 {
-    int i1 = 0;
-    int i2 = 4;
-    int i3 = 32;
-    int i4 = 948;
-    int i5 = 92384;
+    std::vector<std::size_t> vec = {12, 34553, 1, 90, 124124};
     
-    EXPECT_TRUE(speed::scalars::get_n_digits(i1) == 1);
-    EXPECT_TRUE(speed::scalars::get_n_digits(i2) == 1);
-    EXPECT_TRUE(speed::scalars::get_n_digits(i3) == 2);
-    EXPECT_TRUE(speed::scalars::get_n_digits(i4) == 3);
-    EXPECT_TRUE(speed::scalars::get_n_digits(i5) == 5);
+    speed::algorithm::quicksort(vec, vec.size());
+    
+    std::size_t min = 0;
+    
+    for (auto& x : vec)
+    {
+        EXPECT_TRUE(min < x);
+        min = x;
+    }
 }
