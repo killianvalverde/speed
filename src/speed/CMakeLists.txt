@@ -56,7 +56,7 @@ set(SPEED_ERRORS_SOURCE_FILES
 
 set(SPEED_EXCEPTIONS_SOURCE_FILES
         exceptions/exception_base.hpp
-        exceptions/message_exception.hpp
+        exceptions/basic_message_exception.hpp
         exceptions/exceptions.hpp
 )
 
@@ -79,7 +79,7 @@ set(SPEED_IOSTREAM_SOURCE_FILES
 set(SPEED_LOWLEVEL_SOURCE_FILES
         lowlevel/enable_bitwise_operators.hpp
         lowlevel/exception.hpp
-        lowlevel/logical_operations.hpp
+        lowlevel/operations.hpp
         lowlevel/lowlevel.hpp
 )
 

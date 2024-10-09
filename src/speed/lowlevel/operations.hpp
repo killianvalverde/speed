@@ -18,14 +18,14 @@
  */
 
 /**
- * @file        speed/lowlevel/logical_operations.hpp
- * @brief       logical_operations header.
+ * @file        speed/lowlevel/operations.hpp
+ * @brief       operations header.
  * @author      Killian Valverde
  * @date        2018/10/09
  */
 
-#ifndef SPEED_LOWLEVEL_LOGICAL_OPERATIONS_HPP
-#define SPEED_LOWLEVEL_LOGICAL_OPERATIONS_HPP
+#ifndef SPEED_LOWLEVEL_OPERATIONS_HPP
+#define SPEED_LOWLEVEL_OPERATIONS_HPP
 
 #include <cstdint>
 #include <utility>
