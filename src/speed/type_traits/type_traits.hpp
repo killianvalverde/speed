@@ -41,6 +41,18 @@ namespace speed {
 namespace type_traits {}
 
 
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contains utilities for compile-time introspection and modification, including type
+ *              classification traits, type property inspection traits and type transformation
+ *              traits.
+ */
+namespace traits = type_traits;
+
+#endif
+
+
 }
 
 

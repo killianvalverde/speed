@@ -28,7 +28,6 @@
 #define SPEED_SPEED_HPP
 
 #include "algorithm/algorithm.hpp"
-#include "alias.hpp"
 #include "argparse/argparse.hpp"
 #include "containers/containers.hpp"
 #include "errors/errors.hpp"
@@ -51,6 +50,16 @@
  * @brief       Contians all speed librarie.
  */
 namespace speed {}
+
+
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contians all speed librarie.
+ */
+namespace spd = speed;
+
+#endif
 
 
 #endif

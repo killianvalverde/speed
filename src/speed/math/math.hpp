@@ -40,6 +40,17 @@ namespace speed {
 namespace math {}
 
 
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contains a set of resources to compute common mathematical operations and
+ *              transformations.
+ */
+namespace mth = math;
+
+#endif
+
+
 }
 
 

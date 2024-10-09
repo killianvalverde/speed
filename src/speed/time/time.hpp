@@ -43,6 +43,16 @@ namespace speed {
 namespace time {}
 
 
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contains resources and facilities related to time manipulation.
+ */
+namespace tm = time;
+
+#endif
+
+
 }
 
 

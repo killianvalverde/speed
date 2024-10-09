@@ -40,6 +40,16 @@ namespace speed {
 namespace scalars {}
 
 
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contains a set of resources to compute common scalars operations.
+ */
+namespace scals = scalars;
+
+#endif
+
+
 }
 
 

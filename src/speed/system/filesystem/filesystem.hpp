@@ -42,6 +42,16 @@ namespace speed::system {
 namespace filesystem {}
 
 
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contains filesystem interaction resources.
+ */
+namespace fsys = filesystem;
+
+#endif
+
+
 }
 
 

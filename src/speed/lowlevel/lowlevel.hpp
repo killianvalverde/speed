@@ -41,6 +41,16 @@ namespace speed {
 namespace lowlevel {}
 
 
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Constains lowlevel resources.
+ */
+namespace low = lowlevel;
+
+#endif
+
+
 }
 
 

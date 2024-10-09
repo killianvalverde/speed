@@ -41,6 +41,17 @@ namespace speed {
 namespace exceptions {}
 
 
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contains resources for all exceptions thrown by the elements of speed along with
+ *              several types and utilities to assist handling exceptions.
+ */
+namespace except = exceptions;
+
+#endif
+
+
 }
 
 

@@ -50,6 +50,16 @@ namespace compat = compatibility;
 #endif
 
 
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contains utilities for compile-time introspection and modification.
+ */
+namespace traits = type_traits;
+
+#endif
+
+
 }
 
 

@@ -39,6 +39,16 @@ namespace speed::system {
 namespace errors {}
 
 
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Constains ressources to assist handling with function errors.
+ */
+namespace err = errors;
+
+#endif
+
+
 }
 
 

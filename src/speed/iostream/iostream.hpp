@@ -41,6 +41,16 @@ namespace speed {
 namespace iostream {}
 
 
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contains resources for input and output streams.
+ */
+namespace ios = iostream;
+
+#endif
+
+
 }
 
 

@@ -191,7 +191,6 @@ set(SPEED_SOURCE_FILES
         ${SPEED_TYPE_CASTING_SOURCE_FILES}
         ${SPEED_TYPE_TRAITS_SOURCE_FILES}
         speed.hpp
-        alias.hpp
         version.hpp
 )
 

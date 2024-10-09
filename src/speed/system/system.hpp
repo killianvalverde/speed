@@ -46,6 +46,16 @@ namespace speed {
 namespace system {}
 
 
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contains resources for interact with the system.
+ */
+namespace sys = system;
+
+#endif
+
+
 }
 
 

@@ -40,6 +40,16 @@ namespace speed {
 namespace safety {}
 
 
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contians safety resources.
+ */
+namespace saf = safety;
+
+#endif
+
+
 }
 
 

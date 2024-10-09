@@ -45,6 +45,16 @@ namespace speed {
 namespace type_casting {}
 
 
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contains utilities for type casting.
+ */
+namespace cast = type_casting;
+
+#endif
+
+
 }
 
 
