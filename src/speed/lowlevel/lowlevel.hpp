@@ -27,7 +27,6 @@
 #ifndef SPEED_LOWLEVEL_LOWLEVEL_HPP
 #define SPEED_LOWLEVEL_LOWLEVEL_HPP
 
-#include "arithmetic_operations.hpp"
 #include "enable_bitwise_operators.hpp"
 #include "exception.hpp"
 #include "logical_operations.hpp"

@@ -29,7 +29,7 @@
 
 #include <iostream>
 
-#include "../lowlevel/lowlevel.hpp"
+#include "../safety/safety.hpp"
 #include "../system/system.hpp"
 
 
@@ -166,7 +166,7 @@ std::basic_ostream<TpChar, TpCharTraits>& print_wrapped(
                 ++len_to_next;
             } while (aux_str_it != txt.cend() && *aux_str_it != ' ');
 
-            speed::lowlevel::try_addm(&len_to_next, current_line_len);
+            speed::safety::try_addm(&len_to_next, current_line_len);
             if (len_to_next > max_line_len)
             {
                 os << '\n';

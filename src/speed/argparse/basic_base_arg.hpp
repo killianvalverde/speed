@@ -33,7 +33,7 @@
 
 #include "../containers/containers.hpp"
 #include "../iostream/iostream.hpp"
-#include "../lowlevel/lowlevel.hpp"
+#include "../safety/safety.hpp"
 #include "arg_error_flags.hpp"
 #include "arg_flags.hpp"
 #include "basic_arg_parser.hpp"
@@ -242,7 +242,7 @@ public:
         }
         else
         {
-            fnd ? speed::lowlevel::try_addm(&nr_fnd_, 1) : nr_fnd_ = 0;
+            fnd ? speed::safety::try_addm(&nr_fnd_, 1) : nr_fnd_ = 0;
 
             if (presence_sync_ != nullptr)
             {

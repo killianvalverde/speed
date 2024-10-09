@@ -77,7 +77,6 @@ set(SPEED_IOSTREAM_SOURCE_FILES
 )
 
 set(SPEED_LOWLEVEL_SOURCE_FILES
-        lowlevel/arithmetic_operations.hpp
         lowlevel/enable_bitwise_operators.hpp
         lowlevel/exception.hpp
         lowlevel/logical_operations.hpp
@@ -90,6 +89,8 @@ set(SPEED_MATH_SOURCE_FILES
 )
 
 set(SPEED_SAFETY_SOURCE_FILES
+        safety/exception.hpp
+        safety/operations.hpp
         safety/safety.hpp
 )
 

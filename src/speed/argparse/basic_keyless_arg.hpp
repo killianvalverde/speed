@@ -140,7 +140,7 @@ public:
             return 0;
         }
 
-        return lowlevel::addm(usage_ky_.length(), 2);
+        return speed::safety::addm(usage_ky_.length(), 2);
     }
 
     /**
@@ -193,8 +193,8 @@ public:
             return;
         }
         
-        std::size_t current_id_len = speed::lowlevel::addm(usage_ky_.length(), 2);
-        std::size_t total_id_len = speed::lowlevel::addm(short_kys_len, long_kys_len);
+        std::size_t current_id_len = speed::safety::addm(usage_ky_.length(), 2);
+        std::size_t total_id_len = speed::safety::addm(short_kys_len, long_kys_len);
         std::size_t i;
     
         for (i = args_indent; i > 0; i--)
@@ -212,8 +212,8 @@ public:
             }
         }
     
-        speed::lowlevel::try_addm(&args_indent, total_id_len);
-        speed::lowlevel::try_addm(&new_line_indent, args_indent);
+        speed::safety::try_addm(&args_indent, total_id_len);
+        speed::safety::try_addm(&new_line_indent, args_indent);
         
         base_arg_type::print_help_text(args_indent, max_line_len, new_line_indent);
     }

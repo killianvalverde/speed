@@ -18,14 +18,14 @@
  */
 
 /**
- * @file        speed/lowlevel/arithmetic_operations.hpp
- * @brief       arithmetic_operations functions header.
+ * @file        speed/safety/operations.hpp
+ * @brief       operations functions header.
  * @author      Killian Valverde
  * @date        2017/01/28
  */
 
-#ifndef SPEED_LOWLEVEL_ARITHMETIC_OPERATIONS_HPP
-#define SPEED_LOWLEVEL_ARITHMETIC_OPERATIONS_HPP
+#ifndef SPEED_SAFETY_OPERATIONS_HPP
+#define SPEED_SAFETY_OPERATIONS_HPP
 
 #include <limits>
 #include <stdexcept>
@@ -33,7 +33,7 @@
 #include "exception.hpp"
 
 
-namespace speed::lowlevel {
+namespace speed::safety {
 
 
 // TODO: Add support for signed integrals.

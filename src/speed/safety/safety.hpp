@@ -27,6 +27,9 @@
 #ifndef SPEED_SAFETY_SAFETY_HPP
 #define SPEED_SAFETY_SAFETY_HPP
 
+#include "exception.hpp"
+#include "operations.hpp"
+
 
 namespace speed {
 

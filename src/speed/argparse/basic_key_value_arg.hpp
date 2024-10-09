@@ -186,7 +186,7 @@ public:
             additional_len = usage_str_.length();
         }
 
-        return lowlevel::addm(key_arg_type::get_long_keys_length(), additional_len);
+        return speed::safety::addm(key_arg_type::get_long_keys_length(), additional_len);
     }
 
     /**
@@ -208,7 +208,7 @@ public:
             additional_len = usage_str_.length();
         }
 
-        return lowlevel::addm(key_arg_type::get_short_keys_length(), additional_len);
+        return speed::safety::addm(key_arg_type::get_short_keys_length(), additional_len);
     }
 
     /**
@@ -320,13 +320,13 @@ public:
         if (!key_arg_type::has_long_prefix_keys())
         {
             std::cout << usage_str_;
-            speed::lowlevel::try_addm(&current_id_len, usage_str_.length());
+            speed::safety::try_addm(&current_id_len, usage_str_.length());
         }
         
         if (n_args_printd < key_arg_type::get_keys_size() && n_args_printd > 0)
         {
             std::cout << ", ";
-            speed::lowlevel::try_addm(&current_id_len, 2);
+            speed::safety::try_addm(&current_id_len, 2);
         }
         
         if (current_id_len < short_kys_len)
@@ -345,7 +345,7 @@ public:
         if (key_arg_type::has_long_prefix_keys())
         {
             std::cout << usage_str_;
-            speed::lowlevel::try_addm(&current_id_len, usage_str_.length());
+            speed::safety::try_addm(&current_id_len, usage_str_.length());
         }
         
         if (current_id_len < long_kys_len)
@@ -356,8 +356,8 @@ public:
             }
         }
     
-        speed::lowlevel::try_addml(&args_indent, short_kys_len, long_kys_len);
-        speed::lowlevel::try_addm(&new_line_indent, args_indent);
+        speed::safety::try_addml(&args_indent, short_kys_len, long_kys_len);
+        speed::safety::try_addm(&new_line_indent, args_indent);
         
         base_arg_type::print_help_text(args_indent, max_line_len, new_line_indent);
     }

@@ -18,19 +18,19 @@
  */
 
 /**
- * @file        speed/lowlevel/exception.hpp
- * @brief       lowlevel exception main header.
+ * @file        speed/safety/exception.hpp
+ * @brief       safety exception main header.
  * @author      Killian Valverde
  * @date        2017/10/20
  */
 
-#ifndef SPEED_LOWLEVEL_EXCEPTION_HPP
-#define SPEED_LOWLEVEL_EXCEPTION_HPP
+#ifndef SPEED_SAFETY_EXCEPTION_HPP
+#define SPEED_SAFETY_EXCEPTION_HPP
 
 #include "../exceptions/exceptions.hpp"
 
 
-namespace speed::lowlevel {
+namespace speed::safety {
 
 
 /**
@@ -45,7 +45,7 @@ public:
      */
     [[nodiscard]] char const* what() const noexcept override
     {
-        return "lowlevel exception";
+        return "safety exception";
     }
 };
 

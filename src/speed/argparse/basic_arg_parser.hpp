@@ -1388,11 +1388,11 @@ private:
                     if (!ky_arg->is_flag_set(arg_flags::TERMINAL) &&
                         !ky_arg->is_flag_set(arg_flags::PKILL_AFTER_TRIGGERING))
                     {
-                        speed::lowlevel::try_addm(&nr_options_bldr, 1);
+                        speed::safety::try_addm(&nr_options_bldr, 1);
                     }
                     else
                     {
-                        speed::lowlevel::try_addm(&nr_term_not_always_requird, 1);
+                        speed::safety::try_addm(&nr_term_not_always_requird, 1);
                     }
                 }
             }
@@ -1893,7 +1893,6 @@ private:
     bool parsd_;
 
     /** Alocator of the key_arg_type. */
-    // TODO: Use smart pointers instead.
     allocator_type<key_arg_type> key_arg_type_alloc_;
 
     /** Alocator of the help_arg_type. */

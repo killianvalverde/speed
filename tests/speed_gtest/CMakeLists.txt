@@ -28,9 +28,12 @@ set(SPEED_IOSTREAM_TEST_SOURCE_FILES
 )
 
 set(SPEED_LOWLEVEL_TEST_SOURCE_FILES
-        lowlevel_test/arithmetic_operations_test.cpp
         lowlevel_test/enum_bitwise_operators_test.cpp
-        lowlevel_test/logical_operations_test.cpp
+        lowlevel_test/operations_test.cpp
+)
+
+set(SPEED_SAFETY_TEST_SOURCE_FILES
+        safety_test/operations_test.cpp
 )
 
 set(SPEED_SCALARS_TEST_SOURCE_FILES
@@ -70,6 +73,7 @@ add_executable(speed_containers_test main.cpp ${SPEED_CONTAINERS_TEST_SOURCE_FIL
 add_executable(speed_filesystem_test main.cpp ${SPEED_FILESYSTEM_TEST_SOURCE_FILES})
 add_executable(speed_iostream_test main.cpp ${SPEED_IOSTREAM_TEST_SOURCE_FILES})
 add_executable(speed_lowlevel_test main.cpp ${SPEED_LOWLEVEL_TEST_SOURCE_FILES})
+add_executable(speed_safety_test main.cpp ${SPEED_SAFETY_TEST_SOURCE_FILES})
 add_executable(speed_scalars_test main.cpp ${SPEED_SCALARS_TEST_SOURCE_FILES})
 add_executable(speed_stringutils_test main.cpp ${SPEED_STRINGUTILS_TEST_SOURCE_FILES})
 add_executable(speed_system_test main.cpp ${SPEED_SYSTEM_TEST_SOURCE_FILES})
@@ -84,6 +88,7 @@ add_executable(speed_test
         ${SPEED_FILESYSTEM_TEST_SOURCE_FILES}
         ${SPEED_IOSTREAM_TEST_SOURCE_FILES}
         ${SPEED_LOWLEVEL_TEST_SOURCE_FILES}
+        ${SPEED_SAFETY_TEST_SOURCE_FILES}
         ${SPEED_SCALARS_TEST_SOURCE_FILES}
         ${SPEED_STRINGUTILS_TEST_SOURCE_FILES}
         ${SPEED_SYSTEM_TEST_SOURCE_FILES}
@@ -97,6 +102,7 @@ target_link_libraries(speed_argparse_test speed_argparse ${GTEST_BOTH_LIBRARIES}
 target_link_libraries(speed_containers_test speed_containers ${GTEST_BOTH_LIBRARIES} -lpthread)
 target_link_libraries(speed_iostream_test speed_iostream ${GTEST_BOTH_LIBRARIES} -lpthread)
 target_link_libraries(speed_lowlevel_test speed_lowlevel ${GTEST_BOTH_LIBRARIES} -lpthread)
+target_link_libraries(speed_safety_test speed_safety ${GTEST_BOTH_LIBRARIES} -lpthread)
 target_link_libraries(speed_scalars_test speed_scalars ${GTEST_BOTH_LIBRARIES} -lpthread)
 target_link_libraries(speed_stringutils_test speed_stringutils ${GTEST_BOTH_LIBRARIES} -lpthread)
 target_link_libraries(speed_system_test speed_system ${GTEST_BOTH_LIBRARIES} -lpthread)
