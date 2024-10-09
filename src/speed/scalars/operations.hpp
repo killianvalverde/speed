@@ -27,11 +27,12 @@
 #ifndef SPEED_SCALARS_OPERATIONS_HPP
 #define SPEED_SCALARS_OPERATIONS_HPP
 
+#include <cstdlib>
+
 
 namespace speed::scalars {
 
 
-// TODO: This method doesn't work with negatives numbers.
 /**
  * @brief       Get the number of digits of the given scalar.
  * @param       scalr : The scalar to get the number of digits.
@@ -41,11 +42,12 @@ template<typename TpScalar>
 TpScalar get_n_digits(TpScalar scalr) noexcept
 {
     TpScalar cur_n_digits = 1;
+    TpScalar abs_value = std::abs(scalr);
     
-    while (scalr > 9)
+    while (abs_value > 9)
     {
         ++cur_n_digits;
-        scalr /= 10;
+        abs_value /= 10;
     }
     
     return cur_n_digits;
