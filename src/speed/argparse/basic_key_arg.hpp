@@ -51,7 +51,7 @@ class basic_key_arg : public virtual basic_base_arg<TpAllocator>
 public:
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** String type used in the class. */
     using string_type = std::basic_string<char, std::char_traits<char>, allocator_type<char>>;

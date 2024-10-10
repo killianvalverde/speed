@@ -83,7 +83,7 @@ TEST_F(argparse_arg_parser, add_key_arg)
     EXPECT_THROW(ap.add_key_arg(), speed::argparse::exception);
     EXPECT_THROW(ap.add_key_arg("-l"), speed::argparse::exception);
     EXPECT_THROW(ap.add_key_arg("--long"), speed::argparse::exception);
-    EXPECT_NO_THROW(ap.was_found("-l") == false);
+    EXPECT_TRUE(!ap.was_found("-l"));
 }
 
 
@@ -116,7 +116,7 @@ TEST_F(argparse_arg_parser, add_key_value_arg)
     EXPECT_THROW(ap.add_key_value_arg(), speed::argparse::exception);
     EXPECT_THROW(ap.add_key_value_arg("-s"), speed::argparse::exception);
     EXPECT_THROW(ap.add_key_value_arg("--seconds"), speed::argparse::exception);
-    EXPECT_NO_THROW(ap.was_found("-s") == false);
+    EXPECT_TRUE(!ap.was_found("-s"));
 }
 
 
@@ -145,7 +145,7 @@ TEST_F(argparse_arg_parser, add_keyless_arg)
 
     EXPECT_THROW(ap.add_keyless_arg(""), speed::argparse::exception);
     EXPECT_THROW(ap.add_keyless_arg("FILE"), speed::argparse::exception);
-    EXPECT_NO_THROW(ap.was_found("FILE") == false);
+    EXPECT_TRUE(!ap.was_found("FILE"));
 }
 
 
@@ -181,7 +181,7 @@ TEST_F(argparse_arg_parser, add_help_arg)
     EXPECT_THROW(ap.add_help_arg(), speed::argparse::exception);
     EXPECT_THROW(ap.add_help_arg("-h"), speed::argparse::exception);
     EXPECT_THROW(ap.add_help_arg("--help"), speed::argparse::exception);
-    EXPECT_NO_THROW(ap.was_found("-h") == false);
+    EXPECT_TRUE(!ap.was_found("-h"));
 }
 
 
@@ -207,7 +207,7 @@ TEST_F(argparse_arg_parser, add_version_arg)
     EXPECT_THROW(ap.add_version_arg(), speed::argparse::exception);
     EXPECT_THROW(ap.add_version_arg("-v"), speed::argparse::exception);
     EXPECT_THROW(ap.add_version_arg("--version"), speed::argparse::exception);
-    EXPECT_NO_THROW(ap.was_found("-v") == false);
+    EXPECT_TRUE(!ap.was_found("-v"));
 }
 
 

@@ -52,7 +52,7 @@ public:
     
     /** Allocator type. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
     
     /** Input/output stream type. */
     using ios_type = std::basic_ios<char_type, char_traits_type>;
@@ -64,9 +64,9 @@ public:
     using string_type = std::basic_string<char_type, char_traits_type, allocator_type<char_type>>;
     
     /** String stream type. */
-    using stringstream_type = std::basic_stringstream<char_type,
-                                                      char_traits_type,
-                                                      allocator_type<char_type>>;
+    using stringstream_type = std::basic_stringstream<char_type, char_traits_type,
+            allocator_type<char_type>>;
+
     /**
      * @brief       Constructor.
      * @param       ios : Input/output stream whose buffer will be redirect.

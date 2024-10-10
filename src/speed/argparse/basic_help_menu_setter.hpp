@@ -45,7 +45,7 @@ class basic_help_menu_setter
 public:
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** Type that represents a help menu. */
     using help_menu_type = basic_help_menu<TpAllocator>;

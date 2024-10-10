@@ -145,7 +145,7 @@ public:
 
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** Vector type used in the class. */
     using array_type = std::array<target_type, Nm>;
@@ -236,7 +236,7 @@ public:
 
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** Vector type used in the class. */
     using vector_type = std::vector<target_type, allocator_type<target_type>>;
@@ -323,7 +323,7 @@ public:
 
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** Vector type used in the class. */
     using deque_type = std::deque<target_type, allocator_type<target_type>>;
@@ -410,7 +410,7 @@ public:
 
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** Vector type used in the class. */
     using deque_type = std::deque<target_type, allocator_type<target_type>>;
@@ -500,7 +500,7 @@ public:
 
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** Vector type used in the class. */
     using vector_type = std::vector<target_type, allocator_type<target_type>>;
@@ -590,7 +590,7 @@ public:
 
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** Double ended queue type used in the class. */
     using deque_type = std::deque<target_type, allocator_type<target_type>>;
@@ -680,7 +680,7 @@ public:
 
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** Forward list type used in the class. */
     using forward_list_type = std::forward_list<target_type, allocator_type<target_type>>;
@@ -771,7 +771,7 @@ public:
 
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** Forward list type used in the class. */
     using list_type = std::list<target_type, allocator_type<target_type>>;
@@ -858,7 +858,7 @@ public:
 
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** Set type used in the class. */
     using set_type = std::set<target_type, std::less<target_type>, allocator_type<target_type>>;
@@ -945,7 +945,7 @@ public:
 
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** Unordered set type used in the class. */
     using unordered_set_type = std::unordered_set<
@@ -1034,7 +1034,7 @@ public:
 
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** Unordered set type used in the class. */
     using unordered_multiset_type = std::unordered_multiset<

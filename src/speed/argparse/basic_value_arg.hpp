@@ -54,7 +54,7 @@ class basic_value_arg : public virtual basic_base_arg<TpAllocator>
 public:
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** Shared pointer type used in the class. */
     template<typename T>

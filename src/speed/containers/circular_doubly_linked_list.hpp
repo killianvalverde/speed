@@ -47,7 +47,7 @@ public:
     
     /** The allocator type. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
     
     /** The node type. */
     using node_type = doubly_linked_node<value_type>;

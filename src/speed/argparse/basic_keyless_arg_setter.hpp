@@ -48,7 +48,7 @@ class basic_keyless_arg_setter : public speed::type_traits::basic_crtp_base<
 public:
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** Type that represents the base of the arguments hierarchy. */
     using base_arg_type = basic_base_arg<TpAllocator>;

@@ -54,7 +54,7 @@ class basic_arg_value
 public:
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** Pair type used in the class. */
     template<typename T1, typename T2>
