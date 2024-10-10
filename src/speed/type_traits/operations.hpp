@@ -39,6 +39,48 @@ namespace speed::type_traits {
 
 /** @cond */
 namespace __private {
+template<typename...>
+struct __or;
+
+template<>
+struct __or<> : public std::false_type {};
+
+template<typename Tp>
+struct __or<Tp> : public Tp {};
+
+template<typename Tp1, typename Tp2>
+struct __or<Tp1, Tp2> : public std::conditional<Tp1::value, Tp1, Tp2>::type {};
+
+template<typename Tp1, typename Tp2, typename Tp3, typename... TpN>
+struct __or<Tp1, Tp2, Tp3, TpN...>
+        : public std::conditional<Tp1::value, Tp1, __or<Tp2, Tp3, TpN...>>::type {};
+} /* __private */
+/** @endcond */
+
+
+/** @cond */
+namespace __private {
+template<typename...>
+struct __and;
+
+template<>
+struct __and<> : public std::true_type {};
+
+template<typename Tp>
+struct __and<Tp> : public Tp {};
+
+template<typename Tp1, typename Tp2>
+struct __and<Tp1, Tp2> : public std::conditional<Tp1::value, Tp2, Tp1>::type {};
+
+template<typename Tp1, typename Tp2, typename Tp3, typename... TpN>
+struct __and<Tp1, Tp2, Tp3, TpN...>
+        : public std::conditional<Tp1::value, __and<Tp2, Tp3, TpN...>, Tp1>::type {};
+} /* __private */
+/** @endcond */
+
+
+/** @cond */
+namespace __private {
 template<typename>
 struct __is_char_helper : public std::false_type {};
 
@@ -128,7 +170,7 @@ struct is_character
  */
 template<typename Tp>
 struct is_character_pointer
-        : public std::__and_<
+        : public __private::__and<
                 std::is_pointer<Tp>,
                 is_character<typename std::remove_pointer<Tp>::type>
           >::type
@@ -142,7 +184,7 @@ struct is_character_pointer
  */
 template<typename Tp>
 struct is_stdio_character
-        : public std::__or_<is_char<Tp>, is_wchar<Tp>>::type
+        : public __private::__or<is_char<Tp>, is_wchar<Tp>>::type
 {
 };
 
