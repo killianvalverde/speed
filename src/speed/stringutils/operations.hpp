@@ -393,15 +393,13 @@ template<
         typename TpCharTraits = std::char_traits<TpChar>,
         typename TpAllocator = std::allocator<int>
 >
-[[nodiscard]] std::vector<std::basic_string<TpChar, TpCharTraits, TpAllocator>, TpAllocator>
-strsplit(
-        const TpChar *str,
-        const TpIntegral sep
-)
+[[nodiscard]] auto strsplit(const TpChar *str, const TpIntegral sep)
 {
     using string_type = std::basic_string<TpChar, TpCharTraits, TpAllocator>;
     
-    std::vector<string_type, TpAllocator> values;
+    std::vector<string_type,
+            typename std::allocator_traits<TpAllocator>::template rebind_alloc<string_type>> values;
+
     string_type value_builder;
     
     if (str != nullptr)
