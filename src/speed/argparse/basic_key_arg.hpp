@@ -84,7 +84,7 @@ public:
     {
         base_arg_type::set_flags(arg_flags::DEFAULT_KEY_ARG_FLAGS);
 
-        int foreach[sizeof...(Ts_)] = { (
+        int foreach[sizeof...(Ts_) + 1] = { (
                 kys_.push_back({std::forward<Ts_>(kys), arg_parsr}), 0)... };
 
         if (kys_.empty())

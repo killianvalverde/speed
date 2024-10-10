@@ -917,7 +917,7 @@ private:
     template<typename... Ts_>
     inline void assert_valid_keys(const Ts_&... kys) const
     {
-        int foreach[sizeof...(Ts_)] = { (assert_valid_key(kys), 0)... };
+        int foreach[sizeof...(Ts_) + 1] = { (assert_valid_key(kys), 0)... };
     }
 
     /**
@@ -954,7 +954,7 @@ private:
     {
         bse_arg_list_.push_back(static_cast<base_arg_type*>(ky_arg));
 
-        int foreach[sizeof...(Ts_)] = { (
+        int foreach[sizeof...(Ts_) + 1] = { (
                 bse_arg_map_.emplace(std::forward<Ts_>(kys), ky_arg), 0)... };
 
         register_into_help_menus(ky_arg);
@@ -1032,7 +1032,7 @@ private:
     template<typename... Ts_>
     void register_into_help_menus(base_arg_type* bse_arg, Ts_&&... hlp_menus_ids)
     {
-        int foreach[sizeof...(Ts_)] = { (
+        int foreach[sizeof...(Ts_) + 1] = { (
                 get_help_menu(std::forward<Ts_>(hlp_menus_ids)).add_entry(bse_arg), 0)... };
     }
 
@@ -1492,7 +1492,7 @@ private:
     void set_long_prefixes(Ts_&&... prefxs)
     {
         long_prefxs_.clear();
-        int foreach[sizeof...(Ts_)] = { (long_prefxs_.emplace(prefxs), 0)... };
+        int foreach[sizeof...(Ts_) + 1] = { (long_prefxs_.emplace(prefxs), 0)... };
         update_arg_keys_prefixes();
     }
 
@@ -1513,7 +1513,7 @@ private:
     void set_short_prefixes(Ts_&&... prefxs)
     {
         short_prefxs_.clear();
-        int foreach[sizeof...(Ts_)] = { (short_prefxs_.emplace(prefxs), 0)... };
+        int foreach[sizeof...(Ts_) + 1] = { (short_prefxs_.emplace(prefxs), 0)... };
         update_arg_keys_prefixes();
     }
 

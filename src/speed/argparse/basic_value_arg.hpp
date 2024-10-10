@@ -762,7 +762,7 @@ public:
     {
         castrs_.clear();
 
-        int foreach[sizeof...(Ts_)] = { (
+        int foreach[sizeof...(Ts_) + 1] = { (
                 castrs_.emplace_back(std::allocate_shared<caster_type<Ts_>>(
                         allocator_type<caster_type<Ts_>>(), holdrs)), 0)... };
 
@@ -803,7 +803,7 @@ public:
     {
         regxes_.clear();
 
-        int foreach[sizeof...(Ts_)] = { (
+        int foreach[sizeof...(Ts_) + 1] = { (
                 regxes_.emplace_back(std::forward<Ts_>(regxes)), 0)... };
 
         update_max_values(regxes_.size());

@@ -244,7 +244,7 @@ public:
     {
         vals_names_.clear();
 
-        int foreach[sizeof...(Ts_)] = { (
+        int foreach[sizeof...(Ts_) + 1] = { (
                 vals_names_.push_back(std::forward<Ts_>(vals_names)), 0)... };
 
         for (auto& val_id : vals_names_)

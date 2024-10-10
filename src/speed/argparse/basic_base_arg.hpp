@@ -286,7 +286,7 @@ public:
         arg_parsr_->remove_from_help_menus(this, hlp_menus_ids_assignd_);
         hlp_menus_ids_assignd_.clear();
 
-        int foreach[sizeof...(Ts_)] = { (
+        int foreach[sizeof...(Ts_) + 1] = { (
                 hlp_menus_ids_assignd_.emplace(hlp_menus_ids), 0)... };
 
         arg_parsr_->register_into_help_menus(this, std::forward<Ts_>(hlp_menus_ids)...);
