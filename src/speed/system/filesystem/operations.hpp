@@ -427,7 +427,6 @@ inline bool is_symlink(const char* fle_path, std::error_code* err_code = nullptr
 }
 
 
-// TODO: Maybe the modes should have their own data type.
 /**
  * @brief       Checks if the given path corresponds to a socket.
  * @param       fle_path : Path to check.
@@ -597,7 +596,6 @@ inline bool symlink(
 }
 
 
-// TODO: Test this function.
 /**
  * @brief       Creates a symbolic link named lnk_pth which contains the string trg.
  * @param       trg : The string to contain in the symlink.

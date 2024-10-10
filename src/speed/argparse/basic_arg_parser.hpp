@@ -73,10 +73,6 @@ public:
     template<typename T>
     using allocator_type = typename TpAllocator::template rebind<T>::other;
 
-    /** Unique smart pointer type used in the class. */
-    template<typename T>
-    using unique_ptr_type = std::unique_ptr<T>;
-
     /** String type used in the class. */
     using string_type = std::basic_string<char, std::char_traits<char>, allocator_type<char>>;
 
@@ -133,12 +129,10 @@ public:
     using arg_constraint_type = basic_arg_constraint<TpAllocator>;
 
     /** Type that represents an 'at least one found' constraint for a set of arguments. */
-    template<typename T>
-    using at_least_one_found_type = basic_at_least_one_found<T, TpAllocator>;
+    using at_least_one_found_type = basic_at_least_one_found<arg_constraint_type, TpAllocator>;
 
     /** Type that represents a mutually exclusive constraint for a set of arguments. */
-    template<typename T>
-    using mutually_exclusive_type = basic_mutually_exclusive<T, TpAllocator>;
+    using mutually_exclusive_type = basic_mutually_exclusive<arg_constraint_type, TpAllocator>;
 
     /** Type that represents a help menu. */
     using help_menu_type = basic_help_menu<TpAllocator>;
@@ -196,6 +190,8 @@ public:
             , version_arg_type_alloc_()
             , key_value_arg_type_alloc_()
             , keyless_arg_type_alloc_()
+            , at_least_one_found_type_alloc_()
+            , mutually_exclusive_type_alloc_()
             , parsd_(false)
     {
     }
@@ -219,7 +215,12 @@ public:
     {
         for (auto& x : bse_arg_list_)
         {
-            delete_help_text_base(x);
+            delete_base_arg(x);
+        }
+
+        for (auto& x : constrnts_)
+        {
+            delete_arg_constraint(x);
         }
     
         current_vers_arg_ = nullptr;
@@ -336,9 +337,9 @@ public:
     template<typename... Ts_>
     void add_at_least_one_found_constraint(const Ts_&... kys)
     {
-        // TODO: Waiting for allocate_unique.
-        constrnts_.push_back(
-                std::make_unique<at_least_one_found_type<arg_constraint_type>>(this, kys...));
+        at_least_one_found_type* at_least_one_fnd = at_least_one_found_type_alloc_.allocate(1);
+        at_least_one_found_type_alloc_.construct(at_least_one_fnd, this, kys...);
+        constrnts_.push_back(at_least_one_fnd);
     }
 
     /**
@@ -350,8 +351,9 @@ public:
     template<typename... Ts_>
     void add_mutually_exclusive_constraint(const Ts_&... kys)
     {
-        constrnts_.push_back(
-                std::make_unique<mutually_exclusive_type<arg_constraint_type>>(this, kys...));
+        mutually_exclusive_type* mutually_excl = mutually_exclusive_type_alloc_.allocate(1);
+        mutually_exclusive_type_alloc_.construct(mutually_excl, this, kys...);
+        constrnts_.push_back(mutually_excl);
     }
 
     /**
@@ -1063,7 +1065,7 @@ private:
      * @brief       Destroy and deallocate the specified argument.
      * @param       arg : The specified argument.
      */
-    void delete_help_text_base(base_arg_type*& arg) noexcept
+    void delete_base_arg(base_arg_type*& arg) noexcept
     {
         key_arg_type* ky_arg;
         help_arg_type* hlp_arg;
@@ -1095,6 +1097,29 @@ private:
         {
             key_arg_type_alloc_.destroy(ky_arg);
             key_arg_type_alloc_.deallocate(ky_arg, 1);
+        }
+
+        arg = nullptr;
+    }
+
+    /**
+     * @brief       Destroy and deallocate the specified argument.
+     * @param       arg : The specified argument.
+     */
+    void delete_arg_constraint(arg_constraint_type*& arg) noexcept
+    {
+        at_least_one_found_type* at_least_one_fnd;
+        mutually_exclusive_type* mutually_excl;
+
+        if ((at_least_one_fnd = dynamic_cast<at_least_one_found_type*>(arg)) != nullptr)
+        {
+            at_least_one_found_type_alloc_.destroy(at_least_one_fnd);
+            at_least_one_found_type_alloc_.deallocate(at_least_one_fnd, 1);
+        }
+        else if ((mutually_excl = dynamic_cast<mutually_exclusive_type*>(arg)) != nullptr)
+        {
+            mutually_exclusive_type_alloc_.destroy(mutually_excl);
+            mutually_exclusive_type_alloc_.deallocate(mutually_excl, 1);
         }
 
         arg = nullptr;
@@ -1873,7 +1898,7 @@ private:
     vector_type<keyless_arg_type*> kyless_arg_list_;
 
     /** Collection of arguments constraints. */
-    vector_type<unique_ptr_type<arg_constraint_type>> constrnts_;
+    vector_type<arg_constraint_type*> constrnts_;
 
     /** Contains the unrecognized arguments if an error happen. */
     vector_type<string_type> unrecog_args_;
@@ -1896,20 +1921,26 @@ private:
     /** Indicates whether the parsing has been done. */
     bool parsd_;
 
-    /** Alocator of the key_arg_type. */
+    /** Allocator of the key_arg_type. */
     allocator_type<key_arg_type> key_arg_type_alloc_;
 
-    /** Alocator of the help_arg_type. */
+    /** Allocator of the help_arg_type. */
     allocator_type<help_arg_type> help_arg_type_alloc_;
 
-    /** Alocator of the version_arg_type. */
+    /** Allocator of the version_arg_type. */
     allocator_type<version_arg_type> version_arg_type_alloc_;
 
-    /** Alocator of the key_value_arg_type. */
+    /** Allocator of the key_value_arg_type. */
     allocator_type<key_value_arg_type> key_value_arg_type_alloc_;
 
-    /** Alocator of the keyless_arg_type. */
+    /** Allocator of the keyless_arg_type. */
     allocator_type<keyless_arg_type> keyless_arg_type_alloc_;
+
+    /** Allocator of the at_least_one_found_type. */
+    allocator_type<at_least_one_found_type> at_least_one_found_type_alloc_;
+
+    /** Allocator of the mutually_exclusive_type. */
+    allocator_type<mutually_exclusive_type> mutually_exclusive_type_alloc_;
     
     friend class basic_arg_key<TpAllocator>;
     friend class basic_arg_value<TpAllocator>;
