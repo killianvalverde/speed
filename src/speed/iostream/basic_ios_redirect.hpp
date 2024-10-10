@@ -29,6 +29,8 @@
 
 #include <sstream>
 
+#include "../memory/memory.hpp"
+
 
 namespace speed::iostream {
 
@@ -122,8 +124,8 @@ public:
         {
             stringstream_ = stringstream_alloc_.allocate(1);
         }
-        
-        stringstream_alloc_.construct(stringstream_);
+
+        speed::memory::construct_at(stringstream_);
         stringstream_constructed_ = true;
         
         old_streambuf_ = ios_->rdbuf(stringstream_->rdbuf());
@@ -169,7 +171,7 @@ public:
         if (stringstream_constructed_)
         {
             stringstream_alloc_.destroy(stringstream_);
-            stringstream_alloc_.construct(stringstream_);
+            speed::memory::construct_at(stringstream_);
         }
     }
 

@@ -27,6 +27,7 @@
 #ifndef SPEED_CONTAINERS_CIRCULAR_DOUBLY_LINKED_LIST_HPP
 #define SPEED_CONTAINERS_CIRCULAR_DOUBLY_LINKED_LIST_HPP
 
+#include "../memory/memory.hpp"
 #include "doubly_linked_node.hpp"
 #include "exception.hpp"
 #include "iterator_base.hpp"
@@ -445,8 +446,8 @@ public:
     template<typename TpValue_>
     void push_front(TpValue_&& val)
     {
-        node_type* trg = alloctr_.allocate(1);
-        alloctr_.construct(trg, std::forward<TpValue_>(val));
+        node_type* trg = speed::memory::allocate_and_construct(
+                alloctr_, std::forward<TpValue_>(val));
         
         insert_before_node(trg, fir_);
         fir_ = fir_->prev_;
@@ -477,8 +478,8 @@ public:
     template<typename TpValue_>
     void push_back(TpValue_&& val)
     {
-        node_type* trg = alloctr_.allocate(1);
-        alloctr_.construct(trg, std::forward<TpValue_>(val));
+        node_type* trg = speed::memory::allocate_and_construct(
+                alloctr_, std::forward<TpValue_>(val));
     
         insert_before_node(trg, fir_);
     }
@@ -509,8 +510,8 @@ public:
     template<typename TpValue_>
     void insert_before(const_iterator& pos, TpValue_&& val)
     {
-        node_type* trg = alloctr_.allocate(1);
-        alloctr_.construct(trg, std::forward<TpValue_>(val));
+        node_type* trg = speed::memory::allocate_and_construct(
+                alloctr_, std::forward<TpValue_>(val));
     
         insert_before_iterator(trg, pos);
         
@@ -529,8 +530,8 @@ public:
     template<typename TpValue_>
     void insert_after(const_iterator& pos, TpValue_&& val)
     {
-        node_type* trg = alloctr_.allocate(1);
-        alloctr_.construct(trg, std::forward<TpValue_>(val));
+        node_type* trg = speed::memory::allocate_and_construct(
+                alloctr_, std::forward<TpValue_>(val));
         
         insert_after_iterator(trg, pos);
     }

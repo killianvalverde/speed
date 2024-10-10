@@ -34,6 +34,7 @@
 #include <vector>
 
 #include "../containers/containers.hpp"
+#include "../memory/memory.hpp"
 #include "../stringutils/stringutils.hpp"
 #include "arg_error_flags.hpp"
 #include "arg_flags.hpp"
@@ -256,8 +257,8 @@ public:
     key_arg_setter_type add_key_arg(Ts_&&... kys)
     {
         assert_valid_keys(kys...);
-        key_arg_type* ky_arg = key_arg_type_alloc_.allocate(1);
-        key_arg_type_alloc_.construct(ky_arg, this, kys...);
+        key_arg_type* ky_arg = speed::memory::allocate_and_construct(
+                key_arg_type_alloc_, this, kys...);
         register_key_arg(ky_arg, std::forward<Ts_>(kys)...);
 
         return key_arg_setter_type(ky_arg);
@@ -272,8 +273,8 @@ public:
     key_value_arg_setter_type add_key_value_arg(Ts_&&... kys)
     {
         assert_valid_keys(kys...);
-        key_value_arg_type* ky_val_arg = key_value_arg_type_alloc_.allocate(1);
-        key_value_arg_type_alloc_.construct(ky_val_arg, this, kys...);
+        key_value_arg_type* ky_val_arg = speed::memory::allocate_and_construct(
+                key_value_arg_type_alloc_, this, kys...);
         register_key_value_arg(ky_val_arg, std::forward<Ts_>(kys)...);
 
         return key_value_arg_setter_type(ky_val_arg);
@@ -288,8 +289,8 @@ public:
     keyless_arg_setter_type add_keyless_arg(TpString_&& usage_ky)
     {
         assert_valid_key(usage_ky);
-        keyless_arg_type* kyless_arg = keyless_arg_type_alloc_.allocate(1);
-        keyless_arg_type_alloc_.construct(kyless_arg, this, usage_ky);
+        keyless_arg_type* kyless_arg = speed::memory::allocate_and_construct(
+                keyless_arg_type_alloc_, this, usage_ky);
         register_keyless_arg(kyless_arg, std::forward<TpString_>(usage_ky));
 
         return keyless_arg_setter_type(kyless_arg);
@@ -304,8 +305,8 @@ public:
     help_arg_setter_type add_help_arg(Ts_&&... kys)
     {
         assert_valid_keys(kys...);
-        help_arg_type* hlp_arg = help_arg_type_alloc_.allocate(1);
-        help_arg_type_alloc_.construct(hlp_arg, this, kys...);
+        help_arg_type* hlp_arg = speed::memory::allocate_and_construct(
+                help_arg_type_alloc_, this, kys...);
         register_help_arg(hlp_arg, std::forward<Ts_>(kys)...);
 
         return help_arg_setter_type(hlp_arg);
@@ -321,8 +322,8 @@ public:
     {
         assert_valid_keys(kys...);
         assert_valid_version_add();
-        version_arg_type* vers_arg = version_arg_type_alloc_.allocate(1);
-        version_arg_type_alloc_.construct(vers_arg, this, kys...);
+        version_arg_type* vers_arg = speed::memory::allocate_and_construct(
+                version_arg_type_alloc_, this, kys...);
         register_version_arg(vers_arg, std::forward<Ts_>(kys)...);
 
         return version_arg_setter_type(vers_arg);
@@ -337,8 +338,8 @@ public:
     template<typename... Ts_>
     void add_at_least_one_found_constraint(const Ts_&... kys)
     {
-        at_least_one_found_type* at_least_one_fnd = at_least_one_found_type_alloc_.allocate(1);
-        at_least_one_found_type_alloc_.construct(at_least_one_fnd, this, kys...);
+        at_least_one_found_type* at_least_one_fnd = speed::memory::allocate_and_construct(
+                at_least_one_found_type_alloc_, this, kys...);
         constrnts_.push_back(at_least_one_fnd);
     }
 
@@ -351,8 +352,8 @@ public:
     template<typename... Ts_>
     void add_mutually_exclusive_constraint(const Ts_&... kys)
     {
-        mutually_exclusive_type* mutually_excl = mutually_exclusive_type_alloc_.allocate(1);
-        mutually_exclusive_type_alloc_.construct(mutually_excl, this, kys...);
+        mutually_exclusive_type* mutually_excl = speed::memory::allocate_and_construct(
+                mutually_exclusive_type_alloc_, this, kys...);
         constrnts_.push_back(mutually_excl);
     }
 
