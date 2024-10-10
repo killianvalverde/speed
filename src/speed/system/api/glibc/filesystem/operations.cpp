@@ -24,12 +24,13 @@
  * @date        2017/05/26
  */
 
-#include "../../../type_traits/type_traits.hpp"
+#include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_GLIBC
 
 #include <sys/stat.h>
 #include <limits.h>
 #include <stdlib.h>
+#include <wchar.h>
 
 #include "../../../../stringutils/stringutils.hpp"
 #include "directory_entity_extension.hpp"
@@ -80,6 +81,22 @@ bool access(
 
 
 bool access(
+        const wchar_t* fle_path,
+        access_modes acss_modes,
+        std::error_code* err_code
+) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(fle_path, c_str))
+    {
+        return false;
+    }
+
+    return access(c_str, acss_modes, err_code);
+}
+
+
+bool access(
         const char* fle_path,
         access_modes acss_modes,
         file_type fle_type,
@@ -88,6 +105,23 @@ bool access(
 {
     return (is_file_type(fle_path, fle_type, err_code) && 
             access(fle_path, acss_modes, err_code));
+}
+
+
+bool access(
+        const wchar_t* fle_path,
+        access_modes acss_modes,
+        file_type fle_type,
+        std::error_code* err_code
+) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(fle_path, c_str))
+    {
+        return false;
+    }
+
+    return access(c_str, acss_modes, fle_type, err_code);
 }
 
 
@@ -116,6 +150,18 @@ bool can_directory_be_created(const char* dir_path, std::error_code* err_code)
     }
     
     return access(parnt_path, access_modes::WRITE | access_modes::EXECUTE, err_code);
+}
+
+
+bool can_directory_be_created(const wchar_t* dir_path, std::error_code* err_code)
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(dir_path, c_str))
+    {
+        return false;
+    }
+
+    return can_directory_be_created(c_str, err_code);
 }
 
 
@@ -152,6 +198,18 @@ bool can_regular_file_be_created(const char* reg_file_path, std::error_code* err
 }
 
 
+bool can_regular_file_be_created(const wchar_t* reg_file_path, std::error_code* err_code)
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(reg_file_path, c_str))
+    {
+        return false;
+    }
+
+    return can_regular_file_be_created(c_str, err_code);
+}
+
+
 bool chdir(const char* dir_path, std::error_code* err_code) noexcept
 {
     errno = 0;
@@ -163,6 +221,18 @@ bool chdir(const char* dir_path, std::error_code* err_code) noexcept
     }
     
     return true;
+}
+
+
+bool chdir(const wchar_t* dir_path, std::error_code* err_code) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(dir_path, c_str))
+    {
+        return false;
+    }
+
+    return chdir(c_str, err_code);
 }
 
 
@@ -197,6 +267,34 @@ bool closedir(directory_entity* dir_ent, std::error_code* err_code) noexcept
 bool file_exists(const char* fle_path, std::error_code* err_code) noexcept
 {
     return access(fle_path, access_modes::EXISTS, err_code);
+}
+
+
+bool file_exists(const wchar_t* fle_path, std::error_code* err_code) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(fle_path, c_str))
+    {
+        return false;
+    }
+
+    return file_exists(c_str, err_code);
+}
+
+
+bool get_cstr_path_from_wstr(
+        const wchar_t* w_str,
+        char* c_str
+) noexcept
+{
+    size_t len = wcstombs(nullptr, w_str, 0) + 1;
+
+    if (len > PATH_MAX)
+    {
+        return false;
+    }
+
+    return wcstombs(c_str, w_str, len) != static_cast<std::size_t>(-1);
 }
 
 
@@ -257,6 +355,18 @@ uint64_t get_file_inode(const char* fle_path, std::error_code* err_code) noexcep
 }
 
 
+uint64_t get_file_inode(const wchar_t* fle_path, std::error_code* err_code) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(fle_path, c_str))
+    {
+        return false;
+    }
+
+    return get_file_inode(c_str, err_code);
+}
+
+
 int get_file_uid(const char* fle_path, std::error_code* err_code) noexcept
 {
     struct ::stat stt;
@@ -272,6 +382,18 @@ int get_file_uid(const char* fle_path, std::error_code* err_code) noexcept
 }
 
 
+int get_file_uid(const wchar_t* fle_path, std::error_code* err_code) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(fle_path, c_str))
+    {
+        return false;
+    }
+
+    return get_file_uid(c_str, err_code);
+}
+
+
 int get_file_gid(const char* fle_path, std::error_code* err_code) noexcept
 {
     struct ::stat stt;
@@ -284,6 +406,18 @@ int get_file_gid(const char* fle_path, std::error_code* err_code) noexcept
     }
     
     return stt.st_gid;
+}
+
+
+int get_file_gid(const wchar_t* fle_path, std::error_code* err_code) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(fle_path, c_str))
+    {
+        return false;
+    }
+
+    return get_file_gid(c_str, err_code);
 }
 
 
@@ -308,6 +442,18 @@ bool is_block_device(const char* fle_path, std::error_code* err_code) noexcept
 }
 
 
+bool is_block_device(const wchar_t* fle_path, std::error_code* err_code) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(fle_path, c_str))
+    {
+        return false;
+    }
+
+    return is_block_device(c_str, err_code);
+}
+
+
 bool is_character_device(const char* fle_path, std::error_code* err_code) noexcept
 {
     struct ::stat infos;
@@ -320,6 +466,18 @@ bool is_character_device(const char* fle_path, std::error_code* err_code) noexce
     }
     
     return S_ISCHR(infos.st_mode);
+}
+
+
+bool is_character_device(const wchar_t* fle_path, std::error_code* err_code) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(fle_path, c_str))
+    {
+        return false;
+    }
+
+    return is_character_device(c_str, err_code);
 }
 
 
@@ -338,6 +496,18 @@ bool is_directory(const char* fle_path, std::error_code* err_code) noexcept
 }
 
 
+bool is_directory(const wchar_t* fle_path, std::error_code* err_code) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(fle_path, c_str))
+    {
+        return false;
+    }
+
+    return is_directory(c_str, err_code);
+}
+
+
 bool is_fifo(const char* fle_path, std::error_code* err_code) noexcept
 {
     struct ::stat infos;
@@ -350,6 +520,18 @@ bool is_fifo(const char* fle_path, std::error_code* err_code) noexcept
     }
     
     return S_ISFIFO(infos.st_mode);
+}
+
+
+bool is_fifo(const wchar_t* fle_path, std::error_code* err_code) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(fle_path, c_str))
+    {
+        return false;
+    }
+
+    return is_fifo(c_str, err_code);
 }
 
 
@@ -399,6 +581,18 @@ bool is_file_type(const char* fle_path, file_type fle_type, std::error_code* err
 }
 
 
+bool is_file_type(const wchar_t* fle_path, file_type fle_type, std::error_code* err_code) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(fle_path, c_str))
+    {
+        return false;
+    }
+
+    return is_file_type(c_str, fle_type, err_code);
+}
+
+
 bool is_regular_file(const char* fle_path, std::error_code* err_code) noexcept
 {
     struct ::stat infos;
@@ -411,6 +605,18 @@ bool is_regular_file(const char* fle_path, std::error_code* err_code) noexcept
     }
     
     return S_ISREG(infos.st_mode);
+}
+
+
+bool is_regular_file(const wchar_t* fle_path, std::error_code* err_code) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(fle_path, c_str))
+    {
+        return false;
+    }
+
+    return is_regular_file(c_str, err_code);
 }
 
 
@@ -429,6 +635,18 @@ bool is_socket(const char* fle_path, std::error_code* err_code) noexcept
 }
 
 
+bool is_socket(const wchar_t* fle_path, std::error_code* err_code) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(fle_path, c_str))
+    {
+        return false;
+    }
+
+    return is_socket(c_str, err_code);
+}
+
+
 bool is_symlink(const char* fle_path, std::error_code* err_code) noexcept
 {
     struct ::stat infos;
@@ -444,6 +662,18 @@ bool is_symlink(const char* fle_path, std::error_code* err_code) noexcept
 }
 
 
+bool is_symlink(const wchar_t* fle_path, std::error_code* err_code) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(fle_path, c_str))
+    {
+        return false;
+    }
+
+    return is_symlink(c_str, err_code);
+}
+
+
 bool mkdir(const char* dir_path, std::uint32_t mods, std::error_code* err_code) noexcept
 {
     errno = 0;
@@ -455,6 +685,18 @@ bool mkdir(const char* dir_path, std::uint32_t mods, std::error_code* err_code) 
     }
     
     return true;
+}
+
+
+bool mkdir(const wchar_t* dir_path, std::uint32_t mods, std::error_code* err_code) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(dir_path, c_str))
+    {
+        return false;
+    }
+
+    return mkdir(c_str, mods, err_code);
 }
 
 
@@ -522,6 +764,22 @@ bool mkdir_recursively(
 }
 
 
+bool mkdir_recursively(
+        const wchar_t* dir_path,
+        std::uint32_t mods,
+        std::error_code* err_code
+) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(dir_path, c_str))
+    {
+        return false;
+    }
+
+    return mkdir_recursively(c_str, mods, err_code);
+}
+
+
 bool opendir(
         directory_entity* dir_ent,
         const char* dir_pth,
@@ -546,6 +804,22 @@ bool opendir(
     }
     
     return true;
+}
+
+
+bool opendir(
+        directory_entity* dir_ent,
+        const wchar_t* dir_pth,
+        std::error_code* err_code
+) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(dir_pth, c_str))
+    {
+        return false;
+    }
+
+    return opendir(dir_ent, c_str, err_code);
 }
 
 
@@ -586,6 +860,18 @@ bool rmdir(const char* dir_path, std::error_code* err_code) noexcept
 }
 
 
+bool rmdir(const wchar_t* dir_path, std::error_code* err_code) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(dir_path, c_str))
+    {
+        return false;
+    }
+
+    return rmdir(c_str, err_code);
+}
+
+
 bool symlink(const char* trg, const char* lnk_pth, std::error_code* err_code) noexcept
 {
     errno = 0;
@@ -600,6 +886,19 @@ bool symlink(const char* trg, const char* lnk_pth, std::error_code* err_code) no
 }
 
 
+bool symlink(const wchar_t* trg, const wchar_t* lnk_pth, std::error_code* err_code) noexcept
+{
+    char c_str_trg[PATH_MAX] = {};
+    char c_str_lnk[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(trg, c_str_trg) || !get_cstr_path_from_wstr(lnk_pth, c_str_lnk))
+    {
+        return false;
+    }
+
+    return symlink(c_str_trg, c_str_lnk, err_code);
+}
+
+
 bool touch(const char* regfle_path, std::uint32_t mods, std::error_code* err_code) noexcept
 {
     errno = 0;
@@ -611,6 +910,18 @@ bool touch(const char* regfle_path, std::uint32_t mods, std::error_code* err_cod
     }
     
     return true;
+}
+
+
+bool touch(const wchar_t* regfle_path, std::uint32_t mods, std::error_code* err_code) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(regfle_path, c_str))
+    {
+        return false;
+    }
+
+    return touch(c_str, mods, err_code);
 }
 
 

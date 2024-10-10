@@ -27,7 +27,7 @@
 #ifndef SPEED_SYSTEM_API_GLIBC_FILESYSTEM_DIRECTORY_ENTITY_EXTENSION_HPP
 #define SPEED_SYSTEM_API_GLIBC_FILESYSTEM_DIRECTORY_ENTITY_EXTENSION_HPP
 
-#include "../../../type_traits/type_traits.hpp"
+#include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_GLIBC
 
 #include <dirent.h>

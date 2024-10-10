@@ -18,8 +18,8 @@
  */
 
 /**
- * @file        speed/system/compatibility/speed_select_api.hpp
- * @brief       speed_select_api header.
+ * @file        speed/system/compatibility/select_api.hpp
+ * @brief       select_api header.
  * @author      Killian Valverde
  * @date        2018/05/27
  */
@@ -35,6 +35,9 @@
 #include <linux/version.h>
 #endif
 #elif defined(_WIN32)
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #include <windows.h>
 #endif
 

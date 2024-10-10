@@ -24,7 +24,7 @@
  * @date        2017/01/08
  */
 
-#include "../../../type_traits/type_traits.hpp"
+#include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_GLIBC
 
 #include <cstring>

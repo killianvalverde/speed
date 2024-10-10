@@ -28,8 +28,8 @@
 #define SPEED_SYSTEM_PROCESS_OPERATIONS_HPP
 
 #include "../api/api.hpp"
+#include "../compatibility/compatibility.hpp"
 #include "../time/time.hpp"
-#include "../type_traits/type_traits.hpp"
 
 
 namespace speed::system::process {

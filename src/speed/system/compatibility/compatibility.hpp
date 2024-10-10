@@ -24,10 +24,11 @@
  * @date        2023/10/10
  */
 
-#ifndef SPEED_SYSTEM_TYPE_TRAITS_TYPE_TRAITS_HPP
-#define SPEED_SYSTEM_TYPE_TRAITS_TYPE_TRAITS_HPP
+#ifndef SPEED_SYSTEM_COMPATIBILITY_COMPATIBILITY_HPP
+#define SPEED_SYSTEM_COMPATIBILITY_COMPATIBILITY_HPP
 
-#include "speed_select_api.hpp"
+#include "select_api.hpp"
+#include "types.hpp"
 
 
 namespace speed::system {
@@ -36,7 +37,17 @@ namespace speed::system {
 /**
  * @brief       Contains utilities for compile-time introspection and modification.
  */
-namespace type_traits {}
+namespace compatibility {}
+
+
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contains utilities for compile-time introspection and modification.
+ */
+namespace compat = compatibility;
+
+#endif
 
 
 }

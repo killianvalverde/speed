@@ -27,7 +27,7 @@
 #ifndef SPEED_SYSTEM_API_GLIBC_TIME_OPERATIONS_HPP
 #define SPEED_SYSTEM_API_GLIBC_TIME_OPERATIONS_HPP
 
-#include "../../../type_traits/type_traits.hpp"
+#include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_GLIBC
 
 #include "../../../errors/errors.hpp"
