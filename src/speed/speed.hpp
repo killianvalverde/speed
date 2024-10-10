@@ -37,6 +37,7 @@
 #include "iostream/iostream.hpp"
 #include "lowlevel/lowlevel.hpp"
 #include "math/math.hpp"
+#include "memory/memory.hpp"
 #include "scalars/scalars.hpp"
 #include "stringutils/stringutils.hpp"
 #include "system/system.hpp"
