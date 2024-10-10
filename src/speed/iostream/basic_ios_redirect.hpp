@@ -144,7 +144,7 @@ public:
         
         if (stringstream_constructed_)
         {
-            stringstream_alloc_.destroy(stringstream_);
+            speed::memory::destroy_at(stringstream_);
             stringstream_constructed_ = false;
         }
     }
@@ -170,7 +170,7 @@ public:
     {
         if (stringstream_constructed_)
         {
-            stringstream_alloc_.destroy(stringstream_);
+            speed::memory::destroy_at(stringstream_);
             speed::memory::construct_at(stringstream_);
         }
     }
