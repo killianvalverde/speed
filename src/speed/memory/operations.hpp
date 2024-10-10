@@ -39,14 +39,29 @@ namespace speed::memory {
  * @param       args : Arguments to forward to the constructor.
  * @return      The address of the allocated memory.
  */
-template <typename TpAllocator, typename... Ts>
+template<typename TpAllocator, typename... Ts>
 typename std::allocator_traits<TpAllocator>::value_type*
 allocate_and_construct(TpAllocator& alloc, Ts&&... args)
 {
     using pointer_type = typename std::allocator_traits<TpAllocator>::value_type*;
+
     pointer_type ptr = std::allocator_traits<TpAllocator>::allocate(alloc, 1);
     std::allocator_traits<TpAllocator>::construct(alloc, ptr, std::forward<Ts>(args)...);
+
     return ptr;
+}
+
+
+/**
+ * @brief       Construct the given object pointer.
+ * @param       ptr : The pointer to the object to construct.
+ * @param       args : Arguments to forward to the object constructor.
+ * @return      Same pointer as the passed argument, but points to the newly constructed object.
+ */
+template<typename Tp, typename... Ts>
+Tp* construct_at(Tp* ptr, Ts&&... args)
+{
+    return ::new (static_cast<void*>(ptr)) Tp(std::forward<Ts>(args)...);
 }
 
 
