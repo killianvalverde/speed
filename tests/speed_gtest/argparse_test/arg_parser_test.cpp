@@ -276,6 +276,7 @@ TEST_F(argparse_arg_parser, parse_key_value_args)
     std::vector<std::uint64_t> mins_vec;
     std::uint64_t secs = 0;
     std::uint64_t hrs = 0;
+    std::uint64_t dm;
 
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
@@ -304,10 +305,10 @@ TEST_F(argparse_arg_parser, parse_key_value_args)
     EXPECT_TRUE(ap.get_front_as<std::uint64_t>("-s") == 10);
     EXPECT_TRUE(ap.get_front_as<std::uint64_t>("-m") == 20);
     EXPECT_TRUE(ap.get_at_as<std::uint64_t>("-m", 1) == 50);
-    EXPECT_THROW(ap.get_at_as<std::uint64_t>("-s", 1) == 0, speed::argparse::exception);
-    EXPECT_THROW(ap.get_at_as<std::uint64_t>("-m", 2) == 0, speed::argparse::exception);
-    EXPECT_THROW(ap.get_at_as<std::uint64_t>("-m", 3) == 0, speed::argparse::exception);
-    EXPECT_THROW(ap.get_front_as<std::uint64_t>("-h") == 0, speed::type_casting::exception);
+    EXPECT_THROW(dm = ap.get_at_as<std::uint64_t>("-s", 1), speed::argparse::exception);
+    EXPECT_THROW(dm = ap.get_at_as<std::uint64_t>("-m", 2), speed::argparse::exception);
+    EXPECT_THROW(dm = ap.get_at_as<std::uint64_t>("-m", 3), speed::argparse::exception);
+    EXPECT_THROW(dm = ap.get_front_as<std::uint64_t>("-h"), speed::type_casting::exception);
 }
 
 
@@ -357,6 +358,7 @@ TEST_F(argparse_arg_parser, parse_help_args)
     };
 
     std::string help_cat;
+    std::string dm;
     bool presnc;
 
     ap.add_help_arg("--help", "-h")
@@ -371,7 +373,7 @@ TEST_F(argparse_arg_parser, parse_help_args)
     EXPECT_TRUE(ap.count_values_found("-h") == 1);
     EXPECT_TRUE(help_cat == "information");
     EXPECT_TRUE(ap.get_front_as<std::string>("-h") == "information");
-    EXPECT_THROW(ap.get_at_as<std::string>("-h", 1) == "information2", speed::argparse::exception);
+    EXPECT_THROW(dm = ap.get_at_as<std::string>("-h", 1), speed::argparse::exception);
 }
 
 
@@ -409,6 +411,7 @@ TEST_F(argparse_arg_parser, parse_eq_operator)
     std::vector<std::uint64_t> mins_vec;
     std::uint64_t secs = 0;
     std::uint64_t hrs = 0;
+    std::uint64_t dm;
 
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
@@ -437,10 +440,10 @@ TEST_F(argparse_arg_parser, parse_eq_operator)
     EXPECT_TRUE(ap.get_front_as<std::uint64_t>("-s") == 10);
     EXPECT_TRUE(ap.get_front_as<std::uint64_t>("-m") == 20);
     EXPECT_TRUE(ap.get_at_as<std::uint64_t>("-m", 1) == 50);
-    EXPECT_THROW(ap.get_at_as<std::uint64_t>("-s", 1) == 0, speed::argparse::exception);
-    EXPECT_THROW(ap.get_at_as<std::uint64_t>("-m", 2) == 0, speed::argparse::exception);
-    EXPECT_THROW(ap.get_at_as<std::uint64_t>("-m", 3) == 0, speed::argparse::exception);
-    EXPECT_THROW(ap.get_front_as<std::uint64_t>("-h") == 0, speed::type_casting::exception);
+    EXPECT_THROW(dm = ap.get_at_as<std::uint64_t>("-s", 1), speed::argparse::exception);
+    EXPECT_THROW(dm = ap.get_at_as<std::uint64_t>("-m", 2), speed::argparse::exception);
+    EXPECT_THROW(dm = ap.get_at_as<std::uint64_t>("-m", 3), speed::argparse::exception);
+    EXPECT_THROW(dm = ap.get_front_as<std::uint64_t>("-h"), speed::type_casting::exception);
 }
 
 
@@ -455,6 +458,7 @@ TEST_F(argparse_arg_parser, parse_grouping)
     std::vector<std::uint64_t> mins_vec;
     std::uint64_t secs = 0;
     std::uint64_t hrs = 0;
+    std::uint64_t dm;
 
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
@@ -483,10 +487,10 @@ TEST_F(argparse_arg_parser, parse_grouping)
     EXPECT_TRUE(ap.get_front_as<std::uint64_t>("-s") == 10);
     EXPECT_TRUE(ap.get_front_as<std::uint64_t>("-m") == 20);
     EXPECT_TRUE(ap.get_at_as<std::uint64_t>("-m", 1) == 50);
-    EXPECT_THROW(ap.get_at_as<std::uint64_t>("-s", 1) == 0, speed::argparse::exception);
-    EXPECT_THROW(ap.get_at_as<std::uint64_t>("-m", 2) == 0, speed::argparse::exception);
-    EXPECT_THROW(ap.get_at_as<std::uint64_t>("-m", 3) == 0, speed::argparse::exception);
-    EXPECT_THROW(ap.get_front_as<std::uint64_t>("-h") == 0, speed::type_casting::exception);
+    EXPECT_THROW(dm = ap.get_at_as<std::uint64_t>("-s", 1), speed::argparse::exception);
+    EXPECT_THROW(dm = ap.get_at_as<std::uint64_t>("-m", 2), speed::argparse::exception);
+    EXPECT_THROW(dm = ap.get_at_as<std::uint64_t>("-m", 3), speed::argparse::exception);
+    EXPECT_THROW(dm = ap.get_front_as<std::uint64_t>("-h"), speed::type_casting::exception);
 }
 
 
