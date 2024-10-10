@@ -19,7 +19,7 @@
 
 /**
  * @file        speed/type_casting/type_casting.hpp
- * @brief       type_traits main header.
+ * @brief       compatibility main header.
  * @author      Killian Valverde
  * @date        2016/08/05
  */

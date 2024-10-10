@@ -40,10 +40,31 @@ TEST(type_casting_try_type_cast, basic_string_to_type)
 }
 
 
-TEST(type_casting_try_type_cast, c_string_to_basic_string)
+TEST(type_casting_try_type_cast, c_string_to_string)
 {
     std::string res;
     ASSERT_TRUE(speed::type_casting::try_type_cast<std::string>("23.345", &res));
+}
+
+
+TEST(type_casting_try_type_cast, c_string_to_wstring)
+{
+    std::wstring res;
+    ASSERT_TRUE(speed::type_casting::try_type_cast<std::wstring>("23.345", &res));
+}
+
+
+TEST(type_casting_try_type_cast, c_wstring_to_wstring)
+{
+    std::wstring res;
+    ASSERT_TRUE(speed::type_casting::try_type_cast<std::wstring>(L"23.345", &res));
+}
+
+
+TEST(type_casting_try_type_cast, c_wstring_to_string)
+{
+    std::string res;
+    ASSERT_TRUE(speed::type_casting::try_type_cast<std::string>(L"23.345", &res));
 }
 
 
@@ -103,7 +124,7 @@ TEST(type_casting_try_type_cast, c_string_to_path)
 }
 
 
-TEST(type_casting_try_type_cast, c_string_to_secure_path)
+TEST(type_casting_try_type_cast, c_string_to_valid_path)
 {
     speed::filesystem::r_regular_file_path reg_pth;
     speed::filesystem::r_directory_path dir_pth;

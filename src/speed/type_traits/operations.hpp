@@ -18,8 +18,8 @@
  */
 
 /**
- * @file        speed/type_traits/operations.hpp
- * @brief       type_traits functions header.
+ * @file        speed/compatibility/operations.hpp
+ * @brief       compatibility functions header.
  * @author      Killian Valverde
  * @date        2016/08/05
  */
@@ -166,6 +166,32 @@ struct is_character
 
 
 /**
+ * @brief       Trait class that identifies whether T is a char pointer type.
+ */
+template<typename Tp>
+struct is_char_pointer
+        : public __private::__and<
+                std::is_pointer<Tp>,
+                is_char<typename std::remove_pointer<Tp>::type>
+          >::type
+{
+};
+
+
+/**
+ * @brief       Trait class that identifies whether T is a wchar pointer type.
+ */
+template<typename Tp>
+struct is_wchar_pointer
+        : public __private::__and<
+                std::is_pointer<Tp>,
+                is_wchar<typename std::remove_pointer<Tp>::type>
+          >::type
+{
+};
+
+
+/**
  * @brief       Trait class that identifies whether T is a character pointer type.
  */
 template<typename Tp>
@@ -278,6 +304,66 @@ struct __is_basic_string_helper<std::basic_string<TpChar, TpCharTraits, TpCharAl
 template<typename Tp>
 struct is_basic_string
         : public __private::__is_basic_string_helper<
+                typename std::remove_cv<Tp>::type
+          >::type
+{
+};
+
+
+/** @cond */
+namespace __private {
+template<typename>
+struct __is_string_helper : public std::false_type {};
+
+template<
+        typename TpChar,
+        typename TpCharTraits,
+        typename TpCharAlloc
+>
+struct __is_string_helper<std::basic_string<TpChar, TpCharTraits, TpCharAlloc>>
+        : public is_char<TpChar>
+{
+};
+} /* __private */
+/** @endcond */
+
+
+/**
+ * @brief       Trait class that identifies whether T is a 'std::string' type.
+ */
+template<typename Tp>
+struct is_string
+        : public __private::__is_string_helper<
+                typename std::remove_cv<Tp>::type
+          >::type
+{
+};
+
+
+/** @cond */
+namespace __private {
+template<typename>
+struct __is_wstring_helper : public std::false_type {};
+
+template<
+        typename TpChar,
+        typename TpCharTraits,
+        typename TpCharAlloc
+>
+struct __is_wstring_helper<std::basic_string<TpChar, TpCharTraits, TpCharAlloc>>
+        : public is_wchar<TpChar>
+{
+};
+} /* __private */
+/** @endcond */
+
+
+/**
+ * @brief       Trait class that identifies whether T is a 'std::wstring' type.
+ */
+template<typename Tp>
+struct is_wstring
+        : public __private::__is_wstring_helper<
                 typename std::remove_cv<Tp>::type
           >::type
 {

@@ -18,14 +18,14 @@
  */
 
 /**
- * @file        speed/system/type_traits/speed_select_api.hpp
+ * @file        speed/system/compatibility/speed_select_api.hpp
  * @brief       speed_select_api header.
  * @author      Killian Valverde
  * @date        2018/05/27
  */
 
-#ifndef SPEED_SYSTEM_TYPE_TRAITS_SPEED_SELECT_API_HPP
-#define SPEED_SYSTEM_TYPE_TRAITS_SPEED_SELECT_API_HPP
+#ifndef SPEED_SYSTEM_COMPATIBILITY_SELECT_API_HPP
+#define SPEED_SYSTEM_COMPATIBILITY_SELECT_API_HPP
 
 #ifdef __unix__
 #undef _XOPEN_SOURCE
@@ -64,11 +64,6 @@
 #define SPEED_SELECT_API(a, b, ...) SPEED_CONCAT(SPEED_API_DEFINED_,\
         SPEED_IS_API_DEFINED(SPEED_API_PREFIX))(a, b, __VA_ARGS__)
 /** @endcond */
-
-
-namespace speed::system::type_traits {
-
-}
 
 
 #endif

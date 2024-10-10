@@ -18,8 +18,8 @@
  */
 
 /**
- * @file        speed/type_traits/type_traits.hpp
- * @brief       type_traits main header.
+ * @file        speed/compatibility/compatibility.hpp
+ * @brief       compatibility main header.
  * @author      Killian Valverde
  * @date        2016/08/05
  */

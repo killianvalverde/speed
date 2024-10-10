@@ -68,14 +68,23 @@ enum class error_codes : std::uint8_t
     /** Filesystem invalid path. */
     FILESYSTEM_INVALID_PATH = 0x6,
 
-    /** Filesystem invalid path. */
+    /** Filesystem error codes end. */
     FILESYSTEM_CODES_ENDS = 0x6,
 
     /** System error codes end. */
     SYSTEM_CODES_ENDS = 0x6,
 
-    /** Other error code. */
-    OTHER = 0x7,
+    /** Other error codes begin. */
+    OTHERS_BEGINS = 0x7,
+
+    /** Range error. */
+    RANGE_ERROR = 0x7,
+
+    /** Range error. */
+    OTHER = 0x8,
+
+    /** Other error codes end. */
+    OTHERS_ENDS = 0x8
 };
 
 
