@@ -1,9 +1,8 @@
 project(speed_gtest)
 
-find_package(GTest REQUIRED)
-
-include_directories(${GTEST_INCLUDE_DIRS})
 include_directories(${PROJECT_SOURCE_DIR}/../../src)
+
+set(GTEST_LIBRARIES "gtest" "gtest_main")
 
 set(SPEED_ALGORITHM_TEST_SOURCE_FILES
         algorithm_test/operations_test.cpp
@@ -82,6 +81,7 @@ add_executable(speed_type_traits_test main.cpp ${SPEED_TYPE_TRAITS_TEST_SOURCE_F
 
 add_executable(speed_test
         main.cpp
+        ${SPEED_ALGORITHM_TEST_SOURCE_FILES}
         ${SPEED_ARGPARSE_TEST_SOURCE_FILES}
         ${SPEED_CONTAINERS_TEST_SOURCE_FILES}
         ${SPEED_FILESYSTEM_TEST_SOURCE_FILES}
@@ -96,16 +96,16 @@ add_executable(speed_test
         ${SPEED_TYPE_TRAITS_TEST_SOURCE_FILES}
 )
 
-target_link_libraries(speed_algorithm_test speed_algorithm ${GTEST_BOTH_LIBRARIES} -lpthread)
-target_link_libraries(speed_argparse_test speed_argparse ${GTEST_BOTH_LIBRARIES} -lpthread)
-target_link_libraries(speed_containers_test speed_containers ${GTEST_BOTH_LIBRARIES} -lpthread)
-target_link_libraries(speed_iostream_test speed_iostream ${GTEST_BOTH_LIBRARIES} -lpthread)
-target_link_libraries(speed_lowlevel_test speed_lowlevel ${GTEST_BOTH_LIBRARIES} -lpthread)
-target_link_libraries(speed_safety_test speed_safety ${GTEST_BOTH_LIBRARIES} -lpthread)
-target_link_libraries(speed_scalars_test speed_scalars ${GTEST_BOTH_LIBRARIES} -lpthread)
-target_link_libraries(speed_stringutils_test speed_stringutils ${GTEST_BOTH_LIBRARIES} -lpthread)
-target_link_libraries(speed_system_test speed_system ${GTEST_BOTH_LIBRARIES} -lpthread)
-target_link_libraries(speed_time_test speed_time ${GTEST_BOTH_LIBRARIES} -lpthread)
-target_link_libraries(speed_type_casting_test speed_type_casting ${GTEST_BOTH_LIBRARIES} -lpthread)
-target_link_libraries(speed_type_traits_test speed_type_traits ${GTEST_BOTH_LIBRARIES} -lpthread)
-target_link_libraries(speed_test speed ${GTEST_BOTH_LIBRARIES} -lpthread)
+target_link_libraries(speed_algorithm_test speed_algorithm ${GTEST_LIBRARIES})
+target_link_libraries(speed_argparse_test speed_argparse ${GTEST_LIBRARIES})
+target_link_libraries(speed_containers_test speed_containers ${GTEST_LIBRARIES})
+target_link_libraries(speed_iostream_test speed_iostream ${GTEST_LIBRARIES})
+target_link_libraries(speed_lowlevel_test speed_lowlevel ${GTEST_LIBRARIES})
+target_link_libraries(speed_safety_test speed_safety ${GTEST_LIBRARIES})
+target_link_libraries(speed_scalars_test speed_scalars ${GTEST_LIBRARIES})
+target_link_libraries(speed_stringutils_test speed_stringutils ${GTEST_LIBRARIES})
+target_link_libraries(speed_system_test speed_system ${GTEST_LIBRARIES})
+target_link_libraries(speed_time_test speed_time ${GTEST_LIBRARIES})
+target_link_libraries(speed_type_casting_test speed_type_casting ${GTEST_LIBRARIES})
+target_link_libraries(speed_type_traits_test speed_type_traits ${GTEST_LIBRARIES})
+target_link_libraries(speed_test speed ${GTEST_LIBRARIES})
