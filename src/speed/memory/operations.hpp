@@ -36,16 +36,19 @@ namespace speed::memory {
 /**
  * @brief       Allocate using an allocator and construct the object.
  * @param       alloc : Allocator used to allocate the memory.
+ * @param       ptr : Pointer to object to allocate and construct.
  * @param       args : Arguments to forward to the constructor.
  * @return      The address of the allocated memory.
  */
 template<typename TpAllocator, typename... Ts>
 typename std::allocator_traits<TpAllocator>::value_type*
-allocate_and_construct(TpAllocator& alloc, Ts&&... args)
+allocate_and_construct(
+        TpAllocator& alloc,
+        typename std::allocator_traits<TpAllocator>::value_type*& ptr,
+        Ts&&... args
+)
 {
-    using pointer_type = typename std::allocator_traits<TpAllocator>::value_type*;
-
-    pointer_type ptr = std::allocator_traits<TpAllocator>::allocate(alloc, 1);
+    ptr = std::allocator_traits<TpAllocator>::allocate(alloc, 1);
     std::allocator_traits<TpAllocator>::construct(alloc, ptr, std::forward<Ts>(args)...);
 
     return ptr;
@@ -63,6 +66,37 @@ Tp* construct_at(Tp* ptr, Ts&&... args)
 {
     return ::new (static_cast<void*>(ptr)) Tp(std::forward<Ts>(args)...);
 }
+
+
+/**
+ * @brief       Destroy the object pointer by the pointer.
+ * @param       ptr : Pointer to the object to destroy.
+ */
+template<typename Tp>
+void destroy_at(Tp* ptr)
+{
+    if (ptr)
+    {
+        ptr->~Tp();
+    }
+}
+
+
+/**
+ * @brief       Destroy and deallocate using an allocator.
+ * @param       alloc : Allocator used to deallocate.
+ * @param       ptr : Pointer to object to destruct and deallocate.
+ */
+template<typename TpAllocator>
+void destruct_and_deallocate(
+        TpAllocator& alloc,
+        typename std::allocator_traits<TpAllocator>::value_type* ptr
+)
+{
+    std::allocator_traits<TpAllocator>::destroy(alloc, ptr);
+    std::allocator_traits<TpAllocator>::deallocate(alloc, ptr, 1);
+}
+
 
 
 }
