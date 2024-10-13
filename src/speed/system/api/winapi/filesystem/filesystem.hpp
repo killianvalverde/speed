@@ -18,16 +18,33 @@
  */
 
 /**
- * @file        speed/system/time/operations.hpp
- * @brief       operations functions definitions.
+ * @file        speed/system/api/winapi/filesystem/filesystem.hpp
+ * @brief       winapi filesystem main header.
  * @author      Killian Valverde
- * @date        2017/10/18
+ * @date        2023/10/31
  */
 
+#ifndef SPEED_SYSTEM_API_WINAPI_FILESYSTEM_FILESYSTEM_HPP
+#define SPEED_SYSTEM_API_WINAPI_FILESYSTEM_FILESYSTEM_HPP
+
+#include "../../../compatibility/compatibility.hpp"
+#ifdef SPEED_WINAPI
+
+#include "directory_entity_extension.hpp"
 #include "operations.hpp"
 
 
-namespace speed::system::time {
+namespace speed::system::api::winapi {
+
+
+/**
+ * @brief       Contains filesystem interaction resources.
+ */
+namespace filesystem {}
 
 
 }
+
+
+#endif
+#endif

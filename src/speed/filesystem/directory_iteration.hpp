@@ -39,7 +39,6 @@ namespace speed::filesystem {
 
 
 // TODO: Implement this feature.
-
 /** @cond */
 class directory_iteration
 {
@@ -59,7 +58,7 @@ public:
     //    self_type& operator ++() override { return *this; };
     //
     //private:
-    //    std::stack<system::directory_entity> stck_;
+    //    std::stack<system::basic_directory_entity> stck_;
     //
     //    std::set<std::uint64_t> vistd_inos_;
     //

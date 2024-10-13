@@ -32,7 +32,7 @@
 #include "../api/api.hpp"
 #include "../compatibility/compatibility.hpp"
 #include "access_modes.hpp"
-#include "directory_entity.hpp"
+#include "basic_directory_entity.hpp"
 #include "file_type.hpp"
 
 
@@ -51,7 +51,7 @@ inline bool access(
         const char* fle_path,
         access_modes acss_modes,
         std::error_code* err_code = nullptr
-)
+) noexcept
 {
     return SPEED_SELECT_API(filesystem::access, false, fle_path, acss_modes, err_code);
 }
@@ -69,7 +69,7 @@ inline bool access(
         const wchar_t* fle_path,
         access_modes acss_modes,
         std::error_code* err_code = nullptr
-)
+) noexcept
 {
     return SPEED_SELECT_API(filesystem::access, false, fle_path, acss_modes, err_code);
 }
@@ -89,7 +89,7 @@ inline bool access(
         access_modes acss_modes,
         file_type fle_type,
         std::error_code* err_code = nullptr
-)
+) noexcept
 {
     return SPEED_SELECT_API(filesystem::access, false, fle_path, acss_modes, fle_type, err_code);
 }
@@ -109,9 +109,71 @@ inline bool access(
         access_modes acss_modes,
         file_type fle_type,
         std::error_code* err_code = nullptr
-)
+) noexcept
 {
     return SPEED_SELECT_API(filesystem::access, false, fle_path, acss_modes, fle_type, err_code);
+}
+
+
+/**
+ * @brief       Check whether a specified directory can be created.
+ * @param       dir_path : The specified directory.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      On success the true is returned, otherwise false is returned.
+ */
+inline bool can_directory_be_created(
+        const char* dir_path,
+        std::error_code* err_code = nullptr
+) noexcept
+{
+    return SPEED_SELECT_API(filesystem::can_directory_be_created, false, dir_path, err_code);
+}
+
+
+/**
+ * @brief       Check whether a specified directory can be created.
+ * @param       dir_path : The specified directory.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      On success the true is returned, otherwise false is returned.
+ */
+inline bool can_directory_be_created(
+        const wchar_t* dir_path,
+        std::error_code* err_code = nullptr
+) noexcept
+{
+    return SPEED_SELECT_API(filesystem::can_directory_be_created, false, dir_path, err_code);
+}
+
+
+/**
+ * @brief       Check whether a specified regular file can be created.
+ * @param       reg_file_path : The specified regular files.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      On success the true is returned, otherwise false is returned.
+ */
+inline bool can_regular_file_be_created(
+        const char* reg_file_path,
+        std::error_code* err_code = nullptr
+) noexcept
+{
+    return SPEED_SELECT_API(filesystem::can_regular_file_be_created, false, reg_file_path,
+                            err_code);
+}
+
+
+/**
+ * @brief       Check whether a specified regular file can be created.
+ * @param       reg_file_path : The specified regular files.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      On success the true is returned, otherwise false is returned.
+ */
+inline bool can_regular_file_be_created(
+        const wchar_t* reg_file_path,
+        std::error_code* err_code = nullptr
+) noexcept
+{
+    return SPEED_SELECT_API(filesystem::can_regular_file_be_created, false, reg_file_path,
+                            err_code);
 }
 
 
@@ -153,6 +215,19 @@ inline bool closedir(directory_entity* dir_ent, std::error_code* err_code = null
 
 
 /**
+ * @brief       Closes the directory stream.
+ * @param       dir_ent : The directory entity.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      If function was successful a pointer to the directory is returned, otherwise nullptr
+ *              is returned.
+ */
+inline bool closedir(wdirectory_entity* dir_ent, std::error_code* err_code = nullptr) noexcept
+{
+    return SPEED_SELECT_API(filesystem::closedir, false, dir_ent, err_code);
+}
+
+
+/**
  * @brief       Get the inode number of the specified file.
  * @param       fle_path : The file to get the inode number.
  * @param       err_code : If function fails it holds the platform-dependent error code.
@@ -172,7 +247,10 @@ inline uint64_t get_file_inode(const char* fle_path, std::error_code* err_code =
  * @return      On success the inode number of the sepcified file is returned, otherwise -1 is
  *              returned.
  */
-inline uint64_t get_file_inode(const wchar_t* fle_path, std::error_code* err_code = nullptr) noexcept
+inline uint64_t get_file_inode(
+        const wchar_t* fle_path,
+        std::error_code* err_code = nullptr
+) noexcept
 {
     return SPEED_SELECT_API(filesystem::get_file_inode, -1, fle_path, err_code);
 }
@@ -184,7 +262,10 @@ inline uint64_t get_file_inode(const wchar_t* fle_path, std::error_code* err_cod
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      On success the UID of the sepcified file is returned, otherwise -1 is returned.
  */
-inline int get_file_uid(const char* fle_path, std::error_code* err_code = nullptr) noexcept
+inline int get_file_uid(
+        const char* fle_path,
+        std::error_code* err_code = nullptr
+) noexcept
 {
     return SPEED_SELECT_API(filesystem::get_file_uid, -1, fle_path, err_code);
 }
@@ -227,13 +308,13 @@ inline int get_file_gid(const wchar_t* fle_path, std::error_code* err_code = nul
 
 
 /**
- * @brief       Get the tmp system path.
- * @return      If function was successful the tmp system path is returned otherwise a null pointer
+ * @brief       Get a temporal path.
+ * @return      If function was successful a temporal path is returned otherwise a null pointer
  *              is returned.
  */
-inline const char* get_tmp_path() noexcept
+inline const char* get_temporal_path() noexcept
 {
-    return SPEED_SELECT_API(filesystem::get_tmp_path, nullptr);
+    return SPEED_SELECT_API(filesystem::get_temporal_path, nullptr);
 }
 
 
@@ -279,7 +360,10 @@ inline bool is_character_device(const char* fle_path, std::error_code* err_code 
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool is_character_device(const wchar_t* fle_path, std::error_code* err_code = nullptr) noexcept
+inline bool is_character_device(
+        const wchar_t* fle_path,
+        std::error_code* err_code = nullptr
+) noexcept
 {
     return SPEED_SELECT_API(filesystem::is_character_device, false, fle_path, err_code);
 }
@@ -534,7 +618,7 @@ inline bool opendir(
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 inline bool opendir(
-        directory_entity* dir_ent,
+        wdirectory_entity* dir_ent,
         const wchar_t* dir_pth,
         std::error_code* err_code = nullptr
 ) noexcept
@@ -550,6 +634,18 @@ inline bool opendir(
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 inline bool readdir(directory_entity* dir_ent, std::error_code* err_code = nullptr) noexcept
+{
+    return SPEED_SELECT_API(filesystem::readdir, false, dir_ent, err_code);
+}
+
+
+/**
+ * @brief       Read the next directory entry in the directory stream.
+ * @param       dir_ent : The current directory entity.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+inline bool readdir(wdirectory_entity* dir_ent, std::error_code* err_code = nullptr) noexcept
 {
     return SPEED_SELECT_API(filesystem::readdir, false, dir_ent, err_code);
 }
@@ -644,6 +740,30 @@ inline bool touch(
 ) noexcept
 {
     return SPEED_SELECT_API(filesystem::touch, false, regfle_path, mods, err_code);
+}
+
+
+/**
+ * @brief       Delete the specified regular file.
+ * @param       reg_file_path : The path of the regular file to delete.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+inline bool unlink(const char* reg_file_path, std::error_code* err_code = nullptr) noexcept
+{
+    return SPEED_SELECT_API(filesystem::unlink, false, reg_file_path, err_code);
+}
+
+
+/**
+ * @brief       Delete the specified regular file.
+ * @param       reg_file_path : The path of the regular file to delete.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+inline bool unlink(const wchar_t* reg_file_path, std::error_code* err_code = nullptr) noexcept
+{
+    return SPEED_SELECT_API(filesystem::unlink, false, reg_file_path, err_code);
 }
 
 

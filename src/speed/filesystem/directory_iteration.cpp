@@ -64,7 +64,7 @@ namespace speed::filesystem {
 
 //directory_iteration::iterator::self_type& directory_iteration::iterator::operator ++()
 //{
-//    //system::directory_entity* cur_dir_ent = &stck_.top();
+//    //system::basic_directory_entity* cur_dir_ent = &stck_.top();
 //    //
 //    //if (speed::system::is_directory(cur_pth_.c_str()))
 //    //{

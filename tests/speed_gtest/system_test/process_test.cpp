@@ -31,9 +31,9 @@
 
 TEST(system_process, execute_command)
 {
-    // TODO: Deal with the dir print.
-    int ret_val;
-    //ASSERT_TRUE(speed::system::execute_command("dir", &ret_val));
+    // int ret_val;
+    // ASSERT_TRUE(speed::system::process::execute_command("dir", &ret_val));
+    // ASSERT_TRUE(ret_val == 0);
 }
 
 

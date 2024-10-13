@@ -18,17 +18,17 @@
  */
 
 /**
- * @file        speed/system/api/glibc/terminal/operations.hpp
+ * @file        speed/system/api/winapi/terminal/operations.hpp
  * @brief       terminal operations header.
  * @author      Killian Valverde
  * @date        2017/10/18
  */
 
-#ifndef SPEED_SYSTEM_API_GLIBC_TERMINAL_OPERATIONS_HPP
-#define SPEED_SYSTEM_API_GLIBC_TERMINAL_OPERATIONS_HPP
+#ifndef SPEED_SYSTEM_API_WINAPI_TERMINAL_OPERATIONS_HPP
+#define SPEED_SYSTEM_API_WINAPI_TERMINAL_OPERATIONS_HPP
 
 #include "../../../compatibility/compatibility.hpp"
-#ifdef SPEED_GLIBC
+#ifdef SPEED_WINAPI
 
 #include <cstdio>
 #include <iostream>
@@ -37,7 +37,7 @@
 #include "../../../terminal/text_attribute.hpp"
 
 
-namespace speed::system::api::glibc::terminal {
+namespace speed::system::api::winapi::terminal {
 
 
 using namespace speed::system::errors;

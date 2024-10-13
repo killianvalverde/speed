@@ -106,107 +106,7 @@ public:
         
         return *this;
     }
-    
-    /**
-     * @brief       Set the number of seconds and nano seconds.
-     * @param       sec : The new number of seconds.
-     * @param       nsec : The new number of nano seconds.
-     */
-    inline void set_time_specfication(std::uint64_t sec, std::uint64_t nsec) noexcept
-    {
-        sec_ = sec;
-        nsec_ = nsec;
-        balance_nseconds();
-    }
-    
-    /**
-     * @brief       Check whether the time is null.
-     * @return      If function was successful true is returned, otherwise false is returned.
-     */
-    inline bool is_null() const noexcept
-    {
-        return sec_ == 0 && nsec_ == 0;
-    }
-    
-    /**
-     * @brief       Get the number of nano seconds.
-     * @return      The number of nano seconds.
-     */
-    inline std::uint64_t get_nseconds() const noexcept
-    {
-        return nsec_;
-    }
-    
-    /**
-     * @brief       Get the number of seconds.
-     * @return      The number of seconds.
-     */
-    inline std::uint64_t get_seconds() const noexcept
-    {
-        return sec_;
-    }
-    
-    /**
-     * @brief       Get the relative number of nano seconds.
-     * @return      The relative number of nano seconds.
-     */
-    inline std::uint64_t get_relative_nseconds() const noexcept
-    {
-        return nsec_;
-    }
-    
-    /**
-     * @brief       Get the relative number of seconds.
-     * @return      The relative number of seconds.
-     */
-    inline std::uint64_t get_relative_seconds() const noexcept
-    {
-        return sec_ % 60;
-    }
-    
-    /**
-     * @brief       Get the relative number of minutes.
-     * @return      The relative number of minutes.
-     */
-    inline std::uint64_t get_relative_minutes() const noexcept
-    {
-        return (sec_ / 60) % 60;
-    }
-    
-    /**
-     * @brief       Get the relative number of hours.
-     * @return      The relative number of hours.
-     */
-    inline std::uint64_t get_relative_hours() const noexcept
-    {
-        return sec_ / 3600;
-    }
-    
-    /**
-     * @brief       Get the current time under a floating point data type.
-     * @return      The time under a floating point data type.
-     */
-    inline long double get_time() const noexcept
-    {
-        return ((long double)sec_ + ((long double)nsec_ / 10e8l));
-    }
-    
-    /**
-     * @brief       Get the elapsed time between the curremt pbject and another one.
-     * @param       rhs : The second time specfication to get the elapsed time.
-     * @return      The elapsed time between the current object and the other one.
-     */
-    time_specification get_elapsed_time(const time_specification& rhs) const noexcept;
-    
-    /**
-     * @brief       Reset the current time to zero.
-     */
-    inline void reset() noexcept
-    {
-        sec_ = 0;
-        nsec_ = 0;
-    }
-    
+
     /**
      * @brief       Allows knowing whether the two time specifications are the same.
      * @param       rhs : The object to compare.
@@ -217,7 +117,7 @@ public:
         return sec_ == rhs.sec_ &&
                nsec_ == rhs.nsec_;
     }
-    
+
     /**
      * @brief       Allows knowing whether two time specifications are different.
      * @param       rhs : The object to compare.
@@ -226,6 +126,106 @@ public:
     inline bool operator !=(const time_specification& rhs) const noexcept
     {
         return !(rhs == *this);
+    }
+    
+    /**
+     * @brief       Check whether the time is null.
+     * @return      If function was successful true is returned, otherwise false is returned.
+     */
+    inline bool is_null() const noexcept
+    {
+        return sec_ == 0 && nsec_ == 0;
+    }
+
+    /**
+     * @brief       Reset the current time to zero.
+     */
+    inline void reset() noexcept
+    {
+        sec_ = 0;
+        nsec_ = 0;
+    }
+    
+    /**
+     * @brief       Get the number of nano seconds.
+     * @return      The number of nano seconds.
+     */
+    [[nodiscard]] inline std::uint64_t get_nseconds() const noexcept
+    {
+        return nsec_;
+    }
+    
+    /**
+     * @brief       Get the number of seconds.
+     * @return      The number of seconds.
+     */
+    [[nodiscard]] inline std::uint64_t get_seconds() const noexcept
+    {
+        return sec_;
+    }
+    
+    /**
+     * @brief       Get the relative number of nano seconds.
+     * @return      The relative number of nano seconds.
+     */
+    [[nodiscard]] inline std::uint64_t get_relative_nseconds() const noexcept
+    {
+        return nsec_;
+    }
+    
+    /**
+     * @brief       Get the relative number of seconds.
+     * @return      The relative number of seconds.
+     */
+    [[nodiscard]] inline std::uint64_t get_relative_seconds() const noexcept
+    {
+        return sec_ % 60;
+    }
+    
+    /**
+     * @brief       Get the relative number of minutes.
+     * @return      The relative number of minutes.
+     */
+    [[nodiscard]] inline std::uint64_t get_relative_minutes() const noexcept
+    {
+        return (sec_ / 60) % 60;
+    }
+    
+    /**
+     * @brief       Get the relative number of hours.
+     * @return      The relative number of hours.
+     */
+    [[nodiscard]] inline std::uint64_t get_relative_hours() const noexcept
+    {
+        return sec_ / 3600;
+    }
+    
+    /**
+     * @brief       Get the current time under a floating point data type.
+     * @return      The time under a floating point data type.
+     */
+    [[nodiscard]] inline long double get_time() const noexcept
+    {
+        return ((long double)sec_ + ((long double)nsec_ / 10e8l));
+    }
+    
+    /**
+     * @brief       Get the elapsed time between the curremt pbject and another one.
+     * @param       rhs : The second time specfication to get the elapsed time.
+     * @return      The elapsed time between the current object and the other one.
+     */
+    [[nodiscard]] time_specification get_elapsed_time(const time_specification& rhs) const noexcept;
+
+    /**
+     * @brief       Set the number of seconds and nano seconds.
+     * @param       sec : The new number of seconds.
+     * @param       nsec : The new number of nano seconds.
+     */
+    inline void set_time(std::uint64_t sec, std::uint64_t nsec) noexcept
+    {
+        sec_ = sec;
+        nsec_ = nsec;
+        balance_nseconds();
     }
     
 private:

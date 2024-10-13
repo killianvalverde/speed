@@ -18,36 +18,32 @@
  */
 
 /**
- * @file        speed/system/filesystem/directory_entity.hpp
- * @brief       directory_entity header.
+ * @file        speed/system/api/winapi/terminal/terminal.hpp
+ * @brief       winapi terminal main header.
  * @author      Killian Valverde
- * @date        2019/04/06
+ * @date        2023/10/31
  */
 
-#ifndef SPEED_SYSTEM_FILESYSTEM_DIRECTORY_ENTITY_HPP
-#define SPEED_SYSTEM_FILESYSTEM_DIRECTORY_ENTITY_HPP
+#ifndef SPEED_SYSTEM_API_WINAPI_TERMINAL_TERMINAL_HPP
+#define SPEED_SYSTEM_API_WINAPI_TERMINAL_TERMINAL_HPP
+
+#include "../../../compatibility/compatibility.hpp"
+#ifdef SPEED_WINAPI
+
+#include "operations.hpp"
 
 
-namespace speed::system::filesystem {
+namespace speed::system::api::winapi {
 
 
 /**
- * @brief       Struct that represents a directory entity.
+ * @brief       Contains resources for interacting and customizing the terminal.
  */
-struct directory_entity
-{
-    /** Inode number of the current entity. */
-    unsigned long ino;
-    
-    /** Name of the current entity. */
-    const char* nme;
-    
-    /** Additional api dependent data. */
-    void* ext;
-};
+namespace terminal {}
 
 
 }
 
 
+#endif
 #endif

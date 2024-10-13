@@ -125,35 +125,35 @@ bool access(
 }
 
 
-bool can_directory_be_created(const char* dir_path, std::error_code* err_code)
+bool can_directory_be_created(const char* dir_path, std::error_code* err_code) noexcept
 {
-    static_assert(PATH_MAX >= 255, "PATH_MAX has to be at least 255.");
-    
-    char parnt_path[PATH_MAX] = {0};
-    std::size_t dir_path_len;
-    errno = 0;
-    
-    dir_path_len = stringutils::strlen(dir_path);
-    
+    char parent_pth[PATH_MAX] = {0};
+    std::size_t dir_path_len = stringutils::strlen(dir_path);
+    char* last_char_p;
+
     if (dir_path_len >= PATH_MAX ||
         dir_path_len == 0 ||
-        file_exists(dir_path))
+        access(dir_path, access_modes::EXISTS, err_code))
     {
         return false;
     }
-    
-    stringutils::strcpy(parnt_path, dir_path);
-    
-    if (!get_first_actual_directory(parnt_path, err_code))
+
+    stringutils::strcpy(parent_pth, dir_path);
+    stringutils::strdisclastif(parent_pth, '/');
+    last_char_p = stringutils::strcut(parent_pth, '/');
+    dir_path_len = last_char_p == nullptr ? 0 : parent_pth - last_char_p + 1;
+
+    if (dir_path_len == 0)
     {
-        return false;
+        parent_pth[0] = '.';
+        parent_pth[1] = '\0';
     }
-    
-    return access(parnt_path, access_modes::WRITE | access_modes::EXECUTE, err_code);
+
+    return access(parent_pth, access_modes::WRITE | access_modes::EXECUTE, err_code);
 }
 
 
-bool can_directory_be_created(const wchar_t* dir_path, std::error_code* err_code)
+bool can_directory_be_created(const wchar_t* dir_path, std::error_code* err_code) noexcept
 {
     char c_str[PATH_MAX] = {};
     if (!get_cstr_path_from_wstr(dir_path, c_str))
@@ -165,40 +165,38 @@ bool can_directory_be_created(const wchar_t* dir_path, std::error_code* err_code
 }
 
 
-bool can_regular_file_be_created(const char* reg_file_path, std::error_code* err_code)
+bool can_regular_file_be_created(const char* reg_file_path, std::error_code* err_code) noexcept
 {
-    static_assert(PATH_MAX >= 255, "PATH_MAX has to be at least 255.");
-    
-    char parnt_path[PATH_MAX] = {0};
-    std::size_t reg_file_path_len;
-    errno = 0;
-    
-    reg_file_path_len = stringutils::strlen(reg_file_path);
-    
-    if (reg_file_path_len >= PATH_MAX ||
-        reg_file_path_len == 0)
+    char parent_pth[PATH_MAX] = {0};
+    std::size_t path_len = stringutils::strlen(reg_file_path);
+    char* last_char_p;
+
+    if (path_len >= PATH_MAX || path_len == 0)
     {
         return false;
     }
-    
-    if (file_exists(reg_file_path))
+
+    if (access(reg_file_path, access_modes::EXISTS, err_code))
     {
-        return is_regular_file(reg_file_path, err_code) &&
-               access(reg_file_path, access_modes::WRITE, err_code);
+        return access(reg_file_path, access_modes::WRITE, file_type::REGULAR_FILE, err_code);
     }
-    
-    stringutils::strcpy(parnt_path, reg_file_path);
-    
-    if (!get_first_actual_directory(parnt_path, err_code))
+
+    stringutils::strcpy(parent_pth, reg_file_path);
+    stringutils::strdisclastif(parent_pth, '/');
+    last_char_p = stringutils::strcut(parent_pth, '/');
+    path_len = last_char_p == nullptr ? 0 : parent_pth - last_char_p + 1;
+
+    if (path_len == 0)
     {
-        return false;
+        parent_pth[0] = '.';
+        parent_pth[1] = '\0';
     }
-    
-    return access(parnt_path, access_modes::WRITE | access_modes::EXECUTE, err_code);
+
+    return access(parent_pth, access_modes::WRITE | access_modes::EXECUTE, err_code);
 }
 
 
-bool can_regular_file_be_created(const wchar_t* reg_file_path, std::error_code* err_code)
+bool can_regular_file_be_created(const wchar_t* reg_file_path, std::error_code* err_code) noexcept
 {
     char c_str[PATH_MAX] = {};
     if (!get_cstr_path_from_wstr(reg_file_path, c_str))
@@ -264,21 +262,31 @@ bool closedir(directory_entity* dir_ent, std::error_code* err_code) noexcept
 }
 
 
-bool file_exists(const char* fle_path, std::error_code* err_code) noexcept
+bool closedir(wdirectory_entity* dir_ent, std::error_code* err_code) noexcept
 {
-    return access(fle_path, access_modes::EXISTS, err_code);
-}
+    errno = 0;
+    bool succss = false;
 
-
-bool file_exists(const wchar_t* fle_path, std::error_code* err_code) noexcept
-{
-    char c_str[PATH_MAX] = {};
-    if (!get_cstr_path_from_wstr(fle_path, c_str))
+    if (dir_ent->ext != nullptr)
     {
-        return false;
+        if (::closedir(((directory_entity_extension*)dir_ent->ext)->dir) == -1)
+        {
+            assign_system_error_code(errno, err_code);
+        }
+        else
+        {
+            succss = true;
+        }
+
+        free(dir_ent->ext);
+        dir_ent->ext = nullptr;
+    }
+    else
+    {
+        assign_system_error_code(EINVAL, err_code);
     }
 
-    return file_exists(c_str, err_code);
+    return succss;
 }
 
 
@@ -287,14 +295,14 @@ bool get_cstr_path_from_wstr(
         char* c_str
 ) noexcept
 {
-    size_t len = wcstombs(nullptr, w_str, 0) + 1;
+    std::size_t len = wcstombs(nullptr, w_str, 0) + 1;
 
     if (len > PATH_MAX)
     {
         return false;
     }
 
-    return wcstombs(c_str, w_str, len) != static_cast<std::size_t>(-1);
+    return wcstombs(c_str, w_str, len) != (std::size_t)-1;
 }
 
 
@@ -314,7 +322,7 @@ bool get_first_actual_directory(char* pth, std::error_code* err_code) noexcept
     
     while (pth_len > 0)
     {
-        if (file_exists(pth, err_code) && is_directory(pth, err_code))
+        if (access(pth, access_modes::EXISTS, file_type::DIRECTORY, err_code))
         {
             return true;
         }
@@ -340,7 +348,7 @@ bool get_first_actual_directory(char* pth, std::error_code* err_code) noexcept
 }
 
 
-uint64_t get_file_inode(const char* fle_path, std::error_code* err_code) noexcept
+std::uint64_t get_file_inode(const char* fle_path, std::error_code* err_code) noexcept
 {
     struct ::stat stt;
     errno = 0;
@@ -355,7 +363,7 @@ uint64_t get_file_inode(const char* fle_path, std::error_code* err_code) noexcep
 }
 
 
-uint64_t get_file_inode(const wchar_t* fle_path, std::error_code* err_code) noexcept
+std::uint64_t get_file_inode(const wchar_t* fle_path, std::error_code* err_code) noexcept
 {
     char c_str[PATH_MAX] = {};
     if (!get_cstr_path_from_wstr(fle_path, c_str))
@@ -421,9 +429,25 @@ int get_file_gid(const wchar_t* fle_path, std::error_code* err_code) noexcept
 }
 
 
-const char* get_tmp_path() noexcept
+const char* get_temporal_path() noexcept
 {
     return "/tmp";
+}
+
+
+bool get_wstr_path_from_cstr(
+        const char* c_str,
+        wchar_t* w_str
+) noexcept
+{
+    size_t len = mbstowcs(nullptr, c_str, 0) + 1;
+
+    if (len > PATH_MAX)
+    {
+        return false;
+    }
+
+    return mbstowcs(w_str, c_str, len) != static_cast<std::size_t>(-1);
 }
 
 
@@ -719,7 +743,7 @@ bool mkdir_recursively(
     
     if (pth_len >= PATH_MAX ||
         pth_len == 0 ||
-        file_exists(dir_path))
+        access(dir_path, access_modes::EXISTS, err_code))
     {
         assign_system_error_code(EINVAL, err_code);
         return false;
@@ -747,7 +771,7 @@ bool mkdir_recursively(
         
         pth_len = stringutils::strlen(parnt_path);
         
-    } while (!file_exists(parnt_path, err_code) && pth_len > 0);
+    } while (!access(parnt_path, access_modes::EXISTS, err_code) && pth_len > 0);
     
     while (slash_pos_sz > 0)
     {
@@ -808,7 +832,7 @@ bool opendir(
 
 
 bool opendir(
-        directory_entity* dir_ent,
+        wdirectory_entity* dir_ent,
         const wchar_t* dir_pth,
         std::error_code* err_code
 ) noexcept
@@ -819,7 +843,22 @@ bool opendir(
         return false;
     }
 
-    return opendir(dir_ent, c_str, err_code);
+    dir_ent->ext = (directory_entity_extension*)malloc(sizeof(directory_entity_extension));
+    if (dir_ent->ext == nullptr)
+    {
+        assign_system_error_code(errno, err_code);
+        return false;
+    }
+
+    if ((((directory_entity_extension*)dir_ent->ext)->dir = ::opendir(c_str)) == nullptr)
+    {
+        assign_system_error_code(errno, err_code);
+        free(dir_ent->ext);
+        dir_ent->ext = nullptr;
+        return false;
+    }
+
+    return true;
 }
 
 
@@ -846,10 +885,35 @@ bool readdir(directory_entity* dir_ent, std::error_code* err_code) noexcept
 }
 
 
+bool readdir(wdirectory_entity* dir_ent, std::error_code* err_code) noexcept
+{
+    wchar_t w_str[PATH_MAX] = {};
+
+    errno = 0;
+    ((directory_entity_extension*)dir_ent->ext)->entry =
+            ::readdir(((directory_entity_extension*)dir_ent->ext)->dir);
+
+    if (((directory_entity_extension*)dir_ent->ext)->entry == nullptr)
+    {
+        if (errno != 0)
+        {
+            assign_system_error_code(errno, err_code);
+        }
+
+        return false;
+    }
+
+    dir_ent->ino = ((directory_entity_extension*)dir_ent->ext)->entry->d_ino;
+    get_wstr_path_from_cstr(((directory_entity_extension*)dir_ent->ext)->entry->d_name, w_str);
+    ((directory_entity_extension*)dir_ent->ext)->wpath = w_str;
+    dir_ent->nme = &w_str[0];
+
+    return true;
+}
+
+
 bool rmdir(const char* dir_path, std::error_code* err_code) noexcept
 {
-    errno = 0;
-    
     if (::rmdir(dir_path) == -1)
     {
         assign_system_error_code(errno, err_code);
@@ -922,6 +986,30 @@ bool touch(const wchar_t* regfle_path, std::uint32_t mods, std::error_code* err_
     }
 
     return touch(c_str, mods, err_code);
+}
+
+
+bool unlink(const char* reg_file_path, std::error_code* err_code) noexcept
+{
+    if (::unlink(reg_file_path) == -1)
+    {
+        assign_system_error_code(errno, err_code);
+        return false;
+    }
+
+    return true;
+}
+
+
+bool unlink(const wchar_t* reg_file_path, std::error_code* err_code) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(reg_file_path, c_str))
+    {
+        return false;
+    }
+
+    return unlink(c_str, err_code);
 }
 
 

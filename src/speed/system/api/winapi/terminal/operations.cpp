@@ -18,44 +18,46 @@
  */
 
 /**
- * @file        speed/system/api/glibc/terminal/operations.cpp
+ * @file        speed/system/api/winapi/terminal/operations.cpp
  * @brief       terminal operations source.
  * @author      Killian Valverde
  * @date        2017/10/18
  */
 
 #include "../../../compatibility/compatibility.hpp"
-#ifdef SPEED_GLIBC
+#ifdef SPEED_WINAPI
 
-#include <termios.h>
+#include <conio.h>
+#include <io.h>
+
 #include <cstring>
 
 #include "operations.hpp"
 
 
-namespace speed::system::api::glibc::terminal {
+namespace speed::system::api::winapi::terminal {
 
 
 bool flush_input_terminal(::FILE* input_strm, std::error_code* err_code) noexcept
 {
-    if (::tcflush(::fileno(input_strm), TCIFLUSH) == -1)
+    if (!::FlushConsoleInputBuffer((HANDLE)::_get_osfhandle(_fileno(input_strm))))
     {
-        assign_system_error_code(errno, err_code);
+        assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
-    
+
     return true;
 }
 
 
 bool flush_output_terminal(::FILE* output_strm, std::error_code* err_code) noexcept
 {
-    if (::tcflush(::fileno(output_strm), TCOFLUSH) == -1)
+    if (::fflush(output_strm))
     {
-        assign_system_error_code(errno, err_code);
+        assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
-    
+
     return true;
 }
 
@@ -66,42 +68,16 @@ bool kbhit(
         std::error_code* err_code
 ) noexcept
 {
-    ::termios oldt;
-    ::termios newt;
-    int stdout_fd;
-    int stdin_fd;
-    char buf;
-    
-    if ((stdout_fd = ::fileno(stdout)) == -1)
-    {
-        assign_generic_error_code(errno, err_code);
-        return false;
-    }
-    
-    if ((stdin_fd = ::fileno(stdin)) == -1)
-    {
-        assign_generic_error_code(errno, err_code);
-        return false;
-    }
-    
+    HANDLE input_handl;
+    INPUT_RECORD input_rec;
+    DWORD res;
+    DWORD event_red;
+
     if (mess != nullptr)
     {
-        if (::write(stdout_fd, mess, ::strlen(mess) * sizeof(char)) == -1)
-        {
-            assign_system_error_code(errno, err_code);
-            return false;
-        }
+        std::printf("%s", mess);
     }
-    
-    if (::tcgetattr(stdin_fd, &oldt) == -1)
-    {
-        assign_system_error_code(errno, err_code);
-        return false;
-    }
-    
-    newt = oldt;
-    newt.c_lflag &= ~(ICANON | ECHO);
-    
+
     if (flush_input_term)
     {
         if (!flush_input_terminal(stdin, err_code))
@@ -109,16 +85,24 @@ bool kbhit(
             return false;
         }
     }
-    
-    if (::tcsetattr(stdin_fd, TCSANOW, &newt) == -1 ||
-        ::read(stdin_fd, &buf, 1) == -1 ||
-        ::tcsetattr(stdin_fd, TCSANOW, &oldt) == -1)
+
+    if ((input_handl = ::GetStdHandle(STD_INPUT_HANDLE)) == INVALID_HANDLE_VALUE ||
+        (res = ::WaitForSingleObject(input_handl, INFINITE)) == WAIT_FAILED)
     {
-        assign_system_error_code(errno, err_code);
+        assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
-    
-    return true;
+
+    if (res == WAIT_OBJECT_0 &&
+        ReadConsoleInput(input_handl, &input_rec, 1, &event_red) &&
+        event_red == 1 &&
+        input_rec.EventType == KEY_EVENT &&
+        input_rec.Event.KeyEvent.bKeyDown)
+    {
+        return true;
+    }
+
+    return false;
 }
 
 
@@ -127,67 +111,80 @@ bool set_text_attribute(
         text_attribute txt_attribute
 ) noexcept
 {
-    int res = 0;
-    
+    DWORD mode;
+    WORD colr;
+    HANDLE console_handl = (HANDLE)_get_osfhandle(_fileno(terminal_strm));
+
+    if (console_handl == INVALID_HANDLE_VALUE || !console_handl ||
+        !GetConsoleMode(console_handl, &mode))
+    {
+        return false;
+    }
+
     switch (txt_attribute)
     {
     case text_attribute::DEFAULT:
-        res = ::fprintf(terminal_strm, "\033[0m");
+        colr = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
         break;
     case text_attribute::BLACK:
-        res = ::fprintf(terminal_strm, "\033[0;30m");
+        colr = 0;
         break;
     case text_attribute::RED:
-        res = ::fprintf(terminal_strm, "\033[0;31m");
+        colr = FOREGROUND_RED;
         break;
     case text_attribute::GREEN:
-        res = ::fprintf(terminal_strm, "\033[0;32m");
+        colr = FOREGROUND_GREEN;
         break;
     case text_attribute::BROWN:
-        res = ::fprintf(terminal_strm, "\033[0;33m");
+        colr = FOREGROUND_RED | FOREGROUND_GREEN;
         break;
     case text_attribute::BLUE:
-        res = ::fprintf(terminal_strm, "\033[0;34m");
+        colr = FOREGROUND_BLUE;
         break;
     case text_attribute::PURPLE:
-        res = ::fprintf(terminal_strm, "\033[0;35m");
+        colr = FOREGROUND_RED | FOREGROUND_BLUE;
         break;
     case text_attribute::CYAN:
-        res = ::fprintf(terminal_strm, "\033[0;36m");
+        colr = FOREGROUND_GREEN | FOREGROUND_BLUE;
         break;
     case text_attribute::LIGHT_GRAY:
-        res = ::fprintf(terminal_strm, "\033[0;37m");
+        colr = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
         break;
     case text_attribute::DARK_GRAY:
-        res = ::fprintf(terminal_strm, "\033[1;30m");
+        colr = FOREGROUND_INTENSITY;
         break;
     case text_attribute::LIGHT_RED:
-        res = ::fprintf(terminal_strm, "\033[1;31m");
+        colr = FOREGROUND_RED | FOREGROUND_INTENSITY;
         break;
     case text_attribute::LIGHT_GREEN:
-        res = ::fprintf(terminal_strm, "\033[1;32m");
+        colr = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
         break;
     case text_attribute::YELLOW:
-        res = ::fprintf(terminal_strm, "\033[1;33m");
+        colr = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
         break;
     case text_attribute::LIGHT_BLUE:
-        res = ::fprintf(terminal_strm, "\033[1;34m");
+        colr = FOREGROUND_BLUE | FOREGROUND_INTENSITY;
         break;
     case text_attribute::LIGHT_PURPLE:
-        res = ::fprintf(terminal_strm, "\033[1;35m");
+        colr = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
         break;
     case text_attribute::LIGHT_CYAN:
-        res = ::fprintf(terminal_strm, "\033[1;36m");
+        colr = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
         break;
     case text_attribute::WHITE:
-        res = ::fprintf(terminal_strm, "\033[1;37m");
+        colr = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
         break;
     case text_attribute::NIL:
     default:
-        break;
+        return true;
     }
-    
-    return (res >= 0);
+
+    if (!SetConsoleTextAttribute(console_handl, colr))
+    {
+        return false;
+    }
+
+    return true;
 }
 
 

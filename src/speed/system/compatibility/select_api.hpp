@@ -27,31 +27,12 @@
 #ifndef SPEED_SYSTEM_COMPATIBILITY_SELECT_API_HPP
 #define SPEED_SYSTEM_COMPATIBILITY_SELECT_API_HPP
 
-#ifdef __unix__
-#undef _XOPEN_SOURCE
-#define _XOPEN_SOURCE 700
-#include <unistd.h>
-#ifdef __linux__
-#include <linux/version.h>
-#endif
-#elif defined(_WIN32)
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-#include <windows.h>
-#endif
-
-/** @cond */
-#if defined(__GNU_LIBRARY__) || defined(__CYGWIN__)
-#define SPEED_GLIBC 1
-#elif defined(_WIN32)
-#define SPEED_WINAPI 1
-#endif
+#include "platform.hpp"
 
 #ifdef SPEED_GLIBC
 #define SPEED_API_PREFIX 1, ::speed::system::api::glibc
 #elif defined(SPEED_WINAPI)
-#define SPEED_API_PREFIX 0
+#define SPEED_API_PREFIX 1, ::speed::system::api::winapi
 #else
 #define SPEED_API_PREFIX 0
 #endif
@@ -66,7 +47,6 @@
 #define SPEED_CONCAT(a, b) SPEED_CONCAT_HELPER(a, b)
 #define SPEED_SELECT_API(a, b, ...) SPEED_CONCAT(SPEED_API_DEFINED_,\
         SPEED_IS_API_DEFINED(SPEED_API_PREFIX))(a, b, __VA_ARGS__)
-/** @endcond */
 
 
 #endif

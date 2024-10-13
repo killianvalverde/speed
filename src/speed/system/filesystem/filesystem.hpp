@@ -28,7 +28,7 @@
 #define SPEED_SYSTEM_FILESYSTEM_FILESYSTEM_HPP
 
 #include "access_modes.hpp"
-#include "directory_entity.hpp"
+#include "basic_directory_entity.hpp"
 #include "file_type.hpp"
 #include "operations.hpp"
 

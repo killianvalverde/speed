@@ -178,7 +178,7 @@ bool execute_command(
             argv[cur_argv] = nullptr;
             ::execvp(argv[0], (char**)&argv[1]);
             
-    alloc_fail:
+alloc_fail:
             for (std::size_t i = 0; i < max_argv; ++i)
             {
                 if (argv[i] != nullptr)
@@ -198,7 +198,6 @@ bool execute_command(
             int status;
             while (::waitpid(pid, &status, 0) == -1)
             {
-                // TODO: Is that a good idea ?
                 if (errno != EINTR)
                 {
                     assign_system_error_code(errno, err_code);
@@ -242,7 +241,6 @@ unsigned int get_gid() noexcept
 bool nanosleep(
         std::uint64_t sec,
         std::uint64_t nsec,
-        time_specification* rem_time,
         std::error_code* err_code
 ) noexcept
 {
@@ -252,22 +250,9 @@ bool nanosleep(
     tm.tv_sec = sec;
     tm.tv_nsec = nsec;
     
-    if (rem_time != nullptr)
-    {
-        rm_tm.tv_sec = rem_time->get_seconds();
-        rm_tm.tv_nsec = rem_time->get_nseconds();
-    }
-    
     if (::nanosleep(&tm, &rm_tm) == -1)
     {
         assign_system_error_code(errno, err_code);
-        
-        if (rem_time != nullptr)
-        {
-            rem_time->set_time_specfication((std::uint64_t)rm_tm.tv_sec, 
-                                            (std::uint64_t)rm_tm.tv_nsec);
-        }
-        
         return false;
     }
     

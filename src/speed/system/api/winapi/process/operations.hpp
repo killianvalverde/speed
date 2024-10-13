@@ -18,21 +18,27 @@
  */
 
 /**
- * @file        speed/system/process/operations.hpp
+ * @file        speed/system/api/winapi/process/operations.hpp
  * @brief       process operations header.
  * @author      Killian Valverde
  * @date        2017/01/08
  */
 
-#ifndef SPEED_SYSTEM_PROCESS_OPERATIONS_HPP
-#define SPEED_SYSTEM_PROCESS_OPERATIONS_HPP
+#ifndef SPEED_SYSTEM_API_WINAPI_PROCESS_OPERATIONS_HPP
+#define SPEED_SYSTEM_API_WINAPI_PROCESS_OPERATIONS_HPP
 
-#include "../api/api.hpp"
-#include "../compatibility/compatibility.hpp"
-#include "../time/time.hpp"
+#include "../../../compatibility/compatibility.hpp"
+#ifdef SPEED_WINAPI
+
+#include "../../../errors/errors.hpp"
+#include "../../../time/time_specification.hpp"
 
 
-namespace speed::system::process {
+namespace speed::system::api::winapi::process {
+
+
+using namespace speed::system::errors;
+using speed::system::time::time_specification;
 
 
 /**
@@ -42,54 +48,39 @@ namespace speed::system::process {
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool execute_command(
+bool execute_command(
         const char* cmd,
         int* ret_val = nullptr,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(process::execute_command, false, cmd, ret_val, err_code);
-}
+) noexcept;
 
 
 /**
  * @brief       Get the PID of the current process.
  * @return      The PID of the current process.
  */
-inline int get_pid() noexcept
-{
-    return SPEED_SELECT_API(process::get_pid, -1);
-}
+int get_pid() noexcept;
 
 
 /**
  * @brief       Get the PPID of the current process.
  * @return      The PPID of the current process.
  */
-inline int get_ppid() noexcept
-{
-    return SPEED_SELECT_API(process::get_ppid, -1);
-}
+int get_ppid() noexcept;
 
 
 /**
  * @brief       Get the UID of the current process.
  * @return      The UID of the current process.
  */
-inline unsigned int get_uid() noexcept
-{
-    return SPEED_SELECT_API(process::get_uid, -1);
-}
+unsigned int get_uid() noexcept;
 
 
 /**
  * @brief       Get the GID of the current process.
  * @return      The GID of the current process.
  */
-inline unsigned int get_gid() noexcept
-{
-    return SPEED_SELECT_API(process::get_gid, -1);
-}
+unsigned int get_gid() noexcept;
 
 
 /**
@@ -101,34 +92,15 @@ inline unsigned int get_gid() noexcept
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool nanosleep(
+bool nanosleep(
         std::uint64_t sec,
         std::uint64_t nsec,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(process::nanosleep, false, sec, nsec, err_code);
-}
-
-
-/**
- * @brief       Suspends  the  execution  of the calling thread until either at least the time
- *              specified has elapsed, or the delivery of a signal that triggers the invocation of a
- *              handler in the calling thread or that terminates the process.
- * @param       time_spec : The time to suspend the execution.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
- */
-inline bool nanosleep(
-        const speed::system::time::time_specification& time_spec,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return nanosleep(time_spec.get_seconds(), time_spec.get_nseconds(), err_code);
-}
+) noexcept;
 
 
 }
 
 
+#endif
 #endif

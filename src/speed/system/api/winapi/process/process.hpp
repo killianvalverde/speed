@@ -18,46 +18,32 @@
  */
 
 /**
- * @file        speed/system/system.hpp
- * @brief       system functions header.
+ * @file        speed/system/api/winapi/process/process.hpp
+ * @brief       winapi process main header.
  * @author      Killian Valverde
- * @date        2017/01/08
+ * @date        2023/10/31
  */
 
-#ifndef SPEED_SYSTEM_SYSTEM_HPP
-#define SPEED_SYSTEM_SYSTEM_HPP
+#ifndef SPEED_SYSTEM_API_WINAPI_PROCESS_PROCESS_HPP
+#define SPEED_SYSTEM_API_WINAPI_PROCESS_PROCESS_HPP
 
-#include "api/api.hpp"
-#include "compatibility/compatibility.hpp"
-#include "errors/errors.hpp"
-#include "exceptions/exceptions.hpp"
-#include "filesystem/filesystem.hpp"
-#include "process/process.hpp"
-#include "terminal/terminal.hpp"
-#include "time/time.hpp"
+#include "../../../compatibility/compatibility.hpp"
+#ifdef SPEED_WINAPI
+
+#include "operations.hpp"
 
 
-namespace speed {
+namespace speed::system::api::winapi {
 
-
-// TODO: Improve code from api::filesystem and api::process.
-/**
- * @brief       Contains resources for interact with the system.
- */
-namespace system {}
-
-
-#ifndef SPEED_DISABLE_ALIAS
 
 /**
- * @brief       Contains resources for interact with the system.
+ * @brief       Contains resources for process interactions.
  */
-namespace sys = system;
-
-#endif
+namespace process {}
 
 
 }
 
 
+#endif
 #endif

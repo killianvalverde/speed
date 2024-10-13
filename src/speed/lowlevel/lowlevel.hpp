@@ -28,7 +28,6 @@
 #define SPEED_LOWLEVEL_LOWLEVEL_HPP
 
 #include "enable_bitwise_operators.hpp"
-#include "exception.hpp"
 #include "operations.hpp"
 
 

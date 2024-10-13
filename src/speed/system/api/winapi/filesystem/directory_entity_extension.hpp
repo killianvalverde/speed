@@ -18,22 +18,20 @@
  */
 
 /**
- * @file        speed/system/api/glibc/filesystem/directory_entity_extension.hpp
+ * @file        speed/system/api/winapi/filesystem/directory_entity_extension.hpp
  * @brief       directory_entity_extension struct header.
  * @author      Killian Valverde
  * @date        2019/04/10
  */
 
-#ifndef SPEED_SYSTEM_API_GLIBC_FILESYSTEM_DIRECTORY_ENTITY_EXTENSION_HPP
-#define SPEED_SYSTEM_API_GLIBC_FILESYSTEM_DIRECTORY_ENTITY_EXTENSION_HPP
+#ifndef SPEED_SYSTEM_API_WINAPI_FILESYSTEM_DIRECTORY_ENTITY_EXTENSION_HPP
+#define SPEED_SYSTEM_API_WINAPI_FILESYSTEM_DIRECTORY_ENTITY_EXTENSION_HPP
 
 #include "../../../compatibility/compatibility.hpp"
-#ifdef SPEED_GLIBC
-
-#include <dirent.h>
+#ifdef SPEED_WINAPI
 
 
-namespace speed::system::api::glibc::filesystem {
+namespace speed::system::api::winapi::filesystem {
 
 
 /**
@@ -41,14 +39,36 @@ namespace speed::system::api::glibc::filesystem {
  */
 struct directory_entity_extension
 {
-    /** Directory iterator. */
-    DIR* dir;
-    
-    /** Direcotry entry. */
-    dirent* entry;
+    /** Path of the opened directory. */
+    std::string pth;
 
-    /** Wide string path. */
-    std::wstring wpath;
+    /** Directory handle. */
+    HANDLE dir_handl;
+
+    /** Directory data. */
+    WIN32_FIND_DATAA find_dat;
+
+    /** Indicates if a read has already been done. */
+    bool read_dne;
+};
+
+
+/**
+ * @brief       Struct that represents a directory entity extension.
+ */
+struct wdirectory_entity_extension
+{
+    /** Path of the opened directory. */
+    std::wstring pth;
+
+    /** Directory handle. */
+    HANDLE dir_handl;
+
+    /** Directory data. */
+    WIN32_FIND_DATAW find_dat;
+
+    /** Indicates if a read has already been done. */
+    bool read_dne;
 };
 
 

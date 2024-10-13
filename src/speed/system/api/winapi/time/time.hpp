@@ -18,38 +18,32 @@
  */
 
 /**
- * @file        speed/system/compatibility/types.hpp
- * @brief       system compatibility types main header.
+ * @file        speed/system/api/winapi/time/time.hpp
+ * @brief       winapi time main header.
  * @author      Killian Valverde
- * @date        2024/10/10
+ * @date        2023/10/31
  */
 
-#ifndef SPEED_SYSTEM_COMPATIBILITY_TYPES_HPP
-#define SPEED_SYSTEM_COMPATIBILITY_TYPES_HPP
+#ifndef SPEED_SYSTEM_API_WINAPI_TIME_TIME_HPP
+#define SPEED_SYSTEM_API_WINAPI_TIME_TIME_HPP
 
-#include "select_api.hpp"
+#include "../../../compatibility/compatibility.hpp"
+#ifdef SPEED_WINAPI
+
+#include "operations.hpp"
 
 
-namespace speed::system::compatibility {
+namespace speed::system::api::winapi {
 
 
-#ifdef SPEED_GLIBC
-
-using path_char = char;
-
-#elif defined(SPEED_WINAPI)
-
-#ifdef UNICODE
-using path_char = wchar_t;
-#else
-using path_char = char;
-
-#endif
-#else
-#endif
+/**
+ * @brief       Contains resources and facilities related to time manipulation.
+ */
+namespace time {}
 
 
 }
 
 
+#endif
 #endif

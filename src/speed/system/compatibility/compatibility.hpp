@@ -27,8 +27,8 @@
 #ifndef SPEED_SYSTEM_COMPATIBILITY_COMPATIBILITY_HPP
 #define SPEED_SYSTEM_COMPATIBILITY_COMPATIBILITY_HPP
 
+#include "platform.hpp"
 #include "select_api.hpp"
-#include "types.hpp"
 
 
 namespace speed::system {
@@ -46,16 +46,6 @@ namespace compatibility {}
  * @brief       Contains utilities for compile-time introspection and modification.
  */
 namespace compat = compatibility;
-
-#endif
-
-
-#ifndef SPEED_DISABLE_ALIAS
-
-/**
- * @brief       Contains utilities for compile-time introspection and modification.
- */
-namespace traits = type_traits;
 
 #endif
 

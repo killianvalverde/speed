@@ -137,16 +137,30 @@ set(SPEED_SYSTEM_SOURCE_FILES
         system/api/glibc/terminal/terminal.hpp
         system/api/glibc/time/time.hpp
         system/api/glibc/glibc.hpp
+        system/api/winapi/filesystem/directory_entity_extension.hpp
+        system/api/winapi/filesystem/operations.cpp
+        system/api/winapi/filesystem/operations.hpp
+        system/api/winapi/process/operations.cpp
+        system/api/winapi/process/operations.hpp
+        system/api/winapi/terminal/operations.cpp
+        system/api/winapi/terminal/operations.hpp
+        system/api/winapi/time/operations.cpp
+        system/api/winapi/time/operations.hpp
+        system/api/winapi/filesystem/filesystem.hpp
+        system/api/winapi/process/process.hpp
+        system/api/winapi/terminal/terminal.hpp
+        system/api/winapi/time/time.hpp
+        system/api/winapi/winapi.hpp
         system/api/api.hpp
         system/compatibility/compatibility.hpp
+        system/compatibility/platform.hpp
         system/compatibility/select_api.hpp
-        system/compatibility/types.hpp
         system/errors/errors.hpp
         system/errors/operations.hpp
         system/exceptions/exception.hpp
         system/exceptions/exceptions.hpp
         system/filesystem/access_modes.hpp
-        system/filesystem/directory_entity.hpp
+        system/filesystem/basic_directory_entity.hpp
         system/filesystem/file_type.hpp
         system/filesystem/filesystem.hpp
         system/filesystem/operations.hpp
@@ -155,7 +169,6 @@ set(SPEED_SYSTEM_SOURCE_FILES
         system/terminal/operations.hpp
         system/terminal/terminal.hpp
         system/terminal/text_attribute.hpp
-        system/time/operations.cpp
         system/time/operations.hpp
         system/time/time.hpp
         system/time/time_specification.cpp

@@ -18,19 +18,17 @@
  */
 
 /**
- * @file        speed/system/api/glibc/filesystem/operations.hpp
+ * @file        speed/system/api/winapi/filesystem/operations.hpp
  * @brief       filesystem operations header.
  * @author      Killian Valverde
  * @date        2017/05/26
  */
 
-#ifndef SPEED_SYSTEM_API_GLIBC_FILESYSTEM_OPERATIONS_HPP
-#define SPEED_SYSTEM_API_GLIBC_FILESYSTEM_OPERATIONS_HPP
+#ifndef SPEED_SYSTEM_API_WINAPI_FILESYSTEM_OPERATIONS_HPP
+#define SPEED_SYSTEM_API_WINAPI_FILESYSTEM_OPERATIONS_HPP
 
 #include "../../../compatibility/compatibility.hpp"
-#ifdef SPEED_GLIBC
-
-#include <dirent.h>
+#ifdef SPEED_WINAPI
 
 #include "../../../errors/errors.hpp"
 #include "../../../filesystem/access_modes.hpp"
@@ -38,7 +36,7 @@
 #include "../../../filesystem/file_type.hpp"
 
 
-namespace speed::system::api::glibc::filesystem {
+namespace speed::system::api::winapi::filesystem {
 
 
 using namespace speed::system::errors;
@@ -194,15 +192,14 @@ bool closedir(wdirectory_entity* dir_ent, std::error_code* err_code = nullptr) n
 
 
 /**
- * @brief       Set a c_str from a w_str path.
- * @param       w_str : w_str path.
- * @param       c_str : Buffer in which set the data. It is expected to be PATH_MAX size.
+ * @brief       Get through the first directory that exists in a specified path.
+ * @param       pth : Input and output argument, it is used to specify the path and to get the
+ *              result. The length of the string has to be at least 2 characters, otherwise it has
+ *              undefinied behaviour.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-static bool get_cstr_path_from_wstr(
-        const wchar_t* w_str,
-        char* c_str
-) noexcept;
+// static bool get_first_actual_directory(char* pth, std::error_code* err_code = nullptr) noexcept;
 
 
 /**
@@ -213,7 +210,10 @@ static bool get_cstr_path_from_wstr(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-static bool get_first_actual_directory(char* pth, std::error_code* err_code = nullptr) noexcept;
+// static bool get_first_actual_directory(
+//         wchar_t* pth,
+//         std::error_code* err_code = nullptr
+// ) noexcept;
 
 
 /**
@@ -223,7 +223,7 @@ static bool get_first_actual_directory(char* pth, std::error_code* err_code = nu
  * @return      On success the inode number of the sepcified file is returned, otherwise -1 is
  *              returned.
  */
-std::uint64_t get_file_inode(const char* fle_path, std::error_code* err_code = nullptr) noexcept;
+uint64_t get_file_inode(const char* fle_path, std::error_code* err_code = nullptr) noexcept;
 
 
 /**
@@ -233,7 +233,7 @@ std::uint64_t get_file_inode(const char* fle_path, std::error_code* err_code = n
  * @return      On success the inode number of the sepcified file is returned, otherwise -1 is
  *              returned.
  */
-std::uint64_t get_file_inode(const wchar_t* fle_path, std::error_code* err_code = nullptr) noexcept;
+uint64_t get_file_inode(const wchar_t* fle_path, std::error_code* err_code = nullptr) noexcept;
 
 
 /**
@@ -273,22 +273,10 @@ int get_file_gid(const wchar_t* fle_path, std::error_code* err_code = nullptr) n
 
 
 /**
- * @brief       Get the tmp system path.
- * @return      The tmp system path.
+ * @brief       Get a temporal path.
+ * @return      A temporal path.
  */
 const char* get_temporal_path() noexcept;
-
-
-/**
- * @brief       Set a c_str from a w_str path.
- * @param       c_str : str path.
- * @param       w_str : Buffer in which set the data. It is expected to be PATH_MAX size.
- * @return      If function was successful true is returned, otherwise false is returned.
- */
-static bool get_wstr_path_from_cstr(
-        const char* c_str,
-        wchar_t* w_str
-) noexcept;
 
 
 /**
@@ -568,13 +556,17 @@ bool rmdir(const wchar_t* dir_path, std::error_code* err_code = nullptr) noexcep
 
 
 /**
- * @brief       Creates a symbolic link named lnk_pth which contains the string trg.
- * @param       trg : The string to contain in the symlink.
- * @param       lnk_pth : The symbolilc link name.
+ * @brief       Creates a symbolic link named link_pth which contains the string target_pth.
+ * @param       target_pth : The string to contain in the symlink.
+ * @param       link_pth : The symbolilc link name.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-bool symlink(const char* trg, const char* lnk_pth, std::error_code* err_code = nullptr) noexcept;
+bool symlink(
+        const char* target_pth,
+        const char* link_pth,
+        std::error_code* err_code = nullptr
+) noexcept;
 
 
 /**
@@ -593,13 +585,13 @@ bool symlink(
 
 /**
  * @brief       Attempts to create a regular file.
- * @param       regfle_path : The path of the new regular file.
+ * @param       regular_file_pth : The path of the new regular file.
  * @param       mods : Specifies the mode for the new regular file.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 bool touch(
-        const char* regfle_path,
+        const char* regular_file_pth,
         std::uint32_t mods = 0755,
         std::error_code* err_code = nullptr
 ) noexcept;
