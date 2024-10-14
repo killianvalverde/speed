@@ -31,7 +31,7 @@
 #include <system_error>
 
 #include "../api/api.hpp"
-#include "../type_traits/type_traits.hpp"
+#include "../compatibility/compatibility.hpp"
 #include "time_specification.hpp"
 
 

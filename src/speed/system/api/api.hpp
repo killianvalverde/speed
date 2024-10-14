@@ -28,6 +28,7 @@
 #define SPEED_SYSTEM_API_API_HPP
 
 #include "glibc/glibc.hpp"
+#include "winapi/winapi.hpp"
 
 
 namespace speed::system {

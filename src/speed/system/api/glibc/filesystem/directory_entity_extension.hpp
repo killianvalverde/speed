@@ -27,7 +27,7 @@
 #ifndef SPEED_SYSTEM_API_GLIBC_FILESYSTEM_DIRECTORY_ENTITY_EXTENSION_HPP
 #define SPEED_SYSTEM_API_GLIBC_FILESYSTEM_DIRECTORY_ENTITY_EXTENSION_HPP
 
-#include "../../../type_traits/type_traits.hpp"
+#include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_GLIBC
 
 #include <dirent.h>
@@ -45,7 +45,10 @@ struct directory_entity_extension
     DIR* dir;
     
     /** Direcotry entry. */
-    struct dirent* entry;
+    dirent* entry;
+
+    /** Wide string path. */
+    std::wstring wpath;
 };
 
 

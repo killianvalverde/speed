@@ -27,10 +27,8 @@
 #ifndef SPEED_LOWLEVEL_LOWLEVEL_HPP
 #define SPEED_LOWLEVEL_LOWLEVEL_HPP
 
-#include "arithmetic_operations.hpp"
 #include "enable_bitwise_operators.hpp"
-#include "exception.hpp"
-#include "logical_operations.hpp"
+#include "operations.hpp"
 
 
 namespace speed {
@@ -40,6 +38,16 @@ namespace speed {
  * @brief       Constains lowlevel resources.
  */
 namespace lowlevel {}
+
+
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Constains lowlevel resources.
+ */
+namespace low = lowlevel;
+
+#endif
 
 
 }

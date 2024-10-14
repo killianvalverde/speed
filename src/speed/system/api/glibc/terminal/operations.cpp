@@ -24,7 +24,7 @@
  * @date        2017/10/18
  */
 
-#include "../../../type_traits/type_traits.hpp"
+#include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_GLIBC
 
 #include <termios.h>
@@ -36,9 +36,9 @@
 namespace speed::system::api::glibc::terminal {
 
 
-bool flush_input_terminal(int fd, std::error_code* err_code) noexcept
+bool flush_input_terminal(::FILE* input_strm, std::error_code* err_code) noexcept
 {
-    if (::tcflush(fd, TCIFLUSH) == -1)
+    if (::tcflush(::fileno(input_strm), TCIFLUSH) == -1)
     {
         assign_system_error_code(errno, err_code);
         return false;
@@ -48,9 +48,9 @@ bool flush_input_terminal(int fd, std::error_code* err_code) noexcept
 }
 
 
-bool flush_output_terminal(int fd, std::error_code* err_code) noexcept
+bool flush_output_terminal(::FILE* output_strm, std::error_code* err_code) noexcept
 {
-    if (::tcflush(fd, TCOFLUSH) == -1)
+    if (::tcflush(::fileno(output_strm), TCOFLUSH) == -1)
     {
         assign_system_error_code(errno, err_code);
         return false;
@@ -104,7 +104,7 @@ bool kbhit(
     
     if (flush_input_term)
     {
-        if (!flush_input_terminal(stdin_fd, err_code))
+        if (!flush_input_terminal(stdin, err_code))
         {
             return false;
         }
@@ -123,7 +123,7 @@ bool kbhit(
 
 
 bool set_text_attribute(
-        ::FILE* strm,
+        ::FILE* terminal_strm,
         text_attribute txt_attribute
 ) noexcept
 {
@@ -132,58 +132,58 @@ bool set_text_attribute(
     switch (txt_attribute)
     {
     case text_attribute::DEFAULT:
-        res = ::fprintf(strm, "\033[0m");
+        res = ::fprintf(terminal_strm, "\033[0m");
         break;
     case text_attribute::BLACK:
-        res = ::fprintf(strm, "\033[0;30m");
+        res = ::fprintf(terminal_strm, "\033[0;30m");
         break;
     case text_attribute::RED:
-        res = ::fprintf(strm, "\033[0;31m");
+        res = ::fprintf(terminal_strm, "\033[0;31m");
         break;
     case text_attribute::GREEN:
-        res = ::fprintf(strm, "\033[0;32m");
+        res = ::fprintf(terminal_strm, "\033[0;32m");
         break;
     case text_attribute::BROWN:
-        res = ::fprintf(strm, "\033[0;33m");
+        res = ::fprintf(terminal_strm, "\033[0;33m");
         break;
     case text_attribute::BLUE:
-        res = ::fprintf(strm, "\033[0;34m");
+        res = ::fprintf(terminal_strm, "\033[0;34m");
         break;
     case text_attribute::PURPLE:
-        res = ::fprintf(strm, "\033[0;35m");
+        res = ::fprintf(terminal_strm, "\033[0;35m");
         break;
     case text_attribute::CYAN:
-        res = ::fprintf(strm, "\033[0;36m");
+        res = ::fprintf(terminal_strm, "\033[0;36m");
         break;
     case text_attribute::LIGHT_GRAY:
-        res = ::fprintf(strm, "\033[0;37m");
+        res = ::fprintf(terminal_strm, "\033[0;37m");
         break;
     case text_attribute::DARK_GRAY:
-        res = ::fprintf(strm, "\033[1;30m");
+        res = ::fprintf(terminal_strm, "\033[1;30m");
         break;
     case text_attribute::LIGHT_RED:
-        res = ::fprintf(strm, "\033[1;31m");
+        res = ::fprintf(terminal_strm, "\033[1;31m");
         break;
     case text_attribute::LIGHT_GREEN:
-        res = ::fprintf(strm, "\033[1;32m");
+        res = ::fprintf(terminal_strm, "\033[1;32m");
         break;
     case text_attribute::YELLOW:
-        res = ::fprintf(strm, "\033[1;33m");
+        res = ::fprintf(terminal_strm, "\033[1;33m");
         break;
     case text_attribute::LIGHT_BLUE:
-        res = ::fprintf(strm, "\033[1;34m");
+        res = ::fprintf(terminal_strm, "\033[1;34m");
         break;
     case text_attribute::LIGHT_PURPLE:
-        res = ::fprintf(strm, "\033[1;35m");
+        res = ::fprintf(terminal_strm, "\033[1;35m");
         break;
     case text_attribute::LIGHT_CYAN:
-        res = ::fprintf(strm, "\033[1;36m");
+        res = ::fprintf(terminal_strm, "\033[1;36m");
         break;
     case text_attribute::WHITE:
-        res = ::fprintf(strm, "\033[1;37m");
+        res = ::fprintf(terminal_strm, "\033[1;37m");
         break;
-
     case text_attribute::NIL:
+    default:
         break;
     }
     

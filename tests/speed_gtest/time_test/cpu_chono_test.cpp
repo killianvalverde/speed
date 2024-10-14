@@ -45,159 +45,154 @@ TEST(time_cpu_chono, default_constructor)
 TEST(time_cpu_chono, start)
 {
     speed::time::cpu_chrono cpu_chrn;
-    std::size_t i;
+    speed::system::time::time_specification tme;
     
     ASSERT_TRUE(cpu_chrn.start());
-    
-    for (i = static_cast<std::size_t>(pow(10, 8)); i > 0; --i)
+
+    do
     {
-    }
-    auto tme = cpu_chrn.get_elapsed_raw_time();
+        tme = cpu_chrn.get_elapsed_raw_time();
+    } while(tme.is_null());
     
     ASSERT_TRUE(cpu_chrn.is(speed::time::cs_t::RUNNING));
     ASSERT_TRUE(!tme.is_null());
-    ASSERT_TRUE(i == 0);
 }
 
 
 TEST(time_cpu_chono, stop)
 {
     speed::time::cpu_chrono cpu_chrn;
-    std::size_t i;
-    
+    speed::system::time::time_specification tme_1;
+    speed::system::time::time_specification tme_2;
+
     ASSERT_TRUE(cpu_chrn.start());
-    
-    for (i = static_cast<std::size_t>(pow(10, 8)); i > 0; --i)
+
+    do
     {
-    }
+        tme_1 = cpu_chrn.get_elapsed_raw_time();
+    } while(tme_1.is_null());
     
     ASSERT_TRUE(cpu_chrn.stop());
     ASSERT_TRUE(cpu_chrn.is(speed::time::cs_t::STOPED));
-    
-    auto tme_1 = cpu_chrn.get_elapsed_raw_time();
-    
     ASSERT_TRUE(!tme_1.is_null());
-    
-    for (i = static_cast<std::size_t>(pow(10, 8)); i > 0; --i)
-    {
-    }
-    auto tme_2 = cpu_chrn.get_elapsed_raw_time();
-    
+
+    tme_1 = cpu_chrn.get_elapsed_raw_time();
+    tme_2 = cpu_chrn.get_elapsed_raw_time();
+
+    ASSERT_TRUE(!cpu_chrn.stop());
     ASSERT_TRUE(cpu_chrn.is(speed::time::cs_t::STOPED));
+    ASSERT_TRUE(!tme_2.is_null());
     ASSERT_TRUE(tme_1 == tme_2);
-    ASSERT_TRUE(i == 0);
 }
 
 
 TEST(time_cpu_chono, resume)
 {
     speed::time::cpu_chrono cpu_chrn;
-    std::size_t i;
-    
+    speed::system::time::time_specification tme_1;
+    speed::system::time::time_specification tme_2;
+    speed::system::time::time_specification tme_3;
+
     ASSERT_TRUE(cpu_chrn.start());
-    
-    for (i = static_cast<std::size_t>(pow(10, 8)); i > 0; --i)
+
+    do
     {
-    }
+        tme_1 = cpu_chrn.get_elapsed_raw_time();
+    } while(tme_1.is_null());
     
     ASSERT_TRUE(cpu_chrn.stop());
     ASSERT_TRUE(cpu_chrn.is(speed::time::cs_t::STOPED));
-    
-    auto tme_1 = cpu_chrn.get_elapsed_raw_time();
-    
     ASSERT_TRUE(!tme_1.is_null());
-    
-    for (i = static_cast<std::size_t>(pow(10, 8)); i > 0; --i)
-    {
-    }
-    auto tme_2 = cpu_chrn.get_elapsed_raw_time();
-    
+
+    tme_1 = cpu_chrn.get_elapsed_raw_time();
+    tme_2 = cpu_chrn.get_elapsed_raw_time();
+
     ASSERT_TRUE(cpu_chrn.is(speed::time::cs_t::STOPED));
     ASSERT_TRUE(tme_1 == tme_2);
-    
     ASSERT_TRUE(cpu_chrn.resume());
     
-    for (i = static_cast<std::size_t>(pow(10, 8)); i > 0; --i)
+    do
     {
-    }
-    auto tme_3 = cpu_chrn.get_elapsed_raw_time();
+        tme_3 = cpu_chrn.get_elapsed_raw_time();
+    } while(tme_3 == tme_1);
     
     ASSERT_TRUE(cpu_chrn.is(speed::time::cs_t::RUNNING));
     ASSERT_TRUE(tme_1 != tme_3);
-    ASSERT_TRUE(i == 0);
 }
 
 
 TEST(time_cpu_chono, restart)
 {
     speed::time::cpu_chrono cpu_chrn;
-    std::size_t i;
-    
+    speed::system::time::time_specification tme_1;
+    speed::system::time::time_specification tme_2;
+    speed::system::time::time_specification tme_3;
+
     ASSERT_TRUE(cpu_chrn.start());
-    
-    for (i = static_cast<std::size_t>(pow(10, 8)); i > 0; --i)
+
+    do
     {
-    }
+        tme_1 = cpu_chrn.get_elapsed_raw_time();
+    } while(tme_1.is_null());
     
     ASSERT_TRUE(cpu_chrn.stop());
     ASSERT_TRUE(cpu_chrn.is(speed::time::cs_t::STOPED));
-    
-    auto tme_1 = cpu_chrn.get_elapsed_raw_time();
-    
     ASSERT_TRUE(!tme_1.is_null());
-    
-    for (i = static_cast<std::size_t>(pow(10, 8)); i > 0; --i)
-    {
-    }
-    auto tme_2 = cpu_chrn.get_elapsed_raw_time();
+
+    tme_1 = cpu_chrn.get_elapsed_raw_time();
+    tme_2 = cpu_chrn.get_elapsed_raw_time();
     
     ASSERT_TRUE(cpu_chrn.is(speed::time::cs_t::STOPED));
     ASSERT_TRUE(tme_1 == tme_2);
     
     ASSERT_TRUE(cpu_chrn.restart());
-    
-    for (i = static_cast<std::size_t>(pow(10, 8)); i > 0; --i)
+
+    do
     {
-    }
-    auto tme_3 = cpu_chrn.get_elapsed_raw_time();
+        tme_3 = cpu_chrn.get_elapsed_raw_time();
+    } while(tme_3.is_null());
     
     ASSERT_TRUE(cpu_chrn.is(speed::time::cs_t::RUNNING));
     ASSERT_TRUE(!tme_3.is_null());
-    ASSERT_TRUE(i == 0);
 }
 
 
 TEST(time_cpu_chono, get_elapsed_time)
 {
     speed::time::cpu_chrono cpu_chrn;
-    std::size_t i;
-    
+    long double tme_1;
+    long double tme_2;
+
     ASSERT_TRUE(cpu_chrn.start());
-    
-    auto tme_1 = cpu_chrn.get_elapsed_time();
-    for (i = static_cast<std::size_t>(pow(10, 8)); i > 0; --i)
+
+    do
     {
-    }
-    auto tme_2 = cpu_chrn.get_elapsed_time();
+        tme_1 = cpu_chrn.get_elapsed_time();
+    } while(tme_1 == 0.0L);
+
+    do
+    {
+        tme_2 = cpu_chrn.get_elapsed_time();
+    } while(tme_2 == tme_1);
     
     ASSERT_TRUE(tme_1 != tme_2);
-    ASSERT_TRUE(i == 0);
 }
 
 
 TEST(time_cpu_chono, get_elapsed_raw_time)
 {
     speed::time::cpu_chrono cpu_chrn;
-    std::size_t i;
+    speed::system::time::time_specification tme_1;
+    speed::system::time::time_specification tme_2;
     
     ASSERT_TRUE(cpu_chrn.start());
     
-    auto tme_1 = cpu_chrn.get_elapsed_raw_time();
-    for (i = static_cast<std::size_t>(pow(10, 8)); i > 0; --i)
+    tme_1 = cpu_chrn.get_elapsed_raw_time();
+
+    do
     {
-    }
-    auto tme_2 = cpu_chrn.get_elapsed_raw_time();
+        tme_2 = cpu_chrn.get_elapsed_raw_time();
+    } while(tme_2 == tme_1);
     
     ASSERT_TRUE(tme_1 != tme_2);
-    ASSERT_TRUE(i == 0);
 }

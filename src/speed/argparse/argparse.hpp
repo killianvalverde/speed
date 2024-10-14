@@ -39,6 +39,16 @@ namespace speed {
 namespace argparse {}
 
 
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contians all argument parser resources.
+ */
+namespace ap = argparse;
+
+#endif
+
+
 }
 
 

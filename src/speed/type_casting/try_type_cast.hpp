@@ -47,6 +47,13 @@ namespace speed::type_casting {
 namespace __private {
 
 
+/**
+ * @brief       Tries to convert a c_string into an unsigned inegral.
+ * @param       arg : The value to convert.
+ * @param       res : The result of the operation if it was successful.
+ * @param       err_code : If function fails it holds the error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
 template<typename TpTarget, typename TpSource>
 std::enable_if_t<
         speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
@@ -129,6 +136,13 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 }
 
 
+/**
+ * @brief       Tries to convert a c_string into a signed inegral.
+ * @param       arg : The value to convert.
+ * @param       res : The result of the operation if it was successful.
+ * @param       err_code : If function fails it holds the error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
 template<typename TpTarget, typename TpSource>
 std::enable_if_t<
         speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
@@ -227,6 +241,13 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 
 
 // TODO: The conditions for the generation are kinda weird.
+/**
+ * @brief       Tries to convert a c_string into a float.
+ * @param       arg : The value to convert.
+ * @param       res : The result of the operation if it was successful.
+ * @param       err_code : If function fails it holds the error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
 template<typename TpTarget, typename TpSource>
 std::enable_if_t<
         speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
@@ -280,6 +301,13 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 }
 
 
+/**
+ * @brief       Tries to convert a c_string into a double.
+ * @param       arg : The value to convert.
+ * @param       res : The result of the operation if it was successful.
+ * @param       err_code : If function fails it holds the error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
 template<typename TpTarget, typename TpSource>
 std::enable_if_t<
         speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
@@ -333,6 +361,13 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 }
 
 
+/**
+ * @brief       Tries to convert a c_string into a long double.
+ * @param       arg : The value to convert.
+ * @param       res : The result of the operation if it was successful.
+ * @param       err_code : If function fails it holds the error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
 template<typename TpTarget, typename TpSource>
 std::enable_if_t<
         speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
@@ -386,10 +421,17 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 }
 
 
+/**
+ * @brief       Tries to convert a c_string into a string.
+ * @param       arg : The value to convert.
+ * @param       res : The result of the operation if it was successful.
+ * @param       err_code : If function fails it holds the error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
 template<typename TpTarget, typename TpSource>
 std::enable_if_t<
-        speed::type_traits::is_basic_string<TpTarget>::value &&
-                speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value,
+        speed::type_traits::is_string<TpTarget>::value &&
+                speed::type_traits::is_char_pointer<std::decay_t<TpSource>>::value,
         bool
 >
 __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) noexcept
@@ -411,6 +453,135 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 }
 
 
+/**
+ * @brief       Tries to convert a c_string into a wstring.
+ * @param       arg : The value to convert.
+ * @param       res : The result of the operation if it was successful.
+ * @param       err_code : If function fails it holds the error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+template<typename TpTarget, typename TpSource>
+std::enable_if_t<
+        speed::type_traits::is_wstring<TpTarget>::value &&
+                speed::type_traits::is_char_pointer<std::decay_t<TpSource>>::value,
+        bool
+>
+__try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) noexcept
+{
+    try
+    {
+        std::mbstate_t state = std::mbstate_t();
+        std::decay_t<std::add_const_t<TpSource>> src = arg;
+        std::size_t len = std::mbsrtowcs(nullptr, &src, 0, &state);
+
+        if (len == static_cast<std::size_t>(-1))
+        {
+            assign_type_casting_error_code(
+                    static_cast<int>(error_codes::RANGE_ERROR),
+                    err_code);
+
+            return false;
+        }
+
+        res->resize(len);
+        std::mbsrtowcs(&(*res)[0], &src, len + 1, &state);
+        return true;
+    }
+    catch (...)
+    {
+        assign_type_casting_error_code(
+                static_cast<int>(error_codes::RANGE_ERROR),
+                err_code);
+
+        return false;
+    }
+}
+
+
+/**
+ * @brief       Tries to convert a w_string into a wstring.
+ * @param       arg : The value to convert.
+ * @param       res : The result of the operation if it was successful.
+ * @param       err_code : If function fails it holds the error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+template<typename TpTarget, typename TpSource>
+std::enable_if_t<
+        speed::type_traits::is_wstring<TpTarget>::value &&
+                speed::type_traits::is_wchar_pointer<std::decay_t<TpSource>>::value,
+        bool
+>
+__try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) noexcept
+{
+    try
+    {
+        std::size_t len = speed::stringutils::strlen(arg);
+        res->assign(arg, arg + len);
+        return true;
+    }
+    catch (...)
+    {
+        assign_type_casting_error_code(
+                static_cast<int>(error_codes::OTHER),
+                err_code);
+    }
+
+    return false;
+}
+
+
+/**
+ * @brief       Tries to convert a w_string into a string.
+ * @param       arg : The value to convert.
+ * @param       res : The result of the operation if it was successful.
+ * @param       err_code : If function fails it holds the error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+template<typename TpTarget, typename TpSource>
+std::enable_if_t<
+        speed::type_traits::is_string<TpTarget>::value &&
+                speed::type_traits::is_wchar_pointer<std::decay_t<TpSource>>::value,
+        bool
+>
+__try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) noexcept
+{
+    try
+    {
+        std::mbstate_t state = std::mbstate_t();
+        std::decay_t<std::add_const_t<TpSource>> src = arg;
+        std::size_t len = std::wcsrtombs(nullptr, &src, 0, &state);
+
+        if (len == static_cast<std::size_t>(-1))
+        {
+            assign_type_casting_error_code(
+                    static_cast<int>(error_codes::RANGE_ERROR),
+                    err_code);
+
+            return false;
+        }
+
+        res->resize(len);
+        std::wcsrtombs(&(*res)[0], &src, len + 1, &state);
+        return true;
+    }
+    catch (...)
+    {
+        assign_type_casting_error_code(
+                static_cast<int>(error_codes::RANGE_ERROR),
+                err_code);
+
+        return false;
+    }
+}
+
+
+/**
+ * @brief       Tries to convert a c_string into a basic_regex.
+ * @param       arg : The value to convert.
+ * @param       res : The result of the operation if it was successful.
+ * @param       err_code : If function fails it holds the error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
 template<typename TpTarget, typename TpSource>
 std::enable_if_t<
         speed::type_traits::is_basic_regex<TpTarget>::value &&
@@ -436,6 +607,13 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 }
 
 
+/**
+ * @brief       Tries to convert a c_string into a path.
+ * @param       arg : The value to convert.
+ * @param       res : The result of the operation if it was successful.
+ * @param       err_code : If function fails it holds the error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
 template<typename TpTarget, typename TpSource>
 std::enable_if_t<
         speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
@@ -460,6 +638,13 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 }
 
 
+/**
+ * @brief       Tries to convert a c_string into a valid_path.
+ * @param       arg : The value to convert.
+ * @param       res : The result of the operation if it was successful.
+ * @param       err_code : If function fails it holds the error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
 template<typename TpTarget, typename TpSource>
 std::enable_if_t<
         speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
@@ -484,6 +669,13 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 }
 
 
+/**
+ * @brief       Tries to convert a basic_string into a type.
+ * @param       arg : The value to convert.
+ * @param       res : The result of the operation if it was successful.
+ * @param       err_code : If function fails it holds the error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
 template<typename TpTarget, typename TpChar, typename TpCharTraits, typename TpCharAlloc>
 inline bool __try_type_cast(
         const std::basic_string<TpChar, TpCharTraits, TpCharAlloc>& arg,
@@ -500,7 +692,7 @@ inline bool __try_type_cast(
 
 
 /**
- * @brief       Try to convert the source to the target.
+ * @brief       Tries to convert the source into the target.
  * @param       arg : The value to convert.
  * @param       res : The result of the operation if it was successful.
  * @param       err_code : If function fails it holds the error code.

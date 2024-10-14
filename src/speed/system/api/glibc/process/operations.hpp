@@ -27,7 +27,7 @@
 #ifndef SPEED_SYSTEM_API_GLIBC_PROCESS_OPERATIONS_HPP
 #define SPEED_SYSTEM_API_GLIBC_PROCESS_OPERATIONS_HPP
 
-#include "../../../type_traits/type_traits.hpp"
+#include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_GLIBC
 
 #include <sys/stat.h>
@@ -94,14 +94,12 @@ unsigned int get_gid() noexcept;
  *              handler in the calling thread or that terminates the process.
  * @param       sec : The number of seconds.
  * @param       nsec : The number of nano seconds.
- * @param       rem_time : The remaining time if the function was interrupted.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 bool nanosleep(
         std::uint64_t sec,
         std::uint64_t nsec,
-        time_specification* rem_time = nullptr,
         std::error_code* err_code = nullptr
 ) noexcept;
 

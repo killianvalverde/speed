@@ -51,7 +51,7 @@ class basic_key_arg : public virtual basic_base_arg<TpAllocator>
 public:
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** String type used in the class. */
     using string_type = std::basic_string<char, std::char_traits<char>, allocator_type<char>>;
@@ -78,12 +78,13 @@ public:
     explicit basic_key_arg(arg_parser_type* arg_parsr, Ts_&&... kys)
             : base_arg_type(arg_parsr)
             , kys_()
+            , sub_arg_parsr_(nullptr)
             , short_kys_len_(0)
             , long_kys_len_(0)
     {
         base_arg_type::set_flags(arg_flags::DEFAULT_KEY_ARG_FLAGS);
 
-        int foreach[sizeof...(Ts_)] = { (
+        int foreach[sizeof...(Ts_) + 1] = { (
                 kys_.push_back({std::forward<Ts_>(kys), arg_parsr}), 0)... };
 
         if (kys_.empty())
@@ -101,11 +102,11 @@ public:
 
             if (ky.is_prefix_long())
             {
-                speed::lowlevel::try_addml(&long_kys_len_, ky.get_string_length(), 2);
+                speed::safety::try_addml(&long_kys_len_, ky.get_string_length(), 2);
             }
             else
             {
-                speed::lowlevel::try_addml(&short_kys_len_, ky.get_string_length(), 2);
+                speed::safety::try_addml(&short_kys_len_, ky.get_string_length(), 2);
             }
         }
 
@@ -155,6 +156,28 @@ public:
     }
 
     /**
+     * @brief       Parse the arg key arg sub parser.
+     * @param       argc : Reference to the number of arguments found in the program call.
+     * @param       argv : Arguments found in the program call.
+     * @param       cur_idx : The current index checked in argv.
+     * @param       pos_increment : How much the index will be increased afther the parsing.
+     */
+    template<typename TpArgc_, typename TpArgv_>
+    void parse_sub_arg_parser(
+            const TpArgc_& argc,
+            const TpArgv_& argv,
+            std::size_t cur_idx,
+            std::size_t* pos_increment
+    )
+    {
+        if (sub_arg_parsr_ != nullptr)
+        {
+            sub_arg_parsr_->parse_args(argc - cur_idx, &argv[cur_idx]);
+            *pos_increment = argc - cur_idx;
+        }
+    }
+
+    /**
      * @brief       Function to call when prefixes change in the argument parser in order to update
      *              the short and long keys total length.
      */
@@ -169,11 +192,11 @@ public:
 
             if (ky.is_prefix_long())
             {
-                speed::lowlevel::try_addml(&long_kys_len_, ky.get_string_length(), 2);
+                speed::safety::try_addml(&long_kys_len_, ky.get_string_length(), 2);
             }
             else
             {
-                speed::lowlevel::try_addml(&short_kys_len_, ky.get_string_length(), 2);
+                speed::safety::try_addml(&short_kys_len_, ky.get_string_length(), 2);
             }
         }
     }
@@ -227,6 +250,15 @@ public:
         }
 
         return short_kys_len_;
+    }
+
+    /**
+     * @brief       Set a sub argument parser.
+     * @param       sub_arg_parsr : Sub arguement parser.
+     */
+    inline void set_sub_arg_parser(arg_parser_type* sub_arg_parsr) noexcept
+    {
+        sub_arg_parsr_ = sub_arg_parsr;
     }
 
     /**
@@ -286,7 +318,7 @@ public:
         if (n_args_printd < kys_.size() && n_args_printd > 0)
         {
             std::cout << ", ";
-            speed::lowlevel::try_addm(&current_ky_len, 2);
+            speed::safety::try_addm(&current_ky_len, 2);
         }
         
         if (current_ky_len < short_kys_len)
@@ -310,8 +342,8 @@ public:
             }
         }
     
-        speed::lowlevel::try_addml(&args_indent, short_kys_len, long_kys_len);
-        speed::lowlevel::try_addm(&new_line_indent, args_indent);
+        speed::safety::try_addml(&args_indent, short_kys_len, long_kys_len);
+        speed::safety::try_addm(&new_line_indent, args_indent);
         
         base_arg_type::print_help_text(args_indent, max_line_len, new_line_indent);
     }
@@ -336,15 +368,15 @@ public:
                 if (*nr_args_printd > 0)
                 {
                     std::cout << ", " << ky.get_string();
-                    speed::lowlevel::try_addml(cur_ky_len, ky.get_string_length(), 2);
+                    speed::safety::try_addml(cur_ky_len, ky.get_string_length(), 2);
                 }
                 else
                 {
                     std::cout << ky.get_string();
-                    speed::lowlevel::try_addm(cur_ky_len, ky.get_string_length());
+                    speed::safety::try_addm(cur_ky_len, ky.get_string_length());
                 }
     
-                speed::lowlevel::try_addm(nr_args_printd, 1);
+                speed::safety::try_addm(nr_args_printd, 1);
             }
         }
     }
@@ -352,6 +384,9 @@ public:
 private:
     /** Argument keys collection. */
     vector_type<arg_key_type> kys_;
+
+    /** Reference to the argument parser that holds this object. */
+    arg_parser_type* sub_arg_parsr_;
 
     /** The total short keys length. */
     std::size_t short_kys_len_;

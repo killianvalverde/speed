@@ -19,7 +19,7 @@
 
 /**
  * @file        speed/type_casting/type_casting.hpp
- * @brief       type_traits main header.
+ * @brief       compatibility main header.
  * @author      Killian Valverde
  * @date        2016/08/05
  */
@@ -43,6 +43,16 @@ namespace speed {
  * @brief       Contains utilities for type casting.
  */
 namespace type_casting {}
+
+
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contains utilities for type casting.
+ */
+namespace cast = type_casting;
+
+#endif
 
 
 }

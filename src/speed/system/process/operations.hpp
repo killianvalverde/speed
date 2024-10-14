@@ -28,8 +28,8 @@
 #define SPEED_SYSTEM_PROCESS_OPERATIONS_HPP
 
 #include "../api/api.hpp"
+#include "../compatibility/compatibility.hpp"
 #include "../time/time.hpp"
-#include "../type_traits/type_traits.hpp"
 
 
 namespace speed::system::process {
@@ -98,18 +98,16 @@ inline unsigned int get_gid() noexcept
  *              handler in the calling thread or that terminates the process.
  * @param       sec : The number of seconds.
  * @param       nsec : The number of nano seconds.
- * @param       rem_time : The remaining time if the function was interrupted.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 inline bool nanosleep(
         std::uint64_t sec,
         std::uint64_t nsec,
-        speed::system::time::time_specification* rem_time = nullptr,
         std::error_code* err_code = nullptr
 ) noexcept
 {
-    return SPEED_SELECT_API(process::nanosleep, false, sec, nsec, rem_time, err_code);
+    return SPEED_SELECT_API(process::nanosleep, false, sec, nsec, err_code);
 }
 
 
@@ -118,17 +116,15 @@ inline bool nanosleep(
  *              specified has elapsed, or the delivery of a signal that triggers the invocation of a
  *              handler in the calling thread or that terminates the process.
  * @param       time_spec : The time to suspend the execution.
- * @param       rem_time : The remaining time if the function was interrupted.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 inline bool nanosleep(
         const speed::system::time::time_specification& time_spec,
-        speed::system::time::time_specification* rem_time = nullptr,
         std::error_code* err_code = nullptr
 ) noexcept
 {
-    return nanosleep(time_spec.get_seconds(), time_spec.get_nseconds(), rem_time, err_code);
+    return nanosleep(time_spec.get_seconds(), time_spec.get_nseconds(), err_code);
 }
 
 

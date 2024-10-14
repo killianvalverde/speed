@@ -28,22 +28,33 @@
 #define SPEED_SYSTEM_SYSTEM_HPP
 
 #include "api/api.hpp"
+#include "compatibility/compatibility.hpp"
 #include "errors/errors.hpp"
 #include "exceptions/exceptions.hpp"
 #include "filesystem/filesystem.hpp"
 #include "process/process.hpp"
 #include "terminal/terminal.hpp"
 #include "time/time.hpp"
-#include "type_traits/type_traits.hpp"
 
 
 namespace speed {
 
 
+// TODO: Improve code from api::filesystem and api::process.
 /**
  * @brief       Contains resources for interact with the system.
  */
 namespace system {}
+
+
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contains resources for interact with the system.
+ */
+namespace sys = system;
+
+#endif
 
 
 }

@@ -27,6 +27,7 @@
 #ifndef SPEED_CONTAINERS_CIRCULAR_DOUBLY_LINKED_LIST_HPP
 #define SPEED_CONTAINERS_CIRCULAR_DOUBLY_LINKED_LIST_HPP
 
+#include "../memory/memory.hpp"
 #include "doubly_linked_node.hpp"
 #include "exception.hpp"
 #include "iterator_base.hpp"
@@ -47,7 +48,7 @@ public:
     
     /** The allocator type. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
     
     /** The node type. */
     using node_type = doubly_linked_node<value_type>;
@@ -445,8 +446,8 @@ public:
     template<typename TpValue_>
     void push_front(TpValue_&& val)
     {
-        node_type* trg = alloctr_.allocate(1);
-        alloctr_.construct(trg, std::forward<TpValue_>(val));
+        node_type* trg;
+        speed::memory::allocate_and_construct(alloctr_, trg, std::forward<TpValue_>(val));
         
         insert_before_node(trg, fir_);
         fir_ = fir_->prev_;
@@ -466,8 +467,7 @@ public:
 
         erase_node(trg);
 
-        alloctr_.destroy(trg);
-        alloctr_.deallocate(trg, 1);
+        speed::memory::destruct_and_deallocate(alloctr_, trg);
     }
     
     /**
@@ -477,8 +477,8 @@ public:
     template<typename TpValue_>
     void push_back(TpValue_&& val)
     {
-        node_type* trg = alloctr_.allocate(1);
-        alloctr_.construct(trg, std::forward<TpValue_>(val));
+        node_type* trg;
+        speed::memory::allocate_and_construct(alloctr_, trg, std::forward<TpValue_>(val));
     
         insert_before_node(trg, fir_);
     }
@@ -497,8 +497,7 @@ public:
 
         erase_node(trg);
 
-        alloctr_.destroy(trg);
-        alloctr_.deallocate(trg, 1);
+        speed::memory::destruct_and_deallocate(alloctr_, trg);
     }
     
     /**
@@ -509,8 +508,8 @@ public:
     template<typename TpValue_>
     void insert_before(const_iterator& pos, TpValue_&& val)
     {
-        node_type* trg = alloctr_.allocate(1);
-        alloctr_.construct(trg, std::forward<TpValue_>(val));
+        node_type* trg;
+        speed::memory::allocate_and_construct(alloctr_, trg, std::forward<TpValue_>(val));
     
         insert_before_iterator(trg, pos);
         
@@ -529,8 +528,8 @@ public:
     template<typename TpValue_>
     void insert_after(const_iterator& pos, TpValue_&& val)
     {
-        node_type* trg = alloctr_.allocate(1);
-        alloctr_.construct(trg, std::forward<TpValue_>(val));
+        node_type* trg;
+        speed::memory::allocate_and_construct(alloctr_, trg, std::forward<TpValue_>(val));
         
         insert_after_iterator(trg, pos);
     }
@@ -550,8 +549,7 @@ public:
 
         erase_before_iterator(pos);
 
-        alloctr_.destroy(trg);
-        alloctr_.deallocate(trg, 1);
+        speed::memory::destruct_and_deallocate(alloctr_, trg);
     }
     
     /**
@@ -569,8 +567,7 @@ public:
     
         erase_after_iterator(pos);
 
-        alloctr_.destroy(trg);
-        alloctr_.deallocate(trg, 1);
+        speed::memory::destruct_and_deallocate(alloctr_, trg);
     }
     
     /**
@@ -588,8 +585,7 @@ public:
 
         erase_iterator_and_move_backward(pos);
 
-        alloctr_.destroy(trg);
-        alloctr_.deallocate(trg, 1);
+        speed::memory::destruct_and_deallocate(alloctr_, trg);
     }
     
     /**
@@ -607,8 +603,7 @@ public:
     
         erase_iterator_and_move_forward(pos);
 
-        alloctr_.destroy(trg);
-        alloctr_.deallocate(trg, 1);
+        speed::memory::destruct_and_deallocate(alloctr_, trg);
     }
     
     /**
@@ -625,10 +620,8 @@ public:
             {
                 cur = fir_;
                 fir_ = fir_->nxt_;
-            
-                alloctr_.destroy(cur);
-                alloctr_.deallocate(cur, 1);
-            
+                speed::memory::destruct_and_deallocate(alloctr_, cur);
+
             } while (fir_ != end);
             
             fir_ = nullptr;

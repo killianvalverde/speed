@@ -30,7 +30,7 @@
 #include <cstdio>
 #include <iostream>
 
-#include "../type_traits/type_traits.hpp"
+#include "../compatibility/compatibility.hpp"
 #include "text_attribute.hpp"
 
 
@@ -39,25 +39,25 @@ namespace speed::system::terminal {
 
 /**
  * @brief       Flush the input terminal buffer.
- * @param       fd : The file descriptor terminal.
+ * @param       input_strm : Terminal input stream.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool flush_input_terminal(int fd, std::error_code* err_code = nullptr) noexcept
+inline bool flush_input_terminal(::FILE* input_strm, std::error_code* err_code = nullptr) noexcept
 {
-    return SPEED_SELECT_API(terminal::flush_input_terminal, false, fd, err_code);
+    return SPEED_SELECT_API(terminal::flush_input_terminal, false, input_strm, err_code);
 }
 
 
 /**
- * @brief       Flush the input terminal buffer.
- * @param       fd : The file descriptor terminal.
+ * @brief       Flush the output terminal buffer.
+ * @param       output_strm : Terminal output stream.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool flush_output_terminal(int fd, std::error_code* err_code = nullptr) noexcept
+inline bool flush_output_terminal(::FILE* output_strm, std::error_code* err_code = nullptr) noexcept
 {
-    return SPEED_SELECT_API(terminal::flush_output_terminal, false, fd, err_code);
+    return SPEED_SELECT_API(terminal::flush_output_terminal, false, output_strm, err_code);
 }
 
 
@@ -82,32 +82,16 @@ inline bool kbhit(
 
 /**
  * @brief       Set a terminal text attribute.
- * @param       strm : Stream in which set the attribute.
+ * @param       terminal_strm : Terminal stream in which set the attribute.
  * @param       txt_attribute : Attribute to set.
  * @return      If function was successful 0 is returned, otherwise -1 is returned.
  */
 inline bool set_text_attribute(
-        ::FILE* strm,
+        ::FILE* terminal_strm,
         text_attribute txt_attribute
 ) noexcept
 {
-    return SPEED_SELECT_API(terminal::set_text_attribute, false, strm, txt_attribute);
-}
-
-
-/**
- * @brief       Set a terminal text attribute.
- * @param       os : Ostream in which set the attribute.
- * @param       txt_attribute : Attribute to set.
- * @return      If function was successful 0 is returned, otherwise -1 is returned.
- */
-template<typename TpChar, typename TpCharTraits>
-bool set_text_attribute(
-        std::basic_ostream<TpChar, TpCharTraits>& os,
-        text_attribute txt_attribute
-)
-{
-    return SPEED_SELECT_API(terminal::set_text_attribute, false, os, txt_attribute);
+    return SPEED_SELECT_API(terminal::set_text_attribute, false, terminal_strm, txt_attribute);
 }
 
 

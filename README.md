@@ -25,10 +25,10 @@ resources.
 ## Requirements
 
 In order to compile this software you have to use a C++ revision equal or highter to C++17 
-(ISO/IEC 14882:2017). Additionally, you must have the following tools and libraries, each with a 
+(ISO/IEC 14882:2020). Additionally, you must have the following tools and libraries, each with a 
 version that is equal to or higher than the specified ones:
-- GCC 8.3.0
-- CMake 3.15
+- GCC 11.4.0
+- CMake 3.22
 
 ## Build & Install
 

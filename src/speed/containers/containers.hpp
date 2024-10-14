@@ -44,6 +44,16 @@ namespace speed {
 namespace containers {}
 
 
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contians definitions of containers.
+ */
+namespace contain = containers;
+
+#endif
+
+
 }
 
 

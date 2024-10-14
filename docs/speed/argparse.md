@@ -80,9 +80,7 @@ ap.add_key_value_arg("--start-number", "-n")
 ```
 
 The `key_value_arg` knows which type to use for validity checks based on the value used to store 
-the result of the parsing. If the `store_into` method is not used, you will need to call the 
-`scan<T>()` method to specify the types that the parser will try to cast the values into. If no 
-type is specified, there will not be any type verification.
+the result of the parsing. If no value is specified, there will not be any type verification.
 
 Additionally, the `key_value_arg` will, by default, have the minimum and maximum number of 
 required values set to one. You can change this property by using the 
@@ -186,7 +184,7 @@ ap.add_mutually_exclusive_constraint("-c", "-cpp", "-py");
 
 The `help_menu` is an object that will store a reference to arguments in order to print the help 
 information. If no `help_menu` is added to the parser, a default one with an empty ID will be used. 
-The `help_menu` objects are created on demand, and arguments can reference them even if they haven't 
+The `help_menu` objects are created on demand, and arguments can reference them even if they haven't
 been explicitly added to the parser.
 
 Generally, a help_menu object will be created explicitly to add a description and an epilogue for 

@@ -24,7 +24,7 @@
  * @date        2017/10/18
  */
 
-#include "../../../type_traits/type_traits.hpp"
+#include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_GLIBC
 
 #include <ctime>
@@ -38,7 +38,7 @@ namespace speed::system::api::glibc::time {
 
 bool get_monotonic_time(time_specification* time_spec, std::error_code* err_code) noexcept
 {
-    struct ::timespec tp;
+    ::timespec tp;
     int clk;
 
 #if defined(__linux__)
@@ -57,7 +57,7 @@ bool get_monotonic_time(time_specification* time_spec, std::error_code* err_code
         return false;
     }
 
-    time_spec->set_time_specfication((std::uint64_t)tp.tv_sec, (std::uint64_t)tp.tv_nsec);
+    time_spec->set_time((std::uint64_t)tp.tv_sec, (std::uint64_t)tp.tv_nsec);
     
     return true;
 }
@@ -66,7 +66,7 @@ bool get_monotonic_time(time_specification* time_spec, std::error_code* err_code
 bool get_cpu_time(time_specification* time_spec, std::error_code* err_code) noexcept
 {
     ::clock_t cpu_tme;
-    struct ::tms buf;
+    ::tms buf;
     const long cps = ::sysconf(_SC_CLK_TCK);
     
     if (cps == -1)
@@ -80,10 +80,11 @@ bool get_cpu_time(time_specification* time_spec, std::error_code* err_code) noex
         assign_system_error_code(errno, err_code);
         return false;
     }
+
     cpu_tme = buf.tms_utime + buf.tms_stime;
 
-    time_spec->set_time_specfication((std::uint64_t)cpu_tme / cps, 
-                                     (1'000'000'000 / cps) * ((std::uint64_t)cpu_tme % cps));
+    time_spec->set_time((std::uint64_t)cpu_tme / cps,
+                        (1'000'000'000 / cps) * ((std::uint64_t)cpu_tme % cps));
     
     return true;
 }
@@ -92,7 +93,7 @@ bool get_cpu_time(time_specification* time_spec, std::error_code* err_code) noex
 bool get_child_cpu_time(time_specification* time_spec, std::error_code* err_code) noexcept
 {
     ::clock_t cpu_tme;
-    struct ::tms buf;
+    ::tms buf;
     const long cps = ::sysconf(_SC_CLK_TCK);
     
     if (cps == -1)
@@ -106,10 +107,11 @@ bool get_child_cpu_time(time_specification* time_spec, std::error_code* err_code
         assign_system_error_code(errno, err_code);
         return false;
     }
+
     cpu_tme = buf.tms_cutime + buf.tms_cstime;
 
-    time_spec->set_time_specfication((std::uint64_t)cpu_tme / cps, 
-                                     (1'000'000'000 / cps) * ((std::uint64_t)cpu_tme % cps));
+    time_spec->set_time((std::uint64_t)cpu_tme / cps,
+                        (1'000'000'000 / cps) * ((std::uint64_t)cpu_tme % cps));
     
     return true;
 }

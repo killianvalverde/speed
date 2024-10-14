@@ -33,7 +33,7 @@
 namespace speed::containers {
 
 
-// TODO: Replace this class by n_linked_node
+// TODO: Replace this class by linked_node
 /**
  * @brief        Class that represents a doubly linked node.
  */

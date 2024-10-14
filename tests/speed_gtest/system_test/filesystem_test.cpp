@@ -29,23 +29,69 @@
 #include "speed/system/system.hpp"
 
 
-TEST(system_filesystem, access_1)
+TEST(system_filesystem, access)
 {
     ASSERT_TRUE(speed::system::filesystem::access(".", speed::system::filesystem::am_t::EXISTS));
+    ASSERT_TRUE(speed::system::filesystem::access(".", speed::system::filesystem::am_t::EXISTS,
+                                                  speed::system::filesystem::ft_t::DIRECTORY));
 }
 
 
-TEST(system_filesystem, access_2)
+TEST(system_filesystem, can_directory_be_created)
 {
-    ASSERT_TRUE(speed::system::filesystem::access(".", 
-                                                  speed::system::filesystem::am_t::EXISTS, 
-                                                  speed::system::filesystem::ft_t::DIRECTORY));
+    ASSERT_TRUE(speed::system::filesystem::can_directory_be_created(
+            "f57475c9df7a624a05e842b5f852336015de44ba"));
+
+    ASSERT_TRUE(speed::system::filesystem::can_directory_be_created(
+            "."
+            SPEED_SYSTEM_FILESYSTEM_SLASH_CSTR
+            "87e54df0169fce4cec5c064d8f1dfa6162388226"));
+
+    ASSERT_TRUE(!speed::system::filesystem::can_directory_be_created(
+            "f57475c9df7a624a05e842b5f852336015de44ba"
+            SPEED_SYSTEM_FILESYSTEM_SLASH_CSTR
+            "87e54df0169fce4cec5c064d8f1dfa6162388226"));
+}
+
+
+TEST(system_filesystem, can_regular_file_be_created)
+{
+    ASSERT_TRUE(speed::system::filesystem::can_regular_file_be_created(
+            "f57475c9df7a624a05e842b5f852336015de44ba"));
+
+    ASSERT_TRUE(speed::system::filesystem::can_regular_file_be_created(
+            "."
+            SPEED_SYSTEM_FILESYSTEM_SLASH_CSTR
+            "87e54df0169fce4cec5c064d8f1dfa6162388226"));
+
+    ASSERT_TRUE(!speed::system::filesystem::can_regular_file_be_created(
+            "f57475c9df7a624a05e842b5f852336015de44ba"
+            SPEED_SYSTEM_FILESYSTEM_SLASH_CSTR
+            "87e54df0169fce4cec5c064d8f1dfa6162388226"));
 }
 
 
 TEST(system_filesystem, chdir)
 {
     ASSERT_TRUE(speed::system::filesystem::chdir("."));
+}
+
+
+TEST(system_filesystem, closedir)
+{
+    speed::system::filesystem::directory_entity dir_ent;
+
+    ASSERT_TRUE(speed::system::filesystem::opendir(&dir_ent, "."));
+    ASSERT_TRUE(speed::system::filesystem::closedir(&dir_ent));
+}
+
+
+TEST(system_filesystem, get_file_inode)
+{
+    ASSERT_TRUE(speed::system::filesystem::get_file_inode(".") != ~0ull);
+    ASSERT_TRUE(speed::system::filesystem::get_file_inode("..") != ~0ull);
+    ASSERT_TRUE(speed::system::filesystem::get_file_inode(
+            "f57475c9df7a624a05e842b5f852336015de44ba") == ~0ull);
 }
 
 
@@ -61,9 +107,9 @@ TEST(system_filesystem, get_file_gid)
 }
 
 
-TEST(system_filesystem, get_tmp_path)
+TEST(system_filesystem, get_temporal_path)
 {
-    ASSERT_TRUE(speed::system::filesystem::get_tmp_path() != nullptr);
+    ASSERT_TRUE(speed::system::filesystem::get_temporal_path() != nullptr);
 }
 
 
@@ -111,11 +157,43 @@ TEST(system_filesystem, is_symlink)
 
 TEST(system_filesystem, mkdir)
 {
-    ASSERT_TRUE(speed::system::filesystem::mkdir("tmp_dir"));
+    ASSERT_TRUE(speed::system::filesystem::mkdir("6bd55a4e9d240fe0bcc137ad1eaeaf67517cfe4c"));
+}
+
+
+TEST(system_filesystem, opendir)
+{
+    speed::system::filesystem::directory_entity dir_ent;
+
+    ASSERT_TRUE(speed::system::filesystem::opendir(&dir_ent, "."));
+    ASSERT_TRUE(speed::system::filesystem::closedir(&dir_ent));
+}
+
+
+TEST(system_filesystem, readdir)
+{
+    speed::system::filesystem::directory_entity dir_ent;
+
+    ASSERT_TRUE(speed::system::filesystem::opendir(&dir_ent, "."));
+    ASSERT_TRUE(speed::system::filesystem::readdir(&dir_ent));
+    ASSERT_TRUE(speed::system::filesystem::readdir(&dir_ent));
+    ASSERT_TRUE(speed::system::filesystem::closedir(&dir_ent));
 }
 
 
 TEST(system_filesystem, rmdir)
 {
-    ASSERT_TRUE(speed::system::filesystem::rmdir("tmp_dir"));
+    ASSERT_TRUE(speed::system::filesystem::rmdir("6bd55a4e9d240fe0bcc137ad1eaeaf67517cfe4c"));
+}
+
+
+TEST(system_filesystem, touch)
+{
+    ASSERT_TRUE(speed::system::filesystem::touch("6bd55a4e9d240fe0bcc137ad1eaeaf67517cfe4c"));
+}
+
+
+TEST(system_filesystem, unlink)
+{
+    ASSERT_TRUE(speed::system::filesystem::unlink("6bd55a4e9d240fe0bcc137ad1eaeaf67517cfe4c"));
 }

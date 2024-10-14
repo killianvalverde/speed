@@ -54,7 +54,7 @@ class basic_value_arg : public virtual basic_base_arg<TpAllocator>
 public:
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** Shared pointer type used in the class. */
     template<typename T>
@@ -70,16 +70,113 @@ public:
     template<typename T1, typename T2>
     using pair_type = std::pair<T1, T2>;
 
+    /** Array type used in the class. */
+    template<typename T, std::size_t N>
+    using array_type = std::array<T, N>;
+
     /** Vector type used in the class. */
     template<typename T>
     using vector_type = std::vector<T, allocator_type<T>>;
+
+    /** Double ended queue type used in the class. */
+    template<typename T>
+    using deque_type = std::deque<T, allocator_type<T>>;
+
+    /** Queue type used in the class. */
+    template<typename T>
+    using queue_type = std::queue<T, deque_type<T>>;
+
+    /** Priority queue type used in the class. */
+    template<typename T>
+    using priority_queue_type = std::priority_queue<T, vector_type<T>>;
+
+    /** Stack type used in the class. */
+    template<typename T>
+    using stack_type = std::stack<T, deque_type<T>>;
+
+    /** Forward list type used in the class. */
+    template<typename T>
+    using forward_list_type = std::forward_list<T, allocator_type<T>>;
+
+    /** Forward list type used in the class. */
+    template<typename T>
+    using list_type = std::list<T, allocator_type<T>>;
+
+    /** Set type used in the class. */
+    template<typename T>
+    using set_type = std::set<T, std::less<T>, allocator_type<T>>;
+
+    /** Unordered set type used in the class. */
+    template<typename T>
+    using unordered_set_type = std::unordered_set<
+            T, std::hash<T>, std::equal_to<T>, allocator_type<T>>;
+
+    /** Unordered multi set type used in the class. */
+    template<typename T>
+    using unordered_multiset_type = std::unordered_multiset<
+            T, std::hash<T>, std::equal_to<T>, allocator_type<T>>;
 
     /** Type that represents the caster base type. */
     using caster_base_type = speed::type_casting::type_caster_base<string_type>;
 
     /** Type that represents the caster type. */
     template<typename T>
-    using caster_type = speed::argparse::basic_type_caster<T, string_type, vector_type>;
+    using caster_type = speed::argparse::basic_type_caster<T, string_type>;
+
+    /** Type that represents the array caster type. */
+    template<typename T, std::size_t N>
+    using array_caster_type = speed::argparse::basic_array_caster<
+            T, string_type, allocator_type<T>, N>;
+
+    /** Type that represents the vector caster type. */
+    template<typename T>
+    using vector_caster_type = speed::argparse::basic_vector_caster<
+            T, string_type, allocator_type<T>>;
+
+    /** Type that represents the deque caster type. */
+    template<typename T>
+    using deque_caster_type = speed::argparse::basic_deque_caster<
+            T, string_type, allocator_type<T>>;
+
+    /** Type that represents the queue caster type. */
+    template<typename T>
+    using queue_caster_type = speed::argparse::basic_queue_caster<
+            T, string_type, allocator_type<T>>;
+
+    /** Type that represents the priority queue caster type. */
+    template<typename T>
+    using priority_queue_caster_type = speed::argparse::basic_priority_queue_caster<
+            T, string_type, allocator_type<T>>;
+
+    /** Type that represents the stack caster type. */
+    template<typename T>
+    using stack_caster_type = speed::argparse::basic_stack_caster<
+            T, string_type, allocator_type<T>>;
+
+    /** Type that represents the forward list type. */
+    template<typename T>
+    using forward_list_caster_type = speed::argparse::basic_forward_list_caster<
+            T, string_type, allocator_type<T>>;
+
+    /** Type that represents the list type. */
+    template<typename T>
+    using list_caster_type = speed::argparse::basic_list_caster<
+            T, string_type, allocator_type<T>>;
+
+    /** Type that represents the set type. */
+    template<typename T>
+    using set_caster_type = speed::argparse::basic_set_caster<
+            T, string_type, allocator_type<T>>;
+
+    /** Type that represents the unordered set type. */
+    template<typename T>
+    using unordered_set_caster_type = speed::argparse::basic_unordered_set_caster<
+            T, string_type, allocator_type<T>>;
+
+    /** Type that represents the unordered multiset type. */
+    template<typename T>
+    using unordered_multiset_caster_type = speed::argparse::basic_unordered_multiset_caster<
+            T, string_type, allocator_type<T>>;
 
     /** Type that represents a value for an argument. */
     using arg_value_type = basic_arg_value<TpAllocator>;
@@ -99,10 +196,7 @@ public:
             , vals_()
             , castrs_()
             , regxes_()
-            , holdrs_()
             , minmax_vals_(1, 1)
-            , str_collec_holdr_(nullptr)
-            , gen_collec_holdr_(nullptr)
             , max_vals_auto_update_(true)
     {
     }
@@ -160,14 +254,8 @@ public:
     {
         if (!max_values_reached())
         {
-            if (str_collec_holdr_ != nullptr)
-            {
-                str_collec_holdr_->push_back(val);
-            }
-
-            vals_.push_back(arg_value_type(get_next_regex(), std::forward<TpString_>(val),
-                    get_next_caster(), base_arg_type::get_arg_parser(), this, get_next_holder(),
-                    gen_collec_holdr_));
+            vals_.emplace_back(get_next_regex(), std::forward<TpString_>(val),
+                    get_next_caster(), base_arg_type::get_arg_parser(), this);
 
             return true;
         }
@@ -188,17 +276,11 @@ public:
         if (!max_values_reached())
         {
             arg_value_type arg_val(get_next_regex(), std::forward<TpString_>(val),
-                    get_next_caster(), base_arg_type::get_arg_parser(), this, get_next_holder(),
-                    gen_collec_holdr_);
+                    get_next_caster(), base_arg_type::get_arg_parser(), this);
 
             if (!arg_val.has_errors())
             {
-                if (str_collec_holdr_ != nullptr)
-                {
-                    str_collec_holdr_->push_back(arg_val.get_value());
-                }
-
-                vals_.push_back(std::move(arg_val));
+                vals_.emplace_back(std::move(arg_val));
                 return true;
             }
         }
@@ -352,7 +434,7 @@ public:
 
         for (auto& x : vals_)
         {
-            ret_vals.push_back(x.template as<TpTarget_>());
+            ret_vals.emplace_back(x.template as<TpTarget_>());
         }
 
         return ret_vals;
@@ -376,7 +458,7 @@ public:
         {
             if (val.template try_as<TpTarget_>(&val_res))
             {
-                res.push_back(std::move(val_res));
+                res.emplace_back(std::move(val_res));
             }
             else
             {
@@ -405,7 +487,7 @@ public:
         {
             if (val.template try_as<TpTarget_>(&val_res))
             {
-                res->push_back(std::move(val_res));
+                res->emplace_back(std::move(val_res));
             }
             else
             {
@@ -450,7 +532,7 @@ public:
             return castrs_.back();
         }
 
-        return std::make_shared<caster_type<std::string>>();
+        return nullptr;
     }
 
     /**
@@ -469,24 +551,6 @@ public:
         }
 
         return regex_type("^.*$");
-    }
-
-    /**
-     * @brief       Get the next holder associated with the current value.
-     * @return      The next holder associated with the current value.
-     */
-    [[nodiscard]] void* get_next_holder()
-    {
-        if (vals_.size() < holdrs_.size())
-        {
-            return holdrs_[vals_.size()];
-        }
-        else if (!holdrs_.empty())
-        {
-            return holdrs_.back();
-        }
-
-        return nullptr;
     }
 
     /**
@@ -525,43 +589,168 @@ public:
     }
 
     /**
-     * @brief       Set the types in which to cast the values.
-     * @tparam      Ts_ : The types in which to cast the values.
+     * @brief       Set the collection that will get the cast result of each value.
+     * @param       holdr : The collection that will get the cast result of each value.
      */
-    template<typename... Ts_>
-    void set_casters()
+    template<typename TpValue_, std::size_t Nm>
+    void set_holder(array_type<TpValue_, Nm>* holdr)
     {
         castrs_.clear();
 
-        int foreach[sizeof...(Ts_)] = { (
-                castrs_.push_back(std::allocate_shared<caster_type<Ts_>>(
-                        allocator_type<caster_type<Ts_>>())), 0)... };
+        castrs_.emplace_back(std::allocate_shared<array_caster_type<TpValue_, Nm>>(
+                allocator_type<array_caster_type<TpValue_, Nm>>(), holdr));
 
-        update_max_values(castrs_.size());
+        update_max_values(1);
     }
 
     /**
      * @brief       Set the collection that will get the cast result of each value.
-     * @param       gen_collec_holdr : The collection that will get the cast result of each value.
+     * @param       holdr : The collection that will get the cast result of each value.
      */
     template<typename TpValue_>
-    void set_collection_holder(vector_type<TpValue_>* gen_collec_holdr)
+    void set_holder(vector_type<TpValue_>* holdr)
     {
-        gen_collec_holdr_ = gen_collec_holdr;
+        castrs_.clear();
 
-        if (gen_collec_holdr_ != nullptr && castrs_.empty())
-        {
-            set_casters<TpValue_>();
-        }
+        castrs_.emplace_back(std::allocate_shared<vector_caster_type<TpValue_>>(
+                allocator_type<vector_caster_type<TpValue_>>(), holdr));
+
+        update_max_values(1);
     }
 
     /**
      * @brief       Set the collection that will get the cast result of each value.
-     * @param       str_collec_holdr : The collection that will get the cast result of each value.
+     * @param       holdr : The collection that will get the cast result of each value.
      */
-    void set_collection_holder(vector_type<string_type>* str_collec_holdr)
+    template<typename TpValue_>
+    void set_holder(deque_type<TpValue_>* holdr)
     {
-        str_collec_holdr_ = str_collec_holdr;
+        castrs_.clear();
+
+        castrs_.emplace_back(std::allocate_shared<deque_caster_type<TpValue_>>(
+                allocator_type<deque_caster_type<TpValue_>>(), holdr));
+
+        update_max_values(1);
+    }
+
+    /**
+     * @brief       Set the collection that will get the cast result of each value.
+     * @param       holdr : The collection that will get the cast result of each value.
+     */
+    template<typename TpValue_>
+    void set_holder(queue_type<TpValue_>* holdr)
+    {
+        castrs_.clear();
+
+        castrs_.emplace_back(std::allocate_shared<queue_caster_type<TpValue_>>(
+                allocator_type<queue_caster_type<TpValue_>>(), holdr));
+
+        update_max_values(1);
+    }
+
+    /**
+     * @brief       Set the collection that will get the cast result of each value.
+     * @param       holdr : The collection that will get the cast result of each value.
+     */
+    template<typename TpValue_>
+    void set_holder(priority_queue_type<TpValue_>* holdr)
+    {
+        castrs_.clear();
+
+        castrs_.emplace_back(std::allocate_shared<priority_queue_caster_type<TpValue_>>(
+                allocator_type<priority_queue_caster_type<TpValue_>>(), holdr));
+
+        update_max_values(1);
+    }
+
+    /**
+     * @brief       Set the collection that will get the cast result of each value.
+     * @param       holdr : The collection that will get the cast result of each value.
+     */
+    template<typename TpValue_>
+    void set_holder(stack_type<TpValue_>* holdr)
+    {
+        castrs_.clear();
+
+        castrs_.emplace_back(std::allocate_shared<stack_caster_type<TpValue_>>(
+                allocator_type<stack_caster_type<TpValue_>>(), holdr));
+
+        update_max_values(1);
+    }
+
+    /**
+     * @brief       Set the collection that will get the cast result of each value.
+     * @param       holdr : The collection that will get the cast result of each value.
+     */
+    template<typename TpValue_>
+    void set_holder(forward_list_type<TpValue_>* holdr)
+    {
+        castrs_.clear();
+
+        castrs_.emplace_back(std::allocate_shared<forward_list_caster_type<TpValue_>>(
+                allocator_type<forward_list_caster_type<TpValue_>>(), holdr));
+
+        update_max_values(1);
+    }
+
+    /**
+     * @brief       Set the collection that will get the cast result of each value.
+     * @param       holdr : The collection that will get the cast result of each value.
+     */
+    template<typename TpValue_>
+    void set_holder(list_type<TpValue_>* holdr)
+    {
+        castrs_.clear();
+
+        castrs_.emplace_back(std::allocate_shared<list_caster_type<TpValue_>>(
+                allocator_type<list_caster_type<TpValue_>>(), holdr));
+
+        update_max_values(1);
+    }
+
+    /**
+     * @brief       Set the collection that will get the cast result of each value.
+     * @param       holdr : The collection that will get the cast result of each value.
+     */
+    template<typename TpValue_>
+    void set_holder(set_type<TpValue_>* holdr)
+    {
+        castrs_.clear();
+
+        castrs_.emplace_back(std::allocate_shared<set_caster_type<TpValue_>>(
+                allocator_type<set_caster_type<TpValue_>>(), holdr));
+
+        update_max_values(1);
+    }
+
+    /**
+     * @brief       Set the collection that will get the cast result of each value.
+     * @param       holdr : The collection that will get the cast result of each value.
+     */
+    template<typename TpValue_>
+    void set_holder(unordered_set_type<TpValue_>* holdr)
+    {
+        castrs_.clear();
+
+        castrs_.emplace_back(std::allocate_shared<unordered_set_caster_type<TpValue_>>(
+                allocator_type<unordered_set_caster_type<TpValue_>>(), holdr));
+
+        update_max_values(1);
+    }
+
+    /**
+     * @brief       Set the collection that will get the cast result of each value.
+     * @param       holdr : The collection that will get the cast result of each value.
+     */
+    template<typename TpValue_>
+    void set_holder(unordered_multiset_type<TpValue_>* holdr)
+    {
+        castrs_.clear();
+
+        castrs_.emplace_back(std::allocate_shared<unordered_multiset_caster_type<TpValue_>>(
+                allocator_type<unordered_multiset_caster_type<TpValue_>>(), holdr));
+
+        update_max_values(1);
     }
 
     /**
@@ -571,14 +760,13 @@ public:
     template<typename... Ts_>
     void set_holders(Ts_*... holdrs)
     {
-        holdrs_.clear();
+        castrs_.clear();
 
-        int foreach[sizeof...(Ts_)] = { (
-                holdrs_.push_back(holdrs),
-                castrs_.empty() ? (set_casters<Ts_>(), 0) : 0,
-                0)... };
+        int foreach[sizeof...(Ts_) + 1] = { (
+                castrs_.emplace_back(std::allocate_shared<caster_type<Ts_>>(
+                        allocator_type<caster_type<Ts_>>(), holdrs)), 0)... };
 
-        update_max_values(holdrs_.size());
+        update_max_values(castrs_.size());
     }
 
     /**
@@ -615,8 +803,8 @@ public:
     {
         regxes_.clear();
 
-        int foreach[sizeof...(Ts_)] = { (
-                regxes_.push_back(regex_type(std::forward<Ts_>(regxes))), 0)... };
+        int foreach[sizeof...(Ts_) + 1] = { (
+                regxes_.emplace_back(std::forward<Ts_>(regxes)), 0)... };
 
         update_max_values(regxes_.size());
     }
@@ -706,17 +894,8 @@ private:
     /** Regular expressions that the values has to match. */
     vector_type<regex_type> regxes_;
 
-    /** Holders that will contain the casted values. */
-    vector_type<void*> holdrs_;
-
     /** Minimum and maximum number of values for an option. */
     pair_type<std::size_t, std::size_t> minmax_vals_;
-
-    /** Collection that will get the string values. */
-    vector_type<string_type>* str_collec_holdr_;
-
-    /** Collection that will get the casted values. */
-    void* gen_collec_holdr_;
 
     /** Dictates whether the max values number will auto-update. */
     bool max_vals_auto_update_;

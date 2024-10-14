@@ -51,8 +51,8 @@ time_specification time_specification::get_elapsed_time(
         --elapsed_sec;
         elapsed_nsec += 1000000000L;
     }
-    
-    elapsed_tm.set_time_specfication(elapsed_sec, elapsed_nsec);
+
+    elapsed_tm.set_time(elapsed_sec, elapsed_nsec);
     
     return elapsed_tm;
 }

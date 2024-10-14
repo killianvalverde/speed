@@ -54,7 +54,7 @@ class basic_arg_value
 public:
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** Pair type used in the class. */
     template<typename T1, typename T2>
@@ -90,8 +90,6 @@ public:
      * @param       castr : Caster object used to parse the value.
      * @param       arg_parsr : Argument parser that holds this object.
      * @param       val_arg : Value arg that holds this object.
-     * @param       holdr : Pointer to the holder that will strore the result of the parsing.
-     * @param       vec_holdr : Vector that will get the result of the parsing.
      */
     template<
             typename TpString_,
@@ -105,9 +103,7 @@ public:
             TpString_&& val,
             shared_ptr_type<caster_base_type> castr,
             arg_parser_type* arg_parsr,
-            value_arg_type* val_arg,
-            void* holdr,
-            void* vec_holdr
+            value_arg_type* val_arg
     )
             : regx_(std::forward<TpRegex_>(regx))
             , val_(std::forward<TpString_>(val))
@@ -115,8 +111,6 @@ public:
             , castr_(std::move(castr))
             , arg_parsr_(arg_parsr)
             , val_arg_(val_arg)
-            , holdr_(holdr)
-            , vec_holdr_(vec_holdr)
             , err_flgs_(arg_value_error_flags::NIL)
     {
         parse_value();
@@ -161,7 +155,6 @@ public:
     {
         std::error_code err_code;
         bool succs;
-        pair_type<void*, void*> res = {holdr_, vec_holdr_};
 
         err_flgs_.clear();
 
@@ -172,7 +165,7 @@ public:
             return false;
         }
 
-        succs = castr_->try_type_cast(val_, &res, &err_code);
+        succs = (!castr_) || castr_->try_type_cast(val_, &err_code);
 
         if (!succs)
         {
@@ -319,12 +312,6 @@ private:
 
     /** Holds a reference to the value arg object. */
     value_arg_type* val_arg_;
-
-    /** Holds the result of the parsing. */
-    void* holdr_;
-
-    /** Will get the result of the parsing. */
-    void* vec_holdr_;
 
     /** Error flags that allows knowing whether there are errors. */
     flags_type<arg_value_error_flags> err_flgs_;

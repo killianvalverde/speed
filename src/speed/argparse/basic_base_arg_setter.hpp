@@ -45,7 +45,7 @@ class basic_base_arg_setter
 public:
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** Type that represents the base of the arguments hierarchy. */
     using base_arg_type = basic_base_arg<TpAllocator>;
@@ -97,6 +97,20 @@ public:
      * @return      The object who call the method.
      */
     basic_base_arg_setter& operator =(basic_base_arg_setter&& rhs) noexcept = delete;
+
+    /**
+     * @brief       Allows to specify a function to be called when the argument is found during
+     *              the program call.
+     * @param       callabl : Function to be called when the argument is found during
+     *              the program call.
+     * @return      The object who call the method.
+     */
+    template<typename TpCallable>
+    self_type& action(TpCallable&& callabl)
+    {
+        bse_arg_->set_action(std::forward<TpCallable>(callabl));
+        return dynamic_cast<self_type&>(*this);
+    }
 
     /**
      * @brief       Allows to specify the argument description. The description is a string that
@@ -167,7 +181,7 @@ public:
      */
     self_type& store_presence(bool* presence_sync)
     {
-        bse_arg_->set_presence_synchronizer(presence_sync);
+        bse_arg_->set_presence_holder(presence_sync);
         return dynamic_cast<self_type&>(*this);
     }
 

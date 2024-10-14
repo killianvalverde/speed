@@ -47,7 +47,7 @@ std::error_condition error_category::default_error_condition(int val) const noex
     {
         return {error_conditions::SYSTEM_ERROR};
     }
-    else if (val == static_cast<int>(error_codes::OTHER))
+    else if (val >= static_cast<int>(error_codes::OTHERS_BEGINS))
     {
         return {error_conditions::OTHER};
     }
@@ -77,6 +77,9 @@ std::string error_category::message(int val) const
 
         case error_codes::FILESYSTEM_INVALID_PATH:
             return "Invalid path";
+
+        case error_codes::RANGE_ERROR:
+            return "Invalid syntax";
 
         case error_codes::OTHER:
             return "Invalid syntax";

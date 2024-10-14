@@ -55,7 +55,7 @@ class basic_arg_constraint
 public:
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** String type used in the class. */
     using string_type = std::basic_string<char, std::char_traits<char>, allocator_type<char>>;
@@ -109,7 +109,7 @@ public:
     {
         base_arg_type* bse_arg;
 
-        int foreach[sizeof...(Ts_)] = { (
+        int foreach[sizeof...(Ts_) + 1] = { (
                 (bse_arg = arg_parsr_->get_base_arg(kys)) == nullptr ?
                         throw key_not_found_exception() :
                         bse_args_.emplace(bse_arg),

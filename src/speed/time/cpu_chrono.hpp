@@ -40,65 +40,15 @@ class cpu_chrono : public chrono_base
 {
 public:
     /**
-     * @brief       Default constructor.
+     * @brief       Get the specific implementation time since some unspecified starting point.
+     * @return      The specific implementation time since some unspecified starting point.
      */
-    cpu_chrono() noexcept;
-    
-    /**
-     * @brief       Start the process.
-     * @return      If function was successful true is returned, otherwise false is returned.
-     */
-    bool start() noexcept override;
-    
-    /**
-     * @brief       Stop the process.
-     * @return      If function was successful true is returned, otherwise false is returned.
-     */
-    bool stop() noexcept override;
-    
-    /**
-     * @brief       Resume the process.
-     * @return      If function was successful true is returned, otherwise false is returned.
-     */
-    bool resume() noexcept override;
-    
-    /**
-     * @brief       Restart the process.
-     * @return      If function was successful true is returned, otherwise false is returned.
-     */
-    bool restart() noexcept override;
-    
-    /**
-     * @brief       Get the elapsed time since the process has begun.
-     * @return      The elapsed time converted to long double.
-     */
-    long double get_elapsed_time() const noexcept override;
-    
-    /**
-     * @brief       Get the elapsed time since the process has begun.
-     * @return      The elapsed time in a time_specification type.
-     */
-    speed::system::time::time_specification get_elapsed_raw_time() const noexcept override;
-    
-    /**
-     * @brief       Allows knowing whether the chrono is in a specified state.
-     * @param       chrn_state : The state to check.
-     * @return      If function was successful true is returned, otherwise false is returned.
-     */
-    inline bool is(chrono_states chrn_state) const noexcept override
+    [[nodiscard]] speed::system::time::time_specification get_time() const noexcept override
     {
-        return chrn_state_ == chrn_state;
+        speed::system::time::time_specification time_spec;
+        speed::system::time::get_cpu_time(&time_spec);
+        return time_spec;
     }
-
-private:
-    /** The process start time. */
-    speed::system::time::time_specification start_time_spec_;
-    
-    /** The process elapsed time. */
-    speed::system::time::time_specification elapsed_time_spec_;
-    
-    /** The state of the chrono. */
-    chrono_states chrn_state_;
 };
 
 

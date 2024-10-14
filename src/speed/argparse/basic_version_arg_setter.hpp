@@ -50,7 +50,7 @@ class basic_version_arg_setter : public speed::type_traits::basic_crtp_base<basi
 public:
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
     
     /** String type used in the class. */
     using string_type = std::basic_string<char, std::char_traits<char>, allocator_type<char>>;
@@ -141,7 +141,7 @@ public:
 
         vers_info.append(prog_name.empty() ? "???" : prog_name);
         vers_info.append(" ");
-        if (speed::stringutils::get_string_length(prog_vers) == 0)
+        if (speed::stringutils::strlen(prog_vers) == 0)
         {
             vers_info.append("v1.0.0");
         }
@@ -151,7 +151,7 @@ public:
         }
 
         vers_info.append("\nCopyright (C) ");
-        if (speed::stringutils::get_string_length(dte) == 0)
+        if (speed::stringutils::strlen(dte) == 0)
         {
             vers_info.append("20XX");
         }
@@ -167,7 +167,7 @@ public:
                 "This is free software: you are free to change and redistribute it.\n"
                 "There is NO WARRANTY, to the extent permitted by law.\n\n"
                 "Written by ");
-        if (speed::stringutils::get_string_length(authr) == 0)
+        if (speed::stringutils::strlen(authr) == 0)
         {
             vers_info.append("Unknown");
         }

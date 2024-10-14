@@ -32,7 +32,6 @@
 #include "chrono_states.hpp"
 #include "cpu_chrono.hpp"
 #include "monotonic_chrono.hpp"
-#include "monotonic_timer.hpp"
 
 
 namespace speed {
@@ -42,6 +41,16 @@ namespace speed {
  * @brief       Contains resources and facilities related to time manipulation.
  */
 namespace time {}
+
+
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contains resources and facilities related to time manipulation.
+ */
+namespace tm = time;
+
+#endif
 
 
 }

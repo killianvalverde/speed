@@ -18,8 +18,8 @@
  */
 
 /**
- * @file        speed/type_traits/operations.hpp
- * @brief       type_traits functions header.
+ * @file        speed/compatibility/operations.hpp
+ * @brief       compatibility functions header.
  * @author      Killian Valverde
  * @date        2016/08/05
  */
@@ -35,6 +35,48 @@
 
 
 namespace speed::type_traits {
+
+
+/** @cond */
+namespace __private {
+template<typename...>
+struct __or;
+
+template<>
+struct __or<> : public std::false_type {};
+
+template<typename Tp>
+struct __or<Tp> : public Tp {};
+
+template<typename Tp1, typename Tp2>
+struct __or<Tp1, Tp2> : public std::conditional<Tp1::value, Tp1, Tp2>::type {};
+
+template<typename Tp1, typename Tp2, typename Tp3, typename... TpN>
+struct __or<Tp1, Tp2, Tp3, TpN...>
+        : public std::conditional<Tp1::value, Tp1, __or<Tp2, Tp3, TpN...>>::type {};
+} /* __private */
+/** @endcond */
+
+
+/** @cond */
+namespace __private {
+template<typename...>
+struct __and;
+
+template<>
+struct __and<> : public std::true_type {};
+
+template<typename Tp>
+struct __and<Tp> : public Tp {};
+
+template<typename Tp1, typename Tp2>
+struct __and<Tp1, Tp2> : public std::conditional<Tp1::value, Tp2, Tp1>::type {};
+
+template<typename Tp1, typename Tp2, typename Tp3, typename... TpN>
+struct __and<Tp1, Tp2, Tp3, TpN...>
+        : public std::conditional<Tp1::value, __and<Tp2, Tp3, TpN...>, Tp1>::type {};
+} /* __private */
+/** @endcond */
 
 
 /** @cond */
@@ -124,11 +166,37 @@ struct is_character
 
 
 /**
+ * @brief       Trait class that identifies whether T is a char pointer type.
+ */
+template<typename Tp>
+struct is_char_pointer
+        : public __private::__and<
+                std::is_pointer<Tp>,
+                is_char<typename std::remove_pointer<Tp>::type>
+          >::type
+{
+};
+
+
+/**
+ * @brief       Trait class that identifies whether T is a wchar pointer type.
+ */
+template<typename Tp>
+struct is_wchar_pointer
+        : public __private::__and<
+                std::is_pointer<Tp>,
+                is_wchar<typename std::remove_pointer<Tp>::type>
+          >::type
+{
+};
+
+
+/**
  * @brief       Trait class that identifies whether T is a character pointer type.
  */
 template<typename Tp>
 struct is_character_pointer
-        : public std::__and_<
+        : public __private::__and<
                 std::is_pointer<Tp>,
                 is_character<typename std::remove_pointer<Tp>::type>
           >::type
@@ -142,7 +210,7 @@ struct is_character_pointer
  */
 template<typename Tp>
 struct is_stdio_character
-        : public std::__or_<is_char<Tp>, is_wchar<Tp>>::type
+        : public __private::__or<is_char<Tp>, is_wchar<Tp>>::type
 {
 };
 
@@ -236,6 +304,66 @@ struct __is_basic_string_helper<std::basic_string<TpChar, TpCharTraits, TpCharAl
 template<typename Tp>
 struct is_basic_string
         : public __private::__is_basic_string_helper<
+                typename std::remove_cv<Tp>::type
+          >::type
+{
+};
+
+
+/** @cond */
+namespace __private {
+template<typename>
+struct __is_string_helper : public std::false_type {};
+
+template<
+        typename TpChar,
+        typename TpCharTraits,
+        typename TpCharAlloc
+>
+struct __is_string_helper<std::basic_string<TpChar, TpCharTraits, TpCharAlloc>>
+        : public is_char<TpChar>
+{
+};
+} /* __private */
+/** @endcond */
+
+
+/**
+ * @brief       Trait class that identifies whether T is a 'std::string' type.
+ */
+template<typename Tp>
+struct is_string
+        : public __private::__is_string_helper<
+                typename std::remove_cv<Tp>::type
+          >::type
+{
+};
+
+
+/** @cond */
+namespace __private {
+template<typename>
+struct __is_wstring_helper : public std::false_type {};
+
+template<
+        typename TpChar,
+        typename TpCharTraits,
+        typename TpCharAlloc
+>
+struct __is_wstring_helper<std::basic_string<TpChar, TpCharTraits, TpCharAlloc>>
+        : public is_wchar<TpChar>
+{
+};
+} /* __private */
+/** @endcond */
+
+
+/**
+ * @brief       Trait class that identifies whether T is a 'std::wstring' type.
+ */
+template<typename Tp>
+struct is_wstring
+        : public __private::__is_wstring_helper<
                 typename std::remove_cv<Tp>::type
           >::type
 {

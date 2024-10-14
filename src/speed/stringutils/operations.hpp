@@ -60,6 +60,21 @@ template<typename TpChar>
 
 
 /**
+ * @brief       Returns the length of a string.
+ * @param       str : A string.
+ * @return      The length of the string.
+ */
+template<typename TpChar, typename TpCharTraits, typename TpCharAlloc>
+[[nodiscard]] typename std::basic_string<TpChar, TpCharTraits, TpCharAlloc>::size_type
+strlen(
+        const std::basic_string<TpChar, TpCharTraits, TpCharAlloc>& str
+) noexcept
+{
+    return str.length();
+}
+
+
+/**
  * @brief       Copies the C string pointed by source into the array pointed by destination,
  *              including the terminating null character (and stopping at that point).
  * @param       dest : Pointer to the destination array where the content is to be copied.
@@ -376,17 +391,17 @@ template<
         typename TpChar,
         typename TpIntegral,
         typename TpCharTraits = std::char_traits<TpChar>,
-        typename TpAllocator = std::allocator<int>
+        typename TpAllocator = std::allocator<TpChar>
 >
-[[nodiscard]] std::vector<std::basic_string<TpChar, TpCharTraits, TpAllocator>, TpAllocator>
-strsplit(
-        const TpChar *str,
-        const TpIntegral sep
-)
+[[nodiscard]] auto strsplit(const TpChar *str, const TpIntegral sep)
 {
-    using string_type = std::basic_string<TpChar, TpCharTraits, TpAllocator>;
+    using char_allocator_type = std::allocator_traits<TpAllocator>::template rebind_alloc<TpChar>;
+    using string_type = std::basic_string<TpChar, TpCharTraits, char_allocator_type>;
+    using string_allocator_type =
+            std::allocator_traits<TpAllocator>::template rebind_alloc<string_type>;
     
-    std::vector<string_type, TpAllocator> values;
+    std::vector<string_type, string_allocator_type> values;
+
     string_type value_builder;
     
     if (str != nullptr)
@@ -504,34 +519,6 @@ bool strdisclastif(TpChar* str, const TpIntegral val) noexcept
     }
     
     return false;
-}
-
-
-/**
- * @brief       Returns the length of a C string str.
- * @param       str : A C string.
- * @return      The length of the C string.
- */
-template<typename TpChar>
-[[nodiscard]] inline std::enable_if_t<
-        speed::type_traits::is_character<TpChar>::value,
-        std::size_t
->
-get_string_length(const TpChar* str) noexcept
-{
-    return speed::stringutils::strlen(str);
-}
-
-
-/**
- * @brief       Returns the length of a string.
- * @param       str : A string.
- * @return      The length of the string.
- */
-template<typename TpString>
-[[nodiscard]] inline typename TpString::size_type get_string_length(const TpString& str) noexcept
-{
-    return str.length();
 }
     
     

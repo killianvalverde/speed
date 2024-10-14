@@ -40,6 +40,16 @@ namespace speed {
 namespace algorithm {}
 
 
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contians a set of algorithms.
+ */
+namespace algo = algorithm;
+
+#endif
+
+
 }
 
 

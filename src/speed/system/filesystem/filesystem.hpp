@@ -28,7 +28,7 @@
 #define SPEED_SYSTEM_FILESYSTEM_FILESYSTEM_HPP
 
 #include "access_modes.hpp"
-#include "directory_entity.hpp"
+#include "basic_directory_entity.hpp"
 #include "file_type.hpp"
 #include "operations.hpp"
 
@@ -40,6 +40,16 @@ namespace speed::system {
  * @brief       Contains filesystem interaction resources.
  */
 namespace filesystem {}
+
+
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contains filesystem interaction resources.
+ */
+namespace fsys = filesystem;
+
+#endif
 
 
 }

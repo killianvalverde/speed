@@ -34,14 +34,14 @@ TEST(iostream_indentation, operator_pre_increment)
     speed::iostream::indentation indent(2, 0);
     speed::iostream::ios_redirect ios_redirect(std::cout);
     std::string expected_result("  \n    \n      \n");
-    
-    ios_redirect.redirect_to_embedded_stringstream();
+
+    ios_redirect.redirect_to_internal_stream();
     
     std::cout << ++indent << speed::iostream::newl;
     std::cout << ++indent << speed::iostream::newl;
     std::cout << ++indent << speed::iostream::newl;
     
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_result);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_result);
 }
 
 
@@ -50,14 +50,14 @@ TEST(iostream_indentation, operator_post_increment)
     speed::iostream::indentation indent(2, 0);
     speed::iostream::ios_redirect ios_redirect(std::cout);
     std::string expected_result("\n  \n    \n");
-    
-    ios_redirect.redirect_to_embedded_stringstream();
+
+    ios_redirect.redirect_to_internal_stream();
     
     std::cout << indent++ << speed::iostream::newl;
     std::cout << indent++ << speed::iostream::newl;
     std::cout << indent++ << speed::iostream::newl;
     
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_result);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_result);
 }
 
 
@@ -66,8 +66,8 @@ TEST(iostream_indentation, operator_pre_decrement)
     speed::iostream::indentation indent(2, 0);
     speed::iostream::ios_redirect ios_redirect(std::cout);
     std::string expected_result("  \n    \n      \n    \n  \n\n");
-    
-    ios_redirect.redirect_to_embedded_stringstream();
+
+    ios_redirect.redirect_to_internal_stream();
     
     std::cout << ++indent << speed::iostream::newl;
     std::cout << ++indent << speed::iostream::newl;
@@ -76,7 +76,7 @@ TEST(iostream_indentation, operator_pre_decrement)
     std::cout << --indent << speed::iostream::newl;
     std::cout << --indent << speed::iostream::newl;
     
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_result);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_result);
 }
 
 
@@ -85,8 +85,8 @@ TEST(iostream_indentation, operator_post_decrement)
     speed::iostream::indentation indent(2, 0);
     speed::iostream::ios_redirect ios_redirect(std::cout);
     std::string expected_result("\n  \n    \n      \n    \n  \n");
-    
-    ios_redirect.redirect_to_embedded_stringstream();
+
+    ios_redirect.redirect_to_internal_stream();
     
     std::cout << indent++ << speed::iostream::newl;
     std::cout << indent++ << speed::iostream::newl;
@@ -95,5 +95,5 @@ TEST(iostream_indentation, operator_post_decrement)
     std::cout << indent-- << speed::iostream::newl;
     std::cout << indent-- << speed::iostream::newl;
     
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_result);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_result);
 }

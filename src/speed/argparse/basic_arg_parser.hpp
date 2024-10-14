@@ -34,6 +34,7 @@
 #include <vector>
 
 #include "../containers/containers.hpp"
+#include "../memory/memory.hpp"
 #include "../stringutils/stringutils.hpp"
 #include "arg_error_flags.hpp"
 #include "arg_flags.hpp"
@@ -71,11 +72,7 @@ class basic_arg_parser
 public:
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
-
-    /** Unique smart pointer type used in the class. */
-    template<typename T>
-    using unique_ptr_type = std::unique_ptr<T>;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** String type used in the class. */
     using string_type = std::basic_string<char, std::char_traits<char>, allocator_type<char>>;
@@ -133,12 +130,10 @@ public:
     using arg_constraint_type = basic_arg_constraint<TpAllocator>;
 
     /** Type that represents an 'at least one found' constraint for a set of arguments. */
-    template<typename T>
-    using at_least_one_found_type = basic_at_least_one_found<T, TpAllocator>;
+    using at_least_one_found_type = basic_at_least_one_found<arg_constraint_type, TpAllocator>;
 
     /** Type that represents a mutually exclusive constraint for a set of arguments. */
-    template<typename T>
-    using mutually_exclusive_type = basic_mutually_exclusive<T, TpAllocator>;
+    using mutually_exclusive_type = basic_mutually_exclusive<arg_constraint_type, TpAllocator>;
 
     /** Type that represents a help menu. */
     using help_menu_type = basic_help_menu<TpAllocator>;
@@ -196,6 +191,8 @@ public:
             , version_arg_type_alloc_()
             , key_value_arg_type_alloc_()
             , keyless_arg_type_alloc_()
+            , at_least_one_found_type_alloc_()
+            , mutually_exclusive_type_alloc_()
             , parsd_(false)
     {
     }
@@ -219,7 +216,12 @@ public:
     {
         for (auto& x : bse_arg_list_)
         {
-            delete_help_text_base(x);
+            delete_base_arg(x);
+        }
+
+        for (auto& x : constrnts_)
+        {
+            delete_arg_constraint(x);
         }
     
         current_vers_arg_ = nullptr;
@@ -255,8 +257,8 @@ public:
     key_arg_setter_type add_key_arg(Ts_&&... kys)
     {
         assert_valid_keys(kys...);
-        key_arg_type* ky_arg = key_arg_type_alloc_.allocate(1);
-        key_arg_type_alloc_.construct(ky_arg, this, kys...);
+        key_arg_type* ky_arg;
+        speed::memory::allocate_and_construct(key_arg_type_alloc_, ky_arg, this, kys...);
         register_key_arg(ky_arg, std::forward<Ts_>(kys)...);
 
         return key_arg_setter_type(ky_arg);
@@ -271,8 +273,8 @@ public:
     key_value_arg_setter_type add_key_value_arg(Ts_&&... kys)
     {
         assert_valid_keys(kys...);
-        key_value_arg_type* ky_val_arg = key_value_arg_type_alloc_.allocate(1);
-        key_value_arg_type_alloc_.construct(ky_val_arg, this, kys...);
+        key_value_arg_type* ky_val_arg;
+        speed::memory::allocate_and_construct(key_value_arg_type_alloc_, ky_val_arg, this, kys...);
         register_key_value_arg(ky_val_arg, std::forward<Ts_>(kys)...);
 
         return key_value_arg_setter_type(ky_val_arg);
@@ -287,8 +289,8 @@ public:
     keyless_arg_setter_type add_keyless_arg(TpString_&& usage_ky)
     {
         assert_valid_key(usage_ky);
-        keyless_arg_type* kyless_arg = keyless_arg_type_alloc_.allocate(1);
-        keyless_arg_type_alloc_.construct(kyless_arg, this, usage_ky);
+        keyless_arg_type* kyless_arg;
+        speed::memory::allocate_and_construct(keyless_arg_type_alloc_, kyless_arg, this, usage_ky);
         register_keyless_arg(kyless_arg, std::forward<TpString_>(usage_ky));
 
         return keyless_arg_setter_type(kyless_arg);
@@ -303,8 +305,8 @@ public:
     help_arg_setter_type add_help_arg(Ts_&&... kys)
     {
         assert_valid_keys(kys...);
-        help_arg_type* hlp_arg = help_arg_type_alloc_.allocate(1);
-        help_arg_type_alloc_.construct(hlp_arg, this, kys...);
+        help_arg_type* hlp_arg;
+        speed::memory::allocate_and_construct(help_arg_type_alloc_, hlp_arg, this, kys...);
         register_help_arg(hlp_arg, std::forward<Ts_>(kys)...);
 
         return help_arg_setter_type(hlp_arg);
@@ -320,8 +322,8 @@ public:
     {
         assert_valid_keys(kys...);
         assert_valid_version_add();
-        version_arg_type* vers_arg = version_arg_type_alloc_.allocate(1);
-        version_arg_type_alloc_.construct(vers_arg, this, kys...);
+        version_arg_type* vers_arg;
+        speed::memory::allocate_and_construct(version_arg_type_alloc_, vers_arg, this, kys...);
         register_version_arg(vers_arg, std::forward<Ts_>(kys)...);
 
         return version_arg_setter_type(vers_arg);
@@ -336,9 +338,10 @@ public:
     template<typename... Ts_>
     void add_at_least_one_found_constraint(const Ts_&... kys)
     {
-        // TODO: Waiting for allocate_unique.
-        constrnts_.push_back(
-                std::make_unique<at_least_one_found_type<arg_constraint_type>>(this, kys...));
+        at_least_one_found_type* at_least_one_fnd;
+        speed::memory::allocate_and_construct(at_least_one_found_type_alloc_, at_least_one_fnd,
+                                              this, kys...);
+        constrnts_.push_back(at_least_one_fnd);
     }
 
     /**
@@ -350,8 +353,10 @@ public:
     template<typename... Ts_>
     void add_mutually_exclusive_constraint(const Ts_&... kys)
     {
-        constrnts_.push_back(
-                std::make_unique<mutually_exclusive_type<arg_constraint_type>>(this, kys...));
+        mutually_exclusive_type* mutually_excl;
+        speed::memory::allocate_and_construct(mutually_exclusive_type_alloc_, mutually_excl,
+                                              this, kys...);
+        constrnts_.push_back(mutually_excl);
     }
 
     /**
@@ -501,6 +506,7 @@ public:
                         kyless_arg = x;
                         if (static_cast<base_arg_type*>(kyless_arg) !=  prev_arg)
                         {
+                            kyless_arg->execute_action();
                             kyless_arg->set_found(true);
                         }
                         break;
@@ -516,6 +522,7 @@ public:
                             kyless_arg = x;
                             if (static_cast<base_arg_type*>(kyless_arg) !=  prev_arg)
                             {
+                                kyless_arg->execute_action();
                                 kyless_arg->set_found(true);
                             }
                             break;
@@ -915,7 +922,7 @@ private:
     template<typename... Ts_>
     inline void assert_valid_keys(const Ts_&... kys) const
     {
-        int foreach[sizeof...(Ts_)] = { (assert_valid_key(kys), 0)... };
+        int foreach[sizeof...(Ts_) + 1] = { (assert_valid_key(kys), 0)... };
     }
 
     /**
@@ -952,7 +959,7 @@ private:
     {
         bse_arg_list_.push_back(static_cast<base_arg_type*>(ky_arg));
 
-        int foreach[sizeof...(Ts_)] = { (
+        int foreach[sizeof...(Ts_) + 1] = { (
                 bse_arg_map_.emplace(std::forward<Ts_>(kys), ky_arg), 0)... };
 
         register_into_help_menus(ky_arg);
@@ -1030,7 +1037,7 @@ private:
     template<typename... Ts_>
     void register_into_help_menus(base_arg_type* bse_arg, Ts_&&... hlp_menus_ids)
     {
-        int foreach[sizeof...(Ts_)] = { (
+        int foreach[sizeof...(Ts_) + 1] = { (
                 get_help_menu(std::forward<Ts_>(hlp_menus_ids)).add_entry(bse_arg), 0)... };
     }
 
@@ -1061,7 +1068,7 @@ private:
      * @brief       Destroy and deallocate the specified argument.
      * @param       arg : The specified argument.
      */
-    void delete_help_text_base(base_arg_type*& arg) noexcept
+    void delete_base_arg(base_arg_type*& arg) noexcept
     {
         key_arg_type* ky_arg;
         help_arg_type* hlp_arg;
@@ -1071,28 +1078,46 @@ private:
 
         if ((hlp_arg = dynamic_cast<help_arg_type*>(arg)) != nullptr)
         {
-            help_arg_type_alloc_.destroy(hlp_arg);
-            help_arg_type_alloc_.deallocate(hlp_arg, 1);
+            speed::memory::destruct_and_deallocate(help_arg_type_alloc_, hlp_arg);
         }
         else if ((ky_val_arg = dynamic_cast<key_value_arg_type*>(arg)) != nullptr)
         {
-            key_value_arg_type_alloc_.destroy(ky_val_arg);
-            key_value_arg_type_alloc_.deallocate(ky_val_arg, 1);
+            speed::memory::destruct_and_deallocate(key_value_arg_type_alloc_, ky_val_arg);
         }
         else if ((kyless_arg = dynamic_cast<keyless_arg_type*>(arg)) != nullptr)
         {
-            keyless_arg_type_alloc_.destroy(kyless_arg);
-            keyless_arg_type_alloc_.deallocate(kyless_arg, 1);
+            speed::memory::destruct_and_deallocate(keyless_arg_type_alloc_, kyless_arg);
         }
         else if ((vers_arg = dynamic_cast<version_arg_type*>(arg)) != nullptr)
         {
-            version_arg_type_alloc_.destroy(vers_arg);
-            version_arg_type_alloc_.deallocate(vers_arg, 1);
+            speed::memory::destruct_and_deallocate(version_arg_type_alloc_, vers_arg);
         }
         else if ((ky_arg = dynamic_cast<key_arg_type*>(arg)) != nullptr)
         {
-            key_arg_type_alloc_.destroy(ky_arg);
-            key_arg_type_alloc_.deallocate(ky_arg, 1);
+            speed::memory::destruct_and_deallocate(key_arg_type_alloc_, ky_arg);
+        }
+
+        arg = nullptr;
+    }
+
+    /**
+     * @brief       Destroy and deallocate the specified argument.
+     * @param       arg : The specified argument.
+     */
+    void delete_arg_constraint(arg_constraint_type*& arg) noexcept
+    {
+        at_least_one_found_type* at_least_one_fnd;
+        mutually_exclusive_type* mutually_excl;
+
+        if ((at_least_one_fnd = dynamic_cast<at_least_one_found_type*>(arg)) != nullptr)
+        {
+            speed::memory::destruct_and_deallocate(at_least_one_found_type_alloc_,
+                                                   at_least_one_fnd);
+        }
+        else if ((mutually_excl = dynamic_cast<mutually_exclusive_type*>(arg)) != nullptr)
+        {
+            speed::memory::destruct_and_deallocate(mutually_exclusive_type_alloc_,
+                                                   mutually_excl);
         }
 
         arg = nullptr;
@@ -1114,7 +1139,7 @@ private:
      * @param       argv : Arguments found in the program call.
      * @param       ky_arg : The key arg to parse.
      * @param       cur_idx : The current index checked in argv.
-     * @param       pos_increment : How much the index will more afther the parsing.
+     * @param       pos_increment : How much the index will be increased afther the parsing.
      */
     template<typename TpArgc_, typename TpArgv_>
     void parse_key_arg(
@@ -1152,7 +1177,9 @@ private:
             --*pos_increment;
         }
 
+        ky_arg->execute_action();
         ky_arg->set_found(true);
+        ky_arg->parse_sub_arg_parser(argc, argv, cur_idx, pos_increment);
     }
 
     /**
@@ -1388,11 +1415,11 @@ private:
                     if (!ky_arg->is_flag_set(arg_flags::TERMINAL) &&
                         !ky_arg->is_flag_set(arg_flags::PKILL_AFTER_TRIGGERING))
                     {
-                        speed::lowlevel::try_addm(&nr_options_bldr, 1);
+                        speed::safety::try_addm(&nr_options_bldr, 1);
                     }
                     else
                     {
-                        speed::lowlevel::try_addm(&nr_term_not_always_requird, 1);
+                        speed::safety::try_addm(&nr_term_not_always_requird, 1);
                     }
                 }
             }
@@ -1488,7 +1515,7 @@ private:
     void set_long_prefixes(Ts_&&... prefxs)
     {
         long_prefxs_.clear();
-        int foreach[sizeof...(Ts_)] = { (long_prefxs_.emplace(prefxs), 0)... };
+        int foreach[sizeof...(Ts_) + 1] = { (long_prefxs_.emplace(prefxs), 0)... };
         update_arg_keys_prefixes();
     }
 
@@ -1509,7 +1536,7 @@ private:
     void set_short_prefixes(Ts_&&... prefxs)
     {
         short_prefxs_.clear();
-        int foreach[sizeof...(Ts_)] = { (short_prefxs_.emplace(prefxs), 0)... };
+        int foreach[sizeof...(Ts_) + 1] = { (short_prefxs_.emplace(prefxs), 0)... };
         update_arg_keys_prefixes();
     }
 
@@ -1869,7 +1896,7 @@ private:
     vector_type<keyless_arg_type*> kyless_arg_list_;
 
     /** Collection of arguments constraints. */
-    vector_type<unique_ptr_type<arg_constraint_type>> constrnts_;
+    vector_type<arg_constraint_type*> constrnts_;
 
     /** Contains the unrecognized arguments if an error happen. */
     vector_type<string_type> unrecog_args_;
@@ -1892,21 +1919,26 @@ private:
     /** Indicates whether the parsing has been done. */
     bool parsd_;
 
-    /** Alocator of the key_arg_type. */
-    // TODO: Use smart pointers instead.
+    /** Allocator of the key_arg_type. */
     allocator_type<key_arg_type> key_arg_type_alloc_;
 
-    /** Alocator of the help_arg_type. */
+    /** Allocator of the help_arg_type. */
     allocator_type<help_arg_type> help_arg_type_alloc_;
 
-    /** Alocator of the version_arg_type. */
+    /** Allocator of the version_arg_type. */
     allocator_type<version_arg_type> version_arg_type_alloc_;
 
-    /** Alocator of the key_value_arg_type. */
+    /** Allocator of the key_value_arg_type. */
     allocator_type<key_value_arg_type> key_value_arg_type_alloc_;
 
-    /** Alocator of the keyless_arg_type. */
+    /** Allocator of the keyless_arg_type. */
     allocator_type<keyless_arg_type> keyless_arg_type_alloc_;
+
+    /** Allocator of the at_least_one_found_type. */
+    allocator_type<at_least_one_found_type> at_least_one_found_type_alloc_;
+
+    /** Allocator of the mutually_exclusive_type. */
+    allocator_type<mutually_exclusive_type> mutually_exclusive_type_alloc_;
     
     friend class basic_arg_key<TpAllocator>;
     friend class basic_arg_value<TpAllocator>;

@@ -48,13 +48,16 @@ class basic_key_arg_setter : virtual public speed::type_traits::basic_crtp_base<
 public:
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename TpAllocator::template rebind<T>::other;
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
 
     /** Type that represents the base of the arguments hierarchy. */
     using base_arg_type = basic_base_arg<TpAllocator>;
 
     /** Type that represents arguments that have keys. */
     using key_arg_type = basic_key_arg<TpAllocator>;
+
+    /** Type that represents the argument parser. */
+    using arg_parser_type = basic_arg_parser<TpAllocator>;
 
     /** Type that represents the class allowing configuring a base argument. */
     using base_arg_setter_type = speed::type_traits::basic_crtp_base<
@@ -130,6 +133,21 @@ public:
             base_arg_setter_type::bse_arg_->unset_flag(arg_flags::GROUPING);
         }
 
+        return dynamic_cast<self_type&>(*this);
+    }
+
+    /**
+     * @brief       Allows to set an argument sub parser. A sub parser allows to execute a new
+     *              arguement parser with its own configuration and arguments once a specific
+     *              Key argument is found. The parsing will be executed in the next command line
+     *              argument after the one relied with the current argument.
+     * @param       ap : The arguement sub parser.
+     * @return      The object who call the method.
+     */
+    self_type& sub_parser(arg_parser_type* ap)
+    {
+        dynamic_cast<key_arg_type*>(base_arg_setter_type::bse_arg_)
+                ->set_sub_arg_parser(ap);
         return dynamic_cast<self_type&>(*this);
     }
 };

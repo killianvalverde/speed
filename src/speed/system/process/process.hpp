@@ -39,6 +39,16 @@ namespace speed::system {
 namespace process {}
 
 
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contains resources for process interactions.
+ */
+namespace proc = process;
+
+#endif
+
+
 }
 
 

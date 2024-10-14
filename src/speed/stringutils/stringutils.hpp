@@ -39,6 +39,16 @@ namespace speed {
 namespace stringutils {}
 
 
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contains resources for common strings operations.
+ */
+namespace str = stringutils;
+
+#endif
+
+
 }
 
 

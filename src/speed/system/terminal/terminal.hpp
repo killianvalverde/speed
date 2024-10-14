@@ -40,6 +40,16 @@ namespace speed::system {
 namespace terminal {}
 
 
+#ifndef SPEED_DISABLE_ALIAS
+
+/**
+ * @brief       Contains resources for interacting and customizing the terminal.
+ */
+namespace term = terminal;
+
+#endif
+
+
 }
 
 

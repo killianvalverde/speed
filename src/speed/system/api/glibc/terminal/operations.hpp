@@ -27,7 +27,7 @@
 #ifndef SPEED_SYSTEM_API_GLIBC_TERMINAL_OPERATIONS_HPP
 #define SPEED_SYSTEM_API_GLIBC_TERMINAL_OPERATIONS_HPP
 
-#include "../../../type_traits/type_traits.hpp"
+#include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_GLIBC
 
 #include <cstdio>
@@ -46,20 +46,20 @@ using speed::system::terminal::text_attribute;
 
 /**
  * @brief       Flush the input terminal buffer.
- * @param       fd : The file descriptor of the terminal.
+ * @param       input_strm : Terminal input stream.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-bool flush_input_terminal(int fd, std::error_code* err_code = nullptr) noexcept;
+bool flush_input_terminal(::FILE* input_strm, std::error_code* err_code = nullptr) noexcept;
 
 
 /**
- * @brief       Flush the input terminal buffer.
- * @param       fd : The file descriptor of the terminal.
+ * @brief       Flush the output terminal buffer.
+ * @param       output_strm : Terminal output stream.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-bool flush_output_terminal(int fd, std::error_code* err_code = nullptr) noexcept;
+bool flush_output_terminal(::FILE* output_strm, std::error_code* err_code = nullptr) noexcept;
 
 
 /**
@@ -80,85 +80,14 @@ bool kbhit(
 
 /**
  * @brief       Set a terminal text attribute.
- * @param       strm : Stream in which set the attribute.
+ * @param       terminal_strm : Stream in which set the attribute.
  * @param       txt_attribute : Attribute to set.
  * @return      If function was successful 0 is returned, otherwise -1 is returned.
  */
 bool set_text_attribute(
-        ::FILE* strm,
+        ::FILE* terminal_strm,
         text_attribute txt_attribute
 ) noexcept;
-
-
-/**
- * @brief       Set a terminal text attribute.
- * @param       os : Ostream in which set the attribute.
- * @param       txt_attribute : Attribute to set.
- * @return      If function was successful 0 is returned, otherwise -1 is returned.
- */
-template<typename TpChar, typename TpCharTraits>
-bool set_text_attribute(
-        std::basic_ostream<TpChar, TpCharTraits>& os,
-        text_attribute txt_attribute
-)
-{
-    switch (txt_attribute)
-    {
-        case text_attribute::DEFAULT:
-            os << "\033[0m";
-            break;
-        case text_attribute::BLACK:
-            os << "\033[0;30m";
-            break;
-        case text_attribute::RED:
-            os << "\033[0;31m";
-            break;
-        case text_attribute::GREEN:
-            os << "\033[0;32m";
-            break;
-        case text_attribute::BROWN:
-            os << "\033[0;33m";
-            break;
-        case text_attribute::BLUE:
-            os << "\033[0;34m";
-            break;
-        case text_attribute::PURPLE:
-            os << "\033[0;35m";
-            break;
-        case text_attribute::CYAN:
-            os << "\033[0;36m";
-            break;
-        case text_attribute::LIGHT_GRAY:
-            os << "\033[0;37m";
-            break;
-        case text_attribute::DARK_GRAY:
-            os << "\033[1;30m";
-            break;
-        case text_attribute::LIGHT_RED:
-            os << "\033[1;31m";
-            break;
-        case text_attribute::LIGHT_GREEN:
-            os << "\033[1;32m";
-            break;
-        case text_attribute::YELLOW:
-            os << "\033[1;33m";
-            break;
-        case text_attribute::LIGHT_BLUE:
-            os << "\033[1;34m";
-            break;
-        case text_attribute::LIGHT_PURPLE:
-            os << "\033[1;35m";
-            break;
-        case text_attribute::LIGHT_CYAN:
-            os << "\033[1;36m";
-            break;
-        case text_attribute::WHITE:
-            os << "\033[1;37m";
-            break;
-    }
-    
-    return os.good();
-}
 
 
 }

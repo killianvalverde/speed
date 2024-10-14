@@ -70,6 +70,7 @@ TEST_F(argparse_arg_parser, add_key_arg)
     bool presnc;
 
     ap.add_key_arg("-l", "--long")
+            .action([&]() {})
             .description("Recursive behavior.")
             .error_name("error")
             .grouping(true)
@@ -83,7 +84,7 @@ TEST_F(argparse_arg_parser, add_key_arg)
     EXPECT_THROW(ap.add_key_arg(), speed::argparse::exception);
     EXPECT_THROW(ap.add_key_arg("-l"), speed::argparse::exception);
     EXPECT_THROW(ap.add_key_arg("--long"), speed::argparse::exception);
-    EXPECT_NO_THROW(ap.was_found("-l") == false);
+    EXPECT_TRUE(!ap.was_found("-l"));
 }
 
 
@@ -95,6 +96,7 @@ TEST_F(argparse_arg_parser, add_key_value_arg)
     bool presnc;
 
     ap.add_key_value_arg("-s", "--seconds")
+            .action([&]() {})
             .assignment_operator(true)
             .description("The number of seconds.")
             .error_name("error")
@@ -104,7 +106,6 @@ TEST_F(argparse_arg_parser, add_key_value_arg)
             .minmax_values(1, 1)
             .store_into(&vals)
             .regexes("^.*$")
-            .scan<std::uint64_t, double>()
             .store_into(&holdr1, &holdr2)
             .store_presence(&presnc)
             .terminal(false)
@@ -116,7 +117,7 @@ TEST_F(argparse_arg_parser, add_key_value_arg)
     EXPECT_THROW(ap.add_key_value_arg(), speed::argparse::exception);
     EXPECT_THROW(ap.add_key_value_arg("-s"), speed::argparse::exception);
     EXPECT_THROW(ap.add_key_value_arg("--seconds"), speed::argparse::exception);
-    EXPECT_NO_THROW(ap.was_found("-s") == false);
+    EXPECT_TRUE(!ap.was_found("-s"));
 }
 
 
@@ -128,6 +129,7 @@ TEST_F(argparse_arg_parser, add_keyless_arg)
     bool presnc;
 
     ap.add_keyless_arg("FILE")
+            .action([&]() {})
             .description("The file path.")
             .error_name("error")
             .help_menus_assigned("help1", "help2")
@@ -135,7 +137,6 @@ TEST_F(argparse_arg_parser, add_keyless_arg)
             .minmax_values(1, 1)
             .store_into(&vals)
             .regexes("^.*$")
-            .scan<std::uint64_t, double>()
             .store_into(&holdr1, &holdr2)
             .store_presence(&presnc)
             .terminal(false)
@@ -145,7 +146,7 @@ TEST_F(argparse_arg_parser, add_keyless_arg)
 
     EXPECT_THROW(ap.add_keyless_arg(""), speed::argparse::exception);
     EXPECT_THROW(ap.add_keyless_arg("FILE"), speed::argparse::exception);
-    EXPECT_NO_THROW(ap.was_found("FILE") == false);
+    EXPECT_TRUE(!ap.was_found("FILE"));
 }
 
 
@@ -157,6 +158,7 @@ TEST_F(argparse_arg_parser, add_help_arg)
     bool presnc;
 
     ap.add_help_arg("-h", "--help")
+            .action([&]() {})
             .assignment_operator(false)
             .description("Display this help and exit.")
             .error_name("error")
@@ -168,7 +170,6 @@ TEST_F(argparse_arg_parser, add_help_arg)
             .pkill_after_triggering(true)
             .store_into(&vals)
             .regexes("^.*$")
-            .scan<std::uint64_t, double>()
             .store_into(&holdr1, &holdr2)
             .store_presence(&presnc)
             .terminal(false)
@@ -181,7 +182,7 @@ TEST_F(argparse_arg_parser, add_help_arg)
     EXPECT_THROW(ap.add_help_arg(), speed::argparse::exception);
     EXPECT_THROW(ap.add_help_arg("-h"), speed::argparse::exception);
     EXPECT_THROW(ap.add_help_arg("--help"), speed::argparse::exception);
-    EXPECT_NO_THROW(ap.was_found("-h") == false);
+    EXPECT_TRUE(!ap.was_found("-h"));
 }
 
 
@@ -190,6 +191,7 @@ TEST_F(argparse_arg_parser, add_version_arg)
     bool presnc;
 
     ap.add_version_arg("-v", "--version")
+            .action([&]() {})
             .description("Display version information.")
             .error_name("error")
             .gplv3_version_information("v1.0.1", "2024", "Killian Valverde")
@@ -207,7 +209,7 @@ TEST_F(argparse_arg_parser, add_version_arg)
     EXPECT_THROW(ap.add_version_arg(), speed::argparse::exception);
     EXPECT_THROW(ap.add_version_arg("-v"), speed::argparse::exception);
     EXPECT_THROW(ap.add_version_arg("--version"), speed::argparse::exception);
-    EXPECT_NO_THROW(ap.was_found("-v") == false);
+    EXPECT_TRUE(!ap.was_found("-v"));
 }
 
 
@@ -236,6 +238,7 @@ TEST_F(argparse_arg_parser, parse_key_args)
     bool flg_all;
     bool flg_long;
     bool flg_recursive;
+    std::size_t dee = 0;
 
     ap.add_key_arg("-a", "--all")
             .description("Display all the information.")
@@ -247,7 +250,8 @@ TEST_F(argparse_arg_parser, parse_key_args)
 
     ap.add_key_arg("-r", "--recursive")
             .description("Execute the process in a recursive way.")
-            .store_presence(&flg_recursive);
+            .store_presence(&flg_recursive)
+            .action([&]() { ++dee; });
 
     EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
     EXPECT_TRUE(flg_all);
@@ -256,6 +260,7 @@ TEST_F(argparse_arg_parser, parse_key_args)
     EXPECT_TRUE(ap.was_found("-a"));
     EXPECT_TRUE(!ap.was_found("-l"));
     EXPECT_TRUE(ap.was_found("-r"));
+    EXPECT_TRUE(dee == 1);
 }
 
 
@@ -271,11 +276,11 @@ TEST_F(argparse_arg_parser, parse_key_value_args)
     std::vector<std::uint64_t> mins_vec;
     std::uint64_t secs = 0;
     std::uint64_t hrs = 0;
+    std::uint64_t dm;
 
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .store_into(&secs);
 
     ap.add_key_value_arg("--minutes", "-m")
@@ -287,7 +292,6 @@ TEST_F(argparse_arg_parser, parse_key_value_args)
     ap.add_key_value_arg("--hours", "-h")
             .description("Set hours.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .store_into(&hrs);
 
     EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
@@ -301,10 +305,10 @@ TEST_F(argparse_arg_parser, parse_key_value_args)
     EXPECT_TRUE(ap.get_front_as<std::uint64_t>("-s") == 10);
     EXPECT_TRUE(ap.get_front_as<std::uint64_t>("-m") == 20);
     EXPECT_TRUE(ap.get_at_as<std::uint64_t>("-m", 1) == 50);
-    EXPECT_THROW(ap.get_at_as<std::uint64_t>("-s", 1) == 0, speed::argparse::exception);
-    EXPECT_THROW(ap.get_at_as<std::uint64_t>("-m", 2) == 0, speed::argparse::exception);
-    EXPECT_THROW(ap.get_at_as<std::uint64_t>("-m", 3) == 0, speed::argparse::exception);
-    EXPECT_THROW(ap.get_front_as<std::uint64_t>("-h") == 0, speed::type_casting::exception);
+    EXPECT_THROW(dm = ap.get_at_as<std::uint64_t>("-s", 1), speed::argparse::exception);
+    EXPECT_THROW(dm = ap.get_at_as<std::uint64_t>("-m", 2), speed::argparse::exception);
+    EXPECT_THROW(dm = ap.get_at_as<std::uint64_t>("-m", 3), speed::argparse::exception);
+    EXPECT_THROW(dm = ap.get_front_as<std::uint64_t>("-h"), speed::type_casting::exception);
 }
 
 
@@ -354,6 +358,7 @@ TEST_F(argparse_arg_parser, parse_help_args)
     };
 
     std::string help_cat;
+    std::string dm;
     bool presnc;
 
     ap.add_help_arg("--help", "-h")
@@ -368,7 +373,7 @@ TEST_F(argparse_arg_parser, parse_help_args)
     EXPECT_TRUE(ap.count_values_found("-h") == 1);
     EXPECT_TRUE(help_cat == "information");
     EXPECT_TRUE(ap.get_front_as<std::string>("-h") == "information");
-    EXPECT_THROW(ap.get_at_as<std::string>("-h", 1) == "information2", speed::argparse::exception);
+    EXPECT_THROW(dm = ap.get_at_as<std::string>("-h", 1), speed::argparse::exception);
 }
 
 
@@ -406,24 +411,22 @@ TEST_F(argparse_arg_parser, parse_eq_operator)
     std::vector<std::uint64_t> mins_vec;
     std::uint64_t secs = 0;
     std::uint64_t hrs = 0;
+    std::uint64_t dm;
 
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .store_into(&secs);
 
     ap.add_key_value_arg("--minutes", "-m")
             .description("Set minutes.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .minmax_values(2, 2)
             .store_into(&mins_vec);
 
     ap.add_key_value_arg("--hours", "-h")
             .description("Set hours.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .store_into(&hrs);
 
     EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
@@ -437,10 +440,10 @@ TEST_F(argparse_arg_parser, parse_eq_operator)
     EXPECT_TRUE(ap.get_front_as<std::uint64_t>("-s") == 10);
     EXPECT_TRUE(ap.get_front_as<std::uint64_t>("-m") == 20);
     EXPECT_TRUE(ap.get_at_as<std::uint64_t>("-m", 1) == 50);
-    EXPECT_THROW(ap.get_at_as<std::uint64_t>("-s", 1) == 0, speed::argparse::exception);
-    EXPECT_THROW(ap.get_at_as<std::uint64_t>("-m", 2) == 0, speed::argparse::exception);
-    EXPECT_THROW(ap.get_at_as<std::uint64_t>("-m", 3) == 0, speed::argparse::exception);
-    EXPECT_THROW(ap.get_front_as<std::uint64_t>("-h") == 0, speed::type_casting::exception);
+    EXPECT_THROW(dm = ap.get_at_as<std::uint64_t>("-s", 1), speed::argparse::exception);
+    EXPECT_THROW(dm = ap.get_at_as<std::uint64_t>("-m", 2), speed::argparse::exception);
+    EXPECT_THROW(dm = ap.get_at_as<std::uint64_t>("-m", 3), speed::argparse::exception);
+    EXPECT_THROW(dm = ap.get_front_as<std::uint64_t>("-h"), speed::type_casting::exception);
 }
 
 
@@ -455,23 +458,22 @@ TEST_F(argparse_arg_parser, parse_grouping)
     std::vector<std::uint64_t> mins_vec;
     std::uint64_t secs = 0;
     std::uint64_t hrs = 0;
+    std::uint64_t dm;
 
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .store_into(&secs);
 
     ap.add_key_value_arg("--minutes", "-m")
             .description("Set minutes.")
             .values_names("INTEGER")
-            .scan<std::uint64_t, std::uint64_t>()
-            .store_into(&mins_vec);
+            .store_into(&mins_vec)
+            .minmax_values(2, 2);
 
     ap.add_key_value_arg("--hours", "-h")
             .description("Set hours.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .store_into(&hrs);
 
     EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
@@ -485,10 +487,10 @@ TEST_F(argparse_arg_parser, parse_grouping)
     EXPECT_TRUE(ap.get_front_as<std::uint64_t>("-s") == 10);
     EXPECT_TRUE(ap.get_front_as<std::uint64_t>("-m") == 20);
     EXPECT_TRUE(ap.get_at_as<std::uint64_t>("-m", 1) == 50);
-    EXPECT_THROW(ap.get_at_as<std::uint64_t>("-s", 1) == 0, speed::argparse::exception);
-    EXPECT_THROW(ap.get_at_as<std::uint64_t>("-m", 2) == 0, speed::argparse::exception);
-    EXPECT_THROW(ap.get_at_as<std::uint64_t>("-m", 3) == 0, speed::argparse::exception);
-    EXPECT_THROW(ap.get_front_as<std::uint64_t>("-h") == 0, speed::type_casting::exception);
+    EXPECT_THROW(dm = ap.get_at_as<std::uint64_t>("-s", 1), speed::argparse::exception);
+    EXPECT_THROW(dm = ap.get_at_as<std::uint64_t>("-m", 2), speed::argparse::exception);
+    EXPECT_THROW(dm = ap.get_at_as<std::uint64_t>("-m", 3), speed::argparse::exception);
+    EXPECT_THROW(dm = ap.get_front_as<std::uint64_t>("-h"), speed::type_casting::exception);
 }
 
 
@@ -609,6 +611,63 @@ TEST_F(argparse_arg_parser, parse_all_constraints)
 }
 
 
+TEST_F(argparse_arg_parser, parse_sub_parser)
+{
+    std::vector<const char*> argv1 = {
+        "git",
+        "add",
+        "src/speed/argparse/basic_arg_parser.hpp"
+    };
+
+    std::vector<const char*> argv2 = {
+        "git",
+        "commit",
+        "-m",
+        "test: argparse: add test"
+    };
+
+    std::vector<const char*> argv3 = {
+        "git",
+        "rebase",
+        "--interactive"
+    };
+
+    speed::argparse::arg_parser add_parsr;
+    speed::argparse::arg_parser commit_parsr;
+    speed::argparse::arg_parser rebase_parsr;
+    std::filesystem::path pth;
+    std::string messag;
+    bool interactv = false;
+
+    add_parsr.add_keyless_arg("FILE")
+            .store_into(&pth);
+
+    commit_parsr.add_key_value_arg("-m")
+            .store_into(&messag);
+
+    rebase_parsr.add_key_arg("-i", "--interactive")
+            .store_presence(&interactv);
+
+    ap.add_key_arg("add")
+            .sub_parser(&add_parsr);
+
+    ap.add_key_arg("commit")
+            .sub_parser(&commit_parsr);
+
+    ap.add_key_arg("rebase")
+            .sub_parser(&rebase_parsr);
+
+    ap.parse_args(argv1.size(), argv1);
+    EXPECT_TRUE(pth == argv1[2]);
+
+    ap.parse_args(argv2.size(), argv2);
+    EXPECT_TRUE(messag == argv2[3]);
+
+    ap.parse_args(argv3.size(), argv3);
+    EXPECT_TRUE(interactv);
+}
+
+
 TEST_F(argparse_arg_parser, check_errors)
 {
     std::vector<const char*> argv = {
@@ -655,7 +714,7 @@ TEST_F(argparse_arg_parser, print_usage)
         "--hours[=INTEGER]... DESTINATION\n\n";
 
     speed::iostream::ios_redirect ios_redirect(std::cout);
-    ios_redirect.redirect_to_embedded_stringstream();
+    ios_redirect.redirect_to_internal_stream();
 
     ap.configure()
             .program_name("speed");
@@ -677,20 +736,17 @@ TEST_F(argparse_arg_parser, print_usage)
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true);
 
     ap.add_key_value_arg("--minutes", "-m")
             .description("Set minutes.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true)
             .minmax_values(2, 4);
 
     ap.add_key_value_arg("--hours", "-h")
             .description("Set hours.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true)
             .minmax_values(0, 4);
 
@@ -699,7 +755,7 @@ TEST_F(argparse_arg_parser, print_usage)
 
     ap.print_help();
 
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_res);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
 
@@ -712,7 +768,7 @@ TEST_F(argparse_arg_parser, print_description)
             "porttitor.\n\n";
 
     speed::iostream::ios_redirect ios_redirect(std::cout);
-    ios_redirect.redirect_to_embedded_stringstream();
+    ios_redirect.redirect_to_internal_stream();
 
     ap.configure()
             .program_name("speed");
@@ -733,7 +789,7 @@ TEST_F(argparse_arg_parser, print_description)
 
     ap.print_help();
 
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_res);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
 
@@ -746,7 +802,7 @@ TEST_F(argparse_arg_parser, print_options)
         "  -h, --hours[=INTEGER]...  Set hours.\n\n";
 
     speed::iostream::ios_redirect ios_redirect(std::cout);
-    ios_redirect.redirect_to_embedded_stringstream();
+    ios_redirect.redirect_to_internal_stream();
 
     ap.configure()
             .program_name("speed");
@@ -769,20 +825,17 @@ TEST_F(argparse_arg_parser, print_options)
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true);
 
     ap.add_key_value_arg("--minutes", "-m")
             .description("Set minutes.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true)
             .minmax_values(2, 4);
 
     ap.add_key_value_arg("--hours", "-h")
             .description("Set hours.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .minmax_values(0, 4);
 
     ap.add_keyless_arg("DESTINATION")
@@ -790,7 +843,7 @@ TEST_F(argparse_arg_parser, print_options)
 
     ap.print_help();
 
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_res);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
 
@@ -808,7 +861,7 @@ TEST_F(argparse_arg_parser, print_commands)
             "  -s, --seconds=INTEGER     Set seconds.\n\n";
 
     speed::iostream::ios_redirect ios_redirect(std::cout);
-    ios_redirect.redirect_to_embedded_stringstream();
+    ios_redirect.redirect_to_internal_stream();
 
     ap.configure()
             .program_name("speed");
@@ -835,20 +888,17 @@ TEST_F(argparse_arg_parser, print_commands)
                          "Quisque sollicitudin enim a felis vehicula, quis faucibus mi molestie. "
                          "Fusce id justo et tortor vehicula porttitor.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true)
             .minmax_values(2, 4);
 
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true);
 
     ap.add_key_value_arg("--hours", "-h")
             .description("Set hours.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .minmax_values(0, 4);
 
     ap.add_keyless_arg("DESTINATION")
@@ -856,7 +906,7 @@ TEST_F(argparse_arg_parser, print_commands)
 
     ap.print_help();
 
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_res);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
 
@@ -867,7 +917,7 @@ TEST_F(argparse_arg_parser, print_values)
         "  DESTINATION  Destination directory.\n\n";
 
     speed::iostream::ios_redirect ios_redirect(std::cout);
-    ios_redirect.redirect_to_embedded_stringstream();
+    ios_redirect.redirect_to_internal_stream();
 
     ap.configure()
             .program_name("speed");
@@ -890,20 +940,17 @@ TEST_F(argparse_arg_parser, print_values)
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true);
 
     ap.add_key_value_arg("--minutes", "-m")
             .description("Set minutes.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true)
             .minmax_values(2, 4);
 
     ap.add_key_value_arg("--hours", "-h")
             .description("Set hours.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true)
             .minmax_values(0, 4);
 
@@ -912,7 +959,7 @@ TEST_F(argparse_arg_parser, print_values)
 
     ap.print_help();
 
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_res);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
 
@@ -925,7 +972,7 @@ TEST_F(argparse_arg_parser, print_epilogue)
             "porttitor.\n\n";
 
     speed::iostream::ios_redirect ios_redirect(std::cout);
-    ios_redirect.redirect_to_embedded_stringstream();
+    ios_redirect.redirect_to_internal_stream();
 
     ap.configure()
             .program_name("speed");
@@ -946,7 +993,7 @@ TEST_F(argparse_arg_parser, print_epilogue)
 
     ap.print_help();
 
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_res);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
 
@@ -979,7 +1026,7 @@ TEST_F(argparse_arg_parser, print_help)
             "porttitor.\n\n";
 
     speed::iostream::ios_redirect ios_redirect(std::cout);
-    ios_redirect.redirect_to_embedded_stringstream();
+    ios_redirect.redirect_to_internal_stream();
 
     ap.configure()
             .program_name("speed");
@@ -1013,19 +1060,16 @@ TEST_F(argparse_arg_parser, print_help)
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true);
 
     ap.add_key_value_arg("--minutes", "-m")
             .description("Set minutes.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .minmax_values(2, 4);
 
     ap.add_key_value_arg("--hours", "-h")
             .description("Set hours.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true)
             .minmax_values(0, 4);
 
@@ -1034,7 +1078,7 @@ TEST_F(argparse_arg_parser, print_help)
 
     ap.print_help();
 
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_res);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
 
@@ -1043,7 +1087,7 @@ TEST_F(argparse_arg_parser, print_version)
     std::string expected_res = "v1.0.0\n";
 
     speed::iostream::ios_redirect ios_redirect(std::cout);
-    ios_redirect.redirect_to_embedded_stringstream();
+    ios_redirect.redirect_to_internal_stream();
 
     ap.configure()
             .program_name("speed");
@@ -1054,13 +1098,14 @@ TEST_F(argparse_arg_parser, print_version)
 
     ap.print_version();
 
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_res);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
 
 TEST_F(argparse_arg_parser, print_number_errors)
 {
     std::string expected_res = "speed: --seconds: Invalid number '4896K'\n";
+    std::uint32_t val;
 
     std::vector<const char*> argv = {
             "speed",
@@ -1068,17 +1113,17 @@ TEST_F(argparse_arg_parser, print_number_errors)
     };
 
     speed::iostream::ios_redirect ios_redirect(std::cout);
-    ios_redirect.redirect_to_embedded_stringstream();
+    ios_redirect.redirect_to_internal_stream();
 
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>();
+            .store_into(&val);
 
     ap.parse_args(argv.size(), argv);
     ap.print_errors();
 
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_res);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
 
@@ -1111,7 +1156,7 @@ TEST_F(argparse_arg_parser, change_prefix)
             "porttitor.\n\n";
 
     speed::iostream::ios_redirect ios_redirect(std::cout);
-    ios_redirect.redirect_to_embedded_stringstream();
+    ios_redirect.redirect_to_internal_stream();
 
     ap.configure()
             .program_name("speed");
@@ -1145,19 +1190,16 @@ TEST_F(argparse_arg_parser, change_prefix)
     ap.add_key_value_arg("##seconds", "/s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true);
 
     ap.add_key_value_arg("##minutes", "/m")
             .description("Set minutes.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .minmax_values(2, 4);
 
     ap.add_key_value_arg("##hours", "/h")
             .description("Set hours.")
             .values_names("INTEGER")
-            .scan<std::uint64_t>()
             .mandatory(true)
             .minmax_values(0, 4);
 
@@ -1170,5 +1212,5 @@ TEST_F(argparse_arg_parser, change_prefix)
 
     ap.print_help();
 
-    EXPECT_TRUE(ios_redirect.get_embedded_stringstream_str() == expected_res);
+    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }

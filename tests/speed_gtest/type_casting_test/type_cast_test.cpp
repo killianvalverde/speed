@@ -68,10 +68,13 @@ TEST(type_casting_type_cast, c_string_to_integral_unsigned)
     ASSERT_TRUE(speed::type_casting::type_cast<unsigned int>("342432") == 342432);
     ASSERT_TRUE(speed::type_casting::type_cast<unsigned int>("12387645") != 1238764);
     ASSERT_TRUE(speed::type_casting::type_cast<unsigned int>("+342432") == +342432);
-    EXPECT_THROW(speed::type_casting::type_cast<unsigned int>("-342432"), speed::type_casting::exception);
+    EXPECT_THROW(speed::type_casting::type_cast<unsigned int>("-342432"),
+                 speed::type_casting::exception);
     EXPECT_THROW(speed::type_casting::type_cast<unsigned int>(""), speed::type_casting::exception);
-    EXPECT_THROW(speed::type_casting::type_cast<unsigned int>("\0"), speed::type_casting::exception);
-    EXPECT_THROW(speed::type_casting::type_cast<unsigned int>("1238*7645"), speed::type_casting::exception);
+    EXPECT_THROW(speed::type_casting::type_cast<unsigned int>("\0"),
+                 speed::type_casting::exception);
+    EXPECT_THROW(speed::type_casting::type_cast<unsigned int>("1238*7645"),
+                 speed::type_casting::exception);
 }
 
 
