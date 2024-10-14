@@ -268,6 +268,26 @@ set_target_properties(speed_type_casting PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(speed_type_traits PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(speed PROPERTIES LINKER_LANGUAGE CXX)
 
+set(suffix "$<IF:$<CONFIG:Debug>,d,>")
+set_target_properties(speed_algorithm PROPERTIES OUTPUT_NAME speed_algorithm${suffix})
+set_target_properties(speed_argparse PROPERTIES OUTPUT_NAME speed_argparse${suffix})
+set_target_properties(speed_containers PROPERTIES OUTPUT_NAME speed_containers${suffix})
+set_target_properties(speed_errors PROPERTIES OUTPUT_NAME speed_errors${suffix})
+set_target_properties(speed_exception PROPERTIES OUTPUT_NAME speed_exception${suffix})
+set_target_properties(speed_filesystem PROPERTIES OUTPUT_NAME speed_filesystem${suffix})
+set_target_properties(speed_iostream PROPERTIES OUTPUT_NAME speed_iostream${suffix})
+set_target_properties(speed_lowlevel PROPERTIES OUTPUT_NAME speed_lowlevel${suffix})
+set_target_properties(speed_math PROPERTIES OUTPUT_NAME speed_math${suffix})
+set_target_properties(speed_memory PROPERTIES OUTPUT_NAME speed_memory${suffix})
+set_target_properties(speed_safety PROPERTIES OUTPUT_NAME speed_safety${suffix})
+set_target_properties(speed_scalars PROPERTIES OUTPUT_NAME speed_scalars${suffix})
+set_target_properties(speed_stringutils PROPERTIES OUTPUT_NAME speed_stringutils${suffix})
+set_target_properties(speed_system PROPERTIES OUTPUT_NAME speed_system${suffix})
+set_target_properties(speed_time PROPERTIES OUTPUT_NAME speed_time${suffix})
+set_target_properties(speed_type_casting PROPERTIES OUTPUT_NAME speed_type_casting${suffix})
+set_target_properties(speed_type_traits PROPERTIES OUTPUT_NAME speed_type_traits${suffix})
+set_target_properties(speed PROPERTIES OUTPUT_NAME speed${suffix})
+
 target_link_libraries(speed_argparse 
         speed_containers 
         speed_exception 
