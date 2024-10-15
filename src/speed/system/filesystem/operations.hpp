@@ -680,6 +680,40 @@ inline bool rmdir(const wchar_t* dir_path, std::error_code* err_code = nullptr) 
 
 
 /**
+ * @brief       Creates a shortcut stored at shortcut_pth that points at target_pth.
+ * @param       target_pth : Path of the target.
+ * @param       shortcut_pth : Path where the shortcut is stored including the file name.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+inline bool shortcut(
+        const char* target_pth,
+        const char* shortcut_pth,
+        std::error_code* err_code = nullptr
+) noexcept
+{
+    return SPEED_SELECT_API(filesystem::shortcut, false, target_pth, shortcut_pth, err_code);
+}
+
+
+/**
+ * @brief       Creates a shortcut stored at shortcut_pth that points at target_pth.
+ * @param       target_pth : Path of the target.
+ * @param       shortcut_pth : Path where the shortcut is stored including the file name.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+inline bool shortcut(
+        const wchar_t* target_pth,
+        const wchar_t* shortcut_pth,
+        std::error_code* err_code = nullptr
+) noexcept
+{
+    return SPEED_SELECT_API(filesystem::shortcut, false, target_pth, shortcut_pth, err_code);
+}
+
+
+/**
  * @brief       Creates a symbolic link named lnk_pth which contains the string trg.
  * @param       trg : The string to contain in the symlink.
  * @param       lnk_pth : The symbolilc link name.

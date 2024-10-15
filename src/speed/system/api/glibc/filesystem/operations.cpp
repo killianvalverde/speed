@@ -931,6 +931,26 @@ bool rmdir(const wchar_t* dir_path, std::error_code* err_code) noexcept
 }
 
 
+bool shortcut(
+        const char* target_pth,
+        const char* shortcut_pth,
+        std::error_code* err_code
+) noexcept
+{
+    return symlink(target_pth, shortcut_pth, err_code);
+}
+
+
+bool shortcut(
+        const wchar_t* target_pth,
+        const wchar_t* shortcut_pth,
+        std::error_code* err_code
+) noexcept
+{
+    return symlink(target_pth, shortcut_pth, err_code);
+}
+
+
 bool symlink(const char* trg, const char* lnk_pth, std::error_code* err_code) noexcept
 {
     errno = 0;

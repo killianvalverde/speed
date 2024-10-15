@@ -31,6 +31,8 @@
 #include <aclapi.h>
 #include <io.h>
 #include <sddl.h>
+#include <shlguid.h>
+#include <shobjidl_core.h>
 // #include <winsock2.h>
 
 #include <cstdlib>
@@ -1438,6 +1440,156 @@ bool rmdir(const wchar_t* dir_path, std::error_code* err_code) noexcept
     }
 
     return true;
+}
+
+
+bool shortcut(
+        const char* target_pth,
+        const char* shortcut_pth,
+        std::error_code* err_code
+) noexcept
+{
+    HRESULT res = -1;
+    IShellLinkA* shell_lnk = nullptr;
+    IPersistFile* persist_fle = nullptr;
+    char absolute_target_pth[MAX_PATH] = {};
+    wchar_t wshortcut_pth[MAX_PATH] = {};
+    std::size_t converted_chars = 0;
+    errno_t err;
+
+    if (::CoInitialize(nullptr) != S_OK)
+    {
+        goto exit_with_error;
+    }
+
+    res = ::CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink,
+                             (LPVOID*)&shell_lnk);
+
+    if (!SUCCEEDED(res))
+    {
+        goto exit_with_error;
+    }
+
+    if (!::GetFullPathNameA(target_pth, MAX_PATH, absolute_target_pth, nullptr))
+    {
+        assign_system_error_code(ERROR_BAD_PATHNAME, err_code);
+        goto exit;
+    }
+
+    shell_lnk->SetPath(absolute_target_pth);
+    shell_lnk->SetDescription(nullptr);
+
+    res = shell_lnk->QueryInterface(IID_IPersistFile, (LPVOID*)&persist_fle);
+
+    if (!SUCCEEDED(res))
+    {
+        goto exit_with_error;
+    }
+
+    err = mbstowcs_s(&converted_chars, wshortcut_pth, MAX_PATH, shortcut_pth, _TRUNCATE);
+    if (err != 0 || converted_chars == 0)
+    {
+        goto exit_with_error;
+    }
+
+    if (converted_chars + 4 >= MAX_PATH)
+    {
+        assign_system_error_code(ERROR_BAD_PATHNAME, err_code);
+        goto exit;
+    }
+
+    speed::stringutils::strcpy(wshortcut_pth + converted_chars - 1, L".lnk");
+    res = persist_fle->Save(wshortcut_pth, true);
+
+    goto exit;
+
+exit_with_error:
+    assign_system_error_code((int)GetLastError(), err_code);
+
+exit:
+    if (shell_lnk != nullptr)
+    {
+        shell_lnk->Release();
+    }
+    if (persist_fle != nullptr)
+    {
+        persist_fle->Release();
+    }
+
+    return res == 0;
+}
+
+
+bool shortcut(
+        const wchar_t* target_pth,
+        const wchar_t* shortcut_pth,
+        std::error_code* err_code
+) noexcept
+{
+    HRESULT res = -1;
+    IShellLinkW* shell_lnk = nullptr;
+    IPersistFile* persist_fle = nullptr;
+    wchar_t absolute_target_pth[MAX_PATH] = {};
+    wchar_t wshortcut_pth[MAX_PATH] = {};
+    std::size_t shortcut_pth_len;
+    errno_t err;
+
+    if (::CoInitialize(nullptr) != S_OK)
+    {
+        goto exit_with_error;
+    }
+
+    res = ::CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink,
+                             (LPVOID*)&shell_lnk);
+
+    if (!SUCCEEDED(res))
+    {
+        goto exit_with_error;
+    }
+
+    if (!::GetFullPathNameW(target_pth, MAX_PATH, absolute_target_pth, nullptr))
+    {
+        assign_system_error_code(ERROR_BAD_PATHNAME, err_code);
+        goto exit;
+    }
+
+    shell_lnk->SetPath(target_pth);
+    shell_lnk->SetDescription(nullptr);
+
+    res = shell_lnk->QueryInterface(IID_IPersistFile, (LPVOID*)&persist_fle);
+
+    if (!SUCCEEDED(res))
+    {
+        goto exit_with_error;
+    }
+
+    shortcut_pth_len = speed::stringutils::strlen(wshortcut_pth);
+    if (shortcut_pth_len + 5 >= MAX_PATH)
+    {
+        assign_system_error_code(ERROR_BAD_PATHNAME, err_code);
+        goto exit;
+    }
+
+    speed::stringutils::strcpy(wshortcut_pth, shortcut_pth);
+    speed::stringutils::strcpy(wshortcut_pth + shortcut_pth_len, L".lnk");
+    res = persist_fle->Save(wshortcut_pth, true);
+
+    goto exit;
+
+exit_with_error:
+    assign_system_error_code((int)GetLastError(), err_code);
+
+exit:
+    if (shell_lnk != nullptr)
+    {
+        shell_lnk->Release();
+    }
+    if (persist_fle != nullptr)
+    {
+        persist_fle->Release();
+    }
+
+    return res == 0;
 }
 
 
