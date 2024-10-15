@@ -70,6 +70,7 @@ set(SPEED_FILESYSTEM_SOURCE_FILES
         filesystem/directory_iteration.hpp
         filesystem/filesystem.cpp
         filesystem/filesystem.hpp
+        filesystem/forward_declarations.hpp
         filesystem/valid_path.hpp
 )
 
@@ -123,35 +124,43 @@ set(SPEED_STRINGUTILS_SOURCE_FILES
 )
 
 set(SPEED_SYSTEM_SOURCE_FILES
+        system/api/api.hpp
+        system/api/glibc/codecs/codecs.hpp
+        system/api/glibc/codecs/operations.cpp
+        system/api/glibc/codecs/operations.hpp
         system/api/glibc/filesystem/directory_entity_extension.hpp
+        system/api/glibc/filesystem/filesystem.hpp
         system/api/glibc/filesystem/operations.cpp
         system/api/glibc/filesystem/operations.hpp
+        system/api/glibc/glibc.hpp
         system/api/glibc/process/operations.cpp
         system/api/glibc/process/operations.hpp
+        system/api/glibc/process/process.hpp
         system/api/glibc/terminal/operations.cpp
         system/api/glibc/terminal/operations.hpp
+        system/api/glibc/terminal/terminal.hpp
         system/api/glibc/time/operations.cpp
         system/api/glibc/time/operations.hpp
-        system/api/glibc/filesystem/filesystem.hpp
-        system/api/glibc/process/process.hpp
-        system/api/glibc/terminal/terminal.hpp
         system/api/glibc/time/time.hpp
-        system/api/glibc/glibc.hpp
+        system/api/winapi/codecs/codecs.hpp
+        system/api/winapi/codecs/operations.cpp
+        system/api/winapi/codecs/operations.hpp
         system/api/winapi/filesystem/directory_entity_extension.hpp
+        system/api/winapi/filesystem/filesystem.hpp
         system/api/winapi/filesystem/operations.cpp
         system/api/winapi/filesystem/operations.hpp
         system/api/winapi/process/operations.cpp
         system/api/winapi/process/operations.hpp
+        system/api/winapi/process/process.hpp
         system/api/winapi/terminal/operations.cpp
         system/api/winapi/terminal/operations.hpp
+        system/api/winapi/terminal/terminal.hpp
         system/api/winapi/time/operations.cpp
         system/api/winapi/time/operations.hpp
-        system/api/winapi/filesystem/filesystem.hpp
-        system/api/winapi/process/process.hpp
-        system/api/winapi/terminal/terminal.hpp
         system/api/winapi/time/time.hpp
         system/api/winapi/winapi.hpp
-        system/api/api.hpp
+        system/codecs/codecs.hpp
+        system/codecs/operations.hpp
         system/compatibility/compatibility.hpp
         system/compatibility/platform.hpp
         system/compatibility/select_api.hpp
@@ -161,7 +170,7 @@ set(SPEED_SYSTEM_SOURCE_FILES
         system/exceptions/exceptions.hpp
         system/filesystem/access_modes.hpp
         system/filesystem/basic_directory_entity.hpp
-        system/filesystem/file_type.hpp
+        system/filesystem/file_types.hpp
         system/filesystem/filesystem.hpp
         system/filesystem/operations.hpp
         system/process/operations.hpp
@@ -195,6 +204,7 @@ set(SPEED_TYPE_CASTING_SOURCE_FILES
         type_casting/error_codes.hpp
         type_casting/error_conditions.hpp
         type_casting/exception.hpp
+        type_casting/forward_declarations.hpp
         type_casting/try_type_cast.hpp
         type_casting/type_cast.hpp
         type_casting/type_caster_base.hpp
