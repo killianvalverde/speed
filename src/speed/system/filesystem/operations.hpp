@@ -33,7 +33,7 @@
 #include "../compatibility/compatibility.hpp"
 #include "access_modes.hpp"
 #include "basic_directory_entity.hpp"
-#include "file_type.hpp"
+#include "file_types.hpp"
 
 
 namespace speed::system::filesystem {
@@ -87,7 +87,7 @@ inline bool access(
 inline bool access(
         const char* fle_path,
         access_modes acss_modes,
-        file_type fle_type,
+        file_types fle_type,
         std::error_code* err_code = nullptr
 ) noexcept
 {
@@ -107,7 +107,7 @@ inline bool access(
 inline bool access(
         const wchar_t* fle_path,
         access_modes acss_modes,
-        file_type fle_type,
+        file_types fle_type,
         std::error_code* err_code = nullptr
 ) noexcept
 {
@@ -234,7 +234,10 @@ inline bool closedir(wdirectory_entity* dir_ent, std::error_code* err_code = nul
  * @return      On success the inode number of the sepcified file is returned, otherwise -1 is
  *              returned.
  */
-inline uint64_t get_file_inode(const char* fle_path, std::error_code* err_code = nullptr) noexcept
+inline std::uint64_t get_file_inode(
+        const char* fle_path,
+        std::error_code* err_code = nullptr
+) noexcept
 {
     return SPEED_SELECT_API(filesystem::get_file_inode, -1, fle_path, err_code);
 }
@@ -247,7 +250,7 @@ inline uint64_t get_file_inode(const char* fle_path, std::error_code* err_code =
  * @return      On success the inode number of the sepcified file is returned, otherwise -1 is
  *              returned.
  */
-inline uint64_t get_file_inode(
+inline std::uint64_t get_file_inode(
         const wchar_t* fle_path,
         std::error_code* err_code = nullptr
 ) noexcept
@@ -420,14 +423,15 @@ inline bool is_fifo(const wchar_t* fle_path, std::error_code* err_code = nullptr
 /**
  * @brief       Checks if the given path corresponds to a specified file type.
  * @param       fle_path : Path to check.
- * @param       fle_type : The specified file type.
+ * @param       fle_type : The specified file type. If more than one flag is set, the function will
+ *              verify if at least one of the type is matching.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 inline bool is_file_type(
         const char* fle_path,
-        file_type fle_type, 
-        std::error_code* err_code
+        file_types fle_type,
+        std::error_code* err_code = nullptr
 ) noexcept
 {
     return SPEED_SELECT_API(filesystem::is_file_type, false, fle_path, fle_type, err_code);
@@ -443,8 +447,8 @@ inline bool is_file_type(
  */
 inline bool is_file_type(
         const wchar_t* fle_path,
-        file_type fle_type,
-        std::error_code* err_code
+        file_types fle_type,
+        std::error_code* err_code = nullptr
 ) noexcept
 {
     return SPEED_SELECT_API(filesystem::is_file_type, false, fle_path, fle_type, err_code);

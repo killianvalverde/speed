@@ -47,30 +47,29 @@ bool access(
 ) noexcept
 {
     decltype(F_OK) mode_buildr = 0;
-    bool check = false;
-    
+
+    if (acss_modes == access_modes::NIL)
+    {
+        return true;
+    }
     if ((acss_modes & access_modes::EXISTS) != access_modes::NIL)
     {
-        check = true;
         mode_buildr |= F_OK;
     }
     if ((acss_modes & access_modes::READ) != access_modes::NIL)
     {
-        check = true;
         mode_buildr |= R_OK;
     }
     if ((acss_modes & access_modes::WRITE) != access_modes::NIL)
     {
-        check = true;
         mode_buildr |= W_OK;
     }
     if ((acss_modes & access_modes::EXECUTE) != access_modes::NIL)
     {
-        check = true;
         mode_buildr |= X_OK;
     }
     
-    if (check && ::access(fle_path, mode_buildr) == -1)
+    if (::access(fle_path, mode_buildr) == -1)
     {
         assign_system_error_code(errno, err_code);
         return false;
@@ -99,7 +98,7 @@ bool access(
 bool access(
         const char* fle_path,
         access_modes acss_modes,
-        file_type fle_type,
+        file_types fle_type,
         std::error_code* err_code
 ) noexcept
 {
@@ -111,7 +110,7 @@ bool access(
 bool access(
         const wchar_t* fle_path,
         access_modes acss_modes,
-        file_type fle_type,
+        file_types fle_type,
         std::error_code* err_code
 ) noexcept
 {
@@ -178,7 +177,7 @@ bool can_regular_file_be_created(const char* reg_file_path, std::error_code* err
 
     if (access(reg_file_path, access_modes::EXISTS, err_code))
     {
-        return access(reg_file_path, access_modes::WRITE, file_type::REGULAR_FILE, err_code);
+        return access(reg_file_path, access_modes::WRITE, file_types::REGULAR_FILE, err_code);
     }
 
     stringutils::strcpy(parent_pth, reg_file_path);
@@ -322,7 +321,7 @@ bool get_first_actual_directory(char* pth, std::error_code* err_code) noexcept
     
     while (pth_len > 0)
     {
-        if (access(pth, access_modes::EXISTS, file_type::DIRECTORY, err_code))
+        if (access(pth, access_modes::EXISTS, file_types::DIRECTORY, err_code))
         {
             return true;
         }
@@ -559,53 +558,49 @@ bool is_fifo(const wchar_t* fle_path, std::error_code* err_code) noexcept
 }
 
 
-bool is_file_type(const char* fle_path, file_type fle_type, std::error_code* err_code) noexcept
+bool is_file_type(const char* fle_path, file_types fle_type, std::error_code* err_code) noexcept
 {
-    bool scs;
-    
-    switch (fle_type)
+    if ((fle_type & file_types::BLOCK_DEVICE) != file_types::NIL &&
+        is_block_device(fle_path, err_code))
     {
-        case file_type::NIL:
-            scs = true;
-            break;
-        
-        case file_type::BLOCK_DEVICE:
-            scs = is_block_device(fle_path, err_code);
-            break;
-        
-        case file_type::CHARACTER_DEVICE:
-            scs = is_character_device(fle_path, err_code);
-            break;
-        
-        case file_type::DIRECTORY:
-            scs = is_directory(fle_path, err_code);
-            break;
-        
-        case file_type::FIFO:
-            scs = is_fifo(fle_path, err_code);
-            break;
-        
-        case file_type::REGULAR_FILE:
-            scs = is_regular_file(fle_path, err_code);
-            break;
-        
-        case file_type::SOCKET:
-            scs = is_socket(fle_path, err_code);
-            break;
-        
-        case file_type::SYMLINK:
-            scs = is_symlink(fle_path, err_code);
-            break;
-        
-        default:
-            scs = false;
+        return true;
     }
-    
-    return scs;
+    if ((fle_type & file_types::CHARACTER_DEVICE) != file_types::NIL &&
+        is_character_device(fle_path, err_code))
+    {
+        return true;
+    }
+    if ((fle_type & file_types::DIRECTORY) != file_types::NIL &&
+        is_directory(fle_path, err_code))
+    {
+        return true;
+    }
+    if ((fle_type & file_types::FIFO) != file_types::NIL &&
+        is_fifo(fle_path, err_code))
+    {
+        return true;
+    }
+    if ((fle_type & file_types::REGULAR_FILE) != file_types::NIL &&
+        is_regular_file(fle_path, err_code))
+    {
+        return true;
+    }
+    if ((fle_type & file_types::SOCKET) != file_types::NIL &&
+        is_socket(fle_path, err_code))
+    {
+        return true;
+    }
+    if ((fle_type & file_types::SYMLINK) != file_types::NIL &&
+        is_symlink(fle_path, err_code))
+    {
+        return true;
+    }
+
+    return false;
 }
 
 
-bool is_file_type(const wchar_t* fle_path, file_type fle_type, std::error_code* err_code) noexcept
+bool is_file_type(const wchar_t* fle_path, file_types fle_type, std::error_code* err_code) noexcept
 {
     char c_str[PATH_MAX] = {};
     if (!get_cstr_path_from_wstr(fle_path, c_str))

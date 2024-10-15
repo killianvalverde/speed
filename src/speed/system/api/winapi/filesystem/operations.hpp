@@ -33,7 +33,7 @@
 #include "../../../errors/errors.hpp"
 #include "../../../filesystem/access_modes.hpp"
 #include "../../../filesystem/basic_directory_entity.hpp"
-#include "../../../filesystem/file_type.hpp"
+#include "../../../filesystem/file_types.hpp"
 
 
 namespace speed::system::api::winapi::filesystem {
@@ -43,7 +43,7 @@ using namespace speed::system::errors;
 using speed::system::filesystem::access_modes;
 using speed::system::filesystem::directory_entity;
 using speed::system::filesystem::wdirectory_entity;
-using speed::system::filesystem::file_type;
+using speed::system::filesystem::file_types;
 
 
 /**
@@ -88,7 +88,7 @@ bool access(
 bool access(
         const char* fle_path,
         access_modes acss_modes,
-        file_type fle_type,
+        file_types fle_type,
         std::error_code* err_code = nullptr
 ) noexcept;
 
@@ -105,7 +105,7 @@ bool access(
 bool access(
         const wchar_t* fle_path,
         access_modes acss_modes,
-        file_type fle_type,
+        file_types fle_type,
         std::error_code* err_code = nullptr
 ) noexcept;
 
@@ -360,7 +360,7 @@ bool is_fifo(const wchar_t* fle_path, std::error_code* err_code = nullptr) noexc
  */
 bool is_file_type(
         const char* fle_path,
-        file_type fle_type,
+        file_types fle_type,
         std::error_code* err_code = nullptr
 ) noexcept;
 
@@ -374,7 +374,7 @@ bool is_file_type(
  */
 bool is_file_type(
         const wchar_t* fle_path,
-        file_type fle_type,
+        file_types fle_type,
         std::error_code* err_code = nullptr
 ) noexcept;
 
