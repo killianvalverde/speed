@@ -349,7 +349,7 @@ public:
     
     /**
      * @brief       Get an iterator to the past-the-end element in the container.
-     * @return      An iterator to the past-the-end element in the container
+     * @return      An iterator to the past-the-end element in the container.
      */
     inline iterator end() noexcept
     {
@@ -358,7 +358,7 @@ public:
     
     /**
      * @brief       Get a const iterator to the past-the-end element in the container.
-     * @return      A const iterator to the past-the-end element in the container
+     * @return      A const iterator to the past-the-end element in the container.
      */
     inline const_iterator cend() const noexcept
     {

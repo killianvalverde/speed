@@ -18,8 +18,8 @@
  */
 
 /**
- * @file        speed/compatibility/operations.hpp
- * @brief       compatibility functions header.
+ * @file        speed/type_traits/operations.hpp
+ * @brief       operations functions header.
  * @author      Killian Valverde
  * @date        2016/08/05
  */

@@ -29,6 +29,8 @@
 
 #include "platform.hpp"
 
+
+/** @cond */
 #ifdef SPEED_GLIBC
 #define SPEED_API_PREFIX 1, ::speed::system::api::glibc
 #elif defined(SPEED_WINAPI)
@@ -47,6 +49,7 @@
 #define SPEED_CONCAT(a, b) SPEED_CONCAT_HELPER(a, b)
 #define SPEED_SELECT_API(a, b, ...) SPEED_CONCAT(SPEED_API_DEFINED_,\
         SPEED_IS_API_DEFINED(SPEED_API_PREFIX))(a, b, __VA_ARGS__)
+/** @endcond */
 
 
 #endif
