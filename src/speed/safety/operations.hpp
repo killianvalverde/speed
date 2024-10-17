@@ -30,6 +30,7 @@
 #include <limits>
 #include <stdexcept>
 
+#include "../system/system.hpp"
 #include "exception.hpp"
 
 
