@@ -33,7 +33,6 @@
 #include <sddl.h>
 #include <shlguid.h>
 #include <shobjidl_core.h>
-// #include <winsock2.h>
 
 #include <cstdlib>
 #include <memory>
@@ -1014,6 +1013,7 @@ bool is_regular_file(const wchar_t* fle_path, std::error_code* err_code) noexcep
 bool is_socket(const char* fle_path, std::error_code* err_code) noexcept
 {
     // TODO: This function requires a header that make problems.
+    // #include <winsock2.h>
     // HANDLE file_handl;
     // WSANETWORKEVENTS evnts;
     // int sockt;
@@ -1044,6 +1044,7 @@ bool is_socket(const char* fle_path, std::error_code* err_code) noexcept
 bool is_socket(const wchar_t* fle_path, std::error_code* err_code) noexcept
 {
     // TODO: This function requires a header that make problems.
+    // #include <winsock2.h>
     // HANDLE file_handl;
     // WSANETWORKEVENTS evnts;
     // int sockt;
@@ -1457,23 +1458,19 @@ bool shortcut(
     std::size_t converted_chars = 0;
     errno_t err;
 
-    if (::CoInitialize(nullptr) != S_OK)
+    if (!::GetFullPathNameA(target_pth, MAX_PATH, absolute_target_pth, nullptr))
     {
-        goto exit_with_error;
+        assign_system_error_code(ERROR_BAD_PATHNAME, err_code);
+        goto exit;
     }
 
+    ::CoInitialize(nullptr);
     res = ::CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink,
                              (LPVOID*)&shell_lnk);
 
     if (!SUCCEEDED(res))
     {
         goto exit_with_error;
-    }
-
-    if (!::GetFullPathNameA(target_pth, MAX_PATH, absolute_target_pth, nullptr))
-    {
-        assign_system_error_code(ERROR_BAD_PATHNAME, err_code);
-        goto exit;
     }
 
     shell_lnk->SetPath(absolute_target_pth);
@@ -1534,12 +1531,14 @@ bool shortcut(
     std::size_t shortcut_pth_len;
     errno_t err;
 
-    if (::CoInitialize(nullptr) != S_OK)
+    if (!::GetFullPathNameW(target_pth, MAX_PATH, absolute_target_pth, nullptr))
     {
-        goto exit_with_error;
+        assign_system_error_code(ERROR_BAD_PATHNAME, err_code);
+        goto exit;
     }
 
-    res = ::CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink,
+    ::CoInitialize(nullptr);
+    res = ::CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLinkW,
                              (LPVOID*)&shell_lnk);
 
     if (!SUCCEEDED(res))
@@ -1547,13 +1546,7 @@ bool shortcut(
         goto exit_with_error;
     }
 
-    if (!::GetFullPathNameW(target_pth, MAX_PATH, absolute_target_pth, nullptr))
-    {
-        assign_system_error_code(ERROR_BAD_PATHNAME, err_code);
-        goto exit;
-    }
-
-    shell_lnk->SetPath(target_pth);
+    shell_lnk->SetPath(absolute_target_pth);
     shell_lnk->SetDescription(nullptr);
 
     res = shell_lnk->QueryInterface(IID_IPersistFile, (LPVOID*)&persist_fle);
@@ -1563,7 +1556,7 @@ bool shortcut(
         goto exit_with_error;
     }
 
-    shortcut_pth_len = speed::stringutils::strlen(wshortcut_pth);
+    shortcut_pth_len = speed::stringutils::strlen(shortcut_pth);
     if (shortcut_pth_len + 5 >= MAX_PATH)
     {
         assign_system_error_code(ERROR_BAD_PATHNAME, err_code);

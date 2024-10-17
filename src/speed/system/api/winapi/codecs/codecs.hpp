@@ -18,32 +18,28 @@
  */
 
 /**
- * @file        speed/system/api/glibc/glibc.hpp
- * @brief       glibc api main header.
+ * @file        speed/system/api/winapi/codecs/codecs.hpp
+ * @brief       system codecs main header.
  * @author      Killian Valverde
- * @date        2023/10/31
+ * @date        2024/10/16
  */
 
-#ifndef SPEED_SYSTEM_API_GLIBC_GLIBC_HPP
-#define SPEED_SYSTEM_API_GLIBC_GLIBC_HPP
+#ifndef SPEED_SYSTEM_API_WINAPI_CODECS_CODECS_HPP
+#define SPEED_SYSTEM_API_WINAPI_CODECS_CODECS_HPP
 
-#include "../../compatibility/compatibility.hpp"
-#ifdef SPEED_GLIBC
+#include "../../../compatibility/compatibility.hpp"
+#ifdef SPEED_WINAPI
 
-#include "codecs/codecs.hpp"
-#include "filesystem/filesystem.hpp"
-#include "process/process.hpp"
-#include "terminal/terminal.hpp"
-#include "time/time.hpp"
+#include "operations.hpp"
 
 
-namespace speed::system::api {
+namespace speed::system::api::winapi {
 
 
 /**
- * @brief       Contains all the implementation of the system functions using the glibc API.
+ * @brief       Contains utilities encoding and decoding.
  */
-namespace glibc {}
+namespace codecs {}
 
 
 }
