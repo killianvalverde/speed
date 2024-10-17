@@ -1162,9 +1162,7 @@ bool mkdir_recursively(
         std::error_code* err_code
 ) noexcept
 {
-    // TODO: Change the mods after the directory creation to match them with the argument
-    static_assert(MAX_PATH >= 255, "PATH_MAX has to be at least 255.");
-
+    // TODO: Change the mods after the directory creation to match them with the argument.
     char parnt_path[MAX_PATH] = {0};
     std::size_t pth_len;
     size_t slash_pos[MAX_PATH];
@@ -1197,17 +1195,19 @@ bool mkdir_recursively(
             break;
         }
 
-        slash_pos[slash_pos_sz] = last_chr - parnt_path;
-        ++slash_pos_sz;
+        pth_len = last_chr - parnt_path;
+        slash_pos[slash_pos_sz++] = pth_len;
 
-        pth_len = stringutils::strlen(parnt_path);
+        if (pth_len > 0 && parnt_path[pth_len - 1] == ':')
+        {
+            pth_len = 0;
+        }
 
     } while (!access(parnt_path, access_modes::EXISTS, err_code) && pth_len > 0);
 
     while (slash_pos_sz > 0)
     {
-        parnt_path[slash_pos[slash_pos_sz - 1]] = '\\';
-        --slash_pos_sz;
+        parnt_path[slash_pos[--slash_pos_sz]] = '\\';
 
          if (!mkdir(parnt_path, mods, err_code))
          {
@@ -1226,8 +1226,6 @@ bool mkdir_recursively(
 ) noexcept
 {
     // TODO: Change the mods after the directory creation to match them with the argument
-    static_assert(MAX_PATH >= 255, "PATH_MAX has to be at least 255.");
-
     wchar_t parnt_path[MAX_PATH] = {0};
     std::size_t pth_len;
     size_t slash_pos[MAX_PATH];
@@ -1260,22 +1258,24 @@ bool mkdir_recursively(
             break;
         }
 
-        slash_pos[slash_pos_sz] = last_chr - parnt_path;
-        ++slash_pos_sz;
+        pth_len = last_chr - parnt_path;
+        slash_pos[slash_pos_sz++] = pth_len;
 
-        pth_len = stringutils::strlen(parnt_path);
+        if (pth_len > 0 && parnt_path[pth_len - 1] == L':')
+        {
+            pth_len = 0;
+        }
 
     } while (!access(parnt_path, access_modes::EXISTS, err_code) && pth_len > 0);
 
     while (slash_pos_sz > 0)
     {
-        parnt_path[slash_pos[slash_pos_sz - 1]] = L'\\';
-        --slash_pos_sz;
+        parnt_path[slash_pos[--slash_pos_sz]] = L'\\';
 
-         if (!mkdir(parnt_path, mods, err_code))
-         {
-             return false;
-         }
+        if (!mkdir(parnt_path, mods, err_code))
+        {
+            return false;
+        }
     }
 
     return true;
