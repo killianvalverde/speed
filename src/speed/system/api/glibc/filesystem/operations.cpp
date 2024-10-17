@@ -760,18 +760,15 @@ bool mkdir_recursively(
             
             break;
         }
-        
-        slash_pos[slash_pos_sz] = lst_ch - parnt_path;
-        ++slash_pos_sz;
-        
-        pth_len = stringutils::strlen(parnt_path);
+
+        pth_len = lst_ch - parnt_path;
+        slash_pos[slash_pos_sz++] = pth_len;
         
     } while (!access(parnt_path, access_modes::EXISTS, err_code) && pth_len > 0);
     
     while (slash_pos_sz > 0)
     {
-        parnt_path[slash_pos[slash_pos_sz - 1]] = '/';
-        --slash_pos_sz;
+        parnt_path[slash_pos[--slash_pos_sz]] = '/';
         
          if (!mkdir(parnt_path, mods, err_code))
          {
