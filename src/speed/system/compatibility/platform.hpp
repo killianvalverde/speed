@@ -38,6 +38,12 @@
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
+#ifdef max
+#undef max
+#endif
+#ifdef min
+#undef min
+#endif
 //#define _WINSOCKAPI_
 #include <windows.h>
 #if !defined(_MSVC_TRADITIONAL) || _MSVC_TRADITIONAL
