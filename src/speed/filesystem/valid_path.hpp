@@ -246,7 +246,7 @@ public:
         if (speed::system::filesystem::access(TpComponent::c_str(),
                     speed::system::filesystem::access_modes::WRITE,
                     speed::system::filesystem::file_types::DIRECTORY, err_code) ||
-            speed::system::filesystem::mkdir(TpComponent::c_str(), 0755, err_code))
+            speed::system::filesystem::mkdir_recursively(TpComponent::c_str(), 0755, err_code))
         {
             return TpComponent::is_valid(err_code);
         }
