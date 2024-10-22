@@ -72,6 +72,7 @@ bool kbhit(
     INPUT_RECORD input_rec;
     DWORD res;
     DWORD event_red;
+    bool key_dwn = false;
 
     if (mess != nullptr)
     {
@@ -85,24 +86,32 @@ bool kbhit(
             return false;
         }
     }
-
-    if ((input_handl = ::GetStdHandle(STD_INPUT_HANDLE)) == INVALID_HANDLE_VALUE ||
-        (res = ::WaitForSingleObject(input_handl, INFINITE)) == WAIT_FAILED)
+    
+    if ((input_handl = ::GetStdHandle(STD_INPUT_HANDLE)) == INVALID_HANDLE_VALUE)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        assign_system_error_code((int) GetLastError(), err_code);
         return false;
     }
 
-    if (res == WAIT_OBJECT_0 &&
-        ReadConsoleInput(input_handl, &input_rec, 1, &event_red) &&
-        event_red == 1 &&
-        input_rec.EventType == KEY_EVENT &&
-        input_rec.Event.KeyEvent.bKeyDown)
+    while (!key_dwn)
     {
-        return true;
+        if ((res = ::WaitForSingleObject(input_handl, INFINITE)) == WAIT_FAILED)
+        {
+            assign_system_error_code((int) GetLastError(), err_code);
+            return false;
+        }
+        
+        if (res == WAIT_OBJECT_0 &&
+            ReadConsoleInput(input_handl, &input_rec, 1, &event_red) &&
+            event_red == 1 &&
+            input_rec.EventType == KEY_EVENT &&
+            input_rec.Event.KeyEvent.bKeyDown)
+        {
+            key_dwn = true;
+        }
     }
-
-    return false;
+    
+    return true;
 }
 
 
