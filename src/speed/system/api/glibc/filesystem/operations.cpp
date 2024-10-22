@@ -289,6 +289,18 @@ bool closedir(wdirectory_entity* dir_ent, std::error_code* err_code) noexcept
 }
 
 
+bool file_exists(const char* fle_path, std::error_code* err_code) noexcept
+{
+    return access(fle_path, access_modes::EXISTS, err_code);
+}
+
+
+bool file_exists(const wchar_t* fle_path, std::error_code* err_code) noexcept
+{
+    return access(fle_path, access_modes::EXISTS, err_code);
+}
+
+
 bool get_cstr_path_from_wstr(
         const wchar_t* w_str,
         char* c_str
@@ -425,6 +437,50 @@ int get_file_gid(const wchar_t* fle_path, std::error_code* err_code) noexcept
     }
 
     return get_file_gid(c_str, err_code);
+}
+
+
+bool get_modification_time(
+        const char* fle_path,
+        system_time* system_tme,
+        std::error_code* err_code
+) noexcept
+{
+    struct ::stat stt;
+    std::tm* local_tme;
+    
+    if (stat(fle_path, &stt) == -1)
+    {
+        assign_system_error_code(errno, err_code);
+        return false;
+    }
+    
+    local_tme = std::localtime(&stt.st_mtime);
+    
+    system_tme->set_years(local_tme->tm_year + 1900)
+               .set_months(local_tme->tm_mon + 1)
+               .set_days(local_tme->tm_mday)
+               .set_hours(local_tme->tm_hour)
+               .set_minutes(local_tme->tm_min)
+               .set_seconds(local_tme->tm_sec);
+
+    return true;
+}
+
+
+bool get_modification_time(
+        const wchar_t* fle_path,
+        system_time* system_tme,
+        std::error_code* err_code
+) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(fle_path, c_str))
+    {
+        return false;
+    }
+
+    return get_modification_time(c_str, system_tme, err_code);
 }
 
 

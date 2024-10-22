@@ -425,6 +425,18 @@ bool closedir(wdirectory_entity* dir_ent, std::error_code* err_code) noexcept
 }
 
 
+bool file_exists(const char* fle_path, std::error_code* err_code) noexcept
+{
+    return access(fle_path, access_modes::EXISTS, err_code);
+}
+
+
+bool file_exists(const wchar_t* fle_path, std::error_code* err_code) noexcept
+{
+    return access(fle_path, access_modes::EXISTS, err_code);
+}
+
+
 // bool get_first_actual_directory(char* pth, std::error_code* err_code) noexcept
 // {
 //     std::size_t pth_len;
@@ -729,11 +741,85 @@ int get_file_gid(const wchar_t* fle_path, std::error_code* err_code) noexcept
 }
 
 
+bool get_modification_time(
+        const char* fle_path,
+        system_time* system_tme,
+        std::error_code* err_code
+) noexcept
+{
+    HANDLE handl;
+    FILETIME last_write_tme;
+    SYSTEMTIME utc_system_tme;
+    SYSTEMTIME local_system_tme;
+    
+    handl = ::CreateFileA(fle_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+                          OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
+                          nullptr);
+
+    if (handl == INVALID_HANDLE_VALUE ||
+        ::GetFileTime(handl, nullptr, nullptr, &last_write_tme) == 0 ||
+        ::FileTimeToSystemTime(&last_write_tme, &utc_system_tme) == 0 ||
+        ::SystemTimeToTzSpecificLocalTime(nullptr, &utc_system_tme, &local_system_tme) == 0)
+    {
+        assign_system_error_code((int)GetLastError(), err_code);
+        return false;
+    }
+    
+    system_tme->set_years(local_system_tme.wYear)
+               .set_months(local_system_tme.wMonth)
+               .set_days(local_system_tme.wDay)
+               .set_hours(local_system_tme.wHour)
+               .set_minutes(local_system_tme.wMinute)
+               .set_seconds(local_system_tme.wSecond);
+    
+    CloseHandle(handl);
+    
+    return true;
+}
+
+
+bool get_modification_time(
+        const wchar_t* fle_path,
+        system_time* system_tme,
+        std::error_code* err_code
+) noexcept
+{
+    HANDLE handl;
+    FILETIME last_write_tme;
+    SYSTEMTIME utc_system_tme;
+    SYSTEMTIME local_system_tme;
+    
+    handl = ::CreateFileW(fle_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+                          OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
+                          nullptr);
+
+    if (handl == INVALID_HANDLE_VALUE ||
+        ::GetFileTime(handl, nullptr, nullptr, &last_write_tme) == 0 ||
+        ::FileTimeToSystemTime(&last_write_tme, &utc_system_tme) == 0 ||
+        ::SystemTimeToTzSpecificLocalTime(nullptr, &utc_system_tme, &local_system_tme) == 0)
+    {
+        assign_system_error_code((int)GetLastError(), err_code);
+        return false;
+    }
+    
+    system_tme->set_years(local_system_tme.wYear)
+               .set_months(local_system_tme.wMonth)
+               .set_days(local_system_tme.wDay)
+               .set_hours(local_system_tme.wHour)
+               .set_minutes(local_system_tme.wMinute)
+               .set_seconds(local_system_tme.wSecond);
+    
+    CloseHandle(handl);
+    
+    return true;
+}
+
+
 const char* get_temporal_path() noexcept
 {
     // TODO: Make this as a template in order to allow both kind of path (c/w).
     static char temp_pth[MAX_PATH];
-    DWORD len = GetTempPathA(MAX_PATH, temp_pth);
+    DWORD len = ::GetTempPathA(MAX_PATH, temp_pth);
 
     if (len == 0 || len > MAX_PATH)
     {

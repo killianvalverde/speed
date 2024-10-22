@@ -34,6 +34,7 @@
 #include "../../../filesystem/access_modes.hpp"
 #include "../../../filesystem/basic_directory_entity.hpp"
 #include "../../../filesystem/file_types.hpp"
+#include "../../../time/system_time.hpp"
 
 
 namespace speed::system::api::winapi::filesystem {
@@ -44,6 +45,7 @@ using speed::system::filesystem::access_modes;
 using speed::system::filesystem::directory_entity;
 using speed::system::filesystem::wdirectory_entity;
 using speed::system::filesystem::file_types;
+using speed::system::time::system_time;
 
 
 /**
@@ -192,6 +194,24 @@ bool closedir(wdirectory_entity* dir_ent, std::error_code* err_code = nullptr) n
 
 
 /**
+ * @brief       Check if a file exists.
+ * @param       fle_path : The path of the file to check.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+bool file_exists(const char* fle_path, std::error_code* err_code = nullptr) noexcept;
+
+
+/**
+ * @brief       Check if a file exists.
+ * @param       fle_path : The path of the file to check.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+bool file_exists(const wchar_t* fle_path, std::error_code* err_code = nullptr) noexcept;
+
+
+/**
  * @brief       Get through the first directory that exists in a specified path.
  * @param       pth : Input and output argument, it is used to specify the path and to get the
  *              result. The length of the string has to be at least 2 characters, otherwise it has
@@ -270,6 +290,34 @@ int get_file_gid(const char* fle_path, std::error_code* err_code = nullptr) noex
  * @return      On success the GID of the sepcified file is returned, otherwise -1 is returned.
  */
 int get_file_gid(const wchar_t* fle_path, std::error_code* err_code = nullptr) noexcept;
+
+
+/**
+ * @brief       Get the modification time of the specified file.
+ * @param       fle_path : The file to get the modification time.
+ * @param       system_tme : The object in which store the modification time.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+bool get_modification_time(
+        const char* fle_path,
+        system_time* system_tme,
+        std::error_code* err_code = nullptr
+) noexcept;
+
+
+/**
+ * @brief       Get the modification time of the specified time.
+ * @param       fle_path : The file to get the modification time.
+ * @param       system_tme : The object in which store the modification time.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+bool get_modification_time(
+        const wchar_t* fle_path,
+        system_time* system_tme,
+        std::error_code* err_code = nullptr
+) noexcept;
 
 
 /**

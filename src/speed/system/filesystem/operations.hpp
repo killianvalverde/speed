@@ -31,6 +31,7 @@
 
 #include "../api/api.hpp"
 #include "../compatibility/compatibility.hpp"
+#include "../time/time.hpp"
 #include "access_modes.hpp"
 #include "basic_directory_entity.hpp"
 #include "file_types.hpp"
@@ -228,6 +229,30 @@ inline bool closedir(wdirectory_entity* dir_ent, std::error_code* err_code = nul
 
 
 /**
+ * @brief       Check if a file exists.
+ * @param       fle_path : The path of the file to check.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+inline bool file_exists(const char* fle_path, std::error_code* err_code = nullptr) noexcept
+{
+    return SPEED_SELECT_API(filesystem::file_exists, false, fle_path, err_code);
+}
+
+
+/**
+ * @brief       Check if a file exists.
+ * @param       fle_path : The path of the file to check.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+inline bool file_exists(const wchar_t* fle_path, std::error_code* err_code = nullptr) noexcept
+{
+    return SPEED_SELECT_API(filesystem::file_exists, false, fle_path, err_code);
+}
+
+
+/**
  * @brief       Get the inode number of the specified file.
  * @param       fle_path : The file to get the inode number.
  * @param       err_code : If function fails it holds the platform-dependent error code.
@@ -307,6 +332,42 @@ inline int get_file_gid(const char* fle_path, std::error_code* err_code = nullpt
 inline int get_file_gid(const wchar_t* fle_path, std::error_code* err_code = nullptr) noexcept
 {
     return SPEED_SELECT_API(filesystem::get_file_gid, -1, fle_path, err_code);
+}
+
+
+/**
+ * @brief       Get the modification time of the specified file.
+ * @param       fle_path : The file to get the modification time.
+ * @param       system_tme : The object in which store the modification time.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+inline bool get_modification_time(
+        const char* fle_path,
+        time::system_time* system_tme,
+        std::error_code* err_code = nullptr
+) noexcept
+{
+    return SPEED_SELECT_API(filesystem::get_modification_time, false, fle_path, system_tme,
+                            err_code);
+}
+
+
+/**
+ * @brief       Get the modification time of the specified time.
+ * @param       fle_path : The file to get the modification time.
+ * @param       system_tme : The object in which store the modification time.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+inline bool get_modification_time(
+        const wchar_t* fle_path,
+        time::system_time* system_tme,
+        std::error_code* err_code = nullptr
+) noexcept
+{
+    return SPEED_SELECT_API(filesystem::get_modification_time, false, fle_path, system_tme,
+                            err_code);
 }
 
 
