@@ -28,6 +28,7 @@
 #define SPEED_SYSTEM_TIME_TIME_HPP
 
 #include "operations.hpp"
+#include "system_time.hpp"
 #include "time_specification.hpp"
 
 
