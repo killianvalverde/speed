@@ -1508,6 +1508,7 @@ bool readdir(wdirectory_entity* dir_ent, std::error_code* err_code) noexcept
 
 bool rmdir(const char* dir_path, std::error_code* err_code) noexcept
 {
+    ::SetFileAttributesA(dir_path, 0x80);
     if (!::RemoveDirectoryA(dir_path))
     {
         assign_system_error_code((int)GetLastError(), err_code);
@@ -1520,6 +1521,7 @@ bool rmdir(const char* dir_path, std::error_code* err_code) noexcept
 
 bool rmdir(const wchar_t* dir_path, std::error_code* err_code) noexcept
 {
+    ::SetFileAttributesW(dir_path, 0x80);
     if (!::RemoveDirectoryW(dir_path))
     {
         assign_system_error_code((int)GetLastError(), err_code);
