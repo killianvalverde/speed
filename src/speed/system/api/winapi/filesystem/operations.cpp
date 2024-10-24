@@ -741,6 +741,58 @@ int get_file_gid(const wchar_t* fle_path, std::error_code* err_code) noexcept
 }
 
 
+std::size_t get_file_size(const char* fle_path, std::error_code* err_code) noexcept
+{
+    HANDLE file_handl;
+    DWORD file_sz;
+    
+    file_handl = ::CreateFileA(fle_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+    if (file_handl == INVALID_HANDLE_VALUE)
+    {
+        assign_system_error_code((int)GetLastError(), err_code);
+        return ~0ull;
+    }
+
+    file_sz = ::GetFileSize(file_handl, nullptr);
+    if (file_sz == INVALID_FILE_SIZE)
+    {
+        assign_system_error_code((int)GetLastError(), err_code);
+        ::CloseHandle(file_handl);
+        return ~0ull;
+    }
+    
+    ::CloseHandle(file_handl);
+    return file_sz;
+}
+
+
+std::size_t get_file_size(const wchar_t* fle_path, std::error_code* err_code) noexcept
+{
+    HANDLE file_handl;
+    DWORD file_sz;
+    
+    file_handl = ::CreateFileW(fle_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+    if (file_handl == INVALID_HANDLE_VALUE)
+    {
+        assign_system_error_code((int)GetLastError(), err_code);
+        return ~0ull;
+    }
+
+    file_sz = ::GetFileSize(file_handl, nullptr);
+    if (file_sz == INVALID_FILE_SIZE)
+    {
+        assign_system_error_code((int)GetLastError(), err_code);
+        ::CloseHandle(file_handl);
+        return ~0ull;
+    }
+    
+    ::CloseHandle(file_handl);
+    return file_sz;
+}
+
+
 bool get_modification_time(
         const char* fle_path,
         system_time* system_tme,

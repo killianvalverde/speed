@@ -336,6 +336,36 @@ inline int get_file_gid(const wchar_t* fle_path, std::error_code* err_code = nul
 
 
 /**
+ * @brief       Get the size in bytes of a specified file path.
+ * @param       fle_path : The path of the file to get the size.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      On success the file size in bytes in returned, otherwise -1 is returned.
+ */
+inline std::size_t get_file_size(
+        const char* fle_path,
+        std::error_code* err_code = nullptr
+) noexcept
+{
+    return SPEED_SELECT_API(filesystem::get_file_size, ~0ull, fle_path, err_code);
+}
+
+
+/**
+ * @brief       Get the size in bytes of a specified file path.
+ * @param       fle_path : The path of the file to get the size.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      On success the file size in bytes in returned, otherwise -1 is returned.
+ */
+inline std::size_t get_file_size(
+        const wchar_t* fle_path,
+        std::error_code* err_code = nullptr
+) noexcept
+{
+    return SPEED_SELECT_API(filesystem::get_file_size, ~0ull, fle_path, err_code);
+}
+
+
+/**
  * @brief       Get the modification time of the specified file.
  * @param       fle_path : The file to get the modification time.
  * @param       system_tme : The object in which store the modification time.

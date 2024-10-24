@@ -301,6 +301,7 @@ bool file_exists(const wchar_t* fle_path, std::error_code* err_code) noexcept
 }
 
 
+// TODO: Use your own fucntion since wcstombs do not work correclty.
 bool get_cstr_path_from_wstr(
         const wchar_t* w_str,
         char* c_str
@@ -437,6 +438,32 @@ int get_file_gid(const wchar_t* fle_path, std::error_code* err_code) noexcept
     }
 
     return get_file_gid(c_str, err_code);
+}
+
+
+std::size_t get_file_size(const char* fle_path, std::error_code* err_code) noexcept
+{
+    struct stat file_stt;
+
+    if (::stat(fle_path, &file_stt) == -1)
+    {
+        assign_system_error_code(errno, err_code);
+        return ~0ull;
+    }
+
+    return (std::size_t)file_stt.st_size;
+}
+
+
+std::size_t get_file_size(const wchar_t* fle_path, std::error_code* err_code) noexcept
+{
+    char c_str[PATH_MAX] = {};
+    if (!get_cstr_path_from_wstr(fle_path, c_str))
+    {
+        return false;
+    }
+
+    return get_file_size(c_str, err_code);
 }
 
 
