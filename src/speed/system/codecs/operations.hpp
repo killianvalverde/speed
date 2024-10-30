@@ -43,9 +43,10 @@ namespace speed::system::codecs {
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool convert_c_string_to_wstring(
+template<typename TpCharTraits, typename TpCharAlloc>
+bool convert_c_string_to_wstring(
         const char* c_str,
-        std::wstring* wstr,
+        std::basic_string<wchar_t, TpCharTraits, TpCharAlloc>* wstr,
         std::error_code* err_code = nullptr
 ) noexcept
 {
@@ -60,9 +61,10 @@ inline bool convert_c_string_to_wstring(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool convert_w_string_to_string(
+template<typename TpCharTraits, typename TpCharAlloc>
+bool convert_w_string_to_string(
         const wchar_t* w_str,
-        std::string* str,
+        std::basic_string<char, TpCharTraits, TpCharAlloc>* str,
         std::error_code* err_code = nullptr
 ) noexcept
 {

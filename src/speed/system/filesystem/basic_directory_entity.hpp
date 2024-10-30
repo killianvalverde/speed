@@ -37,11 +37,14 @@ namespace speed::system::filesystem {
 template<typename TpChar>
 struct basic_directory_entity
 {
-    /** The character type used. */
+    /** The inode type. */
+    using inode_type = std::uint64_t;
+    
+    /** The character type. */
     using char_type = TpChar;
-
+    
     /** Inode number of the current entity. */
-    std::uint64_t ino;
+    inode_type ino;
     
     /** Name of the current entity. */
     const char_type* nme;
