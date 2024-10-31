@@ -87,13 +87,13 @@ bool execute_command(
 }
 
 
-int get_pid() noexcept
+pid_t get_pid() noexcept
 {
     return (int)::GetCurrentProcessId();
 }
 
 
-int get_ppid() noexcept
+ppid_t get_ppid() noexcept
 {
     PROCESSENTRY32 entr;
     DWORD pid = ::GetCurrentProcessId();
@@ -112,7 +112,7 @@ int get_ppid() noexcept
         {
             if (entr.th32ProcessID == pid)
             {
-                return (int)entr.th32ParentProcessID;
+                return entr.th32ParentProcessID;
             }
         } while (::Process32Next(snapsht, &entr));
     }
@@ -123,12 +123,12 @@ int get_ppid() noexcept
 }
 
 
-unsigned int get_uid() noexcept
+uid_t get_uid() noexcept
 {
     // TODO: Compute a 32 bits hash using the windows api.
     HANDLE tokn = nullptr;
     DWORD token_sz = 0;
-    unsigned int uid = -1;
+    uid_t uid = -1;
 
     if (::OpenProcessToken(::GetCurrentProcess(), TOKEN_QUERY, &tokn))
     {
@@ -156,12 +156,12 @@ unsigned int get_uid() noexcept
 }
 
 
-unsigned int get_gid() noexcept
+gid_t get_gid() noexcept
 {
     // TODO: Compute a 32 bits hash using the windows api.
     HANDLE tokn = nullptr;
     DWORD sz = 0;
-    unsigned int gid = -1;
+    gid_t gid = -1;
 
     if (::OpenProcessToken(::GetCurrentProcess(), TOKEN_QUERY, &tokn))
     {
@@ -196,7 +196,7 @@ bool nanosleep(
 ) noexcept
 {
     DWORD result = ::SleepEx((sec * 1000 + nsec / 1000000), false);
-
+    
     if (result != 0)
     {
         assign_system_error_code((int)GetLastError(), err_code);

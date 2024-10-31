@@ -30,6 +30,7 @@
 #include "../api/api.hpp"
 #include "../compatibility/compatibility.hpp"
 #include "../time/time.hpp"
+#include "types.hpp"
 
 
 namespace speed::system::process {
@@ -56,7 +57,7 @@ inline bool execute_command(
  * @brief       Get the PID of the current process.
  * @return      The PID of the current process.
  */
-inline int get_pid() noexcept
+inline pid_t get_pid() noexcept
 {
     return SPEED_SELECT_API(process::get_pid, -1);
 }
@@ -66,7 +67,7 @@ inline int get_pid() noexcept
  * @brief       Get the PPID of the current process.
  * @return      The PPID of the current process.
  */
-inline int get_ppid() noexcept
+inline ppid_t get_ppid() noexcept
 {
     return SPEED_SELECT_API(process::get_ppid, -1);
 }
@@ -76,7 +77,7 @@ inline int get_ppid() noexcept
  * @brief       Get the UID of the current process.
  * @return      The UID of the current process.
  */
-inline unsigned int get_uid() noexcept
+inline uid_t get_uid() noexcept
 {
     return SPEED_SELECT_API(process::get_uid, -1);
 }
@@ -86,7 +87,7 @@ inline unsigned int get_uid() noexcept
  * @brief       Get the GID of the current process.
  * @return      The GID of the current process.
  */
-inline unsigned int get_gid() noexcept
+inline gid_t get_gid() noexcept
 {
     return SPEED_SELECT_API(process::get_gid, -1);
 }

@@ -46,7 +46,7 @@ bool execute_command(
         ++cmd;
     }
     
-    pid_t pid = ::fork();
+    ::pid_t pid = ::fork();
     
     switch (pid)
     {
@@ -214,27 +214,27 @@ alloc_fail:
 }
 
 
-int get_pid() noexcept
+pid_t get_pid() noexcept
 {
-    return ::getpid();
+    return (pid_t)::getpid();
 }
 
 
-int get_ppid() noexcept
+ppid_t get_ppid() noexcept
 {
-    return ::getppid();
+    return (ppid_t)::getppid();
 }
 
 
-unsigned int get_uid() noexcept
+uid_t get_uid() noexcept
 {
-    return ::getuid();
+    return (uid_t)::getuid();
 }
 
 
-unsigned int get_gid() noexcept
+gid_t get_gid() noexcept
 {
-    return ::getgid();
+    return (gid_t)::getgid();
 }
 
 

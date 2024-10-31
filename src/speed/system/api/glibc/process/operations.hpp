@@ -36,6 +36,7 @@
 #include <unistd.h>
 
 #include "../../../errors/errors.hpp"
+#include "../../../process/types.hpp"
 #include "../../../time/time_specification.hpp"
 
 
@@ -43,6 +44,10 @@ namespace speed::system::api::glibc::process {
 
 
 using namespace speed::system::errors;
+using speed::system::process::pid_t;
+using speed::system::process::ppid_t;
+using speed::system::process::uid_t;
+using speed::system::process::gid_t;
 using speed::system::time::time_specification;
 
 
@@ -64,28 +69,28 @@ bool execute_command(
  * @brief       Get the PID of the current process.
  * @return      The PID of the current process.
  */
-int get_pid() noexcept;
+pid_t get_pid() noexcept;
 
 
 /**
  * @brief       Get the PPID of the current process.
  * @return      The PPID of the current process.
  */
-int get_ppid() noexcept;
+ppid_t get_ppid() noexcept;
 
 
 /**
  * @brief       Get the UID of the current process.
  * @return      The UID of the current process.
  */
-unsigned int get_uid() noexcept;
+uid_t get_uid() noexcept;
 
 
 /**
  * @brief       Get the GID of the current process.
  * @return      The GID of the current process.
  */
-unsigned int get_gid() noexcept;
+gid_t get_gid() noexcept;
 
 
 /**
