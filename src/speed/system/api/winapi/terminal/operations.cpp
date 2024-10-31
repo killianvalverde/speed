@@ -38,6 +38,21 @@
 namespace speed::system::api::winapi::terminal {
 
 
+bool get_current_text_attribute(HANDLE console_handl, WORD* text_attr) noexcept
+{
+    CONSOLE_SCREEN_BUFFER_INFO console_screen_buffer_inf;
+    
+    if (console_handl == INVALID_HANDLE_VALUE ||
+        !GetConsoleScreenBufferInfo(console_handl, &console_screen_buffer_inf))
+    {
+        return false;
+    }
+    
+    *text_attr = console_screen_buffer_inf.wAttributes;
+    return true;
+}
+
+
 bool flush_input_terminal(::FILE* input_strm, std::error_code* err_code) noexcept
 {
     if (!::FlushConsoleInputBuffer((HANDLE)::_get_osfhandle(_fileno(input_strm))))
@@ -120,75 +135,97 @@ bool set_text_attribute(
         text_attribute txt_attribute
 ) noexcept
 {
+    static bool first_cll = true;
+    static WORD default_text_attr;
+    
+    HANDLE console_handl;
     DWORD mode;
-    WORD colr;
-    HANDLE console_handl = (HANDLE)_get_osfhandle(_fileno(terminal_strm));
-
-    if (console_handl == INVALID_HANDLE_VALUE || !console_handl ||
+    WORD new_text_attr;
+    
+    console_handl = (HANDLE)_get_osfhandle(_fileno(terminal_strm));
+    if (console_handl == INVALID_HANDLE_VALUE ||
+        !console_handl ||
         !GetConsoleMode(console_handl, &mode))
     {
         return false;
     }
+    
+    if (first_cll)
+    {
+        if (!get_current_text_attribute(console_handl, &default_text_attr))
+        {
+            return false;
+        }
+        
+        first_cll = false;
+    }
+    
+    if (!get_current_text_attribute(console_handl, &new_text_attr))
+    {
+        return false;
+    }
+    
+    new_text_attr &= 0xF0;
 
     switch (txt_attribute)
     {
     case text_attribute::DEFAULT:
-        colr = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
+        new_text_attr = default_text_attr;
         break;
     case text_attribute::BLACK:
-        colr = 0;
+        new_text_attr |= 0;
         break;
     case text_attribute::RED:
-        colr = FOREGROUND_RED;
+        new_text_attr |= FOREGROUND_RED;
         break;
     case text_attribute::GREEN:
-        colr = FOREGROUND_GREEN;
+        new_text_attr |= FOREGROUND_GREEN;
         break;
     case text_attribute::BROWN:
-        colr = FOREGROUND_RED | FOREGROUND_GREEN;
+        new_text_attr |= FOREGROUND_RED | FOREGROUND_GREEN;
         break;
     case text_attribute::BLUE:
-        colr = FOREGROUND_BLUE;
+        new_text_attr |= FOREGROUND_BLUE;
         break;
     case text_attribute::PURPLE:
-        colr = FOREGROUND_RED | FOREGROUND_BLUE;
+        new_text_attr |= FOREGROUND_RED | FOREGROUND_BLUE;
         break;
     case text_attribute::CYAN:
-        colr = FOREGROUND_GREEN | FOREGROUND_BLUE;
+        new_text_attr |= FOREGROUND_GREEN | FOREGROUND_BLUE;
         break;
     case text_attribute::LIGHT_GRAY:
-        colr = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
+        new_text_attr |= FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
         break;
     case text_attribute::DARK_GRAY:
-        colr = FOREGROUND_INTENSITY;
+        new_text_attr |= FOREGROUND_INTENSITY;
         break;
     case text_attribute::LIGHT_RED:
-        colr = FOREGROUND_RED | FOREGROUND_INTENSITY;
+        new_text_attr |= FOREGROUND_RED | FOREGROUND_INTENSITY;
         break;
     case text_attribute::LIGHT_GREEN:
-        colr = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+        new_text_attr |= FOREGROUND_GREEN | FOREGROUND_INTENSITY;
         break;
     case text_attribute::YELLOW:
-        colr = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+        new_text_attr |= FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
         break;
     case text_attribute::LIGHT_BLUE:
-        colr = FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+        new_text_attr |= FOREGROUND_BLUE | FOREGROUND_INTENSITY;
         break;
     case text_attribute::LIGHT_PURPLE:
-        colr = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+        new_text_attr |= FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
         break;
     case text_attribute::LIGHT_CYAN:
-        colr = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+        new_text_attr |= FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
         break;
     case text_attribute::WHITE:
-        colr = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+        new_text_attr |= FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
         break;
     case text_attribute::NIL:
     default:
         return true;
     }
 
-    if (!SetConsoleTextAttribute(console_handl, colr))
+    if (!SetConsoleTextAttribute(console_handl, new_text_attr))
     {
         return false;
     }

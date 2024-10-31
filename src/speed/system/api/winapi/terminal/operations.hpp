@@ -45,6 +45,15 @@ using speed::system::terminal::text_attribute;
 
 
 /**
+ * @brief       Get the current texte attibute set in the console.
+ * @param       console_handl : Console handle in which get the information.
+ * @param       text_attr : Holder in which set the current text attibute.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+static bool get_current_text_attribute(HANDLE console_handl, WORD* text_attr) noexcept;
+
+
+/**
  * @brief       Flush the input terminal buffer.
  * @param       input_strm : Terminal input stream.
  * @param       err_code : If function fails it holds the platform-dependent error code.
