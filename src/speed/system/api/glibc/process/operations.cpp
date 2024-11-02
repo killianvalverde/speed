@@ -37,7 +37,7 @@ namespace speed::system::api::glibc::process {
 
 bool execute_command(
         const char* cmd,
-        int* ret_val,
+        int* return_val,
         std::error_code* err_code
 ) noexcept
 {
@@ -51,7 +51,7 @@ bool execute_command(
     switch (pid)
     {
         case -1:
-            assign_system_error_code(errno, err_code);
+            system::errors::assign_system_error_code(errno, err_code);
             return false;
         
         case 0:
@@ -200,13 +200,13 @@ alloc_fail:
             {
                 if (errno != EINTR)
                 {
-                    assign_system_error_code(errno, err_code);
+                    system::errors::assign_system_error_code(errno, err_code);
                     return false;
                 }
             }
-            if (ret_val != nullptr)
+            if (return_val != nullptr)
             {
-                *ret_val = WEXITSTATUS(status);
+                *return_val = WEXITSTATUS(status);
             }
             return true;
         }
@@ -214,27 +214,27 @@ alloc_fail:
 }
 
 
-pid_t get_pid() noexcept
+system::process::pid_t get_pid() noexcept
 {
-    return (pid_t)::getpid();
+    return ::getpid();
 }
 
 
-ppid_t get_ppid() noexcept
+system::process::ppid_t get_ppid() noexcept
 {
-    return (ppid_t)::getppid();
+    return ::getppid();
 }
 
 
-uid_t get_uid() noexcept
+system::process::uid_t get_uid() noexcept
 {
-    return (uid_t)::getuid();
+    return ::getuid();
 }
 
 
-gid_t get_gid() noexcept
+system::process::gid_t get_gid() noexcept
 {
-    return (gid_t)::getgid();
+    return ::getgid();
 }
 
 
@@ -252,7 +252,7 @@ bool nanosleep(
     
     if (::nanosleep(&tm, &rm_tm) == -1)
     {
-        assign_system_error_code(errno, err_code);
+        system::errors::assign_system_error_code(errno, err_code);
         return false;
     }
     

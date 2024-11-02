@@ -33,7 +33,10 @@
 namespace speed::system::api::winapi::time {
 
 
-bool get_monotonic_time(time_specification* time_spec, std::error_code* err_code) noexcept
+bool get_monotonic_time(
+        system::time::time_specification* time_spec,
+        std::error_code* err_code
+) noexcept
 {
     LARGE_INTEGER freq;
     LARGE_INTEGER count;
@@ -41,20 +44,23 @@ bool get_monotonic_time(time_specification* time_spec, std::error_code* err_code
     if (!::QueryPerformanceFrequency(&freq) ||
         !::QueryPerformanceCounter(&count))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
     time_spec->set_time(
             static_cast<std::uint64_t>(count.QuadPart / freq.QuadPart),
             static_cast<std::uint64_t>(
-                    ((count.QuadPart % freq.QuadPart) * 1000000000ULL) / freq.QuadPart));
+                    ((count.QuadPart % freq.QuadPart) * 1000000000ull) / freq.QuadPart));
 
     return true;
 }
 
 
-bool get_cpu_time(time_specification* time_spec, std::error_code* err_code) noexcept
+bool get_cpu_time(
+        system::time::time_specification* time_spec,
+        std::error_code* err_code
+) noexcept
 {
     FILETIME creation_tme;
     FILETIME exit_tme;
@@ -65,7 +71,7 @@ bool get_cpu_time(time_specification* time_spec, std::error_code* err_code) noex
 
     if (!::GetProcessTimes(process_handl, &creation_tme, &exit_tme, &kernel_tme, &user_tme))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
@@ -75,16 +81,9 @@ bool get_cpu_time(time_specification* time_spec, std::error_code* err_code) noex
     };
 
     total_ns = filetime_to_uint64(user_tme) * 100 + filetime_to_uint64(kernel_tme) * 100;
-
-    time_spec->set_time(total_ns / 1'000'000'000ULL, total_ns % 1'000'000'000ULL);
+    time_spec->set_time(total_ns / 1'000'000'000ull, total_ns % 1'000'000'000ull);
 
     return true;
-}
-
-
-bool get_child_cpu_time(time_specification* time_spec, std::error_code* err_code) noexcept
-{
-    return false;
 }
 
 

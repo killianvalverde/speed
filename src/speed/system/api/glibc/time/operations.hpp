@@ -37,10 +37,6 @@
 namespace speed::system::api::glibc::time {
 
 
-using namespace speed::system::errors;
-using speed::system::time::time_specification;
-
-
 /**
  * @brief       Get a monotonic time since some unspecified starting point.
  * @param       time_spec : The value in which store the result.
@@ -48,7 +44,7 @@ using speed::system::time::time_specification;
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 bool get_monotonic_time(
-        time_specification* time_spec,
+        system::time::time_specification* time_spec,
         std::error_code* err_code = nullptr
 ) noexcept;
 
@@ -59,7 +55,10 @@ bool get_monotonic_time(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-bool get_cpu_time(time_specification* time_spec, std::error_code* err_code = nullptr) noexcept;
+bool get_cpu_time(
+        system::time::time_specification* time_spec,
+        std::error_code* err_code = nullptr
+) noexcept;
 
 
 /**
@@ -69,7 +68,7 @@ bool get_cpu_time(time_specification* time_spec, std::error_code* err_code = nul
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 bool get_child_cpu_time(
-        time_specification* time_spec,
+        system::time::time_specification* time_spec,
         std::error_code* err_code = nullptr
 ) noexcept;
 

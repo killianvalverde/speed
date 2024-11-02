@@ -18,43 +18,23 @@
  */
 
 /**
- * @file        speed/system/system.hpp
- * @brief       system functions header.
+ * @file        speed/system/filesystem/types.hpp
+ * @brief       types header.
  * @author      Killian Valverde
- * @date        2017/01/08
+ * @date        2024/11/02
  */
 
-#ifndef SPEED_SYSTEM_SYSTEM_HPP
-#define SPEED_SYSTEM_SYSTEM_HPP
+#ifndef SPEED_SYSTEM_FILESYSTEM_TYPES_HPP
+#define SPEED_SYSTEM_FILESYSTEM_TYPES_HPP
 
-#include "api/api.hpp"
-#include "codecs/codecs.hpp"
-#include "compatibility/compatibility.hpp"
-#include "errors/errors.hpp"
-#include "exceptions/exceptions.hpp"
-#include "filesystem/filesystem.hpp"
-#include "process/process.hpp"
-#include "terminal/terminal.hpp"
-#include "time/time.hpp"
+#include <cstdint>
 
 
-namespace speed {
+namespace speed::system::filesystem {
 
 
-/**
- * @brief       Contains resources for interact with the system.
- */
-namespace system {}
-
-
-#ifndef SPEED_DISABLE_ALIAS
-
-/**
- * @brief       Contains resources for interact with the system.
- */
-namespace sys = system;
-
-#endif
+/** Inode type. */
+using inode_t = std::uint64_t;
 
 
 }

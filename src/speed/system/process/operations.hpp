@@ -39,17 +39,17 @@ namespace speed::system::process {
 /**
  * @brief       Execute the specified command.
  * @param       cmd : The command to execute.
- * @param       ret_val : The return value of the command.
+ * @param       return_val : The return value of the command.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 inline bool execute_command(
         const char* cmd,
-        int* ret_val = nullptr,
+        int* return_val = nullptr,
         std::error_code* err_code = nullptr
 ) noexcept
 {
-    return SPEED_SELECT_API(process::execute_command, false, cmd, ret_val, err_code);
+    return SPEED_SELECT_API(process::execute_command, false, cmd, return_val, err_code);
 }
 
 

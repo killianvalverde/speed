@@ -40,7 +40,7 @@ bool flush_input_terminal(::FILE* input_strm, std::error_code* err_code) noexcep
 {
     if (::tcflush(::fileno(input_strm), TCIFLUSH) == -1)
     {
-        assign_system_error_code(errno, err_code);
+        system::errors::assign_system_error_code(errno, err_code);
         return false;
     }
     
@@ -52,7 +52,7 @@ bool flush_output_terminal(::FILE* output_strm, std::error_code* err_code) noexc
 {
     if (::tcflush(::fileno(output_strm), TCOFLUSH) == -1)
     {
-        assign_system_error_code(errno, err_code);
+        system::errors::assign_system_error_code(errno, err_code);
         return false;
     }
     
@@ -74,13 +74,13 @@ bool kbhit(
     
     if ((stdout_fd = ::fileno(stdout)) == -1)
     {
-        assign_generic_error_code(errno, err_code);
+        system::errors::assign_generic_error_code(errno, err_code);
         return false;
     }
     
     if ((stdin_fd = ::fileno(stdin)) == -1)
     {
-        assign_generic_error_code(errno, err_code);
+        system::errors::assign_generic_error_code(errno, err_code);
         return false;
     }
     
@@ -88,14 +88,14 @@ bool kbhit(
     {
         if (::write(stdout_fd, mess, ::strlen(mess) * sizeof(char)) == -1)
         {
-            assign_system_error_code(errno, err_code);
+            system::errors::assign_system_error_code(errno, err_code);
             return false;
         }
     }
     
     if (::tcgetattr(stdin_fd, &oldt) == -1)
     {
-        assign_system_error_code(errno, err_code);
+        system::errors::assign_system_error_code(errno, err_code);
         return false;
     }
     
@@ -114,7 +114,7 @@ bool kbhit(
         ::read(stdin_fd, &buf, 1) == -1 ||
         ::tcsetattr(stdin_fd, TCSANOW, &oldt) == -1)
     {
-        assign_system_error_code(errno, err_code);
+        system::errors::assign_system_error_code(errno, err_code);
         return false;
     }
     
@@ -122,67 +122,67 @@ bool kbhit(
 }
 
 
-bool set_text_attribute(
+bool set_foreground_text_attribute(
         ::FILE* terminal_strm,
-        text_attribute txt_attribute
+        system::terminal::text_attribute text_attr
 ) noexcept
 {
     int res = 0;
     
-    switch (txt_attribute)
+    switch (text_attr)
     {
-    case text_attribute::DEFAULT:
+    case system::terminal::text_attribute::DEFAULT:
         res = ::fprintf(terminal_strm, "\033[0m");
         break;
-    case text_attribute::BLACK:
+    case system::terminal::text_attribute::BLACK:
         res = ::fprintf(terminal_strm, "\033[0;30m");
         break;
-    case text_attribute::RED:
+    case system::terminal::text_attribute::RED:
         res = ::fprintf(terminal_strm, "\033[0;31m");
         break;
-    case text_attribute::GREEN:
+    case system::terminal::text_attribute::GREEN:
         res = ::fprintf(terminal_strm, "\033[0;32m");
         break;
-    case text_attribute::BROWN:
+    case system::terminal::text_attribute::BROWN:
         res = ::fprintf(terminal_strm, "\033[0;33m");
         break;
-    case text_attribute::BLUE:
+    case system::terminal::text_attribute::BLUE:
         res = ::fprintf(terminal_strm, "\033[0;34m");
         break;
-    case text_attribute::PURPLE:
+    case system::terminal::text_attribute::PURPLE:
         res = ::fprintf(terminal_strm, "\033[0;35m");
         break;
-    case text_attribute::CYAN:
+    case system::terminal::text_attribute::CYAN:
         res = ::fprintf(terminal_strm, "\033[0;36m");
         break;
-    case text_attribute::LIGHT_GRAY:
+    case system::terminal::text_attribute::LIGHT_GRAY:
         res = ::fprintf(terminal_strm, "\033[0;37m");
         break;
-    case text_attribute::DARK_GRAY:
+    case system::terminal::text_attribute::GRAY:
         res = ::fprintf(terminal_strm, "\033[1;30m");
         break;
-    case text_attribute::LIGHT_RED:
+    case system::terminal::text_attribute::LIGHT_RED:
         res = ::fprintf(terminal_strm, "\033[1;31m");
         break;
-    case text_attribute::LIGHT_GREEN:
+    case system::terminal::text_attribute::LIGHT_GREEN:
         res = ::fprintf(terminal_strm, "\033[1;32m");
         break;
-    case text_attribute::YELLOW:
+    case system::terminal::text_attribute::YELLOW:
         res = ::fprintf(terminal_strm, "\033[1;33m");
         break;
-    case text_attribute::LIGHT_BLUE:
+    case system::terminal::text_attribute::LIGHT_BLUE:
         res = ::fprintf(terminal_strm, "\033[1;34m");
         break;
-    case text_attribute::LIGHT_PURPLE:
+    case system::terminal::text_attribute::LIGHT_PURPLE:
         res = ::fprintf(terminal_strm, "\033[1;35m");
         break;
-    case text_attribute::LIGHT_CYAN:
+    case system::terminal::text_attribute::LIGHT_CYAN:
         res = ::fprintf(terminal_strm, "\033[1;36m");
         break;
-    case text_attribute::WHITE:
+    case system::terminal::text_attribute::WHITE:
         res = ::fprintf(terminal_strm, "\033[1;37m");
         break;
-    case text_attribute::NIL:
+    case system::terminal::text_attribute::NIL:
     default:
         break;
     }

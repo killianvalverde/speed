@@ -39,14 +39,14 @@ namespace speed::system::api::winapi::filesystem {
  */
 struct directory_entity_extension
 {
-    /** Path of the opened directory. */
-    std::string pth;
+    /** Directory data. */
+    WIN32_FIND_DATAA find_dat;
 
     /** Directory handle. */
     HANDLE dir_handl;
-
-    /** Directory data. */
-    WIN32_FIND_DATAA find_dat;
+    
+    /** Path of the opened directory. */
+    char pth[MAX_PATH];
 
     /** Indicates if a read has already been done. */
     bool read_dne;
@@ -58,14 +58,14 @@ struct directory_entity_extension
  */
 struct wdirectory_entity_extension
 {
-    /** Path of the opened directory. */
-    std::wstring pth;
+    /** Directory data. */
+    WIN32_FIND_DATAW find_dat;
 
     /** Directory handle. */
     HANDLE dir_handl;
-
-    /** Directory data. */
-    WIN32_FIND_DATAW find_dat;
+    
+    /** Path of the opened directory. */
+    wchar_t pth[MAX_PATH];
 
     /** Indicates if a read has already been done. */
     bool read_dne;

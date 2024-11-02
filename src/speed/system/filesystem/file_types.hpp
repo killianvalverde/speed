@@ -50,11 +50,11 @@ enum class file_types : std::uint8_t
     /** Directory. */
     DIRECTORY = 0x4,
     
-    /** Named pipe */
-    FIFO = 0x8,
-    
     /** Regular file. */
-    REGULAR_FILE = 0x10,
+    REGULAR_FILE = 0x8,
+    
+    /** Named pipe */
+    PIPE = 0x10,
     
     /** Named IPC socket. */
     SOCKET = 0x20,

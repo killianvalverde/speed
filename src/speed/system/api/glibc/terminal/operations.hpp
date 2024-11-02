@@ -40,10 +40,6 @@
 namespace speed::system::api::glibc::terminal {
 
 
-using namespace speed::system::errors;
-using speed::system::terminal::text_attribute;
-
-
 /**
  * @brief       Flush the input terminal buffer.
  * @param       input_strm : Terminal input stream.
@@ -81,12 +77,12 @@ bool kbhit(
 /**
  * @brief       Set a terminal text attribute.
  * @param       terminal_strm : Stream in which set the attribute.
- * @param       txt_attribute : Attribute to set.
+ * @param       text_attr : Attribute to set.
  * @return      If function was successful 0 is returned, otherwise -1 is returned.
  */
-bool set_text_attribute(
+bool set_foreground_text_attribute(
         ::FILE* terminal_strm,
-        text_attribute txt_attribute
+        system::terminal::text_attribute text_attr
 ) noexcept;
 
 

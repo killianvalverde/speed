@@ -46,9 +46,22 @@ struct directory_entity_extension
     
     /** Direcotry entry. */
     dirent* entry;
+};
 
+
+/**
+ * @brief       Struct that represents a directory entity extension.
+ */
+struct wdirectory_entity_extension
+{
     /** Wide string path. */
-    std::wstring wpath;
+    std::wstring name_holdr;
+    
+    /** Directory iterator. */
+    DIR* dir;
+    
+    /** Direcotry entry. */
+    dirent* entry;
 };
 
 

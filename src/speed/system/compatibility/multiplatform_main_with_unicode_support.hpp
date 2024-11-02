@@ -46,7 +46,7 @@
         } \
         for (int i = 0; i < argc; ++i) \
         { \
-            if (!speed::system::codecs::convert_w_string_to_string(wargv[i], &str)) \
+            if (!speed::system::codecs::convert_w_str_to_string(wargv[i], &str)) \
             { \
                 goto cleanup; \
             } \

@@ -27,6 +27,8 @@
 #ifndef SPEED_SYSTEM_FILESYSTEM_BASIC_DIRECTORY_ENTITY_HPP
 #define SPEED_SYSTEM_FILESYSTEM_BASIC_DIRECTORY_ENTITY_HPP
 
+#include "types.hpp"
+
 
 namespace speed::system::filesystem {
 
@@ -37,14 +39,11 @@ namespace speed::system::filesystem {
 template<typename TpChar>
 struct basic_directory_entity
 {
-    /** The inode type. */
-    using inode_type = std::uint64_t;
-    
     /** The character type. */
     using char_type = TpChar;
     
     /** Inode number of the current entity. */
-    inode_type ino;
+    inode_t ino;
     
     /** Name of the current entity. */
     const char_type* nme;

@@ -31,6 +31,7 @@
 #include "basic_directory_entity.hpp"
 #include "file_types.hpp"
 #include "operations.hpp"
+#include "types.hpp"
 
 
 namespace speed::system {

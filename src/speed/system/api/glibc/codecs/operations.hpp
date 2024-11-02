@@ -42,9 +42,6 @@
 namespace speed::system::api::glibc::codecs {
 
 
-using namespace speed::system::errors;
-
-
 /**
  * @brief       Converts a specified c_string into a wstring.
  * @param       c_str : The c_string to convert.
@@ -53,7 +50,7 @@ using namespace speed::system::errors;
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 template<typename TpCharTraits, typename TpCharAlloc>
-bool convert_c_string_to_wstring(
+bool convert_c_str_to_wstring(
         const char* c_str,
         std::basic_string<wchar_t, TpCharTraits, TpCharAlloc>* wstr,
         std::error_code* err_code = nullptr
@@ -75,7 +72,7 @@ bool convert_c_string_to_wstring(
         conv_desc = iconv_open(encodng, "UTF-8");
         if (conv_desc == (iconv_t)-1)
         {
-            assign_system_error_code(EINVAL, err_code);
+            system::errors::assign_system_error_code(EINVAL, err_code);
             return false;
         }
 
@@ -92,7 +89,7 @@ bool convert_c_string_to_wstring(
         if (iconv(conv_desc, &in_buf, &in_bytes_left, &out_buf, &out_bytes_left) == (size_t)-1)
         {
             iconv_close(conv_desc);
-            assign_system_error_code(errno, err_code);
+            system::errors::assign_system_error_code(errno, err_code);
             return false;
         }
 
@@ -103,11 +100,11 @@ bool convert_c_string_to_wstring(
     }
     catch (const std::bad_alloc& ba)
     {
-        assign_system_error_code(ENOMEM, err_code);
+        system::errors::assign_system_error_code(ENOMEM, err_code);
     }
     catch (...)
     {
-        assign_system_error_code(EINVAL, err_code);
+        system::errors::assign_system_error_code(EINVAL, err_code);
     }
 
     return false;
@@ -122,7 +119,7 @@ bool convert_c_string_to_wstring(
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 template<typename TpCharTraits, typename TpCharAlloc>
-bool convert_w_string_to_string(
+bool convert_w_str_to_string(
         const wchar_t* w_str,
         std::basic_string<char, TpCharTraits, TpCharAlloc>* str,
         std::error_code* err_code = nullptr
@@ -144,7 +141,7 @@ bool convert_w_string_to_string(
         conv_desc = iconv_open("UTF-8", encodng);
         if (conv_desc == (iconv_t)-1)
         {
-            assign_system_error_code(EINVAL, err_code);
+            system::errors::assign_system_error_code(EINVAL, err_code);
             return false;
         }
 
@@ -161,7 +158,7 @@ bool convert_w_string_to_string(
         if (iconv(conv_desc, &in_buf, &in_bytes_left, &out_buf, &out_bytes_left) == (size_t)-1)
         {
             iconv_close(conv_desc);
-            assign_system_error_code(errno, err_code);
+            system::errors::assign_system_error_code(errno, err_code);
             return false;
         }
 
@@ -172,11 +169,11 @@ bool convert_w_string_to_string(
     }
     catch (const std::bad_alloc& ba)
     {
-        assign_system_error_code(ENOMEM, err_code);
+        system::errors::assign_system_error_code(ENOMEM, err_code);
     }
     catch (...)
     {
-        assign_system_error_code(EINVAL, err_code);
+        system::errors::assign_system_error_code(EINVAL, err_code);
     }
 
     return false;

@@ -28,6 +28,7 @@
 #define SPEED_SYSTEM_PROCESS_PROCESS_HPP
 
 #include "operations.hpp"
+#include "types.hpp"
 
 
 namespace speed::system {

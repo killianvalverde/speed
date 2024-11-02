@@ -30,8 +30,6 @@
 #include <conio.h>
 #include <io.h>
 
-#include <cstring>
-
 #include "operations.hpp"
 
 
@@ -43,7 +41,7 @@ bool get_current_text_attribute(HANDLE console_handl, WORD* text_attr) noexcept
     CONSOLE_SCREEN_BUFFER_INFO console_screen_buffer_inf;
     
     if (console_handl == INVALID_HANDLE_VALUE ||
-        !GetConsoleScreenBufferInfo(console_handl, &console_screen_buffer_inf))
+        !::GetConsoleScreenBufferInfo(console_handl, &console_screen_buffer_inf))
     {
         return false;
     }
@@ -57,7 +55,7 @@ bool flush_input_terminal(::FILE* input_strm, std::error_code* err_code) noexcep
 {
     if (!::FlushConsoleInputBuffer((HANDLE)::_get_osfhandle(_fileno(input_strm))))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
@@ -69,7 +67,7 @@ bool flush_output_terminal(::FILE* output_strm, std::error_code* err_code) noexc
 {
     if (::fflush(output_strm))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
@@ -104,7 +102,7 @@ bool kbhit(
     
     if ((input_handl = ::GetStdHandle(STD_INPUT_HANDLE)) == INVALID_HANDLE_VALUE)
     {
-        assign_system_error_code((int) GetLastError(), err_code);
+        system::errors::assign_system_error_code((int) GetLastError(), err_code);
         return false;
     }
 
@@ -112,7 +110,7 @@ bool kbhit(
     {
         if ((res = ::WaitForSingleObject(input_handl, INFINITE)) == WAIT_FAILED)
         {
-            assign_system_error_code((int) GetLastError(), err_code);
+            system::errors::assign_system_error_code((int) GetLastError(), err_code);
             return false;
         }
         
@@ -130,9 +128,9 @@ bool kbhit(
 }
 
 
-bool set_text_attribute(
+bool set_foreground_text_attribute(
         ::FILE* terminal_strm,
-        text_attribute txt_attribute
+        system::terminal::text_attribute text_attr
 ) noexcept
 {
     static bool first_cll = true;
@@ -142,10 +140,10 @@ bool set_text_attribute(
     DWORD mode;
     WORD new_text_attr;
     
-    console_handl = (HANDLE)_get_osfhandle(_fileno(terminal_strm));
+    console_handl = (HANDLE)::_get_osfhandle(_fileno(terminal_strm));
     if (console_handl == INVALID_HANDLE_VALUE ||
         !console_handl ||
-        !GetConsoleMode(console_handl, &mode))
+        !::GetConsoleMode(console_handl, &mode))
     {
         return false;
     }
@@ -167,65 +165,65 @@ bool set_text_attribute(
     
     new_text_attr &= 0xF0;
 
-    switch (txt_attribute)
+    switch (text_attr)
     {
-    case text_attribute::DEFAULT:
+    case system::terminal::text_attribute::DEFAULT:
         new_text_attr = default_text_attr;
         break;
-    case text_attribute::BLACK:
+    case system::terminal::text_attribute::BLACK:
         new_text_attr |= 0;
         break;
-    case text_attribute::RED:
+    case system::terminal::text_attribute::RED:
         new_text_attr |= FOREGROUND_RED;
         break;
-    case text_attribute::GREEN:
+    case system::terminal::text_attribute::GREEN:
         new_text_attr |= FOREGROUND_GREEN;
         break;
-    case text_attribute::BROWN:
+    case system::terminal::text_attribute::BROWN:
         new_text_attr |= FOREGROUND_RED | FOREGROUND_GREEN;
         break;
-    case text_attribute::BLUE:
+    case system::terminal::text_attribute::BLUE:
         new_text_attr |= FOREGROUND_BLUE;
         break;
-    case text_attribute::PURPLE:
+    case system::terminal::text_attribute::PURPLE:
         new_text_attr |= FOREGROUND_RED | FOREGROUND_BLUE;
         break;
-    case text_attribute::CYAN:
+    case system::terminal::text_attribute::CYAN:
         new_text_attr |= FOREGROUND_GREEN | FOREGROUND_BLUE;
         break;
-    case text_attribute::LIGHT_GRAY:
+    case system::terminal::text_attribute::LIGHT_GRAY:
         new_text_attr |= FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
         break;
-    case text_attribute::DARK_GRAY:
+    case system::terminal::text_attribute::GRAY:
         new_text_attr |= FOREGROUND_INTENSITY;
         break;
-    case text_attribute::LIGHT_RED:
+    case system::terminal::text_attribute::LIGHT_RED:
         new_text_attr |= FOREGROUND_RED | FOREGROUND_INTENSITY;
         break;
-    case text_attribute::LIGHT_GREEN:
+    case system::terminal::text_attribute::LIGHT_GREEN:
         new_text_attr |= FOREGROUND_GREEN | FOREGROUND_INTENSITY;
         break;
-    case text_attribute::YELLOW:
+    case system::terminal::text_attribute::YELLOW:
         new_text_attr |= FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
         break;
-    case text_attribute::LIGHT_BLUE:
+    case system::terminal::text_attribute::LIGHT_BLUE:
         new_text_attr |= FOREGROUND_BLUE | FOREGROUND_INTENSITY;
         break;
-    case text_attribute::LIGHT_PURPLE:
+    case system::terminal::text_attribute::LIGHT_PURPLE:
         new_text_attr |= FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
         break;
-    case text_attribute::LIGHT_CYAN:
+    case system::terminal::text_attribute::LIGHT_CYAN:
         new_text_attr |= FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
         break;
-    case text_attribute::WHITE:
+    case system::terminal::text_attribute::WHITE:
         new_text_attr |= FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
         break;
-    case text_attribute::NIL:
+    case system::terminal::text_attribute::NIL:
     default:
         return true;
     }
 
-    if (!SetConsoleTextAttribute(console_handl, new_text_attr))
+    if (!::SetConsoleTextAttribute(console_handl, new_text_attr))
     {
         return false;
     }

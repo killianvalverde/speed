@@ -18,10 +18,10 @@
  */
 
 /**
- * @file        speed/system/process/operations.hpp
- * @brief       process operations header.
+ * @file        speed/system/process/types.hpp
+ * @brief       types header.
  * @author      Killian Valverde
- * @date        2017/01/08
+ * @date        2024/11/01
  */
 
 #ifndef SPEED_SYSTEM_PROCESS_TYPES_HPP
@@ -31,6 +31,7 @@
 
 
 namespace speed::system::process {
+
 
 /** PID type. */
 using pid_t = std::int64_t;
@@ -43,6 +44,7 @@ using uid_t = std::uint64_t;
 
 /** GID type. */
 using gid_t = std::uint64_t;
+
 
 }
 

@@ -43,24 +43,16 @@
 namespace speed::system::api::glibc::process {
 
 
-using namespace speed::system::errors;
-using speed::system::process::pid_t;
-using speed::system::process::ppid_t;
-using speed::system::process::uid_t;
-using speed::system::process::gid_t;
-using speed::system::time::time_specification;
-
-
 /**
  * @brief       Execute the specified command.
  * @param       cmd : The command to execute.
- * @param       ret_val : The return value of the command.
+ * @param       return_val : The return value of the command.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 bool execute_command(
         const char* cmd,
-        int* ret_val = nullptr,
+        int* return_val = nullptr,
         std::error_code* err_code = nullptr
 ) noexcept;
 
@@ -69,28 +61,28 @@ bool execute_command(
  * @brief       Get the PID of the current process.
  * @return      The PID of the current process.
  */
-pid_t get_pid() noexcept;
+system::process::pid_t get_pid() noexcept;
 
 
 /**
  * @brief       Get the PPID of the current process.
  * @return      The PPID of the current process.
  */
-ppid_t get_ppid() noexcept;
+system::process::ppid_t get_ppid() noexcept;
 
 
 /**
  * @brief       Get the UID of the current process.
  * @return      The UID of the current process.
  */
-uid_t get_uid() noexcept;
+system::process::uid_t get_uid() noexcept;
 
 
 /**
  * @brief       Get the GID of the current process.
  * @return      The GID of the current process.
  */
-gid_t get_gid() noexcept;
+system::process::gid_t get_gid() noexcept;
 
 
 /**

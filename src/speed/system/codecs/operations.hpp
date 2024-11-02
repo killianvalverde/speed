@@ -44,13 +44,13 @@ namespace speed::system::codecs {
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 template<typename TpCharTraits, typename TpCharAlloc>
-bool convert_c_string_to_wstring(
+bool convert_c_str_to_wstring(
         const char* c_str,
         std::basic_string<wchar_t, TpCharTraits, TpCharAlloc>* wstr,
         std::error_code* err_code = nullptr
 ) noexcept
 {
-    return SPEED_SELECT_API(codecs::convert_c_string_to_wstring, false, c_str, wstr, err_code);
+    return SPEED_SELECT_API(codecs::convert_c_str_to_wstring, false, c_str, wstr, err_code);
 }
 
 
@@ -62,13 +62,13 @@ bool convert_c_string_to_wstring(
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 template<typename TpCharTraits, typename TpCharAlloc>
-bool convert_w_string_to_string(
+bool convert_w_str_to_string(
         const wchar_t* w_str,
         std::basic_string<char, TpCharTraits, TpCharAlloc>* str,
         std::error_code* err_code = nullptr
 ) noexcept
 {
-    return SPEED_SELECT_API(codecs::convert_w_string_to_string, false, w_str, str, err_code);
+    return SPEED_SELECT_API(codecs::convert_w_str_to_string, false, w_str, str, err_code);
 }
 
 

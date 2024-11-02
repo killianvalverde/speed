@@ -36,7 +36,10 @@
 namespace speed::system::api::glibc::time {
 
 
-bool get_monotonic_time(time_specification* time_spec, std::error_code* err_code) noexcept
+bool get_monotonic_time(
+        system::time::time_specification* time_spec,
+        std::error_code* err_code
+) noexcept
 {
     ::timespec tp;
     int clk;
@@ -53,7 +56,7 @@ bool get_monotonic_time(time_specification* time_spec, std::error_code* err_code
     
     if (::clock_gettime(clk, &tp) == -1)
     {
-        assign_system_error_code(errno, err_code);
+        system::errors::assign_system_error_code(errno, err_code);
         return false;
     }
 
@@ -63,7 +66,10 @@ bool get_monotonic_time(time_specification* time_spec, std::error_code* err_code
 }
 
 
-bool get_cpu_time(time_specification* time_spec, std::error_code* err_code) noexcept
+bool get_cpu_time(
+        system::time::time_specification* time_spec,
+        std::error_code* err_code
+) noexcept
 {
     ::clock_t cpu_tme;
     ::tms buf;
@@ -71,13 +77,13 @@ bool get_cpu_time(time_specification* time_spec, std::error_code* err_code) noex
     
     if (cps == -1)
     {
-        assign_system_error_code(errno, err_code);
+        system::errors::assign_system_error_code(errno, err_code);
         return false;
     }
     
     if (::times(&buf) == -1)
     {
-        assign_system_error_code(errno, err_code);
+        system::errors::assign_system_error_code(errno, err_code);
         return false;
     }
 
@@ -90,7 +96,10 @@ bool get_cpu_time(time_specification* time_spec, std::error_code* err_code) noex
 }
 
 
-bool get_child_cpu_time(time_specification* time_spec, std::error_code* err_code) noexcept
+bool get_child_cpu_time(
+        system::time::time_specification* time_spec,
+        std::error_code* err_code
+) noexcept
 {
     ::clock_t cpu_tme;
     ::tms buf;
@@ -98,13 +107,13 @@ bool get_child_cpu_time(time_specification* time_spec, std::error_code* err_code
     
     if (cps == -1)
     {
-        assign_system_error_code(errno, err_code);
+        system::errors::assign_system_error_code(errno, err_code);
         return false;
     }
     
     if (::times(&buf) == -1)
     {
-        assign_system_error_code(errno, err_code);
+        system::errors::assign_system_error_code(errno, err_code);
         return false;
     }
 

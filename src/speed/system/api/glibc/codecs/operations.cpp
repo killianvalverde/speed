@@ -29,10 +29,6 @@
 
 #include "operations.hpp"
 
-#include <iconv.h>
-#include <string.h>
-#include <wchar.h>
-
 
 namespace speed::system::api::glibc::codecs {
 
