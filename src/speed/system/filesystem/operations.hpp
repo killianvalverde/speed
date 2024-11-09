@@ -287,6 +287,38 @@ inline inode_t get_file_inode(
 
 
 /**
+ * @brief       Get the inode number of the specified file.
+ * @param       directory_ent : The directory entity current file to get the inode number.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      On success the inode number of the sepcified file is returned, otherwise -1 is
+ *              returned.
+ */
+inline inode_t get_file_inode(
+        directory_entity* directory_ent,
+        std::error_code* err_code = nullptr
+) noexcept
+{
+    return SPEED_SELECT_API(filesystem::get_file_inode, -1, directory_ent, err_code);
+}
+
+
+/**
+ * @brief       Get the inode number of the specified file.
+ * @param       directory_ent : The directory entity current file to get the inode number.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      On success the inode number of the sepcified file is returned, otherwise -1 is
+ *              returned.
+ */
+inline inode_t get_file_inode(
+        wdirectory_entity* directory_ent,
+        std::error_code* err_code = nullptr
+) noexcept
+{
+    return SPEED_SELECT_API(filesystem::get_file_inode, -1, directory_ent, err_code);
+}
+
+
+/**
  * @brief       Get the UID of the specified file.
  * @param       file_pth : The file to get the UID.
  * @param       err_code : If function fails it holds the platform-dependent error code.

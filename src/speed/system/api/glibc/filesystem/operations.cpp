@@ -341,6 +341,24 @@ system::filesystem::inode_t get_file_inode(
 }
 
 
+system::filesystem::inode_t get_file_inode(
+        system::filesystem::directory_entity* directory_ent,
+        std::error_code* err_code
+) noexcept
+{
+    return ((directory_entity_extension*)directory_ent->ext)->ino;
+}
+
+
+system::filesystem::inode_t get_file_inode(
+        system::filesystem::wdirectory_entity* directory_ent,
+        std::error_code* err_code
+) noexcept
+{
+    return ((wdirectory_entity_extension*)directory_ent->ext)->ino;
+}
+
+
 uid_t get_file_uid(const char* file_pth, std::error_code* err_code) noexcept
 {
     struct ::stat stt;
@@ -884,7 +902,7 @@ bool readdir(
         return false;
     }
     
-    directory_ent->ino = directory_ent_ext->entry->d_ino;
+    directory_ent_ext->ino = directory_ent_ext->entry->d_ino;
     directory_ent->nme = directory_ent_ext->entry->d_name;
     
     return true;
@@ -896,11 +914,11 @@ bool readdir(
         std::error_code* err_code
 ) noexcept
 {
-    auto* dir_ent_ext = (wdirectory_entity_extension*)directory_ent->ext;
+    auto* directory_ent_ext = (wdirectory_entity_extension*)directory_ent->ext;
 
     errno = 0;
-    dir_ent_ext->entry = ::readdir(dir_ent_ext->dir);
-    if (dir_ent_ext->entry == nullptr)
+    directory_ent_ext->entry = ::readdir(directory_ent_ext->dir);
+    if (directory_ent_ext->entry == nullptr)
     {
         if (errno != 0)
         {
@@ -910,12 +928,13 @@ bool readdir(
         return false;
     }
 
-    directory_ent->ino = dir_ent_ext->entry->d_ino;
-    if (!codecs::convert_c_str_to_wstring(dir_ent_ext->entry->d_name, &dir_ent_ext->name_holdr))
+    directory_ent_ext->ino = directory_ent_ext->entry->d_ino;
+    if (!codecs::convert_c_str_to_wstring(directory_ent_ext->entry->d_name,
+                                          &directory_ent_ext->name_holdr))
     {
         return false;
     }
-    directory_ent->nme = &dir_ent_ext->name_holdr[0];
+    directory_ent->nme = &directory_ent_ext->name_holdr[0];
 
     return true;
 }

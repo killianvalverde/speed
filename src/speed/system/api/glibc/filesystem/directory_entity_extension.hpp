@@ -32,6 +32,8 @@
 
 #include <dirent.h>
 
+#include "../../../filesystem/types.hpp"
+
 
 namespace speed::system::api::glibc::filesystem {
 
@@ -46,6 +48,9 @@ struct directory_entity_extension
     
     /** Direcotry entry. */
     dirent* entry;
+    
+    /** Inode number of the current entity. */
+    system::filesystem::inode_t ino;
 };
 
 
@@ -62,6 +67,9 @@ struct wdirectory_entity_extension
     
     /** Direcotry entry. */
     dirent* entry;
+    
+    /** Inode number of the current entity. */
+    system::filesystem::inode_t ino;
 };
 
 

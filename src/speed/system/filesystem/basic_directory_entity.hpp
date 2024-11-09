@@ -42,9 +42,6 @@ struct basic_directory_entity
     /** The character type. */
     using char_type = TpChar;
     
-    /** Inode number of the current entity. */
-    inode_t ino;
-    
     /** Name of the current entity. */
     const char_type* nme;
     

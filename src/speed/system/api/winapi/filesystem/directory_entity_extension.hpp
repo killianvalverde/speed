@@ -30,6 +30,8 @@
 #include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_WINAPI
 
+#include "../../../filesystem/types.hpp"
+
 
 namespace speed::system::api::winapi::filesystem {
 

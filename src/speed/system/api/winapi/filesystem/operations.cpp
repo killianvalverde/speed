@@ -506,6 +506,46 @@ system::filesystem::inode_t get_file_inode(
 }
 
 
+system::filesystem::inode_t get_file_inode(
+        system::filesystem::directory_entity* directory_ent,
+        std::error_code* err_code
+) noexcept
+{
+    auto* directory_ent_ext = (directory_entity_extension*)directory_ent->ext;
+    char search_pth[MAX_PATH];
+    errno_t std_err;
+    
+    if ((std_err = ::strcpy_s(search_pth, MAX_PATH, directory_ent_ext->pth)) != 0 ||
+        (std_err = ::strcat_s(search_pth, MAX_PATH, directory_ent->nme)) != 0)
+    {
+        system::errors::assign_system_error_code((int)std_err, err_code);
+        return false;
+    }
+    
+    return get_file_inode(search_pth, err_code);
+}
+
+
+system::filesystem::inode_t get_file_inode(
+        system::filesystem::wdirectory_entity* directory_ent,
+        std::error_code* err_code
+) noexcept
+{
+    auto* directory_ent_ext = (wdirectory_entity_extension*)directory_ent->ext;
+    wchar_t search_pth[MAX_PATH];
+    errno_t std_err;
+    
+    if ((std_err = ::wcscpy_s(search_pth, MAX_PATH, directory_ent_ext->pth)) != 0 ||
+        (std_err = ::wcscat_s(search_pth, MAX_PATH, directory_ent->nme)) != 0)
+    {
+        system::errors::assign_system_error_code((int)std_err, err_code);
+        return false;
+    }
+    
+    return get_file_inode(search_pth, err_code);
+}
+
+
 system::process::uid_t get_file_uid(const char* file_pth, std::error_code* err_code) noexcept
 {
     PSID owner_sid;
@@ -1474,9 +1514,7 @@ bool readdir(
 ) noexcept
 {
     auto* directory_ent_ext = (directory_entity_extension*)directory_ent->ext;
-    char search_pth[MAX_PATH];
     DWORD last_err;
-    errno_t std_err;
 
     if (directory_ent_ext->read_dne &&
         !::FindNextFileA(directory_ent_ext->dir_handl, &directory_ent_ext->find_dat))
@@ -1493,15 +1531,6 @@ bool readdir(
     directory_ent_ext->read_dne = true;
     directory_ent->nme = directory_ent_ext->find_dat.cFileName;
     
-    if ((std_err = ::strcpy_s(search_pth, MAX_PATH, directory_ent_ext->pth)) != 0 ||
-        (std_err = ::strcat_s(search_pth, MAX_PATH, directory_ent->nme)) != 0)
-    {
-        system::errors::assign_system_error_code((int)std_err, err_code);
-        return false;
-    }
-    
-    directory_ent->ino = get_file_inode(search_pth, err_code);
-    
     return true;
 }
 
@@ -1512,9 +1541,7 @@ bool readdir(
 ) noexcept
 {
     auto* directory_ent_ext = (wdirectory_entity_extension*)directory_ent->ext;
-    wchar_t search_pth[MAX_PATH];
     DWORD last_err;
-    errno_t std_err;
 
     if (directory_ent_ext->read_dne &&
         !::FindNextFileW(directory_ent_ext->dir_handl, &directory_ent_ext->find_dat))
@@ -1530,15 +1557,6 @@ bool readdir(
 
     directory_ent_ext->read_dne = true;
     directory_ent->nme = directory_ent_ext->find_dat.cFileName;
-    
-    if ((std_err = ::wcscpy_s(search_pth, MAX_PATH, directory_ent_ext->pth)) != 0 ||
-        (std_err = ::wcscat_s(search_pth, MAX_PATH, directory_ent->nme)) != 0)
-    {
-        system::errors::assign_system_error_code((int)std_err, err_code);
-        return false;
-    }
-    
-    directory_ent->ino = get_file_inode(search_pth, err_code);
 
     return true;
 }
