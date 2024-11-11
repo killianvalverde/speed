@@ -32,7 +32,6 @@
 
 #include "../../../../stringutils/stringutils.hpp"
 #include "../../../codecs/codecs.hpp"
-#include "directory_entity_extension.hpp"
 #include "operations.hpp"
 
 
@@ -240,28 +239,15 @@ bool closedir(
         std::error_code* err_code
 ) noexcept
 {
-    bool succss = false;
-
-    if (directory_ent->ext != nullptr)
+    auto* directory_ent_ext = &directory_ent->__priv;
+    
+    if (::closedir(directory_ent_ext->dir) == -1)
     {
-        if (::closedir(((directory_entity_extension*)directory_ent->ext)->dir) == -1)
-        {
-            system::errors::assign_system_error_code(errno, err_code);
-        }
-        else
-        {
-            succss = true;
-        }
-
-        free(directory_ent->ext);
-        directory_ent->ext = nullptr;
-    }
-    else
-    {
-        system::errors::assign_system_error_code(EINVAL, err_code);
+        system::errors::assign_system_error_code(errno, err_code);
+        return false;
     }
     
-    return succss;
+    return true;
 }
 
 
@@ -270,30 +256,15 @@ bool closedir(
         std::error_code* err_code
 ) noexcept
 {
-    bool succss = false;
-    auto* directory_ent_ext = (wdirectory_entity_extension*)directory_ent->ext;
-
-    if (directory_ent_ext != nullptr)
+    auto* directory_ent_ext = &directory_ent->__priv;
+    
+    if (::closedir(directory_ent_ext->dir) == -1)
     {
-        if (::closedir((directory_ent_ext)->dir) == -1)
-        {
-            system::errors::assign_system_error_code(errno, err_code);
-        }
-        else
-        {
-            succss = true;
-        }
-        
-        directory_ent_ext->~wdirectory_entity_extension();
-        free(directory_ent->ext);
-        directory_ent->ext = nullptr;
+        system::errors::assign_system_error_code(errno, err_code);
+        return false;
     }
-    else
-    {
-        system::errors::assign_system_error_code(EINVAL, err_code);
-    }
-
-    return succss;
+    
+    return true;
 }
 
 
@@ -346,7 +317,7 @@ system::filesystem::inode_t get_file_inode(
         std::error_code* err_code
 ) noexcept
 {
-    return ((directory_entity_extension*)directory_ent->ext)->ino;
+    return directory_ent->__priv.ino;
 }
 
 
@@ -355,7 +326,7 @@ system::filesystem::inode_t get_file_inode(
         std::error_code* err_code
 ) noexcept
 {
-    return ((wdirectory_entity_extension*)directory_ent->ext)->ino;
+    return directory_ent->__priv.ino;
 }
 
 
@@ -825,21 +796,11 @@ bool opendir(
         std::error_code* err_code
 ) noexcept
 {
-    auto* directory_ent_ext = (directory_entity_extension*)malloc(
-            sizeof(directory_entity_extension));
-    directory_ent->ext = directory_ent_ext;
-    
-    if (directory_ent_ext == nullptr)
-    {
-        system::errors::assign_system_error_code(ENOMEM, err_code);
-        return false;
-    }
+    auto* directory_ent_ext = &directory_ent->__priv;
     
     if ((directory_ent_ext->dir = ::opendir(directory_pth)) == nullptr)
     {
         system::errors::assign_system_error_code(errno, err_code);
-        free(directory_ent_ext);
-        directory_ent->ext = nullptr;
         return false;
     }
     
@@ -859,23 +820,11 @@ bool opendir(
         return false;
     }
 
-    auto* directory_ent_ext = (wdirectory_entity_extension*)malloc(
-            sizeof(wdirectory_entity_extension));
-    directory_ent->ext = directory_ent_ext;
-    
-    if (directory_ent_ext == nullptr)
-    {
-        system::errors::assign_system_error_code(ENOMEM, err_code);
-        return false;
-    }
-    
-    ::new((void *) (&directory_ent_ext->name_holdr)) decltype(directory_ent_ext->name_holdr)();
+    auto* directory_ent_ext = &directory_ent->__priv;
 
     if ((directory_ent_ext->dir = ::opendir(str.c_str())) == nullptr)
     {
         system::errors::assign_system_error_code(errno, err_code);
-        free(directory_ent_ext);
-        directory_ent->ext = nullptr;
         return false;
     }
 
@@ -888,7 +837,7 @@ bool readdir(
         std::error_code* err_code
 ) noexcept
 {
-    auto* directory_ent_ext = (directory_entity_extension*)directory_ent->ext;
+    auto* directory_ent_ext = &directory_ent->__priv;
     
     errno = 0;
     directory_ent_ext->entry = ::readdir(directory_ent_ext->dir);
@@ -914,7 +863,7 @@ bool readdir(
         std::error_code* err_code
 ) noexcept
 {
-    auto* directory_ent_ext = (wdirectory_entity_extension*)directory_ent->ext;
+    auto* directory_ent_ext = &directory_ent->__priv;
 
     errno = 0;
     directory_ent_ext->entry = ::readdir(directory_ent_ext->dir);

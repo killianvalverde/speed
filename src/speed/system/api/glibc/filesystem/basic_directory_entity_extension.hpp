@@ -18,14 +18,14 @@
  */
 
 /**
- * @file        speed/system/api/glibc/filesystem/directory_entity_extension.hpp
- * @brief       directory_entity_extension struct header.
+ * @file        speed/system/api/glibc/filesystem/basic_directory_entity_extension.hpp
+ * @brief       basic_directory_entity_extension struct header.
  * @author      Killian Valverde
  * @date        2019/04/10
  */
 
-#ifndef SPEED_SYSTEM_API_GLIBC_FILESYSTEM_DIRECTORY_ENTITY_EXTENSION_HPP
-#define SPEED_SYSTEM_API_GLIBC_FILESYSTEM_DIRECTORY_ENTITY_EXTENSION_HPP
+#ifndef SPEED_SYSTEM_API_GLIBC_FILESYSTEM_BASIC_DIRECTORY_ENTITY_EXTENSION_HPP
+#define SPEED_SYSTEM_API_GLIBC_FILESYSTEM_BASIC_DIRECTORY_ENTITY_EXTENSION_HPP
 
 #include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_GLIBC
@@ -38,10 +38,18 @@
 namespace speed::system::api::glibc::filesystem {
 
 
+/** Struct that represents a directory entity extension. */
+template<typename TpChar>
+struct basic_directory_entity_extension
+{
+};
+
+
 /**
  * @brief       Struct that represents a directory entity extension.
  */
-struct directory_entity_extension
+template<>
+struct basic_directory_entity_extension<char>
 {
     /** Directory iterator. */
     DIR* dir;
@@ -57,7 +65,8 @@ struct directory_entity_extension
 /**
  * @brief       Struct that represents a directory entity extension.
  */
-struct wdirectory_entity_extension
+template<>
+struct basic_directory_entity_extension<wchar_t>
 {
     /** Wide string path. */
     std::wstring name_holdr;
@@ -71,6 +80,15 @@ struct wdirectory_entity_extension
     /** Inode number of the current entity. */
     system::filesystem::inode_t ino;
 };
+
+
+}
+
+
+namespace speed::system::filesystem {
+
+
+using speed::system::api::glibc::filesystem::basic_directory_entity_extension;
 
 
 }

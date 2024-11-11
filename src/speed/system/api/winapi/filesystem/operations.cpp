@@ -38,7 +38,6 @@
 #include <memory>
 
 #include "../../../../cryptography/cryptography.hpp"
-#include "directory_entity_extension.hpp"
 #include "operations.hpp"
 
 
@@ -379,59 +378,37 @@ bool chdir(const wchar_t* directory_pth, std::error_code* err_code) noexcept
 }
 
 
-bool closedir(system::filesystem::directory_entity* directory_ent, std::error_code* err_code) noexcept
+bool closedir(
+        system::filesystem::directory_entity* directory_ent,
+        std::error_code* err_code
+) noexcept
 {
-    bool success = false;
-    auto* directory_ent_ext = (directory_entity_extension*)directory_ent->ext;
-
-    if (directory_ent_ext != nullptr)
+    auto* directory_ent_ext = &directory_ent->__priv;
+    
+    if (!::FindClose(directory_ent_ext->dir_handl))
     {
-        if (!::FindClose(directory_ent_ext->dir_handl))
-        {
-            system::errors::assign_system_error_code((int)GetLastError(), err_code);
-        }
-        else
-        {
-            success = true;
-        }
-
-        free(directory_ent_ext);
-        directory_ent->ext = nullptr;
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
+        return false;
     }
-    else
-    {
-        system::errors::assign_system_error_code(EINVAL, err_code);
-    }
-
-    return success;
+    
+    return true;
 }
 
 
-bool closedir(system::filesystem::wdirectory_entity* directory_ent, std::error_code* err_code) noexcept
+bool closedir(
+        system::filesystem::wdirectory_entity* directory_ent,
+        std::error_code* err_code
+) noexcept
 {
-    bool success = false;
-    auto* directory_ent_ext = (wdirectory_entity_extension*)directory_ent->ext;
-
-    if (directory_ent_ext != nullptr)
+    auto* directory_ent_ext = &directory_ent->__priv;
+    
+    if (!::FindClose(directory_ent_ext->dir_handl))
     {
-        if (!::FindClose(directory_ent_ext->dir_handl))
-        {
-            system::errors::assign_system_error_code((int)GetLastError(), err_code);
-        }
-        else
-        {
-            success = true;
-        }
-
-        free(directory_ent_ext);
-        directory_ent->ext = nullptr;
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
+        return false;
     }
-    else
-    {
-        system::errors::assign_system_error_code(EINVAL, err_code);
-    }
-
-    return success;
+    
+    return true;
 }
 
 
@@ -511,7 +488,7 @@ system::filesystem::inode_t get_file_inode(
         std::error_code* err_code
 ) noexcept
 {
-    auto* directory_ent_ext = (directory_entity_extension*)directory_ent->ext;
+    auto* directory_ent_ext = &directory_ent->__priv;
     char search_pth[MAX_PATH];
     errno_t std_err;
     
@@ -531,7 +508,7 @@ system::filesystem::inode_t get_file_inode(
         std::error_code* err_code
 ) noexcept
 {
-    auto* directory_ent_ext = (wdirectory_entity_extension*)directory_ent->ext;
+    auto* directory_ent_ext = &directory_ent->__priv;
     wchar_t search_pth[MAX_PATH];
     errno_t std_err;
     
@@ -1386,20 +1363,11 @@ bool opendir(
         std::error_code* err_code
 ) noexcept
 {
-    directory_entity_extension* directory_ent_ext;
     std::size_t directory_pth_len;
     bool slash_insertd = false;
-
-    directory_ent_ext = (directory_entity_extension*)malloc(sizeof(directory_entity_extension));
-    directory_ent->ext = directory_ent_ext;
-    if (directory_ent_ext == nullptr)
-    {
-        system::errors::assign_system_error_code(ERROR_NOT_ENOUGH_MEMORY, err_code);
-        return false;
-    }
+    auto* directory_ent_ext = &directory_ent->__priv;
     
     directory_pth_len = speed::stringutils::strlen(directory_pth);
-    
     if (directory_pth_len >= MAX_PATH - 3)
     {
         system::errors::assign_system_error_code(ERANGE, err_code);
@@ -1432,8 +1400,6 @@ bool opendir(
     if (directory_ent_ext->dir_handl == INVALID_HANDLE_VALUE)
     {
         system::errors::assign_system_error_code((int) GetLastError(), err_code);
-        free(directory_ent->ext);
-        directory_ent->ext = nullptr;
         return false;
     }
     
@@ -1449,20 +1415,11 @@ bool opendir(
         std::error_code* err_code
 ) noexcept
 {
-    wdirectory_entity_extension* directory_ent_ext;
     std::size_t directory_pth_len;
     bool slash_insertd = false;
-
-    directory_ent_ext = (wdirectory_entity_extension*)malloc(sizeof(wdirectory_entity_extension));
-    directory_ent->ext = directory_ent_ext;
-    if (directory_ent_ext == nullptr)
-    {
-        system::errors::assign_system_error_code(ERROR_NOT_ENOUGH_MEMORY, err_code);
-        return false;
-    }
+    auto* directory_ent_ext = &directory_ent->__priv;
     
     directory_pth_len = speed::stringutils::strlen(directory_pth);
-    
     if (directory_pth_len >= MAX_PATH - 3)
     {
         system::errors::assign_system_error_code(ERANGE, err_code);
@@ -1495,16 +1452,12 @@ bool opendir(
     if (directory_ent_ext->dir_handl == INVALID_HANDLE_VALUE)
     {
         system::errors::assign_system_error_code((int) GetLastError(), err_code);
-        free(directory_ent->ext);
-        directory_ent->ext = nullptr;
         return false;
     }
     
     directory_ent_ext->read_dne = false;
     
     return true;
-    
-    return false;
 }
 
 
@@ -1513,7 +1466,7 @@ bool readdir(
         std::error_code* err_code
 ) noexcept
 {
-    auto* directory_ent_ext = (directory_entity_extension*)directory_ent->ext;
+    auto* directory_ent_ext = &directory_ent->__priv;
     DWORD last_err;
 
     if (directory_ent_ext->read_dne &&
@@ -1540,7 +1493,7 @@ bool readdir(
         std::error_code* err_code
 ) noexcept
 {
-    auto* directory_ent_ext = (wdirectory_entity_extension*)directory_ent->ext;
+    auto* directory_ent_ext = &directory_ent->__priv;
     DWORD last_err;
 
     if (directory_ent_ext->read_dne &&

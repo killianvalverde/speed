@@ -18,14 +18,14 @@
  */
 
 /**
- * @file        speed/system/api/winapi/filesystem/directory_entity_extension.hpp
- * @brief       directory_entity_extension struct header.
+ * @file        speed/system/api/winapi/filesystem/basic_directory_entity_extension.hpp
+ * @brief       basic_directory_entity_extension struct header.
  * @author      Killian Valverde
  * @date        2019/04/10
  */
 
-#ifndef SPEED_SYSTEM_API_WINAPI_FILESYSTEM_DIRECTORY_ENTITY_EXTENSION_HPP
-#define SPEED_SYSTEM_API_WINAPI_FILESYSTEM_DIRECTORY_ENTITY_EXTENSION_HPP
+#ifndef SPEED_SYSTEM_API_WINAPI_FILESYSTEM_BASIC_DIRECTORY_ENTITY_EXTENSION_HPP
+#define SPEED_SYSTEM_API_WINAPI_FILESYSTEM_BASIC_DIRECTORY_ENTITY_EXTENSION_HPP
 
 #include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_WINAPI
@@ -36,10 +36,18 @@
 namespace speed::system::api::winapi::filesystem {
 
 
+/** Struct that represents a directory entity extension. */
+template<typename TpChar>
+struct basic_directory_entity_extension
+{
+};
+
+
 /**
  * @brief       Struct that represents a directory entity extension.
  */
-struct directory_entity_extension
+template<>
+struct basic_directory_entity_extension<char>
 {
     /** Directory data. */
     WIN32_FIND_DATAA find_dat;
@@ -58,7 +66,8 @@ struct directory_entity_extension
 /**
  * @brief       Struct that represents a directory entity extension.
  */
-struct wdirectory_entity_extension
+template<>
+struct basic_directory_entity_extension<wchar_t>
 {
     /** Directory data. */
     WIN32_FIND_DATAW find_dat;
@@ -72,6 +81,15 @@ struct wdirectory_entity_extension
     /** Indicates if a read has already been done. */
     bool read_dne;
 };
+
+
+}
+
+
+namespace speed::system::filesystem {
+
+
+using speed::system::api::winapi::filesystem::basic_directory_entity_extension;
 
 
 }

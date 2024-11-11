@@ -27,15 +27,15 @@
 #ifndef SPEED_SYSTEM_FILESYSTEM_BASIC_DIRECTORY_ENTITY_HPP
 #define SPEED_SYSTEM_FILESYSTEM_BASIC_DIRECTORY_ENTITY_HPP
 
+#include "../api/glibc/filesystem/basic_directory_entity_extension.hpp"
+#include "../api/winapi/filesystem/basic_directory_entity_extension.hpp"
 #include "types.hpp"
 
 
 namespace speed::system::filesystem {
 
 
-/**
- * @brief       Struct that represents a directory entity.
- */
+/** Struct that represents a directory entity. */
 template<typename TpChar>
 struct basic_directory_entity
 {
@@ -46,12 +46,13 @@ struct basic_directory_entity
     const char_type* nme;
     
     /** Additional api dependent data. */
-    void* ext;
+    basic_directory_entity_extension<char_type> __priv;
 };
 
 
 /** Struct that represents a directory entity. */
 using directory_entity = basic_directory_entity<char>;
+
 
 /** Struct that represents a directory entity. */
 using wdirectory_entity = basic_directory_entity<wchar_t>;
