@@ -258,8 +258,8 @@ int directory_iteration::const_iterator::strncmp(
         
         if (!composit_->case_sensitve_)
         {
-            current_str_ch = speed::stringutils::tolower(current_str_ch);
-            current_pattrn_ch = speed::stringutils::tolower(current_pattrn_ch);
+            current_str_ch = speed::stringutils::strtolower(current_str_ch);
+            current_pattrn_ch = speed::stringutils::strtolower(current_pattrn_ch);
         }
 
         if (current_str_ch != current_pattrn_ch)
@@ -335,8 +335,8 @@ const directory_iteration::char_type* directory_iteration::const_iterator::strst
     {
         if (!composit_->case_sensitve_)
         {
-            current_str_ch = speed::stringutils::tolower(*str);
-            current_pattrn_ch = speed::stringutils::tolower(*pattrn);
+            current_str_ch = speed::stringutils::strtolower(*str);
+            current_pattrn_ch = speed::stringutils::strtolower(*pattrn);
         }
         else
         {
