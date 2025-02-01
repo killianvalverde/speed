@@ -244,7 +244,7 @@ bool can_directory_be_created(const char* directory_pth, std::error_code* err_co
     }
 
     speed::stringutils::strcpy(parent_pth, directory_pth);
-    speed::stringutils::strdisclastif(parent_pth, '\\');
+    speed::stringutils::strrmlast(parent_pth, '\\');
     last_char_p = speed::stringutils::strcut(parent_pth, '\\');
     directory_path_len = last_char_p == nullptr ? 0 : parent_pth - last_char_p + 1;
 
@@ -273,7 +273,7 @@ bool can_directory_be_created(const wchar_t* directory_pth, std::error_code* err
     }
 
     speed::stringutils::strcpy(parent_pth, directory_pth);
-    speed::stringutils::strdisclastif(parent_pth, L'\\');
+    speed::stringutils::strrmlast(parent_pth, L'\\');
     p_last_char = speed::stringutils::strcut(parent_pth, L'\\');
     directory_path_len = p_last_char == nullptr ? 0 : parent_pth - p_last_char + 1;
 
@@ -306,7 +306,7 @@ bool can_regular_file_be_created(const char* regular_file_pth, std::error_code* 
     }
 
     speed::stringutils::strcpy(parent_pth, regular_file_pth);
-    speed::stringutils::strdisclastif(parent_pth, '\\');
+    speed::stringutils::strrmlast(parent_pth, '\\');
     p_last_char = speed::stringutils::strcut(parent_pth, '\\');
     path_len = p_last_char == nullptr ? 0 : parent_pth - p_last_char + 1;
 
@@ -339,7 +339,7 @@ bool can_regular_file_be_created(const wchar_t* regular_file_pth, std::error_cod
     }
 
     speed::stringutils::strcpy(parent_pth, regular_file_pth);
-    speed::stringutils::strdisclastif(parent_pth, L'\\');
+    speed::stringutils::strrmlast(parent_pth, L'\\');
     p_last_char = speed::stringutils::strcut(parent_pth, L'\\');
     path_len = p_last_char == nullptr ? 0 : parent_pth - p_last_char + 1;
 
@@ -1254,7 +1254,7 @@ bool mkdir_recursively(
     }
 
     stringutils::strcpy(parnt_path, directory_pth);
-    stringutils::strdisclastif(parnt_path, '\\');
+    stringutils::strrmlast(parnt_path, '\\');
 
     do
     {
@@ -1316,7 +1316,7 @@ bool mkdir_recursively(
     }
 
     stringutils::strcpy(parnt_path, directory_pth);
-    stringutils::strdisclastif(parnt_path, L'\\');
+    stringutils::strrmlast(parnt_path, L'\\');
 
     do
     {

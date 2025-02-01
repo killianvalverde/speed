@@ -138,7 +138,7 @@ bool can_directory_be_created(const char* directory_pth, std::error_code* err_co
     }
 
     stringutils::strcpy(parent_pth, directory_pth);
-    stringutils::strdisclastif(parent_pth, '/');
+    stringutils::strrmlast(parent_pth, '/');
     last_char_p = stringutils::strcut(parent_pth, '/');
     dir_path_len = last_char_p == nullptr ? 0 : parent_pth - last_char_p + 1;
 
@@ -182,7 +182,7 @@ bool can_regular_file_be_created(const char* regular_file_pth, std::error_code* 
     }
 
     stringutils::strcpy(parent_pth, regular_file_pth);
-    stringutils::strdisclastif(parent_pth, '/');
+    stringutils::strrmlast(parent_pth, '/');
     last_char_p = stringutils::strcut(parent_pth, '/');
     path_len = last_char_p == nullptr ? 0 : parent_pth - last_char_p + 1;
 
@@ -740,7 +740,7 @@ bool mkdir_recursively(
     }
     
     stringutils::strcpy(parnt_path, directory_pth);
-    stringutils::strdisclastif(parnt_path, '/');
+    stringutils::strrmlast(parnt_path, '/');
     
     do
     {
