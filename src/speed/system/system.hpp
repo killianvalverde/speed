@@ -28,6 +28,7 @@
 #define SPEED_SYSTEM_SYSTEM_HPP
 
 #include "api/api.hpp"
+#include "codecs/codecs.hpp"
 #include "compatibility/compatibility.hpp"
 #include "errors/errors.hpp"
 #include "exceptions/exceptions.hpp"
@@ -40,7 +41,6 @@
 namespace speed {
 
 
-// TODO: Improve code from api::filesystem and api::process.
 /**
  * @brief       Contains resources for interact with the system.
  */

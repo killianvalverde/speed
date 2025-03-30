@@ -18,54 +18,42 @@
  */
 
 /**
- * @file        speed/system/filesystem/file_type.hpp
- * @brief       file_type header.
+ * @file        speed/cryptography/city_hash.hpp
+ * @brief       city_hash functions header.
  * @author      Killian Valverde
- * @date        2019/03/22
+ * @date        2024/11/01
  */
 
-#ifndef SPEED_SYSTEM_FILESYSTEM_FILE_TYPE_HPP
-#define SPEED_SYSTEM_FILESYSTEM_FILE_TYPE_HPP
+#ifndef SPEED_CRYPTOGRAPHY_CITY_HASH_HPP
+#define SPEED_CRYPTOGRAPHY_CITY_HASH_HPP
 
 #include <cstdint>
 
+#include "../stringutils/stringutils.hpp"
 
-namespace speed::system::filesystem {
+
+namespace speed::cryptography {
 
 
 /**
- * @brief       Represents a file type.
+ * @brief       Compute the city-hash of a specific value.
+ * @param       ptr : Pointer to the value to hash.
+ * @param       sz : Size of the value to hash.
+ * @return      The hash value.
  */
-enum class file_type : std::uint8_t
+std::uint64_t city_hash_64(const void* ptr, std::size_t sz);
+
+
+/**
+ * @brief       Compute the city-hash of a specific cstr.
+ * @param       str : Cstr to hash.
+ * @return      The hash value.
+ */
+template<typename TpChar>
+inline std::uint64_t city_hash_64(const TpChar* str)
 {
-    /** Any file type. */
-    NIL = 0x0,
-    
-    /** Block device. */
-    BLOCK_DEVICE = 0x1,
-    
-    /** Character device. */
-    CHARACTER_DEVICE = 0x2,
-    
-    /** Directory. */
-    DIRECTORY = 0x3,
-    
-    /** Named pipe */
-    FIFO = 0x4,
-    
-    /** Regular file. */
-    REGULAR_FILE = 0x5,
-    
-    /** Named IPC socket. */
-    SOCKET = 0x6,
-    
-    /** Symbolic link. */
-    SYMLINK = 0x7,
-};
-
-
-/** Represents the file types. */
-using ft_t = file_type;
+    return city_hash_64(str, speed::stringutils::strlen(str) * sizeof(TpChar));
+}
 
 
 }

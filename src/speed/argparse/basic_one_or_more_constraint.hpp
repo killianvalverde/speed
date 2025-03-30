@@ -18,14 +18,14 @@
  */
 
 /**
- *  @file       speed/argparse/basic_mutually_exclusive.hpp
- *  @brief      basic_mutually_exclusive class header.
+ *  @file       speed/argparse/basic_one_or_more_constraint.hpp
+ *  @brief      basic_one_or_more_constraint class header.
  *  @author     Killian Valverde
- *  @date       2024/05/16
+ *  @date       2024/05/09
  */
 
-#ifndef SPEED_ARGPARSE_BASIC_MUTUALLY_EXCLUSIVE_HPP
-#define SPEED_ARGPARSE_BASIC_MUTUALLY_EXCLUSIVE_HPP
+#ifndef SPEED_ARGPARSE_BASIC_ONE_OR_MORE_CONSTRAINT_HPP
+#define SPEED_ARGPARSE_BASIC_ONE_OR_MORE_CONSTRAINT_HPP
 
 #include <memory>
 #include <string>
@@ -47,11 +47,11 @@ namespace speed::argparse {
 
 
 /**
- * @brief       Class used to represent a constraint that verifies that exclusivelly one of the
- *              specified arguments is found in the program call.
+ * @brief       Class used to represent a constraint that verifies that at least one of the
+ *              specified arguments has been found in the program call.
  */
 template<typename TpBase, typename TpAllocator>
-class basic_mutually_exclusive : public TpBase
+class basic_one_or_more_constraint : public TpBase
 {
 public:
     /** Base class type. */
@@ -107,14 +107,14 @@ public:
     
     /**
      * @brief       Constructor with parameters.
-     * @param       arg_parsr : Argument parser that holds this constraint.
+     * @param       arg_parsr : Argument parser that holds this object.
      * @param       kys : The arguments keys in which apply the constraint.
      */
     template<typename... Ts_>
-    explicit basic_mutually_exclusive(arg_parser_type* arg_parsr, const Ts_&... kys)
+    explicit basic_one_or_more_constraint(arg_parser_type* arg_parsr, const Ts_&... kys)
             : base_type(arg_parsr, kys...)
     {
-        if (base_type::get_base_args_size() <= 1)
+        if (base_type::get_base_args_size() < 2)
         {
             throw wrong_dependency_exception();
         }
@@ -132,32 +132,32 @@ public:
      * @brief       Copy constructor.
      * @param       rhs : Object to copy.
      */
-    basic_mutually_exclusive(const basic_mutually_exclusive& rhs) = delete;
+    basic_one_or_more_constraint(const basic_one_or_more_constraint& rhs) = delete;
     
     /**
      * @brief       Move constructor.
      * @param       rhs : Object to move.
      */
-    basic_mutually_exclusive(basic_mutually_exclusive&& rhs) noexcept = default;
+    basic_one_or_more_constraint(basic_one_or_more_constraint&& rhs) noexcept = default;
     
     /**
      * @brief       Destructor.
      */
-    ~basic_mutually_exclusive() = default;
+    ~basic_one_or_more_constraint() = default;
     
     /**
      * @brief       Copy assignment operator.
      * @param       rhs : Object to copy.
      * @return      The object who call the method.
      */
-    basic_mutually_exclusive& operator =(const basic_mutually_exclusive& rhs) = delete;
+    basic_one_or_more_constraint& operator =(const basic_one_or_more_constraint& rhs) = delete;
     
     /**
      * @brief       Move assignment operator.
      * @param       rhs : Object to move.
      * @return      The object who call the method.
      */
-    basic_mutually_exclusive& operator =(basic_mutually_exclusive&& rhs) noexcept = default;
+    basic_one_or_more_constraint& operator =(basic_one_or_more_constraint&& rhs) noexcept = default;
     
     /**
      * @brief       Allows knowing whether a relational constraint is violed.
@@ -165,22 +165,15 @@ public:
      */
     bool violed() override
     {
-        bool fnd = false;
-
         for (auto& bse_arg : base_type::get_base_args())
         {
             if (bse_arg->was_found())
             {
-                if (fnd)
-                {
-                    return true;
-                }
-
-                fnd = true;
+                return base_type::violed();
             }
         }
 
-        return base_type::violed();
+        return true;
     }
 
     /**
@@ -188,18 +181,17 @@ public:
      */
     void print_usage() override
     {
-        std::size_t cnt = 0;
         auto& bse_args = base_type::get_base_args();
         auto bse_arg_it = bse_args.begin();
 
         std::cout << "{";
-        (*bse_arg_it)->print_usage();
+        (*bse_arg_it)->print_name();
         ++bse_arg_it;
 
         for (; bse_arg_it != bse_args.end(); ++bse_arg_it)
         {
-            std::cout << " ⊕ ";
-            (*bse_arg_it)->print_usage();
+            std::cout << " | ";
+            (*bse_arg_it)->print_name();
         }
 
         std::cout << "}";
@@ -212,8 +204,6 @@ public:
      */
     void print_errors() override
     {
-        const string_type* err_name;
-
         if (violed())
         {
             auto& bse_args = base_type::get_base_args();
@@ -222,15 +212,15 @@ public:
             
             for (auto it = bse_args.cbegin(); it != bse_args.cend(); )
             {
-                err_name = &(*it)->get_error_name();
+                auto& err_name = (*it)->get_error_name();
                 
-                if (!err_name->empty())
+                if (!err_name.empty())
                 {
                     if (base_type::colors_enabled())
                     {
                         std::cout << speed::iostream::set_light_red_text;
                     }
-                    std::cout << *err_name;
+                    std::cout << err_name;
     
                     if (++it != bse_args.cend())
                     {
@@ -248,7 +238,7 @@ public:
                 }
             }
             
-            std::cout << "The arguments are mutually exclusive.\n";
+            std::cout << "At least one of the arguments has to be found.\n";
         }
 
         base_type::print_errors();

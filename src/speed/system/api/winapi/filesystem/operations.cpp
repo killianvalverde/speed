@@ -31,13 +31,13 @@
 #include <aclapi.h>
 #include <io.h>
 #include <sddl.h>
-// #include <winsock2.h>
+#include <shlguid.h>
+#include <shobjidl_core.h>
 
 #include <cstdlib>
 #include <memory>
 
-#include "../../../../stringutils/stringutils.hpp"
-#include "directory_entity_extension.hpp"
+#include "../../../../cryptography/cryptography.hpp"
 #include "operations.hpp"
 
 
@@ -45,8 +45,8 @@ namespace speed::system::api::winapi::filesystem {
 
 
 bool access(
-        const char* fle_path,
-        access_modes acss_modes,
+        const char* file_pth,
+        system::filesystem::access_modes access_mods,
         std::error_code* err_code
 ) noexcept
 {
@@ -62,24 +62,110 @@ bool access(
     GENERIC_MAPPING generic_mappng = {FILE_GENERIC_READ, FILE_GENERIC_WRITE,
                                       FILE_GENERIC_EXECUTE, FILE_ALL_ACCESS };
 
-    if (acss_modes == access_modes::EXISTS)
+    if (access_mods == system::filesystem::access_modes::NIL)
     {
-        return GetFileAttributesA(fle_path) != INVALID_FILE_ATTRIBUTES;
+        return true;
     }
-    if ((acss_modes & access_modes::READ) != access_modes::NIL)
+    if (access_mods == system::filesystem::access_modes::EXISTS)
+    {
+        return ::GetFileAttributesA(file_pth) != INVALID_FILE_ATTRIBUTES;
+    }
+    if ((access_mods & system::filesystem::access_modes::READ) !=
+                system::filesystem::access_modes::NIL)
     {
         access_desird |= GENERIC_READ;
     }
-    if ((acss_modes & access_modes::WRITE) != access_modes::NIL)
+    if ((access_mods & system::filesystem::access_modes::WRITE) !=
+                system::filesystem::access_modes::NIL)
     {
         access_desird |= GENERIC_WRITE;
     }
-    if ((acss_modes & access_modes::EXECUTE) != access_modes::NIL)
+    if ((access_mods & system::filesystem::access_modes::EXECUTE) !=
+                system::filesystem::access_modes::NIL)
     {
         access_desird |= GENERIC_EXECUTE;
     }
 
-    if (::GetNamedSecurityInfoA(fle_path, SE_FILE_OBJECT,
+    if (::GetNamedSecurityInfoA(file_pth, SE_FILE_OBJECT,
+                DACL_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION | OWNER_SECURITY_INFORMATION,
+                nullptr, nullptr, &p_dacl, nullptr, &p_security_descriptr) != ERROR_SUCCESS ||
+        !::OpenProcessToken(GetCurrentProcess(),
+                TOKEN_QUERY | TOKEN_DUPLICATE | TOKEN_IMPERSONATE, &tokn) ||
+        !::DuplicateToken(tokn, SecurityImpersonation, &impersonation_tokn))
+    {
+        goto exit_with_error;
+    }
+
+    ::MapGenericMask(&access_desird, &generic_mappng);
+
+    if (!::AccessCheck(p_security_descriptr, impersonation_tokn, access_desird, &generic_mappng,
+                       &privilege_st, &privilege_st_sz, &granted_accss, &access_sttus))
+    {
+        goto exit_with_error;
+    }
+
+    goto exit;
+
+exit_with_error:
+    system::errors::assign_system_error_code((int)GetLastError(), err_code);
+
+exit:
+    if (p_security_descriptr != nullptr)
+    {
+        ::LocalFree(p_security_descriptr);
+    }
+    if (tokn != nullptr)
+    {
+        ::CloseHandle(tokn);
+    }
+    if (impersonation_tokn != nullptr)
+    {
+        ::CloseHandle(impersonation_tokn);
+    }
+
+    return (bool)access_sttus;
+}
+
+
+bool access(
+        const wchar_t* file_pth,
+        system::filesystem::access_modes access_mods,
+        std::error_code* err_code
+) noexcept
+{
+    DWORD access_desird = 0;
+    PACL p_dacl = nullptr;
+    PSECURITY_DESCRIPTOR p_security_descriptr = nullptr;
+    HANDLE tokn = nullptr;
+    HANDLE impersonation_tokn = nullptr;
+    PRIVILEGE_SET privilege_st;
+    DWORD privilege_st_sz = sizeof(PRIVILEGE_SET);
+    DWORD granted_accss = 0;
+    BOOL access_sttus = false;
+    GENERIC_MAPPING generic_mappng = {FILE_GENERIC_READ, FILE_GENERIC_WRITE,
+                                      FILE_GENERIC_EXECUTE, FILE_ALL_ACCESS };
+
+    if (access_mods == system::filesystem::access_modes::EXISTS)
+    {
+        return GetFileAttributesW(file_pth) != INVALID_FILE_ATTRIBUTES;
+    }
+    if ((access_mods & system::filesystem::access_modes::READ) !=
+                system::filesystem::access_modes::NIL)
+    {
+        access_desird |= GENERIC_READ;
+    }
+    if ((access_mods & system::filesystem::access_modes::WRITE) !=
+                system::filesystem::access_modes::NIL)
+    {
+        access_desird |= GENERIC_WRITE;
+    }
+    if ((access_mods & system::filesystem::access_modes::EXECUTE) !=
+                system::filesystem::access_modes::NIL)
+    {
+        access_desird |= GENERIC_EXECUTE;
+    }
+
+    if (::GetNamedSecurityInfoW(file_pth, SE_FILE_OBJECT,
                 DACL_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION | OWNER_SECURITY_INFORMATION,
                 nullptr, nullptr, &p_dacl, nullptr, &p_security_descriptr) != ERROR_SUCCESS ||
         !::OpenProcessToken(GetCurrentProcess(),
@@ -100,7 +186,7 @@ bool access(
     goto exit;
 
 exit_with_error:
-    assign_system_error_code((int)GetLastError(), err_code);
+    system::errors::assign_system_error_code((int)GetLastError(), err_code);
 
 exit:
     if (p_security_descriptr != nullptr)
@@ -116,186 +202,113 @@ exit:
         ::CloseHandle(impersonation_tokn);
     }
 
-    return access_sttus;
+    return (bool)access_sttus;
 }
 
 
 bool access(
-        const wchar_t* fle_path,
-        access_modes acss_modes,
+        const char* file_pth,
+        system::filesystem::access_modes access_mods,
+        system::filesystem::file_types file_typs,
         std::error_code* err_code
 ) noexcept
 {
-    DWORD access_desird = 0;
-    PACL p_dacl = nullptr;
-    PSECURITY_DESCRIPTOR p_security_descriptr = nullptr;
-    HANDLE tokn = nullptr;
-    HANDLE impersonation_tokn = nullptr;
-    PRIVILEGE_SET privilege_st;
-    DWORD privilege_st_sz = sizeof(PRIVILEGE_SET);
-    DWORD granted_accss = 0;
-    BOOL access_sttus = false;
-    GENERIC_MAPPING generic_mappng = {FILE_GENERIC_READ, FILE_GENERIC_WRITE,
-                                      FILE_GENERIC_EXECUTE, FILE_ALL_ACCESS };
-
-    if (acss_modes == access_modes::EXISTS)
-    {
-        return GetFileAttributesW(fle_path) != INVALID_FILE_ATTRIBUTES;
-    }
-    if ((acss_modes & access_modes::READ) != access_modes::NIL)
-    {
-        access_desird |= GENERIC_READ;
-    }
-    if ((acss_modes & access_modes::WRITE) != access_modes::NIL)
-    {
-        access_desird |= GENERIC_WRITE;
-    }
-    if ((acss_modes & access_modes::EXECUTE) != access_modes::NIL)
-    {
-        access_desird |= GENERIC_EXECUTE;
-    }
-
-    if (::GetNamedSecurityInfoW(fle_path, SE_FILE_OBJECT,
-                DACL_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION | OWNER_SECURITY_INFORMATION,
-                nullptr, nullptr, &p_dacl, nullptr, &p_security_descriptr) != ERROR_SUCCESS ||
-        !::OpenProcessToken(GetCurrentProcess(),
-                TOKEN_QUERY | TOKEN_DUPLICATE | TOKEN_IMPERSONATE, &tokn) ||
-        !::DuplicateToken(tokn, SecurityImpersonation, &impersonation_tokn))
-    {
-        goto exit_with_error;
-    }
-
-    ::MapGenericMask(&access_desird, &generic_mappng);
-
-    if (!AccessCheck(p_security_descriptr, impersonation_tokn, access_desird, &generic_mappng,
-                     &privilege_st, &privilege_st_sz, &granted_accss, &access_sttus))
-    {
-        goto exit_with_error;
-    }
-
-    goto exit;
-
-exit_with_error:
-    assign_system_error_code((int)GetLastError(), err_code);
-
-exit:
-    if (p_security_descriptr != nullptr)
-    {
-        ::LocalFree(p_security_descriptr);
-    }
-    if (tokn != nullptr)
-    {
-        ::CloseHandle(tokn);
-    }
-    if (impersonation_tokn != nullptr)
-    {
-        ::CloseHandle(impersonation_tokn);
-    }
-
-    return access_sttus;
+    return (is_file_type(file_pth, file_typs, err_code) &&
+            access(file_pth, access_mods, err_code));
 }
 
 
 bool access(
-        const char* fle_path,
-        access_modes acss_modes,
-        file_type fle_type,
+        const wchar_t* file_pth,
+        system::filesystem::access_modes access_mods,
+        system::filesystem::file_types file_typs,
         std::error_code* err_code
 ) noexcept
 {
-    return (is_file_type(fle_path, fle_type, err_code) &&
-            access(fle_path, acss_modes, err_code));
+    return (is_file_type(file_pth, file_typs, err_code) &&
+            access(file_pth, access_mods, err_code));
 }
 
 
-bool access(
-        const wchar_t* fle_path,
-        access_modes acss_modes,
-        file_type fle_type,
-        std::error_code* err_code
-) noexcept
-{
-    return (is_file_type(fle_path, fle_type, err_code) &&
-            access(fle_path, acss_modes, err_code));
-}
-
-
-bool can_directory_be_created(const char* dir_path, std::error_code* err_code) noexcept
+bool can_directory_be_created(const char* directory_pth, std::error_code* err_code) noexcept
 {
     char parent_pth[MAX_PATH] = {0};
-    std::size_t dir_path_len = stringutils::strlen(dir_path);
+    std::size_t directory_path_len = stringutils::strlen(directory_pth);
     char* last_char_p;
 
-    if (dir_path_len >= MAX_PATH ||
-        dir_path_len == 0 ||
-        access(dir_path, access_modes::EXISTS, err_code))
+    if (directory_path_len >= MAX_PATH ||
+        directory_path_len == 0 ||
+        file_exists(directory_pth, err_code))
     {
         return false;
     }
 
-    stringutils::strcpy(parent_pth, dir_path);
-    stringutils::strdisclastif(parent_pth, '\\');
-    last_char_p = stringutils::strcut(parent_pth, '\\');
-    dir_path_len = last_char_p == nullptr ? 0 : parent_pth - last_char_p + 1;
+    speed::stringutils::strcpy(parent_pth, directory_pth);
+    speed::stringutils::strrmlast(parent_pth, '\\');
+    last_char_p = speed::stringutils::strcut(parent_pth, '\\');
+    directory_path_len = last_char_p == nullptr ? 0 : parent_pth - last_char_p + 1;
 
-    if (dir_path_len == 0)
+    if (directory_path_len == 0)
     {
         parent_pth[0] = '.';
         parent_pth[1] = '\0';
     }
 
-    return access(parent_pth, access_modes::WRITE | access_modes::EXECUTE, err_code);
+    return access(parent_pth, system::filesystem::access_modes::WRITE |
+            system::filesystem::access_modes::EXECUTE, err_code);
 }
 
 
-bool can_directory_be_created(const wchar_t* dir_path, std::error_code* err_code) noexcept
+bool can_directory_be_created(const wchar_t* directory_pth, std::error_code* err_code) noexcept
 {
     wchar_t parent_pth[MAX_PATH] = {0};
-    std::size_t dir_path_len = stringutils::strlen(dir_path);
-    wchar_t* last_char_p;
+    std::size_t directory_path_len = stringutils::strlen(directory_pth);
+    wchar_t* p_last_char;
 
-    if (dir_path_len >= MAX_PATH ||
-        dir_path_len == 0 ||
-        access(dir_path, access_modes::EXISTS, err_code))
+    if (directory_path_len >= MAX_PATH ||
+        directory_path_len == 0 ||
+        file_exists(directory_pth, err_code))
     {
         return false;
     }
 
-    stringutils::strcpy(parent_pth, dir_path);
-    stringutils::strdisclastif(parent_pth, L'\\');
-    last_char_p = stringutils::strcut(parent_pth, L'\\');
-    dir_path_len = last_char_p == nullptr ? 0 : parent_pth - last_char_p + 1;
+    speed::stringutils::strcpy(parent_pth, directory_pth);
+    speed::stringutils::strrmlast(parent_pth, L'\\');
+    p_last_char = speed::stringutils::strcut(parent_pth, L'\\');
+    directory_path_len = p_last_char == nullptr ? 0 : parent_pth - p_last_char + 1;
 
-    if (dir_path_len == 0)
+    if (directory_path_len == 0)
     {
         parent_pth[0] = L'.';
         parent_pth[1] = L'\0';
     }
 
-    return access(parent_pth, access_modes::WRITE | access_modes::EXECUTE, err_code);
+    return access(parent_pth, system::filesystem::access_modes::WRITE |
+            system::filesystem::access_modes::EXECUTE, err_code);
 }
 
 
-bool can_regular_file_be_created(const char* reg_file_path, std::error_code* err_code) noexcept
+bool can_regular_file_be_created(const char* regular_file_pth, std::error_code* err_code) noexcept
 {
     char parent_pth[MAX_PATH] = {0};
-    std::size_t path_len = stringutils::strlen(reg_file_path);
-    char* last_char_p;
+    std::size_t path_len = stringutils::strlen(regular_file_pth);
+    char* p_last_char;
 
     if (path_len >= MAX_PATH || path_len == 0)
     {
         return false;
     }
 
-    if (access(reg_file_path, access_modes::EXISTS, err_code))
+    if (file_exists(regular_file_pth, err_code))
     {
-        return access(reg_file_path, access_modes::WRITE, file_type::REGULAR_FILE, err_code);
+        return access(regular_file_pth, system::filesystem::access_modes::WRITE,
+                      system::filesystem::file_types::REGULAR_FILE, err_code);
     }
 
-    stringutils::strcpy(parent_pth, reg_file_path);
-    stringutils::strdisclastif(parent_pth, '\\');
-    last_char_p = stringutils::strcut(parent_pth, '\\');
-    path_len = last_char_p == nullptr ? 0 : parent_pth - last_char_p + 1;
+    speed::stringutils::strcpy(parent_pth, regular_file_pth);
+    speed::stringutils::strrmlast(parent_pth, '\\');
+    p_last_char = speed::stringutils::strcut(parent_pth, '\\');
+    path_len = p_last_char == nullptr ? 0 : parent_pth - p_last_char + 1;
 
     if (path_len == 0)
     {
@@ -303,30 +316,32 @@ bool can_regular_file_be_created(const char* reg_file_path, std::error_code* err
         parent_pth[1] = '\0';
     }
 
-    return access(parent_pth, access_modes::WRITE | access_modes::EXECUTE, err_code);
+    return access(parent_pth, system::filesystem::access_modes::WRITE |
+            system::filesystem::access_modes::EXECUTE, err_code);
 }
 
 
-bool can_regular_file_be_created(const wchar_t* reg_file_path, std::error_code* err_code) noexcept
+bool can_regular_file_be_created(const wchar_t* regular_file_pth, std::error_code* err_code) noexcept
 {
     wchar_t parent_pth[MAX_PATH] = {0};
-    std::size_t path_len = stringutils::strlen(reg_file_path);
-    wchar_t* last_char_p;
+    std::size_t path_len = stringutils::strlen(regular_file_pth);
+    wchar_t* p_last_char;
 
     if (path_len >= MAX_PATH || path_len == 0)
     {
         return false;
     }
 
-    if (access(reg_file_path, access_modes::EXISTS, err_code))
+    if (file_exists(regular_file_pth, err_code))
     {
-        return access(reg_file_path, access_modes::WRITE, file_type::REGULAR_FILE, err_code);
+        return access(regular_file_pth, system::filesystem::access_modes::WRITE,
+                      system::filesystem::file_types::REGULAR_FILE, err_code);
     }
 
-    stringutils::strcpy(parent_pth, reg_file_path);
-    stringutils::strdisclastif(parent_pth, L'\\');
-    last_char_p = stringutils::strcut(parent_pth, L'\\');
-    path_len = last_char_p == nullptr ? 0 : parent_pth - last_char_p + 1;
+    speed::stringutils::strcpy(parent_pth, regular_file_pth);
+    speed::stringutils::strrmlast(parent_pth, L'\\');
+    p_last_char = speed::stringutils::strcut(parent_pth, L'\\');
+    path_len = p_last_char == nullptr ? 0 : parent_pth - p_last_char + 1;
 
     if (path_len == 0)
     {
@@ -334,15 +349,16 @@ bool can_regular_file_be_created(const wchar_t* reg_file_path, std::error_code* 
         parent_pth[1] = L'\0';
     }
 
-    return access(parent_pth, access_modes::WRITE | access_modes::EXECUTE, err_code);
+    return access(parent_pth, system::filesystem::access_modes::WRITE |
+            system::filesystem::access_modes::EXECUTE, err_code);
 }
 
 
-bool chdir(const char* dir_path, std::error_code* err_code) noexcept
+bool chdir(const char* directory_pth, std::error_code* err_code) noexcept
 {
-    if (!::SetCurrentDirectoryA(dir_path))
+    if (!::SetCurrentDirectoryA(directory_pth))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
@@ -350,11 +366,11 @@ bool chdir(const char* dir_path, std::error_code* err_code) noexcept
 }
 
 
-bool chdir(const wchar_t* dir_path, std::error_code* err_code) noexcept
+bool chdir(const wchar_t* directory_pth, std::error_code* err_code) noexcept
 {
-    if (!::SetCurrentDirectoryW(dir_path))
+    if (!::SetCurrentDirectoryW(directory_pth))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
@@ -362,164 +378,70 @@ bool chdir(const wchar_t* dir_path, std::error_code* err_code) noexcept
 }
 
 
-bool closedir(directory_entity* dir_ent, std::error_code* err_code) noexcept
+bool closedir(
+        system::filesystem::directory_entity* directory_ent,
+        std::error_code* err_code
+) noexcept
 {
-    bool success = false;
-    auto* dir_ent_ext = (directory_entity_extension*)dir_ent->ext;
-
-    if (dir_ent_ext != nullptr)
+    auto* directory_ent_ext = &directory_ent->__priv;
+    
+    if (!::FindClose(directory_ent_ext->dir_handl))
     {
-        if (!::FindClose(dir_ent_ext->dir_handl))
-        {
-            assign_system_error_code((int)GetLastError(), err_code);
-        }
-        else
-        {
-            success = true;
-        }
-
-        dir_ent_ext->~directory_entity_extension();
-        free(dir_ent_ext);
-        dir_ent->ext = nullptr;
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
+        return false;
     }
-    else
-    {
-        assign_system_error_code(EINVAL, err_code);
-    }
-
-    return success;
+    
+    return true;
 }
 
 
-bool closedir(wdirectory_entity* dir_ent, std::error_code* err_code) noexcept
+bool closedir(
+        system::filesystem::wdirectory_entity* directory_ent,
+        std::error_code* err_code
+) noexcept
 {
-    bool success = false;
-    auto* dir_ent_ext = (wdirectory_entity_extension*)dir_ent->ext;
-
-    if (dir_ent_ext != nullptr)
+    auto* directory_ent_ext = &directory_ent->__priv;
+    
+    if (!::FindClose(directory_ent_ext->dir_handl))
     {
-        if (!::FindClose(dir_ent_ext->dir_handl))
-        {
-            assign_system_error_code((int)GetLastError(), err_code);
-        }
-        else
-        {
-            success = true;
-        }
-
-        dir_ent_ext->~wdirectory_entity_extension();
-        free(dir_ent_ext);
-        dir_ent->ext = nullptr;
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
+        return false;
     }
-    else
-    {
-        assign_system_error_code(EINVAL, err_code);
-    }
-
-    return success;
+    
+    return true;
 }
 
 
-// bool get_first_actual_directory(char* pth, std::error_code* err_code) noexcept
-// {
-//     std::size_t pth_len;
-//
-//     stringutils::strdisclastif(pth, '\\');
-//     pth_len = stringutils::strlen(pth);
-//
-//     if (pth_len == 0)
-//     {
-//         assign_system_error_code(EINVAL, err_code);
-//         return false;
-//     }
-//
-//     while (pth_len > 0)
-//     {
-//         if (access(pth, access_modes::EXISTS, file_type::DIRECTORY, err_code))
-//         {
-//             return true;
-//         }
-//
-//         if (stringutils::strcut(pth, '\\') == nullptr)
-//         {
-//             break;
-//         }
-//
-//         pth_len = stringutils::strlen(pth);
-//
-//         if (pth_len != 1)
-//         {
-//             stringutils::strdisclastif(pth, '\\');
-//             --pth_len;
-//         }
-//     }
-//
-//     pth[0] = '.';
-//     pth[1] = '\0';
-//
-//     return true;
-// }
+bool file_exists(const char* file_pth, std::error_code* err_code) noexcept
+{
+    return access(file_pth, system::filesystem::access_modes::EXISTS, err_code);
+}
 
 
-// bool get_first_actual_directory(wchar_t* pth, std::error_code* err_code) noexcept
-// {
-//     std::size_t pth_len;
-//
-//     stringutils::strdisclastif(pth, '\\');
-//     pth_len = stringutils::strlen(pth);
-//
-//     if (pth_len == 0)
-//     {
-//         assign_system_error_code(EINVAL, err_code);
-//         return false;
-//     }
-//
-//     while (pth_len > 0)
-//     {
-//         if (access(pth, access_modes::EXISTS, file_type::DIRECTORY, err_code))
-//         {
-//             return true;
-//         }
-//
-//         if (stringutils::strcut(pth, '\\') == nullptr)
-//         {
-//             break;
-//         }
-//
-//         pth_len = stringutils::strlen(pth);
-//
-//         if (pth_len != 1)
-//         {
-//             stringutils::strdisclastif(pth, '\\');
-//             --pth_len;
-//         }
-//     }
-//
-//     pth[0] = '.';
-//     pth[1] = '\0';
-//
-//     return true;
-// }
+bool file_exists(const wchar_t* file_pth, std::error_code* err_code) noexcept
+{
+    return access(file_pth, system::filesystem::access_modes::EXISTS, err_code);
+}
 
 
-uint64_t get_file_inode(const char* fle_path, std::error_code* err_code) noexcept
+system::filesystem::inode_t get_file_inode(const char* file_pth, std::error_code* err_code) noexcept
 {
     HANDLE file_handl;
     BY_HANDLE_FILE_INFORMATION file_info;
 
-    file_handl = ::CreateFileA(fle_path, GENERIC_READ,  FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+    file_handl = ::CreateFileA(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
                                OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
                                nullptr);
-
+    
     if (file_handl == INVALID_HANDLE_VALUE)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return ~0ull;
     }
 
     if (!::GetFileInformationByHandle(file_handl, &file_info))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         ::CloseHandle(file_handl);
         return ~0ull;
     }
@@ -530,24 +452,27 @@ uint64_t get_file_inode(const char* fle_path, std::error_code* err_code) noexcep
 }
 
 
-uint64_t get_file_inode(const wchar_t* fle_path, std::error_code* err_code) noexcept
+system::filesystem::inode_t get_file_inode(
+        const wchar_t* file_pth,
+        std::error_code* err_code
+) noexcept
 {
     HANDLE file_handl;
     BY_HANDLE_FILE_INFORMATION file_info;
 
-    file_handl = ::CreateFileW(fle_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+    file_handl = ::CreateFileW(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
                                OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
                                nullptr);
 
     if (file_handl == INVALID_HANDLE_VALUE)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return ~0ull;
     }
 
     if (!::GetFileInformationByHandle(file_handl, &file_info))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         ::CloseHandle(file_handl);
         return ~0ull;
     }
@@ -558,27 +483,66 @@ uint64_t get_file_inode(const wchar_t* fle_path, std::error_code* err_code) noex
 }
 
 
-int get_file_uid(const char* fle_path, std::error_code* err_code) noexcept
+system::filesystem::inode_t get_file_inode(
+        system::filesystem::directory_entity* directory_ent,
+        std::error_code* err_code
+) noexcept
 {
-    PSID owner_sid = nullptr;
-    PSECURITY_DESCRIPTOR sec_desc = nullptr;
-    char* sid_cstr = nullptr;
-    int uid;
+    auto* directory_ent_ext = &directory_ent->__priv;
+    char search_pth[MAX_PATH];
+    errno_t std_err;
+    
+    if ((std_err = ::strcpy_s(search_pth, MAX_PATH, directory_ent_ext->pth)) != 0 ||
+        (std_err = ::strcat_s(search_pth, MAX_PATH, directory_ent->nme)) != 0)
+    {
+        system::errors::assign_system_error_code((int)std_err, err_code);
+        return false;
+    }
+    
+    return get_file_inode(search_pth, err_code);
+}
 
-    if (::GetNamedSecurityInfoA(fle_path, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &owner_sid,
-                nullptr, nullptr, nullptr, &sec_desc) != ERROR_SUCCESS ||
+
+system::filesystem::inode_t get_file_inode(
+        system::filesystem::wdirectory_entity* directory_ent,
+        std::error_code* err_code
+) noexcept
+{
+    auto* directory_ent_ext = &directory_ent->__priv;
+    wchar_t search_pth[MAX_PATH];
+    errno_t std_err;
+    
+    if ((std_err = ::wcscpy_s(search_pth, MAX_PATH, directory_ent_ext->pth)) != 0 ||
+        (std_err = ::wcscat_s(search_pth, MAX_PATH, directory_ent->nme)) != 0)
+    {
+        system::errors::assign_system_error_code((int)std_err, err_code);
+        return false;
+    }
+    
+    return get_file_inode(search_pth, err_code);
+}
+
+
+system::process::uid_t get_file_uid(const char* file_pth, std::error_code* err_code) noexcept
+{
+    PSID owner_sid;
+    PSECURITY_DESCRIPTOR sec_desc;
+    char* sid_cstr;
+    system::process::uid_t uid;
+
+    if (::GetNamedSecurityInfoA(file_pth, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &owner_sid,
+                                nullptr, nullptr, nullptr, &sec_desc) != ERROR_SUCCESS ||
         !::ConvertSidToStringSidA(owner_sid, &sid_cstr))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         if (sec_desc != nullptr)
         {
             ::LocalFree(sec_desc);
         }
-        return -1;
+        return ~0ull;
     }
-
-    // TODO: Compute a 32 bits hash using the windows api.
-    uid = (int)std::hash<std::string>{}(sid_cstr);
+    
+    uid = speed::cryptography::city_hash_64((const char*)sid_cstr);
 
     ::LocalFree(sid_cstr);
     ::LocalFree(sec_desc);
@@ -587,148 +551,260 @@ int get_file_uid(const char* fle_path, std::error_code* err_code) noexcept
 }
 
 
-int get_file_uid(const wchar_t* fle_path, std::error_code* err_code) noexcept
+system::process::uid_t get_file_uid(const wchar_t* file_pth, std::error_code* err_code) noexcept
 {
-    PSID owner_sid = nullptr;
-    PSECURITY_DESCRIPTOR sec_desc = nullptr;
-    char* sid_wstr = nullptr;
-    int uid;
+    PSID owner_sid;
+    PSECURITY_DESCRIPTOR sec_desc;
+    char* sid_cstr;
+    system::process::uid_t uid;
 
-    if (::GetNamedSecurityInfoW(fle_path, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &owner_sid,
-                nullptr, nullptr, nullptr, &sec_desc) != ERROR_SUCCESS ||
-        !::ConvertSidToStringSidA(owner_sid, &sid_wstr))
+    if (::GetNamedSecurityInfoW(file_pth, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &owner_sid,
+                                nullptr, nullptr, nullptr, &sec_desc) != ERROR_SUCCESS ||
+        !::ConvertSidToStringSidA(owner_sid, &sid_cstr))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         if (sec_desc != nullptr)
         {
             ::LocalFree(sec_desc);
         }
-        return -1;
+        return ~0ull;
     }
 
-    // TODO: Compute a 32 bits hash using the windows api.
-    uid = (int)std::hash<std::string>{}(sid_wstr);
+    uid = speed::cryptography::city_hash_64((const char*)sid_cstr);
 
-    ::LocalFree(sid_wstr);
+    ::LocalFree(sid_cstr);
     ::LocalFree(sec_desc);
 
     return uid;
 }
 
 
-int get_file_gid(const char* fle_path, std::error_code* err_code) noexcept
+system::process::gid_t get_file_gid(const char* file_pth, std::error_code* err_code) noexcept
 {
-    // TODO: Correct this function.
-    PSECURITY_DESCRIPTOR pSD;
-    DWORD size = 0;
-    PSID pGroupSID = nullptr;
-    BOOL bGroupDefaulted = FALSE;
-    char name[256];
-    char domain[256];
-    DWORD name_len = sizeof(name);
-    DWORD domain_len = sizeof(domain);
-    SID_NAME_USE sid_type;
+    PSECURITY_DESCRIPTOR security_desc;
+    DWORD security_desc_sz;
+    PSID group_sid = nullptr;
+    BOOL group_defaultd = FALSE;
+    LPSTR sid_cstr;
+    system::process::gid_t gid = ~0ull;
 
-    if (!GetFileSecurityA(fle_path, GROUP_SECURITY_INFORMATION, nullptr, 0, &size) &&
+    if (!::GetFileSecurityA(file_pth, GROUP_SECURITY_INFORMATION, nullptr, 0, &security_desc_sz) &&
         GetLastError() != ERROR_INSUFFICIENT_BUFFER)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
-        return -1;
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
+        return ~0ull;
     }
 
-    pSD = (PSECURITY_DESCRIPTOR)malloc(size);
-    if (!pSD)
+    security_desc = (PSECURITY_DESCRIPTOR)malloc(security_desc_sz);
+    if (!security_desc)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
-        return -1;
+        system::errors::assign_system_error_code(ERROR_NOT_ENOUGH_MEMORY, err_code);
+        return ~0ull;
     }
 
-    if (!GetFileSecurityA(fle_path, GROUP_SECURITY_INFORMATION, pSD, size, &size))
+    if (!::GetFileSecurityA(file_pth, GROUP_SECURITY_INFORMATION, security_desc, security_desc_sz,
+                            &security_desc_sz) ||
+        !::GetSecurityDescriptorGroup(security_desc, &group_sid, &group_defaultd))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
-        free(pSD);
-        return -1;
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
+        free(security_desc);
+        return ~0ull;
     }
 
-    if (!GetSecurityDescriptorGroup(pSD, &pGroupSID, &bGroupDefaulted))
+    if (::ConvertSidToStringSidA(group_sid, &sid_cstr))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
-        free(pSD);
-        return -1;
+        gid = speed::cryptography::city_hash_64((const char*)sid_cstr);
+        ::LocalFree(sid_cstr);
     }
-
-    if (!LookupAccountSidA(nullptr, pGroupSID, name, &name_len, domain, &domain_len, &sid_type))
+    else
     {
-        assign_system_error_code((int)GetLastError(), err_code);
-        free(pSD);
-        return -1;
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
     }
 
-    free(pSD);
-
-    return (int)std::hash<std::string>()(std::string(domain) + "\\" + std::string(name));
+    free(security_desc);
+    return gid;
 }
 
 
-int get_file_gid(const wchar_t* fle_path, std::error_code* err_code) noexcept
+system::process::gid_t get_file_gid(const wchar_t* file_pth, std::error_code* err_code) noexcept
 {
-    // TODO: Correct this function.
-    PSECURITY_DESCRIPTOR pSD;
-    DWORD size = 0;
-    PSID pGroupSID = nullptr;
-    BOOL bGroupDefaulted = FALSE;
-    char name[256];
-    char domain[256];
-    DWORD name_len = sizeof(name);
-    DWORD domain_len = sizeof(domain);
-    SID_NAME_USE sid_type;
+    PSECURITY_DESCRIPTOR security_desc;
+    DWORD security_desc_sz;
+    PSID group_sid = nullptr;
+    BOOL group_defaultd = FALSE;
+    LPSTR sid_cstr;
+    system::process::gid_t gid = ~0ull;
 
-    if (!GetFileSecurityW(fle_path, GROUP_SECURITY_INFORMATION, nullptr, 0, &size) &&
+    if (!::GetFileSecurityW(file_pth, GROUP_SECURITY_INFORMATION, nullptr, 0, &security_desc_sz) &&
         GetLastError() != ERROR_INSUFFICIENT_BUFFER)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
-        return -1;
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
+        return ~0ull;
     }
 
-    pSD = (PSECURITY_DESCRIPTOR)malloc(size);
-    if (!pSD)
+    security_desc = (PSECURITY_DESCRIPTOR)malloc(security_desc_sz);
+    if (!security_desc)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
-        return -1;
+        system::errors::assign_system_error_code(ERROR_NOT_ENOUGH_MEMORY, err_code);
+        return ~0ull;
     }
 
-    if (!GetFileSecurityW(fle_path, GROUP_SECURITY_INFORMATION, pSD, size, &size))
+    if (!::GetFileSecurityW(file_pth, GROUP_SECURITY_INFORMATION, security_desc, security_desc_sz,
+                            &security_desc_sz) ||
+        !::GetSecurityDescriptorGroup(security_desc, &group_sid, &group_defaultd))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
-        free(pSD);
-        return -1;
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
+        free(security_desc);
+        return ~0ull;
     }
 
-    if (!GetSecurityDescriptorGroup(pSD, &pGroupSID, &bGroupDefaulted))
+    if (::ConvertSidToStringSidA(group_sid, &sid_cstr))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
-        free(pSD);
-        return -1;
+        gid = speed::cryptography::city_hash_64((const char*)sid_cstr);
+        ::LocalFree(sid_cstr);
     }
-
-    if (!LookupAccountSidA(nullptr, pGroupSID, name, &name_len, domain, &domain_len, &sid_type))
+    else
     {
-        assign_system_error_code((int)GetLastError(), err_code);
-        free(pSD);
-        return -1;
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
     }
 
-    free(pSD);
+    free(security_desc);
+    return gid;
+}
 
-    return (int)std::hash<std::string>()(std::string(domain) + "\\" + std::string(name));
+
+std::size_t get_file_size(const char* file_pth, std::error_code* err_code) noexcept
+{
+    HANDLE file_handl;
+    DWORD file_sz;
+    
+    file_handl = ::CreateFileA(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+    
+    if (file_handl == INVALID_HANDLE_VALUE)
+    {
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
+        return ~0ull;
+    }
+
+    file_sz = ::GetFileSize(file_handl, nullptr);
+    if (file_sz == INVALID_FILE_SIZE)
+    {
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
+        ::CloseHandle(file_handl);
+        return ~0ull;
+    }
+    
+    ::CloseHandle(file_handl);
+    return file_sz;
+}
+
+
+std::size_t get_file_size(const wchar_t* file_pth, std::error_code* err_code) noexcept
+{
+    HANDLE file_handl;
+    DWORD file_sz;
+    
+    file_handl = ::CreateFileW(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+    
+    if (file_handl == INVALID_HANDLE_VALUE)
+    {
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
+        return ~0ull;
+    }
+
+    file_sz = ::GetFileSize(file_handl, nullptr);
+    if (file_sz == INVALID_FILE_SIZE)
+    {
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
+        ::CloseHandle(file_handl);
+        return ~0ull;
+    }
+    
+    ::CloseHandle(file_handl);
+    return file_sz;
+}
+
+
+bool get_modification_time(
+        const char* file_pth,
+        system::time::system_time* system_tme,
+        std::error_code* err_code
+) noexcept
+{
+    HANDLE handl;
+    FILETIME last_write_tme;
+    SYSTEMTIME utc_system_tme;
+    SYSTEMTIME local_system_tme;
+    
+    handl = ::CreateFileA(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+                          OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
+                          nullptr);
+    
+    if (handl == INVALID_HANDLE_VALUE ||
+        ::GetFileTime(handl, nullptr, nullptr, &last_write_tme) == 0 ||
+        ::FileTimeToSystemTime(&last_write_tme, &utc_system_tme) == 0 ||
+        ::SystemTimeToTzSpecificLocalTime(nullptr, &utc_system_tme, &local_system_tme) == 0)
+    {
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
+        return false;
+    }
+    
+    system_tme->set_years(local_system_tme.wYear)
+               .set_months(local_system_tme.wMonth)
+               .set_days(local_system_tme.wDay)
+               .set_hours(local_system_tme.wHour)
+               .set_minutes(local_system_tme.wMinute)
+               .set_seconds(local_system_tme.wSecond);
+    
+    ::CloseHandle(handl);
+    
+    return true;
+}
+
+
+bool get_modification_time(
+        const wchar_t* file_pth,
+        system::time::system_time* system_tme,
+        std::error_code* err_code
+) noexcept
+{
+    HANDLE handl;
+    FILETIME last_write_tme;
+    SYSTEMTIME utc_system_tme;
+    SYSTEMTIME local_system_tme;
+    
+    handl = ::CreateFileW(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+                          OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
+                          nullptr);
+
+    if (handl == INVALID_HANDLE_VALUE ||
+        ::GetFileTime(handl, nullptr, nullptr, &last_write_tme) == 0 ||
+        ::FileTimeToSystemTime(&last_write_tme, &utc_system_tme) == 0 ||
+        ::SystemTimeToTzSpecificLocalTime(nullptr, &utc_system_tme, &local_system_tme) == 0)
+    {
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
+        return false;
+    }
+    
+    system_tme->set_years(local_system_tme.wYear)
+               .set_months(local_system_tme.wMonth)
+               .set_days(local_system_tme.wDay)
+               .set_hours(local_system_tme.wHour)
+               .set_minutes(local_system_tme.wMinute)
+               .set_seconds(local_system_tme.wSecond);
+    
+    CloseHandle(handl);
+    
+    return true;
 }
 
 
 const char* get_temporal_path() noexcept
 {
-    // TODO: Make this as a template in order to allow both kind of path (c/w).
     static char temp_pth[MAX_PATH];
-    DWORD len = GetTempPathA(MAX_PATH, temp_pth);
+    DWORD len = ::GetTempPathA(MAX_PATH, temp_pth);
 
     if (len == 0 || len > MAX_PATH)
     {
@@ -739,97 +815,97 @@ const char* get_temporal_path() noexcept
 }
 
 
-bool is_block_device(const char* fle_path, std::error_code* err_code) noexcept
+bool is_block_device(const char* file_pth, std::error_code* err_code) noexcept
 {
     HANDLE file_handl;
     DWORD file_typ;
 
-    file_handl = ::CreateFileA(fle_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+    file_handl = ::CreateFileA(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
                                OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
     if (file_handl == INVALID_HANDLE_VALUE)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
     file_typ = ::GetFileType(file_handl);
-    CloseHandle(file_handl);
+    ::CloseHandle(file_handl);
 
     return file_typ == FILE_TYPE_DISK;
 }
 
 
-bool is_block_device(const wchar_t* fle_path, std::error_code* err_code) noexcept
+bool is_block_device(const wchar_t* file_pth, std::error_code* err_code) noexcept
 {
     HANDLE file_handl;
     DWORD file_typ;
 
-    file_handl = ::CreateFileW(fle_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+    file_handl = ::CreateFileW(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
                                OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
     if (file_handl == INVALID_HANDLE_VALUE)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
     file_typ = ::GetFileType(file_handl);
-    CloseHandle(file_handl);
+    ::CloseHandle(file_handl);
 
     return file_typ == FILE_TYPE_DISK;
 }
 
 
-bool is_character_device(const char* fle_path, std::error_code* err_code) noexcept
+bool is_character_device(const char* file_pth, std::error_code* err_code) noexcept
 {
     HANDLE file_handl;
     DWORD file_typ;
 
-    file_handl = ::CreateFileA(fle_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+    file_handl = ::CreateFileA(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
                                OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
     if (file_handl == INVALID_HANDLE_VALUE)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
     file_typ = ::GetFileType(file_handl);
-    CloseHandle(file_handl);
+    ::CloseHandle(file_handl);
 
     return file_typ == FILE_TYPE_CHAR;
 }
 
 
-bool is_character_device(const wchar_t* fle_path, std::error_code* err_code) noexcept
+bool is_character_device(const wchar_t* file_pth, std::error_code* err_code) noexcept
 {
     HANDLE file_handl;
     DWORD file_typ;
 
-    file_handl = ::CreateFileW(fle_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+    file_handl = ::CreateFileW(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
                                OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
     if (file_handl == INVALID_HANDLE_VALUE)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
     file_typ = ::GetFileType(file_handl);
-    CloseHandle(file_handl);
+    ::CloseHandle(file_handl);
 
     return file_typ == FILE_TYPE_CHAR;
 }
 
 
-bool is_directory(const char* fle_path, std::error_code* err_code) noexcept
+bool is_directory(const char* file_pth, std::error_code* err_code) noexcept
 {
-    DWORD attr = ::GetFileAttributesA(fle_path);
+    DWORD attr = ::GetFileAttributesA(file_pth);
 
     if (attr == INVALID_FILE_ATTRIBUTES)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
@@ -837,13 +913,13 @@ bool is_directory(const char* fle_path, std::error_code* err_code) noexcept
 }
 
 
-bool is_directory(const wchar_t* fle_path, std::error_code* err_code) noexcept
+bool is_directory(const wchar_t* file_pth, std::error_code* err_code) noexcept
 {
-    DWORD attr = ::GetFileAttributesW(fle_path);
+    DWORD attr = ::GetFileAttributesW(file_pth);
 
     if (attr == INVALID_FILE_ATTRIBUTES)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
@@ -851,121 +927,147 @@ bool is_directory(const wchar_t* fle_path, std::error_code* err_code) noexcept
 }
 
 
-bool is_fifo(const char* fle_path, std::error_code* err_code) noexcept
+bool is_file_type(
+        const char* file_pth,
+        system::filesystem::file_types fle_type,
+        std::error_code* err_code
+) noexcept
 {
-    HANDLE file_handl;
-    DWORD file_typ;
-
-    file_handl = ::CreateFileA(fle_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-
-    if (file_handl == INVALID_HANDLE_VALUE)
+    if ((fle_type & system::filesystem::file_types::BLOCK_DEVICE) !=
+                system::filesystem::file_types::NIL && is_block_device(file_pth, err_code))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
-        return false;
+        return true;
     }
-
-    file_typ = ::GetFileType(file_handl);
-    CloseHandle(file_handl);
-
-    return file_typ == FILE_TYPE_PIPE;
-}
-
-
-bool is_fifo(const wchar_t* fle_path, std::error_code* err_code) noexcept
-{
-    HANDLE file_handl;
-    DWORD file_typ;
-
-    file_handl = ::CreateFileW(fle_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-
-    if (file_handl == INVALID_HANDLE_VALUE)
+    if ((fle_type & system::filesystem::file_types::CHARACTER_DEVICE) !=
+                system::filesystem::file_types::NIL && is_character_device(file_pth, err_code))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
-        return false;
+        return true;
     }
-
-    file_typ = ::GetFileType(file_handl);
-    CloseHandle(file_handl);
-
-    return file_typ == FILE_TYPE_PIPE;
-}
-
-
-bool is_file_type(const char* fle_path, file_type fle_type, std::error_code* err_code) noexcept
-{
-    switch (fle_type)
+    if ((fle_type & system::filesystem::file_types::DIRECTORY) !=
+                system::filesystem::file_types::NIL && is_directory(file_pth, err_code))
     {
-        case file_type::NIL:
-            return true;
-
-        case file_type::BLOCK_DEVICE:
-            return is_block_device(fle_path, err_code);
-
-        case file_type::CHARACTER_DEVICE:
-            return is_character_device(fle_path, err_code);
-
-        case file_type::DIRECTORY:
-            return is_directory(fle_path, err_code);
-
-        case file_type::FIFO:
-            return is_fifo(fle_path, err_code);
-
-        case file_type::REGULAR_FILE:
-            return is_regular_file(fle_path, err_code);
-
-        case file_type::SOCKET:
-            return is_socket(fle_path, err_code);
-
-        case file_type::SYMLINK:
-            return is_symlink(fle_path, err_code);
+        return true;
+    }
+    if ((fle_type & system::filesystem::file_types::PIPE) !=
+                system::filesystem::file_types::NIL && is_pipe(file_pth, err_code))
+    {
+        return true;
+    }
+    if ((fle_type & system::filesystem::file_types::REGULAR_FILE) !=
+                system::filesystem::file_types::NIL && is_regular_file(file_pth, err_code))
+    {
+        return true;
+    }
+    if ((fle_type & system::filesystem::file_types::SOCKET) !=
+                system::filesystem::file_types::NIL && is_socket(file_pth, err_code))
+    {
+        return true;
+    }
+    if ((fle_type & system::filesystem::file_types::SYMLINK) !=
+                system::filesystem::file_types::NIL && is_symlink(file_pth, err_code))
+    {
+        return true;
     }
 
     return false;
 }
 
 
-bool is_file_type(const wchar_t* fle_path, file_type fle_type, std::error_code* err_code) noexcept
+bool is_file_type(
+        const wchar_t* file_pth,
+        system::filesystem::file_types fle_type,
+        std::error_code* err_code
+) noexcept
 {
-    switch (fle_type)
+    if ((fle_type & system::filesystem::file_types::BLOCK_DEVICE) !=
+                system::filesystem::file_types::NIL && is_block_device(file_pth, err_code))
     {
-        case file_type::NIL:
-            return true;
-
-        case file_type::BLOCK_DEVICE:
-            return is_block_device(fle_path, err_code);
-
-        case file_type::CHARACTER_DEVICE:
-            return is_character_device(fle_path, err_code);
-
-        case file_type::DIRECTORY:
-            return is_directory(fle_path, err_code);
-
-        case file_type::FIFO:
-            return is_fifo(fle_path, err_code);
-
-        case file_type::REGULAR_FILE:
-            return is_regular_file(fle_path, err_code);
-
-        case file_type::SOCKET:
-            return is_socket(fle_path, err_code);
-
-        case file_type::SYMLINK:
-            return is_symlink(fle_path, err_code);
+        return true;
+    }
+    if ((fle_type & system::filesystem::file_types::CHARACTER_DEVICE) !=
+                system::filesystem::file_types::NIL && is_character_device(file_pth, err_code))
+    {
+        return true;
+    }
+    if ((fle_type & system::filesystem::file_types::DIRECTORY) !=
+                system::filesystem::file_types::NIL && is_directory(file_pth, err_code))
+    {
+        return true;
+    }
+    if ((fle_type & system::filesystem::file_types::PIPE) !=
+                system::filesystem::file_types::NIL && is_pipe(file_pth, err_code))
+    {
+        return true;
+    }
+    if ((fle_type & system::filesystem::file_types::REGULAR_FILE) !=
+                system::filesystem::file_types::NIL && is_regular_file(file_pth, err_code))
+    {
+        return true;
+    }
+    if ((fle_type & system::filesystem::file_types::SOCKET) !=
+                system::filesystem::file_types::NIL && is_socket(file_pth, err_code))
+    {
+        return true;
+    }
+    if ((fle_type & system::filesystem::file_types::SYMLINK) !=
+                system::filesystem::file_types::NIL && is_symlink(file_pth, err_code))
+    {
+        return true;
     }
 
     return false;
 }
 
 
-bool is_regular_file(const char* fle_path, std::error_code* err_code) noexcept
+bool is_pipe(const char* file_pth, std::error_code* err_code) noexcept
 {
-    DWORD attr = ::GetFileAttributesA(fle_path);
+    HANDLE file_handl;
+    DWORD file_typ;
+
+    file_handl = ::CreateFileA(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+
+    if (file_handl == INVALID_HANDLE_VALUE)
+    {
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
+        return false;
+    }
+
+    file_typ = ::GetFileType(file_handl);
+    ::CloseHandle(file_handl);
+
+    return file_typ == FILE_TYPE_PIPE;
+}
+
+
+bool is_pipe(const wchar_t* file_pth, std::error_code* err_code) noexcept
+{
+    HANDLE file_handl;
+    DWORD file_typ;
+
+    file_handl = ::CreateFileW(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+
+    if (file_handl == INVALID_HANDLE_VALUE)
+    {
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
+        return false;
+    }
+
+    file_typ = ::GetFileType(file_handl);
+    ::CloseHandle(file_handl);
+
+    return file_typ == FILE_TYPE_PIPE;
+}
+
+
+bool is_regular_file(const char* file_pth, std::error_code* err_code) noexcept
+{
+    DWORD attr = ::GetFileAttributesA(file_pth);
 
     if (attr == INVALID_FILE_ATTRIBUTES)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
@@ -973,13 +1075,13 @@ bool is_regular_file(const char* fle_path, std::error_code* err_code) noexcept
 }
 
 
-bool is_regular_file(const wchar_t* fle_path, std::error_code* err_code) noexcept
+bool is_regular_file(const wchar_t* file_pth, std::error_code* err_code) noexcept
 {
-    DWORD attr = ::GetFileAttributesW(fle_path);
+    DWORD attr = ::GetFileAttributesW(file_pth);
 
     if (attr == INVALID_FILE_ATTRIBUTES)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
@@ -987,9 +1089,10 @@ bool is_regular_file(const wchar_t* fle_path, std::error_code* err_code) noexcep
 }
 
 
-bool is_socket(const char* fle_path, std::error_code* err_code) noexcept
+bool is_socket(const char* file_pth, std::error_code* err_code) noexcept
 {
     // TODO: This function requires a header that make problems.
+    // #include <winsock2.h>
     // HANDLE file_handl;
     // WSANETWORKEVENTS evnts;
     // int sockt;
@@ -1017,9 +1120,10 @@ bool is_socket(const char* fle_path, std::error_code* err_code) noexcept
 }
 
 
-bool is_socket(const wchar_t* fle_path, std::error_code* err_code) noexcept
+bool is_socket(const wchar_t* file_pth, std::error_code* err_code) noexcept
 {
     // TODO: This function requires a header that make problems.
+    // #include <winsock2.h>
     // HANDLE file_handl;
     // WSANETWORKEVENTS evnts;
     // int sockt;
@@ -1047,22 +1151,22 @@ bool is_socket(const wchar_t* fle_path, std::error_code* err_code) noexcept
 }
 
 
-bool is_symlink(const char* fle_path, std::error_code* err_code) noexcept
+bool is_symlink(const char* file_pth, std::error_code* err_code) noexcept
 {
     WIN32_FIND_DATA find_dat;
     DWORD file_attrs;
     HANDLE file_handl;
 
-    file_attrs = ::GetFileAttributesA(fle_path);
+    file_attrs = ::GetFileAttributesA(file_pth);
     if (file_attrs == INVALID_FILE_ATTRIBUTES)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
     if (file_attrs & FILE_ATTRIBUTE_REPARSE_POINT)
     {
-        file_handl = ::FindFirstFileA(fle_path, &find_dat);
+        file_handl = ::FindFirstFileA(file_pth, &find_dat);
         if (file_handl != INVALID_HANDLE_VALUE)
         {
             ::FindClose(file_handl);
@@ -1076,22 +1180,22 @@ bool is_symlink(const char* fle_path, std::error_code* err_code) noexcept
 }
 
 
-bool is_symlink(const wchar_t* fle_path, std::error_code* err_code) noexcept
+bool is_symlink(const wchar_t* file_pth, std::error_code* err_code) noexcept
 {
     WIN32_FIND_DATAW find_dat;
     DWORD file_attrs;
     HANDLE file_handl;
 
-    file_attrs = ::GetFileAttributesW(fle_path);
+    file_attrs = ::GetFileAttributesW(file_pth);
     if (file_attrs == INVALID_FILE_ATTRIBUTES)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
     if (file_attrs & FILE_ATTRIBUTE_REPARSE_POINT)
     {
-        file_handl = ::FindFirstFileW(fle_path, &find_dat);
+        file_handl = ::FindFirstFileW(file_pth, &find_dat);
         if (file_handl != INVALID_HANDLE_VALUE)
         {
             ::FindClose(file_handl);
@@ -1105,12 +1209,11 @@ bool is_symlink(const wchar_t* fle_path, std::error_code* err_code) noexcept
 }
 
 
-bool mkdir(const char* dir_path, std::uint32_t mods, std::error_code* err_code) noexcept
+bool mkdir(const char* directory_pth, std::error_code* err_code) noexcept
 {
-    // TODO: Change the mods after the directory creation to match them with the argument
-    if (!::CreateDirectoryA(dir_path, nullptr))
+    if (!::CreateDirectoryA(directory_pth, nullptr))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
@@ -1118,12 +1221,11 @@ bool mkdir(const char* dir_path, std::uint32_t mods, std::error_code* err_code) 
 }
 
 
-bool mkdir(const wchar_t* dir_path, std::uint32_t mods, std::error_code* err_code) noexcept
+bool mkdir(const wchar_t* directory_pth, std::error_code* err_code) noexcept
 {
-    // TODO: Change the mods after the directory creation to match them with the argument
-    if (!::CreateDirectoryW(dir_path, nullptr))
+    if (!::CreateDirectoryW(directory_pth, nullptr))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
@@ -1132,31 +1234,27 @@ bool mkdir(const wchar_t* dir_path, std::uint32_t mods, std::error_code* err_cod
 
 
 bool mkdir_recursively(
-        const char* dir_path,
-        std::uint32_t mods,
+        const char* directory_pth,
         std::error_code* err_code
 ) noexcept
 {
-    // TODO: Change the mods after the directory creation to match them with the argument
-    static_assert(MAX_PATH >= 255, "PATH_MAX has to be at least 255.");
-
     char parnt_path[MAX_PATH] = {0};
     std::size_t pth_len;
     size_t slash_pos[MAX_PATH];
     size_t slash_pos_sz = 0;
     char* last_chr;
 
-    pth_len = stringutils::strlen(dir_path);
+    pth_len = stringutils::strlen(directory_pth);
 
     if (pth_len >= MAX_PATH ||
         pth_len == 0 ||
-        access(dir_path, access_modes::EXISTS, err_code))
+        access(directory_pth, system::filesystem::access_modes::EXISTS, err_code))
     {
         return false;
     }
 
-    stringutils::strcpy(parnt_path, dir_path);
-    stringutils::strdisclastif(parnt_path, '\\');
+    stringutils::strcpy(parnt_path, directory_pth);
+    stringutils::strrmlast(parnt_path, '\\');
 
     do
     {
@@ -1164,7 +1262,7 @@ bool mkdir_recursively(
 
         if (last_chr == nullptr)
         {
-            if (!mkdir(parnt_path, mods, err_code))
+            if (!mkdir(parnt_path, err_code))
             {
                 return false;
             }
@@ -1172,19 +1270,22 @@ bool mkdir_recursively(
             break;
         }
 
-        slash_pos[slash_pos_sz] = last_chr - parnt_path;
-        ++slash_pos_sz;
+        pth_len = last_chr - parnt_path;
+        slash_pos[slash_pos_sz++] = pth_len;
 
-        pth_len = stringutils::strlen(parnt_path);
+        if (pth_len > 0 && parnt_path[pth_len - 1] == ':')
+        {
+            pth_len = 0;
+        }
 
-    } while (!access(parnt_path, access_modes::EXISTS, err_code) && pth_len > 0);
+    } while (!access(parnt_path, system::filesystem::access_modes::EXISTS, err_code) &&
+             pth_len > 0);
 
     while (slash_pos_sz > 0)
     {
-        parnt_path[slash_pos[slash_pos_sz - 1]] = '\\';
-        --slash_pos_sz;
+        parnt_path[slash_pos[--slash_pos_sz]] = '\\';
 
-         if (!mkdir(parnt_path, mods, err_code))
+         if (!mkdir(parnt_path, err_code))
          {
              return false;
          }
@@ -1195,31 +1296,27 @@ bool mkdir_recursively(
 
 
 bool mkdir_recursively(
-        const wchar_t* dir_path,
-        std::uint32_t mods,
+        const wchar_t* directory_pth,
         std::error_code* err_code
 ) noexcept
 {
-    // TODO: Change the mods after the directory creation to match them with the argument
-    static_assert(MAX_PATH >= 255, "PATH_MAX has to be at least 255.");
-
     wchar_t parnt_path[MAX_PATH] = {0};
     std::size_t pth_len;
     size_t slash_pos[MAX_PATH];
     size_t slash_pos_sz = 0;
     wchar_t* last_chr;
 
-    pth_len = stringutils::strlen(dir_path);
+    pth_len = stringutils::strlen(directory_pth);
 
     if (pth_len >= MAX_PATH ||
         pth_len == 0 ||
-        access(dir_path, access_modes::EXISTS, err_code))
+        access(directory_pth, system::filesystem::access_modes::EXISTS, err_code))
     {
         return false;
     }
 
-    stringutils::strcpy(parnt_path, dir_path);
-    stringutils::strdisclastif(parnt_path, L'\\');
+    stringutils::strcpy(parnt_path, directory_pth);
+    stringutils::strrmlast(parnt_path, L'\\');
 
     do
     {
@@ -1227,7 +1324,7 @@ bool mkdir_recursively(
 
         if (last_chr == nullptr)
         {
-            if (!mkdir(parnt_path, mods, err_code))
+            if (!mkdir(parnt_path, err_code))
             {
                 return false;
             }
@@ -1235,22 +1332,25 @@ bool mkdir_recursively(
             break;
         }
 
-        slash_pos[slash_pos_sz] = last_chr - parnt_path;
-        ++slash_pos_sz;
+        pth_len = last_chr - parnt_path;
+        slash_pos[slash_pos_sz++] = pth_len;
 
-        pth_len = stringutils::strlen(parnt_path);
+        if (pth_len > 0 && parnt_path[pth_len - 1] == L':')
+        {
+            pth_len = 0;
+        }
 
-    } while (!access(parnt_path, access_modes::EXISTS, err_code) && pth_len > 0);
+    } while (!access(parnt_path, system::filesystem::access_modes::EXISTS, err_code) &&
+             pth_len > 0);
 
     while (slash_pos_sz > 0)
     {
-        parnt_path[slash_pos[slash_pos_sz - 1]] = L'\\';
-        --slash_pos_sz;
+        parnt_path[slash_pos[--slash_pos_sz]] = L'\\';
 
-         if (!mkdir(parnt_path, mods, err_code))
-         {
-             return false;
-         }
+        if (!mkdir(parnt_path, err_code))
+        {
+            return false;
+        }
     }
 
     return true;
@@ -1258,148 +1358,169 @@ bool mkdir_recursively(
 
 
 bool opendir(
-        directory_entity* dir_ent,
-        const char* dir_pth,
+        system::filesystem::directory_entity* directory_ent,
+        const char* directory_pth,
         std::error_code* err_code
 ) noexcept
 {
-    // TODO: Stop using strings and make it noexcept.
-    std::string search_pth;
-    directory_entity_extension* dir_ent_ext;
-    std::size_t dir_pth_len;
-
-    dir_ent_ext = (directory_entity_extension*)malloc(sizeof(directory_entity_extension));
-    dir_ent->ext = dir_ent_ext;
-    if (dir_ent_ext == nullptr)
+    std::size_t directory_pth_len;
+    bool slash_insertd = false;
+    auto* directory_ent_ext = &directory_ent->__priv;
+    
+    directory_pth_len = speed::stringutils::strlen(directory_pth);
+    if (directory_pth_len >= MAX_PATH - 3)
     {
-        assign_system_error_code(ERROR_NOT_ENOUGH_MEMORY, err_code);
+        system::errors::assign_system_error_code(ERANGE, err_code);
         return false;
     }
-
-    ::new ((void*)(&dir_ent_ext->pth)) decltype(dir_ent_ext->pth)(dir_pth);
-    dir_pth_len = dir_ent_ext->pth.length();
-    if (dir_pth_len < 1 || dir_pth[dir_pth_len - 1] != '\\')
+    
+    speed::stringutils::strcpy(directory_ent_ext->pth, directory_pth);
+    if (directory_pth_len < 1 || directory_pth[directory_pth_len - 1] != '\\')
     {
-        dir_ent_ext->pth += '\\';
+        speed::stringutils::strcat(directory_ent_ext->pth, "\\*");
+        slash_insertd = true;
     }
-
-    search_pth = dir_ent_ext->pth + '*';
-    dir_ent_ext->dir_handl = FindFirstFileA(search_pth.c_str(), &dir_ent_ext->find_dat);
-    if (dir_ent_ext->dir_handl == INVALID_HANDLE_VALUE)
+    else
     {
-        assign_system_error_code((int)GetLastError(), err_code);
-        free(dir_ent->ext);
-        dir_ent->ext = nullptr;
+        speed::stringutils::strcat(directory_ent_ext->pth, "*");
+    }
+    
+    directory_ent_ext->dir_handl = ::FindFirstFileA(
+            directory_ent_ext->pth, &directory_ent_ext->find_dat);
+    
+    if (slash_insertd)
+    {
+        directory_ent_ext->pth[directory_pth_len + 1] = '\0';
+    }
+    else
+    {
+        directory_ent_ext->pth[directory_pth_len] = '\0';
+    }
+    
+    if (directory_ent_ext->dir_handl == INVALID_HANDLE_VALUE)
+    {
+        system::errors::assign_system_error_code((int) GetLastError(), err_code);
         return false;
     }
-
-    dir_ent_ext->read_dne = false;
-
+    
+    directory_ent_ext->read_dne = false;
+    
     return true;
 }
 
 
 bool opendir(
-        wdirectory_entity* dir_ent,
-        const wchar_t* dir_pth,
+        system::filesystem::wdirectory_entity* directory_ent,
+        const wchar_t* directory_pth,
         std::error_code* err_code
 ) noexcept
 {
-    // TODO: Stop using strings and make it noexcept.
-    std::wstring search_pth;
-    wdirectory_entity_extension* dir_ent_ext;
-    std::size_t dir_pth_len;
-
-    dir_ent_ext = (wdirectory_entity_extension*)malloc(sizeof(wdirectory_entity_extension));
-    dir_ent->ext = dir_ent_ext;
-    if (dir_ent_ext == nullptr)
+    std::size_t directory_pth_len;
+    bool slash_insertd = false;
+    auto* directory_ent_ext = &directory_ent->__priv;
+    
+    directory_pth_len = speed::stringutils::strlen(directory_pth);
+    if (directory_pth_len >= MAX_PATH - 3)
     {
-        assign_system_error_code(ERROR_NOT_ENOUGH_MEMORY, err_code);
+        system::errors::assign_system_error_code(ERANGE, err_code);
         return false;
     }
-
-    ::new ((void*)(&dir_ent_ext->pth)) decltype(dir_ent_ext->pth)(dir_pth);
-    dir_pth_len = dir_ent_ext->pth.length();
-    if (dir_pth_len < 1 || dir_pth[dir_pth_len - 1] != '\\')
+    
+    speed::stringutils::strcpy(directory_ent_ext->pth, directory_pth);
+    if (directory_pth_len < 1 || directory_pth[directory_pth_len - 1] != '\\')
     {
-        dir_ent_ext->pth += L'\\';
+        speed::stringutils::strcat(directory_ent_ext->pth, "\\*");
+        slash_insertd = true;
     }
-
-    search_pth = dir_ent_ext->pth + L'*';
-    dir_ent_ext->dir_handl = FindFirstFileW(search_pth.c_str(), &dir_ent_ext->find_dat);
-    if (dir_ent_ext->dir_handl == INVALID_HANDLE_VALUE)
+    else
     {
-        assign_system_error_code((int)GetLastError(), err_code);
-        free(dir_ent->ext);
-        dir_ent->ext = nullptr;
+        speed::stringutils::strcat(directory_ent_ext->pth, "*");
+    }
+    
+    directory_ent_ext->dir_handl = ::FindFirstFileW(
+            directory_ent_ext->pth, &directory_ent_ext->find_dat);
+    
+    if (slash_insertd)
+    {
+        directory_ent_ext->pth[directory_pth_len + 1] = '\0';
+    }
+    else
+    {
+        directory_ent_ext->pth[directory_pth_len] = '\0';
+    }
+    
+    if (directory_ent_ext->dir_handl == INVALID_HANDLE_VALUE)
+    {
+        system::errors::assign_system_error_code((int) GetLastError(), err_code);
         return false;
     }
-
-    dir_ent_ext->read_dne = false;
-
+    
+    directory_ent_ext->read_dne = false;
+    
     return true;
 }
 
 
-bool readdir(directory_entity* dir_ent, std::error_code* err_code) noexcept
+bool readdir(
+        system::filesystem::directory_entity* directory_ent,
+        std::error_code* err_code
+) noexcept
 {
-    // TODO: Stop using strings and make it noexcept.
-    auto* dir_ent_ext = (directory_entity_extension*)dir_ent->ext;
+    auto* directory_ent_ext = &directory_ent->__priv;
     DWORD last_err;
-    std::string search_pth;
 
-    if (dir_ent_ext->read_dne && !::FindNextFileA(dir_ent_ext->dir_handl, &dir_ent_ext->find_dat))
+    if (directory_ent_ext->read_dne &&
+        !::FindNextFileA(directory_ent_ext->dir_handl, &directory_ent_ext->find_dat))
     {
         last_err = ::GetLastError();
         if (last_err != ERROR_NO_MORE_FILES)
         {
-            assign_system_error_code((int)last_err, err_code);
+            system::errors::assign_system_error_code((int)last_err, err_code);
         }
 
         return false;
     }
 
-    dir_ent_ext->read_dne = true;
-    dir_ent->nme = dir_ent_ext->find_dat.cFileName;
-    search_pth = dir_ent_ext->pth + dir_ent->nme;
-    dir_ent->ino = get_file_inode(search_pth.c_str(), err_code);
-
+    directory_ent_ext->read_dne = true;
+    directory_ent->nme = directory_ent_ext->find_dat.cFileName;
+    
     return true;
 }
 
 
-bool readdir(wdirectory_entity* dir_ent, std::error_code* err_code) noexcept
+bool readdir(
+        system::filesystem::wdirectory_entity* directory_ent,
+        std::error_code* err_code
+) noexcept
 {
-    // TODO: Stop using strings and make it noexcept.
-    auto* dir_ent_ext = (wdirectory_entity_extension*)dir_ent->ext;
+    auto* directory_ent_ext = &directory_ent->__priv;
     DWORD last_err;
-    std::wstring search_pth;
 
-    if (dir_ent_ext->read_dne && !::FindNextFileW(dir_ent_ext->dir_handl, &dir_ent_ext->find_dat))
+    if (directory_ent_ext->read_dne &&
+        !::FindNextFileW(directory_ent_ext->dir_handl, &directory_ent_ext->find_dat))
     {
         last_err = ::GetLastError();
         if (last_err != ERROR_NO_MORE_FILES)
         {
-            assign_system_error_code((int)last_err, err_code);
+            system::errors::assign_system_error_code((int)last_err, err_code);
         }
 
         return false;
     }
 
-    dir_ent_ext->read_dne = true;
-    dir_ent->nme = dir_ent_ext->find_dat.cFileName;
-    search_pth = dir_ent_ext->pth + dir_ent->nme;
-    dir_ent->ino = get_file_inode(search_pth.c_str(), err_code);
+    directory_ent_ext->read_dne = true;
+    directory_ent->nme = directory_ent_ext->find_dat.cFileName;
 
     return true;
 }
 
 
-bool rmdir(const char* dir_path, std::error_code* err_code) noexcept
+bool rmdir(const char* directory_pth, std::error_code* err_code) noexcept
 {
-    if (!::RemoveDirectoryA(dir_path))
+    ::SetFileAttributesA(directory_pth, 0x80);
+    if (!::RemoveDirectoryA(directory_pth))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
@@ -1407,15 +1528,158 @@ bool rmdir(const char* dir_path, std::error_code* err_code) noexcept
 }
 
 
-bool rmdir(const wchar_t* dir_path, std::error_code* err_code) noexcept
+bool rmdir(const wchar_t* directory_pth, std::error_code* err_code) noexcept
 {
-    if (!::RemoveDirectoryW(dir_path))
+    ::SetFileAttributesW(directory_pth, 0x80);
+    if (!::RemoveDirectoryW(directory_pth))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
     return true;
+}
+
+
+bool shortcut(
+        const char* target_pth,
+        const char* shortcut_pth,
+        std::error_code* err_code
+) noexcept
+{
+    HRESULT res = -1;
+    IShellLinkA* shell_lnk = nullptr;
+    IPersistFile* persist_fle = nullptr;
+    char absolute_target_pth[MAX_PATH] = {};
+    wchar_t wshortcut_pth[MAX_PATH] = {};
+    std::size_t converted_chars = 0;
+    errno_t err;
+
+    if (!::GetFullPathNameA(target_pth, MAX_PATH, absolute_target_pth, nullptr))
+    {
+        system::errors::assign_system_error_code(ERROR_BAD_PATHNAME, err_code);
+        goto exit;
+    }
+
+    ::CoInitialize(nullptr);
+    res = ::CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink,
+                             (LPVOID*)&shell_lnk);
+
+    if (!SUCCEEDED(res))
+    {
+        goto exit_with_error;
+    }
+
+    shell_lnk->SetPath(absolute_target_pth);
+    shell_lnk->SetDescription(nullptr);
+
+    res = shell_lnk->QueryInterface(IID_IPersistFile, (LPVOID*)&persist_fle);
+
+    if (!SUCCEEDED(res))
+    {
+        goto exit_with_error;
+    }
+
+    err = mbstowcs_s(&converted_chars, wshortcut_pth, MAX_PATH, shortcut_pth, _TRUNCATE);
+    if (err != 0 || converted_chars == 0)
+    {
+        goto exit_with_error;
+    }
+
+    if (converted_chars + 4 >= MAX_PATH)
+    {
+        system::errors::assign_system_error_code(ERROR_BAD_PATHNAME, err_code);
+        goto exit;
+    }
+
+    speed::stringutils::strcpy(wshortcut_pth + converted_chars - 1, L".lnk");
+    res = persist_fle->Save(wshortcut_pth, true);
+
+    goto exit;
+
+exit_with_error:
+    system::errors::assign_system_error_code((int)GetLastError(), err_code);
+
+exit:
+    if (shell_lnk != nullptr)
+    {
+        shell_lnk->Release();
+    }
+    if (persist_fle != nullptr)
+    {
+        persist_fle->Release();
+    }
+
+    return res == 0;
+}
+
+
+bool shortcut(
+        const wchar_t* target_pth,
+        const wchar_t* shortcut_pth,
+        std::error_code* err_code
+) noexcept
+{
+    HRESULT res = -1;
+    IShellLinkW* shell_lnk = nullptr;
+    IPersistFile* persist_fle = nullptr;
+    wchar_t absolute_target_pth[MAX_PATH] = {};
+    wchar_t wshortcut_pth[MAX_PATH] = {};
+    std::size_t shortcut_pth_len;
+    errno_t err;
+
+    if (!::GetFullPathNameW(target_pth, MAX_PATH, absolute_target_pth, nullptr))
+    {
+        system::errors::assign_system_error_code(ERROR_BAD_PATHNAME, err_code);
+        goto exit;
+    }
+
+    ::CoInitialize(nullptr);
+    res = ::CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLinkW,
+                             (LPVOID*)&shell_lnk);
+
+    if (!SUCCEEDED(res))
+    {
+        goto exit_with_error;
+    }
+
+    shell_lnk->SetPath(absolute_target_pth);
+    shell_lnk->SetDescription(nullptr);
+
+    res = shell_lnk->QueryInterface(IID_IPersistFile, (LPVOID*)&persist_fle);
+
+    if (!SUCCEEDED(res))
+    {
+        goto exit_with_error;
+    }
+
+    shortcut_pth_len = speed::stringutils::strlen(shortcut_pth);
+    if (shortcut_pth_len + 5 >= MAX_PATH)
+    {
+        system::errors::assign_system_error_code(ERROR_BAD_PATHNAME, err_code);
+        goto exit;
+    }
+
+    speed::stringutils::strcpy(wshortcut_pth, shortcut_pth);
+    speed::stringutils::strcpy(wshortcut_pth + shortcut_pth_len, L".lnk");
+    res = persist_fle->Save(wshortcut_pth, true);
+
+    goto exit;
+
+exit_with_error:
+    system::errors::assign_system_error_code((int)GetLastError(), err_code);
+
+exit:
+    if (shell_lnk != nullptr)
+    {
+        shell_lnk->Release();
+    }
+    if (persist_fle != nullptr)
+    {
+        persist_fle->Release();
+    }
+
+    return res == 0;
 }
 
 
@@ -1427,7 +1691,7 @@ bool symlink(const char* target_pth, const char* link_pth, std::error_code* err_
     file_attr = ::GetFileAttributesA(target_pth);
     if (file_attr == INVALID_FILE_ATTRIBUTES)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
@@ -1438,7 +1702,7 @@ bool symlink(const char* target_pth, const char* link_pth, std::error_code* err_
 
     if (!::CreateSymbolicLinkA(link_pth, target_pth, flgs))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
@@ -1454,7 +1718,7 @@ bool symlink(const wchar_t* target_pth, const wchar_t* link_pth, std::error_code
     file_attr = ::GetFileAttributesW(target_pth);
     if (file_attr == INVALID_FILE_ATTRIBUTES)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
@@ -1465,7 +1729,7 @@ bool symlink(const wchar_t* target_pth, const wchar_t* link_pth, std::error_code
 
     if (!::CreateSymbolicLinkW(link_pth, target_pth, flgs))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
@@ -1473,15 +1737,14 @@ bool symlink(const wchar_t* target_pth, const wchar_t* link_pth, std::error_code
 }
 
 
-bool touch(const char* regular_file_pth, std::uint32_t mods, std::error_code* err_code) noexcept
+bool touch(const char* regular_file_pth, std::error_code* err_code) noexcept
 {
-    // TODO: Change the mods after the regular file creation to match them with the argument
     HANDLE file_handle = ::CreateFileA(regular_file_pth, GENERIC_WRITE, 0, nullptr, CREATE_NEW,
                                        FILE_ATTRIBUTE_NORMAL, nullptr);
 
     if (file_handle == INVALID_HANDLE_VALUE)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
@@ -1491,15 +1754,14 @@ bool touch(const char* regular_file_pth, std::uint32_t mods, std::error_code* er
 }
 
 
-bool touch(const wchar_t* regular_file_pth, std::uint32_t mods, std::error_code* err_code) noexcept
+bool touch(const wchar_t* regular_file_pth, std::error_code* err_code) noexcept
 {
-    // TODO: Change the mods after the regular file creation to match them with the argument
     HANDLE file_handle = ::CreateFileW(regular_file_pth, GENERIC_WRITE, 0, nullptr, CREATE_NEW,
                                        FILE_ATTRIBUTE_NORMAL, nullptr);
 
     if (file_handle == INVALID_HANDLE_VALUE)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
@@ -1509,11 +1771,11 @@ bool touch(const wchar_t* regular_file_pth, std::uint32_t mods, std::error_code*
 }
 
 
-bool unlink(const char* reg_file_path, std::error_code* err_code) noexcept
+bool unlink(const char* regular_file_pth, std::error_code* err_code) noexcept
 {
-    if (!::DeleteFileA(reg_file_path))
+    if (!::DeleteFileA(regular_file_pth))
     {
-        assign_system_error_code((int)::GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)::GetLastError(), err_code);
         return false;
     }
 
@@ -1521,11 +1783,11 @@ bool unlink(const char* reg_file_path, std::error_code* err_code) noexcept
 }
 
 
-bool unlink(const wchar_t* reg_file_path, std::error_code* err_code) noexcept
+bool unlink(const wchar_t* regular_file_pth, std::error_code* err_code) noexcept
 {
-    if (!::DeleteFileW(reg_file_path))
+    if (!::DeleteFileW(regular_file_pth))
     {
-        assign_system_error_code((int)::GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)::GetLastError(), err_code);
         return false;
     }
 

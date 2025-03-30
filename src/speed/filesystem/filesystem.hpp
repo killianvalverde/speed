@@ -27,7 +27,9 @@
 #ifndef SPEED_FILESYSTEM_FILESYSTEM_HPP
 #define SPEED_FILESYSTEM_FILESYSTEM_HPP
 
+#include "forward_declarations.hpp"
 #include "directory_iteration.hpp"
+#include "operations.hpp"
 #include "valid_path.hpp"
 
 

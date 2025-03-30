@@ -27,6 +27,7 @@
 #ifndef SPEED_STRINGUTILS_STRINGUTILS_HPP
 #define SPEED_STRINGUTILS_STRINGUTILS_HPP
 
+#include "forward_declarations.hpp"
 #include "operations.hpp"
 
 

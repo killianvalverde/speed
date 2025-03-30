@@ -18,36 +18,46 @@
  */
 
 /**
- * @file        speed/system/api/winapi/filesystem/directory_entity_extension.hpp
- * @brief       directory_entity_extension struct header.
+ * @file        speed/system/api/winapi/filesystem/basic_directory_entity_extension.hpp
+ * @brief       basic_directory_entity_extension struct header.
  * @author      Killian Valverde
  * @date        2019/04/10
  */
 
-#ifndef SPEED_SYSTEM_API_WINAPI_FILESYSTEM_DIRECTORY_ENTITY_EXTENSION_HPP
-#define SPEED_SYSTEM_API_WINAPI_FILESYSTEM_DIRECTORY_ENTITY_EXTENSION_HPP
+#ifndef SPEED_SYSTEM_API_WINAPI_FILESYSTEM_BASIC_DIRECTORY_ENTITY_EXTENSION_HPP
+#define SPEED_SYSTEM_API_WINAPI_FILESYSTEM_BASIC_DIRECTORY_ENTITY_EXTENSION_HPP
 
 #include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_WINAPI
+
+#include "../../../filesystem/types.hpp"
 
 
 namespace speed::system::api::winapi::filesystem {
 
 
+/** Struct that represents a directory entity extension. */
+template<typename TpChar>
+struct basic_directory_entity_extension
+{
+};
+
+
 /**
  * @brief       Struct that represents a directory entity extension.
  */
-struct directory_entity_extension
+template<>
+struct basic_directory_entity_extension<char>
 {
-    /** Path of the opened directory. */
-    std::string pth;
-
-    /** Directory handle. */
-    HANDLE dir_handl;
-
     /** Directory data. */
     WIN32_FIND_DATAA find_dat;
 
+    /** Directory handle. */
+    HANDLE dir_handl;
+    
+    /** Path of the opened directory. */
+    char pth[MAX_PATH];
+
     /** Indicates if a read has already been done. */
     bool read_dne;
 };
@@ -56,20 +66,30 @@ struct directory_entity_extension
 /**
  * @brief       Struct that represents a directory entity extension.
  */
-struct wdirectory_entity_extension
+template<>
+struct basic_directory_entity_extension<wchar_t>
 {
-    /** Path of the opened directory. */
-    std::wstring pth;
+    /** Directory data. */
+    WIN32_FIND_DATAW find_dat;
 
     /** Directory handle. */
     HANDLE dir_handl;
-
-    /** Directory data. */
-    WIN32_FIND_DATAW find_dat;
+    
+    /** Path of the opened directory. */
+    wchar_t pth[MAX_PATH];
 
     /** Indicates if a read has already been done. */
     bool read_dne;
 };
+
+
+}
+
+
+namespace speed::system::filesystem {
+
+
+using speed::system::api::winapi::filesystem::basic_directory_entity_extension;
 
 
 }

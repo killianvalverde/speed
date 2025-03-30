@@ -129,6 +129,51 @@ public:
     }
     
     /**
+     * @brief       Less-than operator.
+     * @param       rhs : The object to compare.
+     * @return      True if this object is less than rhs, otherwise false.
+     */
+    inline bool operator <(const time_specification& rhs) const noexcept
+    {
+        if (sec_ != rhs.sec_)
+        {
+            return sec_ < rhs.sec_;
+        }
+        
+        return nsec_ < rhs.nsec_;
+    }
+    
+    /**
+     * @brief       Greater-than operator.
+     * @param       rhs : The object to compare.
+     * @return      True if this object is greater than rhs, otherwise false.
+     */
+    inline bool operator >(const time_specification& rhs) const noexcept
+    {
+        return !(*this <= rhs);
+    }
+    
+    /**
+     * @brief       Greater-than or equal-to operator.
+     * @param       rhs : The object to compare.
+     * @return      True if this object is greater than or equal to rhs, otherwise false.
+     */
+    inline bool operator >=(const time_specification& rhs) const noexcept
+    {
+        return !(*this < rhs);
+    }
+
+    /**
+     * @brief       Less-than or equal-to operator.
+     * @param       rhs : The object to compare.
+     * @return      True if this object is less than or equal to rhs, otherwise false.
+     */
+    inline bool operator <=(const time_specification& rhs) const noexcept
+    {
+        return *this < rhs || *this == rhs;
+    }
+    
+    /**
      * @brief       Check whether the time is null.
      * @return      If function was successful true is returned, otherwise false is returned.
      */

@@ -30,6 +30,7 @@
 #include "../../compatibility/compatibility.hpp"
 #ifdef SPEED_GLIBC
 
+#include "codecs/codecs.hpp"
 #include "filesystem/filesystem.hpp"
 #include "process/process.hpp"
 #include "terminal/terminal.hpp"

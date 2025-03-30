@@ -27,32 +27,32 @@
 #ifndef SPEED_SYSTEM_FILESYSTEM_BASIC_DIRECTORY_ENTITY_HPP
 #define SPEED_SYSTEM_FILESYSTEM_BASIC_DIRECTORY_ENTITY_HPP
 
+#include "../api/glibc/filesystem/basic_directory_entity_extension.hpp"
+#include "../api/winapi/filesystem/basic_directory_entity_extension.hpp"
+#include "types.hpp"
+
 
 namespace speed::system::filesystem {
 
 
-/**
- * @brief       Struct that represents a directory entity.
- */
+/** Struct that represents a directory entity. */
 template<typename TpChar>
 struct basic_directory_entity
 {
-    /** The character type used. */
+    /** The character type. */
     using char_type = TpChar;
-
-    /** Inode number of the current entity. */
-    std::uint64_t ino;
     
     /** Name of the current entity. */
     const char_type* nme;
     
     /** Additional api dependent data. */
-    void* ext;
+    basic_directory_entity_extension<char_type> __priv;
 };
 
 
 /** Struct that represents a directory entity. */
 using directory_entity = basic_directory_entity<char>;
+
 
 /** Struct that represents a directory entity. */
 using wdirectory_entity = basic_directory_entity<wchar_t>;

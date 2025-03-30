@@ -30,7 +30,7 @@
 #include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_GLIBC
 
-#include "directory_entity_extension.hpp"
+#include "basic_directory_entity_extension.hpp"
 #include "operations.hpp"
 
 

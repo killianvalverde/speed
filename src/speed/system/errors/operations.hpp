@@ -35,28 +35,28 @@ namespace speed::system::errors {
 
 /**
  * @brief       Assign the value to the error_code if it is not null using a system category.
- * @param       value : The value to assign.
+ * @param       val : The value to assign.
  * @param       err_code : The object that will contain the error.
  */
-inline void assign_system_error_code(int value, std::error_code* err_code)
+inline void assign_system_error_code(int val, std::error_code* err_code)
 {
     if (err_code != nullptr)
     {
-        err_code->assign(value, std::system_category());
+        err_code->assign(val, std::system_category());
     }
 }
 
 
 /**
  * @brief       Assign the value to the error_code if it is not null using a generic category.
- * @param       value : The value to assign.
+ * @param       val : The value to assign.
  * @param       err_code : The object that will contain the error.
  */
-inline void assign_generic_error_code(int value, std::error_code* err_code)
+inline void assign_generic_error_code(int val, std::error_code* err_code)
 {
     if (err_code != nullptr)
     {
-        err_code->assign(value, std::generic_category());
+        err_code->assign(val, std::generic_category());
     }
 }
 

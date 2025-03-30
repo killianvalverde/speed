@@ -30,6 +30,7 @@
 #include <sddl.h>
 #include <tlhelp32.h>
 
+#include "../../../../cryptography/cryptography.hpp"
 #include "operations.hpp"
 
 
@@ -63,7 +64,7 @@ bool execute_command(
             &process_info              // Pointer to PROCESS_INFORMATION structure
     ))
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
@@ -73,7 +74,7 @@ bool execute_command(
     {
         if (!::GetExitCodeProcess(process_info.hProcess, &ret_val_buildr))
         {
-            assign_system_error_code((int)GetLastError(), err_code);
+            system::errors::assign_system_error_code((int)GetLastError(), err_code);
             return false;
         }
 
@@ -87,13 +88,13 @@ bool execute_command(
 }
 
 
-int get_pid() noexcept
+system::process::pid_t get_pid() noexcept
 {
-    return (int)::GetCurrentProcessId();
+    return ::GetCurrentProcessId();
 }
 
 
-int get_ppid() noexcept
+system::process::ppid_t get_ppid() noexcept
 {
     PROCESSENTRY32 entr;
     DWORD pid = ::GetCurrentProcessId();
@@ -112,7 +113,7 @@ int get_ppid() noexcept
         {
             if (entr.th32ProcessID == pid)
             {
-                return (int)entr.th32ParentProcessID;
+                return entr.th32ParentProcessID;
             }
         } while (::Process32Next(snapsht, &entr));
     }
@@ -123,30 +124,30 @@ int get_ppid() noexcept
 }
 
 
-unsigned int get_uid() noexcept
+system::process::uid_t get_uid() noexcept
 {
-    // TODO: Compute a 32 bits hash using the windows api.
-    HANDLE tokn = nullptr;
-    DWORD token_sz = 0;
-    unsigned int uid = -1;
+    HANDLE tokn;
+    PTOKEN_USER token_usr;
+    DWORD token_sz;
+    LPSTR sid_cstr;
+    system::process::uid_t uid = -1;
 
     if (::OpenProcessToken(::GetCurrentProcess(), TOKEN_QUERY, &tokn))
     {
         ::GetTokenInformation(tokn, TokenUser, nullptr, 0, &token_sz);
         if (token_sz)
         {
-            auto* usr = (TOKEN_USER*)malloc(token_sz);
-            if (::GetTokenInformation(tokn, TokenUser, usr, token_sz, &token_sz))
+            token_usr = (PTOKEN_USER)malloc(token_sz);
+            if (::GetTokenInformation(tokn, TokenUser, token_usr, token_sz, &token_sz))
             {
-                LPSTR sid_string = nullptr;
-                if (::ConvertSidToStringSidA(usr->User.Sid, &sid_string))
+                if (::ConvertSidToStringSidA(token_usr->User.Sid, &sid_cstr))
                 {
-                    uid = std::hash<std::string>{}(sid_string);
-                    ::LocalFree(sid_string);
+                    uid = speed::cryptography::city_hash_64((const char*)sid_cstr);
+                    ::LocalFree(sid_cstr);
                 }
             }
 
-            ::free(usr);
+            ::free(token_usr);
         }
 
         ::CloseHandle(tokn);
@@ -156,33 +157,33 @@ unsigned int get_uid() noexcept
 }
 
 
-unsigned int get_gid() noexcept
+system::process::gid_t get_gid() noexcept
 {
-    // TODO: Compute a 32 bits hash using the windows api.
-    HANDLE tokn = nullptr;
-    DWORD sz = 0;
-    unsigned int gid = -1;
+    HANDLE tokn;
+    PTOKEN_PRIMARY_GROUP token_grp;
+    DWORD token_sz;
+    LPSTR group_cstr;
+    system::process::gid_t gid = -1;
 
     if (::OpenProcessToken(::GetCurrentProcess(), TOKEN_QUERY, &tokn))
     {
-        ::GetTokenInformation(tokn, TokenPrimaryGroup, nullptr, 0, &sz);
-        if (sz)
+        ::GetTokenInformation(tokn, TokenPrimaryGroup, nullptr, 0, &token_sz);
+        if (token_sz)
         {
-            auto* grop = (TOKEN_PRIMARY_GROUP*)malloc(sz);
-            if (::GetTokenInformation(tokn, TokenPrimaryGroup, grop, sz, &sz))
+            token_grp = (PTOKEN_PRIMARY_GROUP)malloc(token_sz);
+            if (::GetTokenInformation(tokn, TokenPrimaryGroup, token_grp, token_sz, &token_sz))
             {
-                LPSTR sid_string = nullptr;
-                if (ConvertSidToStringSidA(grop->PrimaryGroup, &sid_string))
+                if (::ConvertSidToStringSidA(token_grp->PrimaryGroup, &group_cstr))
                 {
-                    gid = std::hash<std::string>{}(sid_string);
-                    LocalFree(sid_string);
+                    gid = speed::cryptography::city_hash_64((const char*)group_cstr);
+                    ::LocalFree(group_cstr);
                 }
             }
 
-            free(grop);
+            free(token_grp);
         }
 
-        CloseHandle(tokn);
+        ::CloseHandle(tokn);
     }
 
     return gid;
@@ -196,10 +197,10 @@ bool nanosleep(
 ) noexcept
 {
     DWORD result = ::SleepEx((sec * 1000 + nsec / 1000000), false);
-
+    
     if (result != 0)
     {
-        assign_system_error_code((int)GetLastError(), err_code);
+        system::errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 

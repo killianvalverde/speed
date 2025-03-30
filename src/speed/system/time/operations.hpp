@@ -68,21 +68,6 @@ inline bool get_cpu_time(
 }
 
 
-/**
- * @brief       Get a child cpu time since some unspecified starting point.
- * @param       time_spec : The value in which store the result.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
- */
-inline bool get_child_cpu_time(
-        time_specification* time_spec,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(time::get_child_cpu_time, false, time_spec, err_code);
-}
-
-
 }
 
 

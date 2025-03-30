@@ -26,26 +26,6 @@
 #include "speed/stringutils/stringutils.hpp"
 
 
-TEST(stringutils_operations, strlen)
-{
-    const char* str1 = "hello, world";
-    const wchar_t* str2 = L"hello, world";
-    char str3[] = "hello, world";
-    wchar_t str4[] = L"hello, world";
-    char* str5 = nullptr;
-    std::string str6 = "12345";
-    std::wstring str7 = L"12345";
-    
-    EXPECT_TRUE(speed::stringutils::strlen(str1) == 12);
-    EXPECT_TRUE(speed::stringutils::strlen(str2) == 12);
-    EXPECT_TRUE(speed::stringutils::strlen(str3) == 12);
-    EXPECT_TRUE(speed::stringutils::strlen(str4) == 12);
-    EXPECT_TRUE(speed::stringutils::strlen(str5) == 0);
-    EXPECT_TRUE(speed::stringutils::strlen(str6) == 5);
-    EXPECT_TRUE(speed::stringutils::strlen(str7) == 5);
-}
-
-
 TEST(stringutils_operations, strcpy)
 {
     char str1[32] = "hello";
@@ -67,6 +47,50 @@ TEST(stringutils_operations, strncpy)
     speed::stringutils::strncpy(str1, str2, 2);
     
     EXPECT_TRUE(str_res == str1);
+}
+
+
+TEST(stringutils_operations, strcat)
+{
+    char str1[32] = "hello";
+    wchar_t str2[32] = L", world";
+    std::string str_res = "hello, world";
+    
+    speed::stringutils::strcat(str1, str2);
+    
+    EXPECT_TRUE(str_res == str1);
+}
+
+
+TEST(stringutils_operations, strncat)
+{
+    char str1[32] = "hello";
+    wchar_t str2[32] = L", world";
+    std::string str_res = "hello, ";
+    
+    speed::stringutils::strncat(str1, str2, 2);
+    
+    EXPECT_TRUE(str_res == str1);
+}
+
+
+TEST(stringutils_operations, strlen)
+{
+    const char* str1 = "hello, world";
+    const wchar_t* str2 = L"hello, world";
+    char str3[] = "hello, world";
+    wchar_t str4[] = L"hello, world";
+    char* str5 = nullptr;
+    std::string str6 = "12345";
+    std::wstring str7 = L"12345";
+    
+    EXPECT_TRUE(speed::stringutils::strlen(str1) == 12);
+    EXPECT_TRUE(speed::stringutils::strlen(str2) == 12);
+    EXPECT_TRUE(speed::stringutils::strlen(str3) == 12);
+    EXPECT_TRUE(speed::stringutils::strlen(str4) == 12);
+    EXPECT_TRUE(speed::stringutils::strlen(str5) == 0);
+    EXPECT_TRUE(speed::stringutils::strlen(str6) == 5);
+    EXPECT_TRUE(speed::stringutils::strlen(str7) == 5);
 }
 
 
@@ -149,6 +173,36 @@ TEST(stringutils_operations, strrnchr)
 }
 
 
+TEST(stringutils_operations, strescregexchars)
+{
+    const char* str1 = "hello*bye";
+    const char* str2 = "hello*$bye";
+    const char* str3 = "hell*o*$bye";
+    std::string strng1 = "hello*bye";
+    std::string strng2 = "hello*$bye";
+    std::string strng3 = "hell*o*$bye";
+    
+    EXPECT_TRUE(speed::stringutils::strescregexchars(str1) == "hello\\*bye");
+    EXPECT_TRUE(speed::stringutils::strescregexchars(str2) == "hello\\*\\$bye");
+    EXPECT_TRUE(speed::stringutils::strescregexchars(str3) == "hell\\*o\\*\\$bye");
+    EXPECT_TRUE(speed::stringutils::strescregexchars(strng1) == "hello\\*bye");
+    EXPECT_TRUE(speed::stringutils::strescregexchars(strng2) == "hello\\*\\$bye");
+    EXPECT_TRUE(speed::stringutils::strescregexchars(strng3) == "hell\\*o\\*\\$bye");
+}
+
+
+TEST(stringutils_operations, strrmbelow)
+{
+    char str1[32] = "123456";
+    wchar_t str2[32] = L"123456";
+    std::string str1_res = "456";
+    std::wstring str2_res = L"56";
+    
+    EXPECT_TRUE(speed::stringutils::strrmbelow(str1, '4') == str1_res);
+    EXPECT_TRUE(speed::stringutils::strrmbelow(str2, '5') == str2_res);
+}
+
+
 TEST(stringutils_operations, strsplit)
 {
     char str1[32] = "1;2;3;4;5;6";
@@ -173,13 +227,12 @@ TEST(stringutils_operations, strsplit)
 }
 
 
-TEST(stringutils_operations, strdisclower)
+TEST(stringutils_operations, strwildmatch)
 {
-    char str1[32] = "123456";
-    wchar_t str2[32] = L"123456";
-    std::string str1_res = "456";
-    std::wstring str2_res = L"56";
+    const char* str = "hello, world";
+    const char* wildcrd1 = "*rld";
+    const char* wildcrd2 = "*zrld";
     
-    EXPECT_TRUE(speed::stringutils::strdisclower(str1, '4') == str1_res);
-    EXPECT_TRUE(speed::stringutils::strdisclower(str2, '5') == str2_res);
+    EXPECT_TRUE(speed::stringutils::strwildmatch(str, wildcrd1));
+    EXPECT_TRUE(!speed::stringutils::strwildmatch(str, wildcrd2));
 }

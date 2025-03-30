@@ -240,7 +240,6 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 }
 
 
-// TODO: The conditions for the generation are kinda weird.
 /**
  * @brief       Tries to convert a c_string into a float.
  * @param       arg : The value to convert.
@@ -251,10 +250,6 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 template<typename TpTarget, typename TpSource>
 std::enable_if_t<
         speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
-                speed::type_traits::is_char<
-                        std::remove_pointer_t<
-                        std::decay_t<
-                        typename std::remove_extent<TpSource>::type>>>::value &&
                 speed::type_traits::is_float<TpTarget>::value,
         bool
 >
@@ -311,10 +306,6 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 template<typename TpTarget, typename TpSource>
 std::enable_if_t<
         speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
-                speed::type_traits::is_char<
-                       std::remove_pointer_t<
-                       std::decay_t<
-                       typename std::remove_extent<TpSource>::type>>>::value &&
                 speed::type_traits::is_double<TpTarget>::value,
         bool
 >
@@ -371,10 +362,6 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 template<typename TpTarget, typename TpSource>
 std::enable_if_t<
         speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
-                speed::type_traits::is_char<
-                        std::remove_pointer_t<
-                        std::decay_t<
-                        typename std::remove_extent<TpSource>::type>>>::value &&
                 speed::type_traits::is_long_double<TpTarget>::value,
         bool
 >
@@ -438,8 +425,7 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 {
     try
     {
-        std::size_t len = speed::stringutils::strlen(arg);
-        res->assign(arg, arg + len);
+        res->assign(arg);
         return true;
     }
     catch (...)
@@ -468,26 +454,7 @@ std::enable_if_t<
 >
 __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) noexcept
 {
-    try
-    {
-        std::mbstate_t state = std::mbstate_t();
-        std::decay_t<std::add_const_t<TpSource>> src = arg;
-        std::size_t len = std::mbsrtowcs(nullptr, &src, 0, &state);
-
-        if (len == static_cast<std::size_t>(-1))
-        {
-            assign_type_casting_error_code(
-                    static_cast<int>(error_codes::RANGE_ERROR),
-                    err_code);
-
-            return false;
-        }
-
-        res->resize(len);
-        std::mbsrtowcs(&(*res)[0], &src, len + 1, &state);
-        return true;
-    }
-    catch (...)
+    if (!speed::system::codecs::convert_c_str_to_wstring(arg, res))
     {
         assign_type_casting_error_code(
                 static_cast<int>(error_codes::RANGE_ERROR),
@@ -495,6 +462,8 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 
         return false;
     }
+
+    return true;
 }
 
 
@@ -515,8 +484,7 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 {
     try
     {
-        std::size_t len = speed::stringutils::strlen(arg);
-        res->assign(arg, arg + len);
+        res->assign(arg);
         return true;
     }
     catch (...)
@@ -545,26 +513,7 @@ std::enable_if_t<
 >
 __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) noexcept
 {
-    try
-    {
-        std::mbstate_t state = std::mbstate_t();
-        std::decay_t<std::add_const_t<TpSource>> src = arg;
-        std::size_t len = std::wcsrtombs(nullptr, &src, 0, &state);
-
-        if (len == static_cast<std::size_t>(-1))
-        {
-            assign_type_casting_error_code(
-                    static_cast<int>(error_codes::RANGE_ERROR),
-                    err_code);
-
-            return false;
-        }
-
-        res->resize(len);
-        std::wcsrtombs(&(*res)[0], &src, len + 1, &state);
-        return true;
-    }
-    catch (...)
+    if (!speed::system::codecs::convert_w_str_to_string(arg, res))
     {
         assign_type_casting_error_code(
                 static_cast<int>(error_codes::RANGE_ERROR),
@@ -572,11 +521,13 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 
         return false;
     }
+
+    return true;
 }
 
 
 /**
- * @brief       Tries to convert a c_string into a basic_regex.
+ * @brief       Tries to convert a c_string into a basic_regex when types are not compatible.
  * @param       arg : The value to convert.
  * @param       res : The result of the operation if it was successful.
  * @param       err_code : If function fails it holds the error code.
@@ -584,16 +535,25 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
  */
 template<typename TpTarget, typename TpSource>
 std::enable_if_t<
-        speed::type_traits::is_basic_regex<TpTarget>::value &&
-                speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value,
+        !std::is_same_v<speed::type_traits::fundamental_type_t<TpSource>,
+                        typename TpTarget::value_type> &&
+                speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
+                speed::type_traits::is_basic_regex<TpTarget>::value,
         bool
 >
 __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) noexcept
 {
     try
     {
-        std::size_t len = speed::stringutils::strlen(arg);
-        res->assign(arg, arg + len);
+        using string_type = std::basic_string<typename TpTarget::value_type>;
+        string_type string_helpr;
+        
+        if (!__try_type_cast<string_type>(arg, &string_helpr, err_code))
+        {
+            return false;
+        }
+        
+        res->assign(std::move(string_helpr));
         return true;
     }
     catch (...)
@@ -608,7 +568,7 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 
 
 /**
- * @brief       Tries to convert a c_string into a path.
+ * @brief       Tries to convert a c_string into a basic_regex when types are compatible.
  * @param       arg : The value to convert.
  * @param       res : The result of the operation if it was successful.
  * @param       err_code : If function fails it holds the error code.
@@ -616,7 +576,83 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
  */
 template<typename TpTarget, typename TpSource>
 std::enable_if_t<
-        speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
+        std::is_same_v<speed::type_traits::fundamental_type_t<TpSource>,
+                        typename TpTarget::value_type> &&
+                speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
+                speed::type_traits::is_basic_regex<TpTarget>::value,
+        bool
+>
+__try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) noexcept
+{
+    try
+    {
+        res->assign(arg);
+        return true;
+    }
+    catch (...)
+    {
+        assign_type_casting_error_code(
+                static_cast<int>(error_codes::OTHER),
+                err_code);
+    }
+
+    return false;
+}
+
+
+/**
+ * @brief       Tries to convert a c_string into a path when types are not compatible.
+ * @param       arg : The value to convert.
+ * @param       res : The result of the operation if it was successful.
+ * @param       err_code : If function fails it holds the error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+template<typename TpTarget, typename TpSource>
+std::enable_if_t<
+        !std::is_same_v<speed::type_traits::fundamental_type_t<TpSource>,
+                        std::filesystem::path::value_type> &&
+                speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
+                speed::type_traits::is_path<TpTarget>::value,
+        bool
+>
+__try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) noexcept
+{
+    try
+    {
+        using string_type = std::basic_string<std::filesystem::path::value_type>;
+        string_type string_helpr;
+        
+        if (!__try_type_cast<string_type>(arg, &string_helpr, err_code))
+        {
+            return false;
+        }
+        
+        res->assign(std::move(string_helpr));
+        return true;
+    }
+    catch (...)
+    {
+        assign_type_casting_error_code(
+                static_cast<int>(error_codes::FILESYSTEM_INVALID_PATH),
+                err_code);
+
+        return false;
+    }
+}
+
+
+/**
+ * @brief       Tries to convert a c_string into a path when types are compatible.
+ * @param       arg : The value to convert.
+ * @param       res : The result of the operation if it was successful.
+ * @param       err_code : If function fails it holds the error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+template<typename TpTarget, typename TpSource>
+std::enable_if_t<
+        std::is_same_v<speed::type_traits::fundamental_type_t<TpSource>,
+                        std::filesystem::path::value_type> &&
+                speed::type_traits::is_character_pointer<std::decay_t<TpSource>>::value &&
                 speed::type_traits::is_path<TpTarget>::value,
         bool
 >
@@ -655,7 +691,12 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 {
     try
     {
-        res->assign(arg);
+        if (!__try_type_cast<std::filesystem::path>(
+                arg, (dynamic_cast<std::filesystem::path*>(res)), err_code))
+        {
+            return false;
+        }
+        
         return res->is_valid(err_code);
     }
     catch (...)
@@ -702,7 +743,7 @@ template<typename TpTarget, typename TpSource>
 inline bool try_type_cast(
     const TpSource& arg, 
     TpTarget* res, 
-    std::error_code* err_code = nullptr
+    std::error_code* err_code
 ) noexcept
 {
     return __private::__try_type_cast(arg, res, err_code);

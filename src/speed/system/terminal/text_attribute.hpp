@@ -41,56 +41,56 @@ enum class text_attribute : std::uint8_t
     /** Nil text attribute. */
     NIL,
     
-    /** Default text attribute */
+    /** Default text attribute. */
     DEFAULT,
     
-    /** Black text. */
+    /** Black text attribute. */
     BLACK,
     
-    /** Red text. */
-    RED,
-    
-    /** Green text. */
-    GREEN,
-    
-    /** Brown text. */
-    BROWN,
-    
-    /** Blue text. */
+    /** Blue text attribute. */
     BLUE,
     
-    /** Purple text. */
-    PURPLE,
+    /** Brown text attribute. */
+    BROWN,
     
-    /** Cyan text. */
+    /** Cyan text attribute. */
     CYAN,
     
-    /** Light gray text. */
-    LIGHT_GRAY,
+    /** Gray text attribute. */
+    GRAY,
     
-    /** Dark gray text. */
-    DARK_GRAY,
+    /** Green text attribute. */
+    GREEN,
     
-    /** Light red text. */
-    LIGHT_RED,
-    
-    /** Light green text. */
-    LIGHT_GREEN,
-    
-    /** Yellow text. */
-    YELLOW,
-    
-    /** Light blue text. */
+    /** Light blue text attribute. */
     LIGHT_BLUE,
     
-    /** Light purple text. */
-    LIGHT_PURPLE,
-    
-    /** Light cyan text. */
+    /** Light cyan text attribute. */
     LIGHT_CYAN,
     
-    /** White text. */
-    WHITE
+    /** Light gray text attribute. */
+    LIGHT_GRAY,
+    
+    /** Light green text attribute. */
+    LIGHT_GREEN,
+    
+    /** Light purple text attribute. */
+    LIGHT_PURPLE,
+    
+    /** Light red text attribute. */
+    LIGHT_RED,
+    
+    /** Purple text attribute. */
+    PURPLE,
+    
+    /** Red text attribute. */
+    RED,
+    
+    /** White text attribute. */
+    WHITE,
+    
+    /** Yellow text attribute. */
+    YELLOW,
 };
 
 

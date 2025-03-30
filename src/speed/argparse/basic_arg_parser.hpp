@@ -43,7 +43,7 @@
 #include "arg_value_error_flags.hpp"
 #include "basic_arg_constraint.hpp"
 #include "basic_arg_parser_setter.hpp"
-#include "basic_at_least_one_found.hpp"
+#include "basic_one_or_more_constraint.hpp"
 #include "basic_help_arg.hpp"
 #include "basic_help_arg_setter.hpp"
 #include "basic_help_menu.hpp"
@@ -54,7 +54,7 @@
 #include "basic_key_value_arg_setter.hpp"
 #include "basic_keyless_arg.hpp"
 #include "basic_keyless_arg_setter.hpp"
-#include "basic_mutually_exclusive.hpp"
+#include "basic_mutually_exclusive_constraint.hpp"
 #include "basic_version_arg.hpp"
 #include "basic_version_arg_setter.hpp"
 #include "forward_declarations.hpp"
@@ -130,10 +130,12 @@ public:
     using arg_constraint_type = basic_arg_constraint<TpAllocator>;
 
     /** Type that represents an 'at least one found' constraint for a set of arguments. */
-    using at_least_one_found_type = basic_at_least_one_found<arg_constraint_type, TpAllocator>;
+    using one_or_more_constraint_type = basic_one_or_more_constraint<
+            arg_constraint_type, TpAllocator>;
 
     /** Type that represents a mutually exclusive constraint for a set of arguments. */
-    using mutually_exclusive_type = basic_mutually_exclusive<arg_constraint_type, TpAllocator>;
+    using mutually_exclusive_constraint_type = basic_mutually_exclusive_constraint<
+            arg_constraint_type, TpAllocator>;
 
     /** Type that represents a help menu. */
     using help_menu_type = basic_help_menu<TpAllocator>;
@@ -336,9 +338,9 @@ public:
      *              applies.
      */
     template<typename... Ts_>
-    void add_at_least_one_found_constraint(const Ts_&... kys)
+    void add_constraint_one_or_more(const Ts_&... kys)
     {
-        at_least_one_found_type* at_least_one_fnd;
+        one_or_more_constraint_type* at_least_one_fnd;
         speed::memory::allocate_and_construct(at_least_one_found_type_alloc_, at_least_one_fnd,
                                               this, kys...);
         constrnts_.push_back(at_least_one_fnd);
@@ -351,9 +353,9 @@ public:
      *              applies.
      */
     template<typename... Ts_>
-    void add_mutually_exclusive_constraint(const Ts_&... kys)
+    void add_constraint_mutually_exclusive(const Ts_&... kys)
     {
-        mutually_exclusive_type* mutually_excl;
+        mutually_exclusive_constraint_type* mutually_excl;
         speed::memory::allocate_and_construct(mutually_exclusive_type_alloc_, mutually_excl,
                                               this, kys...);
         constrnts_.push_back(mutually_excl);
@@ -398,8 +400,9 @@ public:
         keyless_arg_type *kyless_arg = nullptr;
         base_arg_type *prev_arg = nullptr;
         vector_type<key_arg_type*> chaind_args;
-        bool val_has_prefx;
-        bool succs;
+        bool insertd;
+        bool prefix_err;
+        auto cur_keyless_arg_it = kyless_arg_list_.begin();
 
         for (cur_state = dfa_t::START; cur_state != dfa_t::FINISH; )
         {
@@ -496,41 +499,41 @@ public:
                 continue;
 
             case dfa_t::PARSE_KEYLESS_ARG:
-                kyless_arg = nullptr;
-                val_has_prefx = value_has_prefix(cur_argv);
-                for (auto& x : kyless_arg_list_)
+                insertd = false;
+                while (cur_keyless_arg_it != kyless_arg_list_.end() &&
+                       (*cur_keyless_arg_it)->max_values_reached())
                 {
-                    if ((!val_has_prefx || x->is_flag_set(arg_flags::VALUES_WITH_PREFIX)) &&
-                        x->try_add_value(cur_argv))
+                    ++cur_keyless_arg_it;
+                }
+                while (cur_keyless_arg_it != kyless_arg_list_.end())
+                {
+                    kyless_arg = *cur_keyless_arg_it;
+                    prefix_err = has_value_with_prefix_error(kyless_arg, cur_argv);
+                    if (prefix_err || !kyless_arg->try_add_value(cur_argv))
                     {
-                        kyless_arg = x;
-                        if (static_cast<base_arg_type*>(kyless_arg) !=  prev_arg)
+                        if (kyless_arg->min_values_reached() ||
+                            (kyless_arg->get_number_of_values() > 0 && prefix_err))
                         {
-                            kyless_arg->execute_action();
-                            kyless_arg->set_found(true);
+                            ++cur_keyless_arg_it;
+                            continue;
+                        }
+                        else if (!prefix_err)
+                        {
+                            kyless_arg->add_value(std::move(cur_argv));
+                            insertd = true;
                         }
                         break;
                     }
+                    insertd = true;
+                    break;
                 }
-                if (kyless_arg == nullptr)
+                if (insertd)
                 {
-                    for (auto& x : kyless_arg_list_)
+                    if (static_cast<base_arg_type*>(kyless_arg) !=  prev_arg)
                     {
-                        if (!x->max_values_reached())
-                        {
-                            x->add_value(std::move(cur_argv));
-                            kyless_arg = x;
-                            if (static_cast<base_arg_type*>(kyless_arg) !=  prev_arg)
-                            {
-                                kyless_arg->execute_action();
-                                kyless_arg->set_found(true);
-                            }
-                            break;
-                        }
+                        kyless_arg->execute_action();
+                        kyless_arg->set_found(true);
                     }
-                }
-                if (kyless_arg != nullptr)
-                {
                     ++cur_idx;
                     cur_state = dfa_t::READ_ARG;
                     prev_arg = kyless_arg;
@@ -1106,15 +1109,15 @@ private:
      */
     void delete_arg_constraint(arg_constraint_type*& arg) noexcept
     {
-        at_least_one_found_type* at_least_one_fnd;
-        mutually_exclusive_type* mutually_excl;
+        one_or_more_constraint_type* at_least_one_fnd;
+        mutually_exclusive_constraint_type* mutually_excl;
 
-        if ((at_least_one_fnd = dynamic_cast<at_least_one_found_type*>(arg)) != nullptr)
+        if ((at_least_one_fnd = dynamic_cast<one_or_more_constraint_type*>(arg)) != nullptr)
         {
             speed::memory::destruct_and_deallocate(at_least_one_found_type_alloc_,
                                                    at_least_one_fnd);
         }
-        else if ((mutually_excl = dynamic_cast<mutually_exclusive_type*>(arg)) != nullptr)
+        else if ((mutually_excl = dynamic_cast<mutually_exclusive_constraint_type*>(arg)) != nullptr)
         {
             speed::memory::destruct_and_deallocate(mutually_exclusive_type_alloc_,
                                                    mutually_excl);
@@ -1626,6 +1629,21 @@ private:
     }
 
     /**
+     * @brief       Allows knowing whether a string can't be an argument value due to the
+     *              presece of a prefix while the value argument doesn't allow it.
+     * @param       val_arg : The value arg to consider for the checking.
+     * @param       str : The string to check.
+     * @return      If function was successful true is returned, otherwise false is returned.
+     */
+    [[nodiscard]] bool has_value_with_prefix_error(
+            value_arg_type* val_arg,
+            const string_type& str
+    ) const
+    {
+        return value_has_prefix(str) && !val_arg->is_flag_set(arg_flags::VALUES_WITH_PREFIX);
+    }
+
+    /**
      * @brief       Allows knowing whether the parse of the arguements have been done.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
@@ -1707,7 +1725,7 @@ private:
      */
     [[nodiscard]] bool string_can_be_value(value_arg_type* val_arg, const string_type& str) const
     {
-        return (!value_has_prefix(str) || val_arg->is_flag_set(arg_flags::VALUES_WITH_PREFIX)) &&
+        return !has_value_with_prefix_error(val_arg, str) &&
                (!arg_key_exists(str) || val_arg->is_flag_set(arg_flags::KEYS_AS_VALUES)) &&
                !arg_has_eq_operator(str) && !chained_args_exists(str);
     }
@@ -1801,8 +1819,8 @@ private:
         }
 
         print_commands_usage();
-        print_constraints_usage();
         print_values_usage();
+        print_constraints_usage();
 
         std::cout << "\n\n";
     }
@@ -1935,10 +1953,10 @@ private:
     allocator_type<keyless_arg_type> keyless_arg_type_alloc_;
 
     /** Allocator of the at_least_one_found_type. */
-    allocator_type<at_least_one_found_type> at_least_one_found_type_alloc_;
+    allocator_type<one_or_more_constraint_type> at_least_one_found_type_alloc_;
 
     /** Allocator of the mutually_exclusive_type. */
-    allocator_type<mutually_exclusive_type> mutually_exclusive_type_alloc_;
+    allocator_type<mutually_exclusive_constraint_type> mutually_exclusive_type_alloc_;
     
     friend class basic_arg_key<TpAllocator>;
     friend class basic_arg_value<TpAllocator>;

@@ -83,15 +83,16 @@ inline bool kbhit(
 /**
  * @brief       Set a terminal text attribute.
  * @param       terminal_strm : Terminal stream in which set the attribute.
- * @param       txt_attribute : Attribute to set.
+ * @param       text_attr : Attribute to set.
  * @return      If function was successful 0 is returned, otherwise -1 is returned.
  */
-inline bool set_text_attribute(
+inline bool set_foreground_text_attribute(
         ::FILE* terminal_strm,
-        text_attribute txt_attribute
+        text_attribute text_attr
 ) noexcept
 {
-    return SPEED_SELECT_API(terminal::set_text_attribute, false, terminal_strm, txt_attribute);
+    return SPEED_SELECT_API(terminal::set_foreground_text_attribute, false, terminal_strm,
+                            text_attr);
 }
 
 

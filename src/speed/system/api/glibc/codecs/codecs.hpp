@@ -18,38 +18,28 @@
  */
 
 /**
- * @file        speed/system/api/glibc/filesystem/directory_entity_extension.hpp
- * @brief       directory_entity_extension struct header.
+ * @file        speed/system/api/glibc/codecs/codecs.hpp
+ * @brief       system codecs main header.
  * @author      Killian Valverde
- * @date        2019/04/10
+ * @date        2024/10/16
  */
 
-#ifndef SPEED_SYSTEM_API_GLIBC_FILESYSTEM_DIRECTORY_ENTITY_EXTENSION_HPP
-#define SPEED_SYSTEM_API_GLIBC_FILESYSTEM_DIRECTORY_ENTITY_EXTENSION_HPP
+#ifndef SPEED_SYSTEM_API_GLIBC_CODECS_CODECS_HPP
+#define SPEED_SYSTEM_API_GLIBC_CODECS_CODECS_HPP
 
 #include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_GLIBC
 
-#include <dirent.h>
+#include "operations.hpp"
 
 
-namespace speed::system::api::glibc::filesystem {
+namespace speed::system::api::glibc {
 
 
 /**
- * @brief       Struct that represents a directory entity extension.
+ * @brief       Contains utilities encoding and decoding.
  */
-struct directory_entity_extension
-{
-    /** Directory iterator. */
-    DIR* dir;
-    
-    /** Direcotry entry. */
-    dirent* entry;
-
-    /** Wide string path. */
-    std::wstring wpath;
-};
+namespace codecs {}
 
 
 }
