@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/algorithm/algorithm.hpp
+ * @file        algorithm.hpp
  * @brief       algorithm main header
  * @author      Killian Valverde
  * @date        2018/08/07
@@ -30,27 +30,20 @@
 #include "operations.hpp"
 #include "simple_compare.hpp"
 
-
 namespace speed {
-
 
 /**
  * @brief       Contians a set of algorithms.
  */
 namespace algorithm {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contians a set of algorithms.
  */
 namespace algo = algorithm;
-
 #endif
 
-
 }
-
 
 #endif

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/algorithm/simple_compare.hpp
+ * @file        simple_compare.hpp
  * @brief       simple_compare class header.
  * @author      Killian Valverde
  * @date        2018/08/07
@@ -30,9 +30,7 @@
 #include <cstdlib>
 #include <type_traits>
 
-
 namespace speed::algorithm {
-
 
 /**
  * @brief       Class used to compare easily two objects.
@@ -53,8 +51,6 @@ struct simple_compare
     }
 };
 
-
 }
-
 
 #endif
