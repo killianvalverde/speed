@@ -726,7 +726,6 @@ template<
 /**
  * @brief       Converts a character to lowercase using the specified locale.
  * @param       ch : The character to convert to lowercase.
- * @param       loc : The locale to use for conversion (applies to `char` type only).
  * @return      The lowercase equivalent of the input character.
  */
 template<typename TpChar>
@@ -768,8 +767,6 @@ std::basic_string<TpChar, TpCharTraits, TpCharAlloc> strtolower(
  * @brief       Compares a string to a pattern with wildcard characters '*' and '?'.
  * @param       str : Pointer to the string to match.
  * @param       pattrn : Pointer to the pattern containing wildcards.
- * @param       case_sensitive : Determines whether the match is case-sensitive
- *              (default is `false`).
  * @return      `true` if `str` matches the `pattrn` with wildcards; otherwise, `false`.
  */
 template<typename TpChar1, typename TpChar2>
