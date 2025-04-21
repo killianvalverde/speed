@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/exceptions/exceptions.hpp
+ * @file        exceptions.hpp
  * @brief       exceptions main header.
  * @author      Killian Valverde
  * @date        2016/08/19
@@ -30,9 +30,7 @@
 #include "exception_base.hpp"
 #include "basic_message_exception.hpp"
 
-
 namespace speed {
-
 
 /**
  * @brief       Contains resources for all exceptions thrown by the elements of speed along with
@@ -40,19 +38,14 @@ namespace speed {
  */
 namespace exceptions {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contains resources for all exceptions thrown by the elements of speed along with
  *              several types and utilities to assist handling exceptions.
  */
 namespace except = exceptions;
-
 #endif
 
-
 }
-
 
 #endif

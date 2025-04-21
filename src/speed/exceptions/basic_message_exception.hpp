@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/exceptions/basic_message_exception.hpp
+ * @file        basic_message_exception.hpp
  * @brief       basic_message_exception class header.
  * @author      Killian Valverde
  * @date        2016/08/19
@@ -31,9 +31,7 @@
 
 #include "exception_base.hpp"
 
-
 namespace speed::exceptions {
-
 
 /**
  * @brief       Base for any speed exception class that needs to have a customizable message.
@@ -109,12 +107,9 @@ protected:
     string_type mess_;
 };
 
-
 /** Class used to parse arguments. */
 using message_exception = basic_message_exception<std::allocator<char>>;
 
-
 }
-
 
 #endif

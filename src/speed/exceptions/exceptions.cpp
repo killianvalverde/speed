@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/exceptions/exceptions.cpp
+ * @file        exceptions.cpp
  * @brief       exceptions module object.
  * @author      Killian Valverde
  * @date        2024/10/11
