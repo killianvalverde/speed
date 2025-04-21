@@ -18,7 +18,7 @@
  */
 
 /**
- * @file       speed/containers/flags.hpp
+ * @file       flags.hpp
  * @brief      flags class header.
  * @author     Killian Valverde
  * @date       2016/01/08
@@ -34,9 +34,7 @@
 #include "exception.hpp"
 #include "iterator_base.hpp"
 
-
 namespace speed::containers {
-
 
 /**
  * @brief       Class that represents flags conteiner.
@@ -594,7 +592,6 @@ private:
     value_type val_;
 };
 
-
 /**
  * @brief       Allows to use an object to print in standard output the value that constains the
  *              flags conteiner.
@@ -623,8 +620,6 @@ std::basic_ostream<TpChar, TpCharTraits>& operator <<(
     return os;
 }
 
-
 }
-
 
 #endif

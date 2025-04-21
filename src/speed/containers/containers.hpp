@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/containers/containers.hpp
+ * @file        containers.hpp
  * @brief       containers main header
  * @author      Killian Valverde
  * @date        2018/01/13
@@ -34,27 +34,20 @@
 #include "iterator_base.hpp"
 #include "static_cache.hpp"
 
-
 namespace speed {
-
 
 /**
  * @brief       Contians definitions of containers.
  */
 namespace containers {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contians definitions of containers.
  */
 namespace contain = containers;
-
 #endif
 
-
 }
-
 
 #endif

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/containers/exception.hpp
+ * @file        exception.hpp
  * @brief       containers exception main header.
  * @author      Killian Valverde
  * @date        2018/01/12
@@ -29,9 +29,7 @@
 
 #include "../exceptions/exceptions.hpp"
 
-
 namespace speed::containers {
-
 
 /**
  * @brief       Base class used to throw exceptions when a containers operation fails.
@@ -49,7 +47,6 @@ public:
     }
 };
 
-
 /**
  * @brief       Class used to throw exceptions when an insertion error occurs.
  */
@@ -65,7 +62,6 @@ public:
         return "insertion exception";
     }
 };
-
 
 /**
  * @brief       This class defines the type of objects thrown as exceptions to report an empty
@@ -84,7 +80,6 @@ public:
     }
 };
 
-
 /**
  * @brief       This class defines the type of objects thrown as exceptions to report an
  *              out-of-range error
@@ -101,7 +96,6 @@ public:
         return "out of range exception";
     }
 };
-
 
 /**
  * @brief       This class defines the type of objects thrown as exceptions to report an
@@ -120,7 +114,6 @@ public:
     }
 };
 
-
 /**
  * @brief       Class used to throw exceptions when an insertion error occurs.
  */
@@ -137,8 +130,6 @@ public:
     }
 };
 
-
 }
-
 
 #endif

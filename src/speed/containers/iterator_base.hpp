@@ -18,7 +18,7 @@
  */
 
 /**
- * @file       speed/containers/iterator_base.hpp
+ * @file       iterator_base.hpp
  * @brief      iterator_base interface header.
  * @author     Killian Valverde
  * @date       2018/01/19
@@ -29,9 +29,7 @@
 
 #include <cstddef>
 
-
 namespace speed::containers {
-
 
 /**
  * @brief       Class that represents the interface of the iterators base.
@@ -255,7 +253,6 @@ public:
     }
 };
 
-
 /**
  * @brief       Class that represents the interface for a constant iterator.
  */
@@ -302,7 +299,6 @@ public:
     }
 };
 
-
 /**
  * @brief       Class that represents the interface for a mutable iterator.
  */
@@ -348,7 +344,6 @@ public:
         return *old_it;
     }
 };
-
 
 /**
  * @brief       Class that represents the interface for a constant mutable iterator.
@@ -397,8 +392,6 @@ public:
     using base_type::operator >=;
 };
 
-
 }
-
 
 #endif

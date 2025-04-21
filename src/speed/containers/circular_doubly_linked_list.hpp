@@ -18,7 +18,7 @@
  */
 
 /**
- * @file       speed/containers/circular_doubly_linked_list.hpp
+ * @file       circular_doubly_linked_list.hpp
  * @brief      circular_doubly_linked_list class header.
  * @author     Killian Valverde
  * @date       2018/01/19
@@ -32,9 +32,7 @@
 #include "exception.hpp"
 #include "iterator_base.hpp"
 
-
 namespace speed::containers {
-
 
 /**
  * @brief       Class that represents a doubly linked list.
@@ -147,9 +145,6 @@ public:
         {
             return &cur_->val_;
         }
-        
-        template<typename TpValue__, typename TpAllocator__>
-        friend class circular_doubly_linked_list;
     
     protected:
         /** The first list node. */
@@ -157,6 +152,9 @@ public:
         
         /** The current list node. */
         node_type* cur_;
+        
+        template<typename TpValue__, typename TpAllocator__>
+        friend class circular_doubly_linked_list;
     };
     
     /**
@@ -816,8 +814,6 @@ private:
     allocator_type<node_type> alloctr_;
 };
 
-
 }
-
 
 #endif

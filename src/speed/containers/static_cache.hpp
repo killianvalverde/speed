@@ -18,7 +18,7 @@
  */
 
 /**
- * @file       speed/containers/static_cache.hpp
+ * @file       static_cache.hpp
  * @brief      static_cache class header.
  * @author     Killian Valverde
  * @date       2018/01/12
@@ -34,9 +34,7 @@
 #include "flags.hpp"
 #include "iterator_base.hpp"
 
-
 namespace speed::containers {
-
 
 /**
  * @brief       Contains all buffer cache buffers flags.
@@ -56,10 +54,8 @@ enum class static_cache_buffer_flags : std::uint8_t
     ALL = 0x3
 };
 
-
 /** Contains all buffer cache buffers flags. */
 using scbf_t = static_cache_buffer_flags;
-
 
 /**
  * @brief       Class that represents a generic static cache.
@@ -432,7 +428,6 @@ public:
     }
     
     // TODO: Implement copy and move operators.
-
     /** @cond */
     static_cache(const static_cache& rhs) = delete;
     
@@ -807,8 +802,6 @@ private:
     hash_buffer hbuf_[SIZE * 2];
 };
 
-
 }
-
 
 #endif
