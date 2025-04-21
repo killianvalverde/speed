@@ -486,6 +486,7 @@ struct is_path
 template<typename Tp>
 struct fundamental_type
 {
+    /** The fundamental type of Tp. */
     using type = std::remove_cv_t<
             std::remove_pointer_t<
                     std::remove_all_extents_t<
