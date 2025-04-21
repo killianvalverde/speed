@@ -6,6 +6,7 @@ set(SPEED_ALGORITHM_SOURCE_FILES
 )
 
 set(SPEED_ARGPARSE_SOURCE_FILES
+        argparse/arg_constraint_flags.hpp
         argparse/arg_error_flags.hpp
         argparse/arg_flags.hpp
         argparse/arg_parser_error_flags.hpp
@@ -14,11 +15,11 @@ set(SPEED_ARGPARSE_SOURCE_FILES
         argparse/argparse.cpp
         argparse/argparse.hpp
         argparse/basic_arg_constraint.hpp
+        argparse/basic_arg_constraint_setter.hpp
         argparse/basic_arg_key.hpp
         argparse/basic_arg_parser.hpp
         argparse/basic_arg_parser_setter.hpp
         argparse/basic_arg_value.hpp
-        argparse/basic_one_or_more_constraint.hpp
         argparse/basic_base_arg.hpp
         argparse/basic_base_arg_setter.hpp
         argparse/basic_help_arg.hpp
@@ -29,9 +30,8 @@ set(SPEED_ARGPARSE_SOURCE_FILES
         argparse/basic_key_arg_setter.hpp
         argparse/basic_key_value_arg.hpp
         argparse/basic_key_value_arg_setter.hpp
-        argparse/basic_keyless_arg.hpp
-        argparse/basic_keyless_arg_setter.hpp
-        argparse/basic_mutually_exclusive_constraint.hpp
+        argparse/basic_positional_arg.hpp
+        argparse/basic_positional_arg_setter.hpp
         argparse/basic_type_caster.hpp
         argparse/basic_value_arg.hpp
         argparse/basic_value_arg_setter.hpp
@@ -42,7 +42,7 @@ set(SPEED_ARGPARSE_SOURCE_FILES
 )
 
 set(SPEED_CONTAINERS_SOURCE_FILES
-        containers/circular_doubly_linked_list.hpp
+        containers/linked_list.hpp
         containers/containers.cpp
         containers/containers.hpp
         containers/doubly_linked_node.hpp
@@ -329,9 +329,15 @@ target_link_libraries(speed_containers
         speed_type_traits
 )
 
+target_link_libraries(speed_cryptography
+        speed_stringutils
+)
+
 target_link_libraries(speed_filesystem 
-        speed_containers 
+        speed_containers
+        speed_stringutils
         speed_system
+        speed_type_casting
 )
 
 target_link_libraries(speed_iostream 
@@ -347,7 +353,8 @@ target_link_libraries(speed_stringutils
         speed_type_traits
 )
 
-target_link_libraries(speed_system 
+target_link_libraries(speed_system
+        speed_cryptography
         speed_exception 
         speed_lowlevel
 )
@@ -356,9 +363,12 @@ target_link_libraries(speed_time
         speed_system
 )
 
-target_link_libraries(speed_type_casting 
-        speed_exception 
-        speed_stringutils 
+target_link_libraries(speed_type_casting
+        speed_errors
+        speed_exception
+        speed_filesystem
+        speed_stringutils
+        speed_system
         speed_type_traits
 )
 
