@@ -36,14 +36,15 @@
 #include "../containers/containers.hpp"
 #include "../memory/memory.hpp"
 #include "../stringutils/stringutils.hpp"
+#include "forward_declarations.hpp"
 #include "arg_error_flags.hpp"
 #include "arg_flags.hpp"
 #include "arg_parser_error_flags.hpp"
 #include "arg_parser_flags.hpp"
 #include "arg_value_error_flags.hpp"
 #include "basic_arg_constraint.hpp"
+#include "basic_arg_constraint_setter.hpp"
 #include "basic_arg_parser_setter.hpp"
-#include "basic_one_or_more_constraint.hpp"
 #include "basic_help_arg.hpp"
 #include "basic_help_arg_setter.hpp"
 #include "basic_help_menu.hpp"
@@ -54,10 +55,8 @@
 #include "basic_key_value_arg_setter.hpp"
 #include "basic_keyless_arg.hpp"
 #include "basic_keyless_arg_setter.hpp"
-#include "basic_mutually_exclusive_constraint.hpp"
 #include "basic_version_arg.hpp"
 #include "basic_version_arg_setter.hpp"
-#include "forward_declarations.hpp"
 
 
 namespace speed::argparse {
@@ -80,6 +79,10 @@ public:
     /** Vector type used in the class. */
     template<typename T>
     using vector_type = std::vector<T, allocator_type<T>>;
+
+    /** Vector type used in the class. */
+    template<typename T>
+    using list_type = std::list<T, allocator_type<T>>;
 
     /** Unordered map type used in the class. */
     template<typename TpKey_, typename TpValue_>
@@ -129,31 +132,26 @@ public:
     /** Type that represents a constraint for a set of arguments. */
     using arg_constraint_type = basic_arg_constraint<TpAllocator>;
 
-    /** Type that represents an 'at least one found' constraint for a set of arguments. */
-    using one_or_more_constraint_type = basic_one_or_more_constraint<
-            arg_constraint_type, TpAllocator>;
-
-    /** Type that represents a mutually exclusive constraint for a set of arguments. */
-    using mutually_exclusive_constraint_type = basic_mutually_exclusive_constraint<
-            arg_constraint_type, TpAllocator>;
-
     /** Type that represents a help menu. */
     using help_menu_type = basic_help_menu<TpAllocator>;
 
-    /** Type used to configure an added key arg. */
+    /** Type used to configure an added key argument. */
     using key_arg_setter_type = basic_key_arg_setter<TpAllocator>;
 
-    /** Type used to configure an added version arg. */
+    /** Type used to configure an added version argument. */
     using version_arg_setter_type = basic_version_arg_setter<TpAllocator>;
 
-    /** Type used to configure an added keyless arg. */
+    /** Type used to configure an added keyless argument. */
     using keyless_arg_setter_type = basic_keyless_arg_setter<TpAllocator>;
 
-    /** Type used to configure an added key value arg. */
+    /** Type used to configure an added key value argument. */
     using key_value_arg_setter_type = basic_key_value_arg_setter<TpAllocator>;
 
-    /** Type used to configure an added help arg. */
+    /** Type used to configure an added help argument. */
     using help_arg_setter_type = basic_help_arg_setter<TpAllocator>;
+
+    /** Type used to configure an added argument constraint. */
+    using arg_constraint_setter_type = basic_arg_constraint_setter<TpAllocator>;
 
     /** Type used to configure an added help menu. */
     using help_menu_setter_type = basic_help_menu_setter<TpAllocator>;
@@ -173,28 +171,15 @@ public:
             >
     >
     explicit basic_arg_parser(TpString_&& prog_name = string_type())
-            : max_unrecog_args_(1)
-            , default_hlp_arg_(nullptr)
-            , current_vers_arg_(nullptr)
+            : short_prefxs_({"-"})
+            , long_prefxs_({"--"})
             , prog_name_(std::forward<TpString_>(prog_name))
             , err_id_("error")
-            , bse_arg_list_()
-            , kyless_arg_list_()
-            , constrnts_()
-            , unrecog_args_()
-            , short_prefxs_({"-"})
-            , long_prefxs_({"--"})
-            , bse_arg_map_()
-            , hlp_menu_map_()
+            , default_hlp_arg_(nullptr)
+            , current_vers_arg_(nullptr)
+            , max_unrecog_args_(1)
             , flgs_(arg_parser_flags::DEFAULT_ARG_PARSER_FLAGS)
             , err_flgs_(arg_parser_error_flags::NIL)
-            , key_arg_type_alloc_()
-            , help_arg_type_alloc_()
-            , version_arg_type_alloc_()
-            , key_value_arg_type_alloc_()
-            , keyless_arg_type_alloc_()
-            , at_least_one_found_type_alloc_()
-            , mutually_exclusive_type_alloc_()
             , parsd_(false)
     {
     }
@@ -219,11 +204,6 @@ public:
         for (auto& x : bse_arg_list_)
         {
             delete_base_arg(x);
-        }
-
-        for (auto& x : constrnts_)
-        {
-            delete_arg_constraint(x);
         }
     
         current_vers_arg_ = nullptr;
@@ -334,31 +314,13 @@ public:
     /**
      * @brief       Add a constraint that verifies that at least one of the specified arguments has
      *              been found in the program call.
-     * @param       kys : Variadic number of strings to speficy every key in which the constraint
-     *              applies.
+     * @param       kys : Variadic number of strings to speficy every argument in which the
+     *              constraint applies.
      */
     template<typename... Ts_>
-    void add_constraint_one_or_more(const Ts_&... kys)
+    arg_constraint_setter_type add_constraint(const Ts_&... kys)
     {
-        one_or_more_constraint_type* at_least_one_fnd;
-        speed::memory::allocate_and_construct(at_least_one_found_type_alloc_, at_least_one_fnd,
-                                              this, kys...);
-        constrnts_.push_back(at_least_one_fnd);
-    }
-
-    /**
-     * @brief       Add a constraint that verifies that exclusivelly one of the specified arguments
-     *              is found in the program call.
-     * @param       kys : Variadic number of strings to speficy every key in which the constraint
-     *              applies.
-     */
-    template<typename... Ts_>
-    void add_constraint_mutually_exclusive(const Ts_&... kys)
-    {
-        mutually_exclusive_constraint_type* mutually_excl;
-        speed::memory::allocate_and_construct(mutually_exclusive_type_alloc_, mutually_excl,
-                                              this, kys...);
-        constrnts_.push_back(mutually_excl);
+        return arg_constraint_setter_type(&constrnts_.emplace_back(this, kys...));
     }
 
     /**
@@ -873,7 +835,7 @@ public:
         {
             for (auto& constrnt : constrnts_)
             {
-                constrnt->print_errors();
+                constrnt.print_errors();
             }
         }
         
@@ -942,7 +904,7 @@ private:
     }
 
     /**
-     * @brief       Assert the validity of adding a version arg.
+     * @brief       Assert the validity of adding a version argument.
      */
     inline void assert_valid_version_add() const
     {
@@ -953,9 +915,9 @@ private:
     }
 
     /**
-     * @brief       Register in the data stuctures a specified key arg and its keys.
-     * @param       ky_arg : Key arg to register.
-     * @param       kys : Keys of the key arg.
+     * @brief       Register in the data stuctures a specified key argument and its keys.
+     * @param       ky_arg : Key argument to register.
+     * @param       kys : Keys of the key argument.
      */
     template<typename... Ts_>
     void register_key_arg(key_arg_type* ky_arg, Ts_&&... kys)
@@ -969,9 +931,9 @@ private:
     }
 
     /**
-     * @brief       Register in the data stuctures a specified key value arg and its keys.
-     * @param       ky_val_arg : Key value arg to register.
-     * @param       kys : Keys of the key value arg.
+     * @brief       Register in the data stuctures a specified key value argument and its keys.
+     * @param       ky_val_arg : Key value argument to register.
+     * @param       kys : Keys of the key value argument.
      */
     template<typename... Ts_>
     inline void register_key_value_arg(key_value_arg_type* ky_val_arg, Ts_&&... kys)
@@ -980,9 +942,9 @@ private:
     }
 
     /**
-     * @brief       Register in the data stuctures a specified keyless arg and its usage key.
-     * @param       kyless_arg : Keyless arg to register.
-     * @param       usage_ky : Usage key of the keyless arg.
+     * @brief       Register in the data stuctures a specified keyless argument and its usage key.
+     * @param       kyless_arg : Keyless argument to register.
+     * @param       usage_ky : Usage key of the keyless argument.
      */
     template<typename TpString_>
     inline void register_keyless_arg(keyless_arg_type* kyless_arg, TpString_&& usage_ky)
@@ -994,9 +956,9 @@ private:
     }
 
     /**
-     * @brief       Register in the data stuctures a specified help arg and its keys.
-     * @param       hlp_arg : Help arg to register.
-     * @param       kys : Keys of the help arg.
+     * @brief       Register in the data stuctures a specified help argument and its keys.
+     * @param       hlp_arg : Help argument to register.
+     * @param       kys : Keys of the help argument.
      */
     template<typename... Ts_>
     inline void register_help_arg(help_arg_type* hlp_arg, Ts_&&... kys)
@@ -1009,9 +971,9 @@ private:
     }
 
     /**
-     * @brief       Register in the data stuctures a specified version arg and its keys.
-     * @param       vers_arg : Version arg to register.
-     * @param       kys : Keys of the version arg.
+     * @brief       Register in the data stuctures a specified version argument and its keys.
+     * @param       vers_arg : Version argument to register.
+     * @param       kys : Keys of the version argument.
      */
     template<typename... Ts_>
     inline void register_version_arg(version_arg_type* vers_arg, Ts_&&... kys)
@@ -1060,7 +1022,7 @@ private:
         }
         else
         {
-            for (auto &hlp_menu_id: hlp_menus_ids)
+            for (auto& hlp_menu_id: hlp_menus_ids)
             {
                 get_help_menu(hlp_menu_id).remove_entry(bse_arg);
             }
@@ -1104,29 +1066,6 @@ private:
     }
 
     /**
-     * @brief       Destroy and deallocate the specified argument.
-     * @param       arg : The specified argument.
-     */
-    void delete_arg_constraint(arg_constraint_type*& arg) noexcept
-    {
-        one_or_more_constraint_type* at_least_one_fnd;
-        mutually_exclusive_constraint_type* mutually_excl;
-
-        if ((at_least_one_fnd = dynamic_cast<one_or_more_constraint_type*>(arg)) != nullptr)
-        {
-            speed::memory::destruct_and_deallocate(at_least_one_found_type_alloc_,
-                                                   at_least_one_fnd);
-        }
-        else if ((mutually_excl = dynamic_cast<mutually_exclusive_constraint_type*>(arg)) != nullptr)
-        {
-            speed::memory::destruct_and_deallocate(mutually_exclusive_type_alloc_,
-                                                   mutually_excl);
-        }
-
-        arg = nullptr;
-    }
-
-    /**
      * @brief       Exit the program with the value specified.
      * @param       val : Value that the program will return.
      */
@@ -1137,10 +1076,10 @@ private:
     }
 
     /**
-     * @brief       Parse the specified key arg.
+     * @brief       Parse the specified key argument.
      * @param       argc : Reference to the number of arguments found in the program call.
      * @param       argv : Arguments found in the program call.
-     * @param       ky_arg : The key arg to parse.
+     * @param       ky_arg : The key argument to parse.
      * @param       cur_idx : The current index checked in argv.
      * @param       pos_increment : How much the index will be increased afther the parsing.
      */
@@ -1242,7 +1181,7 @@ private:
         err_fnd = false;
         for (auto& constrnt : constrnts_)
         {
-            if (constrnt->violed())
+            if (constrnt.is_violed())
             {
                 err_fnd = true;
                 err_flgs_.set(arg_parser_error_flags::ARGS_CONSTRAINTS_ERROR);
@@ -1266,7 +1205,7 @@ private:
         {
             if ((ky_arg = dynamic_cast<key_arg_type*>(bse_arg)) != nullptr)
             {
-                ky_arg->update_prefixes();
+                ky_arg->update_prefixes_length();
             }
         }
     }
@@ -1377,6 +1316,15 @@ private:
         }
         
         return nullptr;
+    }
+    
+    /**
+     * @brief       Retrieves the list of argument constraints.
+     * @return      A reference to the list containing pointers to the argument constraint types.
+     */
+    [[nodiscard]] const list_type<arg_constraint_type>& get_constraints() const noexcept
+    {
+        return constrnts_;
     }
 
     /**
@@ -1631,7 +1579,7 @@ private:
     /**
      * @brief       Allows knowing whether a string can't be an argument value due to the
      *              presece of a prefix while the value argument doesn't allow it.
-     * @param       val_arg : The value arg to consider for the checking.
+     * @param       val_arg : The value argument to consider for the checking.
      * @param       str : The string to check.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
@@ -1719,7 +1667,7 @@ private:
 
     /**
      * @brief       Allows knowing whether a string can be interpreted as an argument value.
-     * @param       val_arg : The value arg that the value is currecntly related.
+     * @param       val_arg : The value argument that the value is currecntly related.
      * @param       str : The string to check.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
@@ -1872,24 +1820,19 @@ private:
         }
 
         std::cout << " ";
-
-        for (auto it = constrnts_.begin(); ; )
+        
+        if (constrnts_.size() > 1)
         {
-            (*it)->print_usage();
-
-            if (++it != constrnts_.end())
-            {
-                std::cout << " ";
-            }
-            else
-            {
-                break;
-            }
+            std::cout << "{CONSTRAINTS}";
+        }
+        else
+        {
+            std::cout << "{CONSTRAINT}";
         }
     }
 
 private:
-    /** Map allowing access to a base arg from one of its keys. */
+    /** Map allowing access to a base argument from one of its keys. */
     unordered_map_type<string_type, base_arg_type*> bse_arg_map_;
 
     /** Map allowing access to a help menu from its key. */
@@ -1913,11 +1856,11 @@ private:
     /** Contains all the keyless arguments. */
     vector_type<keyless_arg_type*> kyless_arg_list_;
 
-    /** Collection of arguments constraints. */
-    vector_type<arg_constraint_type*> constrnts_;
-
     /** Contains the unrecognized arguments if an error happen. */
     vector_type<string_type> unrecog_args_;
+
+    /** Collection of arguments constraints. */
+    list_type<arg_constraint_type> constrnts_;
 
     /** Reference to the first added help argument. */
     help_arg_type* default_hlp_arg_;
@@ -1940,23 +1883,17 @@ private:
     /** Allocator of the key_arg_type. */
     allocator_type<key_arg_type> key_arg_type_alloc_;
 
-    /** Allocator of the help_arg_type. */
-    allocator_type<help_arg_type> help_arg_type_alloc_;
-
-    /** Allocator of the version_arg_type. */
-    allocator_type<version_arg_type> version_arg_type_alloc_;
-
     /** Allocator of the key_value_arg_type. */
     allocator_type<key_value_arg_type> key_value_arg_type_alloc_;
 
     /** Allocator of the keyless_arg_type. */
     allocator_type<keyless_arg_type> keyless_arg_type_alloc_;
 
-    /** Allocator of the at_least_one_found_type. */
-    allocator_type<one_or_more_constraint_type> at_least_one_found_type_alloc_;
+    /** Allocator of the help_arg_type. */
+    allocator_type<help_arg_type> help_arg_type_alloc_;
 
-    /** Allocator of the mutually_exclusive_type. */
-    allocator_type<mutually_exclusive_constraint_type> mutually_exclusive_type_alloc_;
+    /** Allocator of the version_arg_type. */
+    allocator_type<version_arg_type> version_arg_type_alloc_;
     
     friend class basic_arg_key<TpAllocator>;
     friend class basic_arg_value<TpAllocator>;

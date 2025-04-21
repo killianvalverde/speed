@@ -130,6 +130,15 @@ public:
     }
 
     /**
+     * @brief       Get the necessary length to print the name of the argument.
+     * @return      The necessary length to print long argument name.
+     */
+    [[nodiscard]] virtual std::size_t get_name_length() const override
+    {
+        return usage_ky_.size();
+    }
+
+    /**
      * @brief       Get the necessary length to print the usage key.
      * @return      The necessary length to print the usage key.
      */

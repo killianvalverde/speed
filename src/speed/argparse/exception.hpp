@@ -223,10 +223,9 @@ public:
 
 
 /**
- * @brief       Class used to thrown exceptions when the minimum and maximum number of values is 
- *              incoherent.
+ * @brief       Exception class for handling wrong constraint errors.
  */
-class wrong_dependency_exception : public exception
+class wrong_constraint_exception : public exception
 {
 public:
     /**
@@ -241,8 +240,8 @@ public:
 
 
 /**
- * @brief       Class used to thrown exceptions when the minimum and maximum number of values is
- *              incoherent.
+ * @brief       Exception class for handling invalid or incorrect descriptions.
+
  */
 class wrong_description_exception : public exception
 {

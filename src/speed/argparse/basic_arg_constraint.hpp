@@ -31,6 +31,9 @@
 #include <string>
 #include <unordered_set>
 
+#include "../containers/containers.hpp"
+#include "forward_declarations.hpp"
+#include "arg_constraint_flags.hpp"
 #include "basic_arg_parser.hpp"
 #include "basic_base_arg.hpp"
 #include "basic_help_arg.hpp"
@@ -40,7 +43,6 @@
 #include "basic_value_arg.hpp"
 #include "basic_version_arg.hpp"
 #include "exception.hpp"
-#include "forward_declarations.hpp"
 
 
 namespace speed::argparse {
@@ -60,12 +62,13 @@ public:
     /** String type used in the class. */
     using string_type = std::basic_string<char, std::char_traits<char>, allocator_type<char>>;
 
-    /** Unordered set type used in the class. */
-    template<typename TpKey_>
-    using unordered_set_type = std::unordered_set<
-            TpKey_, std::hash<TpKey_>,
-            std::equal_to<TpKey_>,
-            allocator_type<TpKey_>>;
+    /** Vector type used in the class. */
+    template<typename T>
+    using vector_type = std::vector<T, allocator_type<T>>;
+
+    /** Class that represents a bit field */
+    template<typename T>
+    using flags_type = speed::containers::flags<T>;
 
     /** Type that represents an argument key. */
     using arg_key_type = basic_arg_key<TpAllocator>;
@@ -103,16 +106,15 @@ public:
      * @param       kys : The arguments keys in which apply the constraint.
      */
     template<typename... Ts_>
-    explicit basic_arg_constraint(arg_parser_type* arg_parsr, const Ts_&... kys)
-            : bse_args_()
-            , arg_parsr_(arg_parsr)
+    basic_arg_constraint(arg_parser_type* arg_parsr, const Ts_&... kys)
+            : arg_parsr_(arg_parsr)
     {
         base_arg_type* bse_arg;
 
         int foreach[sizeof...(Ts_) + 1] = { (
                 (bse_arg = arg_parsr_->get_base_arg(kys)) == nullptr ?
                         throw key_not_found_exception() :
-                        bse_args_.emplace(bse_arg),
+                        bse_args_.emplace_back(bse_arg),
                 0)... };
     }
     
@@ -131,7 +133,7 @@ public:
     /**
      * @brief       Destructor.
      */
-    virtual ~basic_arg_constraint() = default;
+    ~basic_arg_constraint() = default;
     
     /**
      * @brief       Copy assignment operator.
@@ -148,71 +150,291 @@ public:
     basic_arg_constraint& operator =(basic_arg_constraint&& rhs) noexcept = delete;
     
     /**
-     * @brief       Allows knowing whether a relational constraint is violed.
+     * @brief       Allows knowing whether the constraint is violed.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    virtual bool violed()
+    [[nodiscard]] bool is_violed() const
     {
+        if (flgs_.is_empty())
+        {
+            throw wrong_constraint_exception();
+        }
+        
+        if ((flgs_.is_set(arg_constraint_flags::ONE_OR_MORE_REQUIRED) &&
+                is_one_or_more_required_violed()) ||
+            (flgs_.is_set(arg_constraint_flags::MUTUALLY_EXCLUSIVE) &&
+             is_mutually_exclusive_violed()))
+        {
+            return true;
+        }
+        
         return false;
+    }
+    
+    /**
+     * @brief       Enforces that the set of arguments must be mutually exclusive, meaning only one
+     *              of the arguments in the group can be used at a time.
+     */
+    void set_mutually_exclusive(bool enabl)
+    {
+        if (!enabl)
+        {
+            flgs_.unset(arg_constraint_flags::MUTUALLY_EXCLUSIVE);
+            return;
+        }
+        
+        if (bse_args_.size() <= 1)
+        {
+            throw wrong_constraint_exception();
+        }
+        
+        for (auto& bse_arg : bse_args_)
+        {
+            if (bse_arg->is_flag_set(arg_flags::MANDATORY))
+            {
+                throw wrong_constraint_exception();
+            }
+        }
+        
+        flgs_.set(arg_constraint_flags::MUTUALLY_EXCLUSIVE);
+    }
+    
+    /**
+     * @brief       Enforces that one or more arguments in the group must be provided.
+     */
+    void set_one_or_more_required(bool enabl)
+    {
+        if (!enabl)
+        {
+            flgs_.unset(arg_constraint_flags::ONE_OR_MORE_REQUIRED);
+            return;
+        }
+        
+        if (bse_args_.size() < 2)
+        {
+            throw wrong_constraint_exception();
+        }
+
+        for (auto& bse_arg : bse_args_)
+        {
+            if (bse_arg->is_flag_set(arg_flags::MANDATORY))
+            {
+                throw wrong_constraint_exception();
+            }
+        }
+        
+        flgs_.set(arg_constraint_flags::ONE_OR_MORE_REQUIRED);
     }
 
     /**
-     * @brief       Print the constraint usage.
+     * @brief       Print the constraint.
      */
-    virtual void print_usage()
+    void print_help(
+            std::size_t args_indent,
+            std::size_t max_line_len,
+            std::size_t new_line_indent,
+            std::size_t short_kys_len,
+            std::size_t long_kys_len
+    ) const
     {
+        string_type desc;
+        std::size_t kys_len = 0;
+        std::size_t total_id_len = speed::safety::addm(short_kys_len, long_kys_len);
+        bool arg_printd = false;
+        bool is_mutually_exclusiv = flgs_.is_set(arg_constraint_flags::MUTUALLY_EXCLUSIVE);
+        std::size_t i;
+        
+        if (is_mutually_exclusiv)
+        {
+            desc += "Arguments are mutually exclusive";
+        }
+        if (flgs_.is_set(arg_constraint_flags::ONE_OR_MORE_REQUIRED))
+        {
+            if (is_mutually_exclusiv)
+            {
+                desc += " and at least one is required";
+            }
+            else
+            {
+                desc += "At least one argument is required";
+            }
+        }
+        
+        desc += '.';
+    
+        for (i = args_indent; i > 0; --i)
+        {
+            std::cout << ' ';
+        }
+        
+        for (auto& bse_arg : bse_args_)
+        {
+            if (arg_printd)
+            {
+                std::cout << ", ";
+                bse_arg->print_name();
+                speed::safety::try_addml(&kys_len, bse_arg->get_name_length(), 2);
+            }
+            else
+            {
+                bse_arg->print_name();
+                speed::safety::try_addm(&kys_len, bse_arg->get_name_length());
+                arg_printd = true;
+            }
+        }
+        
+        std::cout << "  ";
+        speed::safety::try_addm(&kys_len, 2);
+        
+        if (kys_len < total_id_len)
+        {
+            for (i = total_id_len - kys_len; i > 0; i--)
+            {
+                std::cout << ' ';
+            }
+            
+            kys_len = total_id_len;
+        }
+        
+        speed::safety::try_addm(&kys_len, args_indent);
+        speed::safety::try_addml(&new_line_indent, args_indent, total_id_len);
+        
+        speed::iostream::print_wrapped(std::cout, desc, max_line_len, new_line_indent, kys_len);
+        std::cout << '\n';
+    }
+    
+    /**
+     * @brief       Print the constraint errors.
+     */
+    virtual void print_errors()
+    {
+        if (flgs_.is_set(arg_constraint_flags::ONE_OR_MORE_REQUIRED))
+        {
+            print_one_or_more_required_errors();
+        }
+        if (flgs_.is_set(arg_constraint_flags::MUTUALLY_EXCLUSIVE))
+        {
+            print_mutually_exclusive_errors();
+        }
+    }
+
+private:
+    /**
+     * @brief       Allows knowing whether a relational constraint is is_violed.
+     * @return      If function was successful true is returned, otherwise false is returned.
+     */
+    bool is_mutually_exclusive_violed() const noexcept
+    {
+        bool fnd = false;
+
+        for (auto& bse_arg : bse_args_)
+        {
+            if (bse_arg->was_found())
+            {
+                if (fnd)
+                {
+                    return true;
+                }
+
+                fnd = true;
+            }
+        }
+
+        return false;
+    }
+    
+    /**
+     * @brief       Allows knowing whether the 'one or more' constraint is is_violed.
+     * @return      If function was successful true is returned, otherwise false is returned.
+     */
+    [[nodiscard]] bool is_one_or_more_required_violed() const noexcept
+    {
+        for (auto& bse_arg : bse_args_)
+        {
+            if (bse_arg->was_found())
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
     
     /**
      * @brief       Print the constraints errors.
      */
-    virtual void print_errors()
+    void print_mutually_exclusive_errors() const
     {
-    }
+        if (!is_mutually_exclusive_violed())
+        {
+            return;
+        }
 
-protected:
-    /**
-     * @brief       Allows knowing whether or not the colors are enabled.
-     * @return      If fucntion is successful true is returned, otherwise false is returned.
-     */
-    [[nodiscard]] virtual inline bool colors_enabled() const noexcept
-    {
-        return arg_parsr_->is_flag_set(arg_parser_flags::USE_COLORS);
+        print_arguments_during_error();
+        
+        std::cout << "The arguments are mutually exclusive.\n";
     }
-
+    
     /**
-     * @brief       Get the base args in which the constraint is applied.
-     * @return      The base args in which the constraint is applied.
+     * @brief       Print the 'one or more' constraint errors.
      */
-    [[nodiscard]] virtual inline unordered_set_type<base_arg_type*>& get_base_args() noexcept
+    void print_one_or_more_required_errors() const
     {
-        return bse_args_;
+        if (!is_one_or_more_required_violed())
+        {
+            return;
+        }
+
+        print_arguments_during_error();
+        
+        std::cout << "At least one of the arguments has to be found.\n";
     }
-
-    /**
-     * @brief       Get the number of arguments concerned by the constraint.
-     * @return      The number of arguments concerned by the constraint.
-     */
-    [[nodiscard]] virtual inline std::size_t get_base_args_size() const noexcept
+    
+    void print_arguments_during_error() const
     {
-        return bse_args_.size();
-    }
+        const string_type* err_name;
+        bool colors_enabld = arg_parsr_->is_flag_set(arg_parser_flags::USE_COLORS);
+        
+        std::cout << arg_parsr_->get_program_name() << ": ";
+        
+        for (auto it = bse_args_.cbegin(); it != bse_args_.cend(); )
+        {
+            err_name = &(*it)->get_error_name();
+            
+            if (!err_name->empty())
+            {
+                if (colors_enabld)
+                {
+                    std::cout << speed::iostream::set_light_red_text;
+                }
+                std::cout << *err_name;
 
-    /**
-     * @brief       Get the program name.
-     * @return      The program name.
-     */
-    [[nodiscard]] virtual inline const string_type& get_program_name() const noexcept
-    {
-        return arg_parsr_->get_program_name();
+                if (++it != bse_args_.cend())
+                {
+                    std::cout << ", ";
+                }
+                else
+                {
+                    std::cout << ": ";
+                }
+                
+                if (colors_enabld)
+                {
+                    std::cout << speed::iostream::set_default_text;
+                }
+            }
+        }
     }
 
 private:
     /** The arguments in which apply the dependencies. */
-    unordered_set_type<base_arg_type*> bse_args_;
+    vector_type<base_arg_type*> bse_args_;
 
     /** Holds a reference to the composite object. */
     arg_parser_type* arg_parsr_;
+    
+    /** Flags that control the behavior and settings of the argument constraint. */
+    flags_type<arg_constraint_flags> flgs_;
 };
 
 

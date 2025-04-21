@@ -178,7 +178,7 @@ public:
             hlp_menu_->unset_flag(help_menu_flags::PRINT_ARGS_KEYS);
         }
 
-        return dynamic_cast<self_type&>(*this);
+        return *this;
     }
 
     /**
@@ -199,7 +199,27 @@ public:
             hlp_menu_->unset_flag(help_menu_flags::PRINT_COMMANDS);
         }
 
-        return dynamic_cast<self_type&>(*this);
+        return *this;
+    }
+    
+    /**
+     * @brief       Enables or disables the printing of constraints in the help menu.
+     * @param       enabl : A boolean value indicating whether to enable or disable the printing of
+     *              constraints. This feature is enabled by default.
+     * @return      A reference to the current object.
+     */
+    self_type& print_constraints(bool enabl)
+    {
+        if (enabl)
+        {
+            hlp_menu_->set_flag(help_menu_flags::PRINT_CONSTRAINTS);
+        }
+        else
+        {
+            hlp_menu_->unset_flag(help_menu_flags::PRINT_CONSTRAINTS);
+        }
+
+        return *this;
     }
 
     /**
@@ -220,7 +240,7 @@ public:
             hlp_menu_->unset_flag(help_menu_flags::PRINT_OPTIONS);
         }
 
-        return dynamic_cast<self_type&>(*this);
+        return *this;
     }
 
     /**
@@ -241,7 +261,7 @@ public:
             hlp_menu_->unset_flag(help_menu_flags::PRINT_USAGE);
         }
 
-        return dynamic_cast<self_type&>(*this);
+        return *this;
     }
 
     /**
@@ -261,7 +281,7 @@ public:
             hlp_menu_->unset_flag(help_menu_flags::PRINT_VALUES);
         }
 
-        return dynamic_cast<self_type&>(*this);
+        return *this;
     }
 
 private:

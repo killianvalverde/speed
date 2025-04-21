@@ -171,6 +171,12 @@ public:
     [[nodiscard]] virtual std::size_t get_long_keys_length() noexcept = 0;
 
     /**
+     * @brief       Get the necessary length to print the name of the argument.
+     * @return      The necessary length to print long argument name.
+     */
+    [[nodiscard]] virtual std::size_t get_name_length() const = 0;
+
+    /**
      * @brief       Get the program name.
      * @return      The program name.
      */

@@ -225,13 +225,16 @@ public:
      */
     void update_max_keys_length_from_key_arg(key_arg_type* ky_arg) noexcept
     {
-        if (max_short_kys_len_ < ky_arg->get_short_keys_length())
+        auto short_kys_len = ky_arg->get_short_keys_length();
+        auto long_kys_len = ky_arg->get_long_keys_length();
+        
+        if (max_short_kys_len_ < short_kys_len)
         {
-            max_short_kys_len_ = ky_arg->get_short_keys_length();
+            max_short_kys_len_ = short_kys_len;
         }
-        if (max_long_kys_len_ < ky_arg->get_long_keys_length())
+        if (max_long_kys_len_ < long_kys_len)
         {
-            max_long_kys_len_ = ky_arg->get_long_keys_length();
+            max_long_kys_len_ = long_kys_len;
         }
     }
 
@@ -241,11 +244,12 @@ public:
      */
     void update_max_keys_length_from_keyless_arg(keyless_arg_type* kyless_arg) noexcept
     {
+        std::size_t short_kys_len = kyless_arg->get_short_keys_length();
         std::size_t totl = max_short_kys_len_ + max_long_kys_len_;
 
-        if (kyless_arg->get_short_keys_length() > totl)
+        if (short_kys_len > totl)
         {
-            max_long_kys_len_ =  kyless_arg->get_short_keys_length() - max_short_kys_len_;
+            max_long_kys_len_ =  short_kys_len - max_short_kys_len_;
         }
     }
 
@@ -280,11 +284,11 @@ public:
 
     /**
      * @brief       Set the indentation after printing new lines.
-     * @param       desc_new_line_indentation : The indentation after printing new lines.
+     * @param       new_line_indent : The indentation after printing new lines.
      */
-    void set_new_line_indentation(std::size_t desc_new_line_indentation)
+    void set_new_line_indentation(std::size_t new_line_indent)
     {
-        new_line_indent_ = desc_new_line_indentation;
+        new_line_indent_ = new_line_indent;
     }
 
     /**
@@ -338,6 +342,7 @@ public:
         print_options();
         print_commands();
         print_values();
+        print_constraints();
         print_epilog();
 
         std::flush(std::cout);
@@ -348,11 +353,10 @@ public:
      */
     void print_usage()
     {
-        if (flgs_.is_not_set(help_menu_flags::PRINT_USAGE))
+        if (flgs_.is_set(help_menu_flags::PRINT_USAGE))
         {
-            return;
+            arg_parsr_->print_usage();
         }
-        arg_parsr_->print_usage();
     }
 
     /**
@@ -360,13 +364,10 @@ public:
      */
     inline void print_description()
     {
-        if (flgs_.is_set(help_menu_flags::PRINT_DESCRIPTION))
+        if (flgs_.is_set(help_menu_flags::PRINT_DESCRIPTION) && !desc_.empty())
         {
-            if (!desc_.empty())
-            {
-                speed::iostream::print_wrapped(std::cout, desc_, max_line_len_, 0);
-                std::cout << "\n\n";
-            }
+            speed::iostream::print_wrapped(std::cout, desc_, max_line_len_, 0);
+            std::cout << "\n\n";
         }
     }
 
@@ -480,17 +481,40 @@ public:
     }
 
     /**
+     * @brief       Print the constraints.
+     */
+    void print_constraints()
+    {
+        if (flgs_.is_not_set(help_menu_flags::PRINT_CONSTRAINTS))
+        {
+            return;
+        }
+        
+        // TODO: Don't print every constraint in every help menu.
+        auto& constrnts = arg_parsr_->get_constraints();
+        if (constrnts.empty())
+        {
+            return;
+        }
+
+        std::cout << "Constraints:\n";
+        
+        for (auto& constrnt : constrnts)
+        {
+            constrnt.print_help(args_indent_, max_line_len_, new_line_indent_, max_short_kys_len_,
+                                max_long_kys_len_);
+        }
+    }
+
+    /**
      * @brief       Print the epilog.
      */
     void print_epilog()
     {
-        if (flgs_.is_set(help_menu_flags::PRINT_EPILOGUE))
+        if (flgs_.is_set(help_menu_flags::PRINT_EPILOGUE) && !epilg_.empty())
         {
-            if (!epilg_.empty())
-            {
-                speed::iostream::print_wrapped(std::cout, epilg_, max_line_len_, 0);
-                std::cout << "\n\n";
-            }
+            speed::iostream::print_wrapped(std::cout, epilg_, max_line_len_, 0);
+            std::cout << "\n\n";
         }
     }
 
