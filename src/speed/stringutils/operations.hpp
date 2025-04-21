@@ -27,6 +27,8 @@
 #ifndef SPEED_STRINGUTILS_OPERATIONS_HPP
 #define SPEED_STRINGUTILS_OPERATIONS_HPP
 
+#include <algorithm>
+#include <array>
 #include <cwctype>
 #include <string>
 #include <type_traits>
