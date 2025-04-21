@@ -39,6 +39,7 @@ namespace speed::system::time {
 class system_time
 {
 public:
+    /** @brief Type alias for a unsigned integer to represent time. */
     using time_type = std::uint16_t;
     
     /**

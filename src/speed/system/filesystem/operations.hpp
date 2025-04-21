@@ -664,7 +664,6 @@ inline bool is_symlink(const wchar_t* file_pth, std::error_code* err_code = null
 /**
  * @brief       Attempts to create a directory.
  * @param       directory_pth : The path of the new directory.
- * @param       mods : Specifies the mode for the new directory.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
@@ -680,7 +679,6 @@ inline bool mkdir(
 /**
  * @brief       Attempts to create a directory.
  * @param       directory_pth : The path of the new directory.
- * @param       mods : Specifies the mode for the new directory.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
@@ -696,7 +694,6 @@ inline bool mkdir(
 /**
  * @brief       Attemps to create a directory path.
  * @param       directory_pth : The path of directories to create.
- * @param       mods : Specifies the mode for the new directories.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
@@ -712,7 +709,6 @@ inline bool mkdir_recursively(
 /**
  * @brief       Attemps to create a directory path.
  * @param       directory_pth : The path of directories to create.
- * @param       mods : Specifies the mode for the new directories.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
@@ -880,7 +876,6 @@ inline bool symlink(
 /**
  * @brief       Attempts to create a regular file.
  * @param       regular_file_pth : The path of the new regular file.
- * @param       mods : Specifies the mode for the new regular file.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
@@ -896,7 +891,6 @@ inline bool touch(
 /**
  * @brief       Attempts to create a regular file.
  * @param       regular_file_pth : The path of the new regular file.
- * @param       mods : Specifies the mode for the new regular file.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
