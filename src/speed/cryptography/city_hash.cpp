@@ -18,8 +18,8 @@
  */
 
 /**
- * @file        speed/cryptography/operations.cpp
- * @brief       operations functions source.
+ * @file        speed/cryptography/city_hash.cpp
+ * @brief       city_hash functions source.
  * @author      Killian Valverde
  * @date        2024/11/01
  */
@@ -33,6 +33,7 @@
 namespace speed::cryptography {
 
 
+/** @cond */
 typedef std::pair<std::uint64_t, std::uint64_t> uint128_t;
 
 
@@ -262,6 +263,7 @@ static std::uint64_t hash_len_33_to_64(const char *s, size_t len)
     b = shift_mix((z + a) * mul + d + h) * mul;
     return b + x;
 }
+/** @endcond */
 
 
 std::uint64_t city_hash_64(const void* ptr, std::size_t sz)
