@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/lowlevel/operations.hpp
+ * @file        operations.hpp
  * @brief       operations header.
  * @author      Killian Valverde
  * @date        2018/10/09
@@ -30,9 +30,7 @@
 #include <cstdint>
 #include <utility>
 
-
 namespace speed::lowlevel {
-
 
 /**
  * @brief       Convert a one-hot encoding number to a binary number.
@@ -56,8 +54,6 @@ constexpr std::uint8_t onehot_to_binary(const TpOnehot& val)
     return 0;
 }
 
-
 }
-
 
 #endif

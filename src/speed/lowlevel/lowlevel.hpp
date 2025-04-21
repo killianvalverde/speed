@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/lowlevel/lowlevel.hpp
+ * @file        lowlevel.hpp
  * @brief       lowlevel main header
  * @author      Killian Valverde
  * @date        2016/01/07
@@ -30,27 +30,20 @@
 #include "enable_bitwise_operators.hpp"
 #include "operations.hpp"
 
-
 namespace speed {
-
 
 /**
  * @brief       Constains lowlevel resources.
  */
 namespace lowlevel {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Constains lowlevel resources.
  */
 namespace low = lowlevel;
-
 #endif
 
-
 }
-
 
 #endif
