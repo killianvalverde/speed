@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/iostream/indentation.hpp
+ * @file        indentation.hpp
  * @brief       indentation class header.
  * @author      Killian Valverde
  * @date        2018/01/10
@@ -29,9 +29,7 @@
 
 #include <iostream>
 
-
 namespace speed::iostream {
-
 
 /**
  * @brief       Class used to print indentation.
@@ -91,7 +89,6 @@ private:
     std::size_t curr_size_;
 };
 
-
 /**
  * @brief       Allows to use an object to print in standard output the value that constains the
  *              indentation.
@@ -113,8 +110,6 @@ std::basic_ostream<TpChar, TpCharTraits>& operator <<(
     return os;
 }
 
-
 }
-
 
 #endif

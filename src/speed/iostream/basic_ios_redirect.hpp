@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/iostream/basic_ios_redirect.hpp
+ * @file        basic_ios_redirect.hpp
  * @brief       basic_ios_redirect class header.
  * @author      Killian Valverde
  * @date        2017/05/19
@@ -31,9 +31,7 @@
 
 #include "../memory/memory.hpp"
 
-
 namespace speed::iostream {
-
 
 /**
  * @brief       Class used to redirect a input/output stream buffer to another one.
@@ -83,6 +81,7 @@ public:
     }
     
     basic_ios_redirect(const basic_ios_redirect&) = delete;
+    
     basic_ios_redirect(basic_ios_redirect&&) = delete;
     
     /**
@@ -100,6 +99,7 @@ public:
     }
     
     basic_ios_redirect& operator =(const basic_ios_redirect&) = delete;
+    
     basic_ios_redirect& operator =(basic_ios_redirect&&) = delete;
     
     /**
@@ -192,16 +192,12 @@ private:
     bool stringstream_constructed_;
 };
 
-
 /** Class used to redirect a 8 bits input/output stream buffer to another one. */
 using ios_redirect = basic_ios_redirect<char>;
-
 
 /** Class used to redirect a 16 bits input/output stream buffer to another one. */
 using wios_redirect = basic_ios_redirect<wchar_t>;
 
-
 }
-
 
 #endif

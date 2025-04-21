@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/iostream/iostream.hpp
+ * @file        iostream.hpp
  * @brief       iostream main header.
  * @author      Killian Valverde
  * @date        2016/08/24
@@ -31,27 +31,20 @@
 #include "indentation.hpp"
 #include "operations.hpp"
 
-
 namespace speed {
-
 
 /**
  * @brief       Contains resources for input and output streams.
  */
 namespace iostream {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contains resources for input and output streams.
  */
 namespace ios = iostream;
-
 #endif
 
-
 }
-
 
 #endif

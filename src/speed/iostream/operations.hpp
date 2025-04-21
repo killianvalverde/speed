@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/iostream/operations.hpp
+ * @file        operations.hpp
  * @brief       operations functions header.
  * @author      Killian Valverde
  * @date        2016/08/24
@@ -32,9 +32,7 @@
 #include "../safety/safety.hpp"
 #include "../system/system.hpp"
 
-
 namespace speed::iostream {
-
 
 /**
  * @brief       Clears the buffers of the given stream. For output streams this discards any
@@ -45,14 +43,12 @@ namespace speed::iostream {
  */
 void fpurge(::FILE* fp) noexcept;
 
-
 /**
  * @brief       Get the current 'std::basic_ostream' object used to print TpChar in standard output.
  * @return      The current 'std::basic_ostream' object used to print TpChar in standard output.
  */
 template<typename TpChar>
 inline std::basic_ostream<TpChar>& get_cout() noexcept;
-
 
 /**
  * @brief       Get the current 'std::ostream' object used to print in standard output.
@@ -64,7 +60,6 @@ inline std::ostream& get_cout<char>() noexcept
     return std::cout;
 }
 
-
 /**
  * @brief       Get the current 'std::wostream' object used to print in standard output.
  * @return      The current 'std::wostream' object used to print in standard output.
@@ -74,7 +69,6 @@ inline std::wostream& get_cout<wchar_t>() noexcept
 {
     return std::wcout;
 }
-
 
 /**
  * @brief       Inserts a new-line character in the stream.
@@ -86,7 +80,6 @@ inline std::basic_ostream<TpChar, TpTraits>& newl(std::basic_ostream<TpChar, TpT
 {
     return os.put(os.widen('\n'));
 }
-
 
 /**
  * @brief       Writes the C string pointed by format to the standard output (stdout). If format
@@ -103,7 +96,6 @@ inline std::basic_ostream<TpChar, TpTraits>& newl(std::basic_ostream<TpChar, TpT
  */
 int printf(const char* formt, ...) noexcept;
 
-
 /**
  * @brief       Writes the C string pointed by format to the standard output (stdout). If format
  *              includes format specifiers (subsequences beginning with %), the additional arguments
@@ -118,7 +110,6 @@ int printf(const char* formt, ...) noexcept;
  *              set to EILSEQ and a negative number is returned.
  */
 int printf(const wchar_t* formt, ...) noexcept;
-
 
 /**
  * @brief       Print a string wrapping if necessary.
@@ -192,7 +183,6 @@ std::basic_ostream<TpChar, TpCharTraits>& print_wrapped(
     return os;
 }
 
-
 /**
  * @brief       Set the default text in terminal.
  * @param       os : Ostream in which set the attribute.
@@ -207,7 +197,6 @@ inline std::basic_ostream<TpChar, TpTraits>& set_default_text(
             stdout, speed::system::terminal::text_attribute::DEFAULT);
     return os;
 }
-
 
 /**
  * @brief       Set black text in terminal.
@@ -224,7 +213,6 @@ inline std::basic_ostream<TpChar, TpTraits>& set_black_text(
     return os;
 }
 
-
 /**
  * @brief       Set red text in terminal.
  * @param       os : Ostream in which set the attribute.
@@ -239,7 +227,6 @@ inline std::basic_ostream<TpChar, TpTraits>& set_red_text(
             stdout, speed::system::terminal::text_attribute::RED);
     return os;
 }
-
 
 /**
  * @brief       Set green text in terminal.
@@ -256,7 +243,6 @@ inline std::basic_ostream<TpChar, TpTraits>& set_green_text(
     return os;
 }
 
-
 /**
  * @brief       Set brown text in terminal.
  * @param       os : Ostream in which set the attribute.
@@ -271,7 +257,6 @@ inline std::basic_ostream<TpChar, TpTraits>& set_brown_text(
             stdout, speed::system::terminal::text_attribute::BROWN);
     return os;
 }
-
 
 /**
  * @brief       Set blue text in terminal.
@@ -288,7 +273,6 @@ inline std::basic_ostream<TpChar, TpTraits>& set_blue_text(
     return os;
 }
 
-
 /**
  * @brief       Set purple text in terminal.
  * @param       os : Ostream in which set the attribute.
@@ -303,7 +287,6 @@ inline std::basic_ostream<TpChar, TpTraits>& set_purple_text(
             stdout, speed::system::terminal::text_attribute::PURPLE);
     return os;
 }
-
 
 /**
  * @brief       Set cyan text in terminal.
@@ -320,7 +303,6 @@ inline std::basic_ostream<TpChar, TpTraits>& set_cyan_text(
     return os;
 }
 
-
 /**
  * @brief       Set light gray text in terminal.
  * @param       os : Ostream in which set the attribute.
@@ -335,7 +317,6 @@ inline std::basic_ostream<TpChar, TpTraits>& set_light_gray_text(
             stdout, speed::system::terminal::text_attribute::LIGHT_GRAY);
     return os;
 }
-
 
 /**
  * @brief       Set dark gray text in terminal.
@@ -352,7 +333,6 @@ inline std::basic_ostream<TpChar, TpTraits>& set_dark_gray_text(
     return os;
 }
 
-
 /**
  * @brief       Set light red text in terminal.
  * @param       os : Ostream in which set the attribute.
@@ -367,7 +347,6 @@ inline std::basic_ostream<TpChar, TpTraits>& set_light_red_text(
             stdout, speed::system::terminal::text_attribute::LIGHT_RED);
     return os;
 }
-
 
 /**
  * @brief       Set light green text in terminal.
@@ -384,7 +363,6 @@ inline std::basic_ostream<TpChar, TpTraits>& set_light_green_text(
     return os;
 }
 
-
 /**
  * @brief       Set yellow text in terminal.
  * @param       os : Ostream in which set the attribute.
@@ -399,7 +377,6 @@ inline std::basic_ostream<TpChar, TpTraits>& set_yellow_text(
             stdout, speed::system::terminal::text_attribute::YELLOW);
     return os;
 }
-
 
 /**
  * @brief       Set light blue text in terminal.
@@ -416,7 +393,6 @@ inline std::basic_ostream<TpChar, TpTraits>& set_light_blue_text(
     return os;
 }
 
-
 /**
  * @brief       Set light purple text in terminal.
  * @param       os : Ostream in which set the attribute.
@@ -431,7 +407,6 @@ inline std::basic_ostream<TpChar, TpTraits>& set_light_purple_text(
             stdout, speed::system::terminal::text_attribute::LIGHT_PURPLE);
     return os;
 }
-
 
 /**
  * @brief       Set light cyan text in terminal.
@@ -448,7 +423,6 @@ inline std::basic_ostream<TpChar, TpTraits>& set_light_cyan_text(
     return os;
 }
 
-
 /**
  * @brief       Set white text in terminal.
  * @param       os : Ostream in which set the attribute.
@@ -464,8 +438,6 @@ inline std::basic_ostream<TpChar, TpTraits>& set_white_text(
     return os;
 }
 
-
 }
-
 
 #endif
