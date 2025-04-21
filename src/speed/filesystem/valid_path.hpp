@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/filesystem/valid_path.hpp
+ * @file        valid_path.hpp
  * @brief       valid_path main header.
  * @author      Killian Valverde
  * @date        2024/05/20
@@ -30,9 +30,7 @@
 #include <filesystem>
 #include <system_error>
 
-
 namespace speed::filesystem {
-
 
 /**
  * @brief       Path class that allows performing validity checks throught decorators.
@@ -54,7 +52,6 @@ public:
                 speed::system::filesystem::access_modes::EXISTS, err_code);
     }
 };
-
 
 /**
  * @brief       Path class decorator that checks whether the path can be read.
@@ -83,7 +80,6 @@ public:
     }
 };
 
-
 /**
  * @brief       Path class decorator that checks whether the path can be written.
  */
@@ -110,7 +106,6 @@ public:
         return false;
     }
 };
-
 
 /**
  * @brief       Path class decorator that checks whether the path can be executed.
@@ -139,7 +134,6 @@ public:
     }
 };
 
-
 /**
  * @brief       Path class decorator that checks whether the path is a regular file.
  */
@@ -166,7 +160,6 @@ public:
     }
 };
 
-
 /**
  * @brief       Path class decorator that checks whether the path is a directory.
  */
@@ -192,7 +185,6 @@ public:
         return false;
     }
 };
-
 
 /**
  * @brief       Path class decorator that checks whether the regular file path can be used as an
@@ -224,7 +216,6 @@ public:
     }
 };
 
-
 /**
  * @brief       Path class decorator that checks whether the directory path can be used as an
  *              output.
@@ -254,7 +245,6 @@ public:
         return false;
     }
 };
-
 
 /** Regular file path type. */
 using regular_file_path = regular_file_path_decorator<valid_path>;
@@ -312,8 +302,6 @@ using output_regular_file_path = output_regular_file_path_decorator<valid_path>;
 /** Directory path type that can be used as an output file. */
 using output_directory_path = output_directory_path_decorator<valid_path>;
 
-
 }
-
 
 #endif

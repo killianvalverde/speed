@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/filesystem/directory_iteration.hpp
+ * @file        directory_iteration.hpp
  * @brief       directory_iteration class header.
  * @author      Killian Valverde
  * @date        2024/10/15
@@ -37,9 +37,7 @@
 #include "../type_casting/type_casting.hpp"
 #include "operations.hpp"
 
-
 namespace speed::filesystem {
-
 
 /**
  * @brief       Class that configures and produce directories iterators.
@@ -433,8 +431,6 @@ private:
     friend class const_iterator;
 };
 
-
 }
-
 
 #endif
