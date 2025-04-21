@@ -390,6 +390,9 @@ private:
         std::cout << "At least one of the arguments has to be found.\n";
     }
     
+    /**
+     * @brief       Prints the arguments during an error with optional color formatting.
+     */
     void print_arguments_during_error() const
     {
         const string_type* err_name;
