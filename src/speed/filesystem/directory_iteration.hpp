@@ -334,8 +334,8 @@ public:
     }
 
     /**
-     * @brief       Specify the level of recursivity that .
-     * @param       recursivity_level : Access modes that the files are mandatory to have.
+     * @brief       Specify the level of recursivity that.
+     * @param       recursivity_levl : Access modes that the files are mandatory to have.
      * @return      The object who call the method.
      */
     inline directory_iteration& recursivity_level(std::uint64_t recursivity_levl)
