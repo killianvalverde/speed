@@ -531,7 +531,7 @@ TEST_F(argparse_arg_parser, parse_grouping)
 }
 
 
-TEST_F(argparse_arg_parser, parse_alof_constraint)
+TEST_F(argparse_arg_parser, parse_one_or_more_required_constraint)
 {
     std::vector<const char*> argv1 = {
         "speed"
@@ -551,7 +551,8 @@ TEST_F(argparse_arg_parser, parse_alof_constraint)
     ap.add_key_arg("-r", "--recursive")
             .description("Execute the process in a recursive way.");
     
-    ap.add_constraint_one_or_more("-a", "-l", "-r");
+    ap.add_constraint("-a", "-l", "-r")
+            .one_or_more_required(true);
 
     ap.parse_args(argv1.size(), argv1);
     EXPECT_TRUE(ap.has_errors());
@@ -583,7 +584,8 @@ TEST_F(argparse_arg_parser, parse_mutually_exclusive_constraint)
     ap.add_key_arg("-r", "--recursive")
             .description("Execute the process in a recursive way.");
     
-    ap.add_constraint_mutually_exclusive("-a", "-l", "-r");
+    ap.add_constraint("-a", "-l", "-r")
+            .mutually_exclusive(true);
 
     ap.parse_args(argv1.size(), argv1);
     EXPECT_TRUE(ap.was_found("-a"));
@@ -625,8 +627,9 @@ TEST_F(argparse_arg_parser, parse_all_constraints)
     ap.add_key_arg("-r", "--recursive")
             .description("Execute the process in a recursive way.");
     
-    ap.add_constraint_one_or_more("-a", "-l", "-r");
-    ap.add_constraint_mutually_exclusive("-a", "-l", "-r");
+    ap.add_constraint("-a", "-l", "-r")
+            .mutually_exclusive(true)
+            .one_or_more_required(true);
 
     ap.parse_args(argv1.size(), argv1);
     EXPECT_TRUE(ap.was_found("-a"));
