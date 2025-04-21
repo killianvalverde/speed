@@ -18,7 +18,7 @@
  */
 
 /**
- *  @file       speed/argparse/basic_arg_constraint.hpp
+ *  @file       basic_arg_constraint.hpp
  *  @brief      basic_arg_constraint class header.
  *  @author     Killian Valverde
  *  @date       2017/10/21
@@ -44,9 +44,7 @@
 #include "basic_version_arg.hpp"
 #include "exception.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Class used to represent the base of an argument constraint.
@@ -440,8 +438,6 @@ private:
     flags_type<arg_constraint_flags> flgs_;
 };
 
-
 }
-
 
 #endif

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/argparse.hpp
+ * @file        argparse.hpp
  * @brief       argparse main header
  * @author      Killian Valverde
  * @date        2016/01/03
@@ -29,27 +29,20 @@
 
 #include "basic_arg_parser.hpp"
 
-
 namespace speed {
-
 
 /**
  * @brief       Contians all argument parser resources.
  */
 namespace argparse {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contians all argument parser resources.
  */
 namespace ap = argparse;
-
 #endif
 
-
 }
-
 
 #endif

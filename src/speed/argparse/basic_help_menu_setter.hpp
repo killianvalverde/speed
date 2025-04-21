@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_help_menu_setter.hpp
+ * @file        basic_help_menu_setter.hpp
  * @brief       basic_help_menu_setter class header.
  * @author      Killian Valverde
  * @date        2024/05/08
@@ -32,9 +32,7 @@
 
 #include "basic_help_menu.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief        Class allowing configuring a help menu.
@@ -289,8 +287,6 @@ private:
     help_menu_type* hlp_menu_;
 };
 
-
 }
-
 
 #endif

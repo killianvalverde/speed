@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_base_arg.hpp
+ * @file        basic_base_arg.hpp
  * @brief       basic_base_arg class header.
  * @author      Killian Valverde
  * @date        2015/12/28
@@ -40,9 +40,7 @@
 #include "exception.hpp"
 #include "forward_declarations.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Class that represents the base of the arguments hierarchy.
@@ -533,8 +531,6 @@ private:
     flags_type<arg_error_flags> err_flgs_;
 };
 
-
 }
-
 
 #endif

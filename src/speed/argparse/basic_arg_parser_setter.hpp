@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_arg_parser_setter.hpp
+ * @file        basic_arg_parser_setter.hpp
  * @brief       basic_arg_parser_setter class header.
  * @author      Killian Valverde
  * @date        2024/05/09
@@ -32,9 +32,7 @@
 #include "arg_parser_flags.hpp"
 #include "basic_arg_parser.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief        Class allowing configuring an argument parser.
@@ -249,8 +247,6 @@ private:
     arg_parser_type* arg_parsr_;
 };
 
-
 }
-
 
 #endif

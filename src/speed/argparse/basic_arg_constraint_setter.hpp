@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_arg_constraint_setter.hpp
+ * @file        basic_arg_constraint_setter.hpp
  * @brief       basic_arg_constraint_setter class header.
  * @author      Killian Valverde
  * @date        2025/04/21
@@ -32,9 +32,7 @@
 
 #include "basic_arg_constraint.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief        Class allowing configuring an argument constraint setter.
@@ -122,8 +120,6 @@ private:
     arg_constraint_type* arg_constrnt_;
 };
 
-
 }
-
 
 #endif

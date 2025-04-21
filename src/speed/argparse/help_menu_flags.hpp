@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/help_menu_flags.hpp
+ * @file        help_menu_flags.hpp
  * @brief       help_menu_flags enum header.
  * @author      Killian Valverde
  * @date        2024/04/29
@@ -29,9 +29,7 @@
 
 #include "../lowlevel/lowlevel.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Contains all help menu flags constants.
@@ -80,13 +78,10 @@ enum class help_menu_flags : std::uint16_t
     )
 };
 
-
 /** Contains all help menu flags constants. Alias of 'help_menu_flags' enumeration. */
 using hmf_t = help_menu_flags;
 
-
 }
-
 
 /** @cond */
 namespace speed::lowlevel {
@@ -97,6 +92,5 @@ struct enable_bitwise_operators<speed::argparse::help_menu_flags>
 };
 }
 /** @endcond */
-
 
 #endif

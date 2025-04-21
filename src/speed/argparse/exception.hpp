@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/exception.hpp
+ * @file        exception.hpp
  * @brief       argparse exception class header.
  * @author      Killian Valverde
  * @date        2016/01/01
@@ -29,9 +29,7 @@
 
 #include "../exceptions/exceptions.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       The base class that the argparse classes will use to throw exceptions.
@@ -49,7 +47,6 @@ public:
     }
 };
 
-
 /**
  * @brief       Class used to thrown exceptions when keys vectors and keys to add are empty.
  */
@@ -65,7 +62,6 @@ public:
         return "no key specified exception";
     }
 };
-
 
 /**
  * @brief       Class used to thrown exceptions when an argument value is not found.
@@ -83,7 +79,6 @@ public:
     }
 };
 
-
 /**
  * @brief       Class used to thrown exceptions when keys vectors to add are empty.
  */
@@ -100,7 +95,6 @@ public:
     }
 };
 
-
 /**
  * @brief       Class used to thrown exceptions when a new key already exists.
  */
@@ -116,7 +110,6 @@ public:
         return "key already exists exception";
     }
 };
-
 
 /**
  * @brief       Class used to thrown exceptions when a version argument exists and the user try to
@@ -135,7 +128,6 @@ public:
     }
 };
 
-
 /**
  * @brief       Class used to thrown exceptions when a help menu exists and the user try to
  *              add another.
@@ -153,7 +145,6 @@ public:
     }
 };
 
-
 /**
  * @brief       Class used to thrown exceptions when an argument spedified doesn't exists.
  */
@@ -169,7 +160,6 @@ public:
         return "key not found exception";
     }
 };
-
 
 /**
  * @brief       Class used to thrown exceptions when a help menu is not found.
@@ -187,7 +177,6 @@ public:
     }
 };
 
-
 /**
  * @brief       Class used to thrown exceptions when an argument value is not found.
  */
@@ -203,7 +192,6 @@ public:
         return "value not found exception";
     }
 };
-
 
 /**
  * @brief       Class used to thrown exceptions when a help menu is not found.
@@ -221,7 +209,6 @@ public:
     }
 };
 
-
 /**
  * @brief       Exception class for handling wrong constraint errors.
  */
@@ -237,7 +224,6 @@ public:
         return "wrong dependency exception";
     }
 };
-
 
 /**
  * @brief       Exception class for handling invalid or incorrect descriptions.
@@ -256,7 +242,6 @@ public:
     }
 };
 
-
 /**
  * @brief       Class used to thrown exceptions when the minimum and maximum number of values is 
  *              incoherent.
@@ -273,7 +258,6 @@ public:
         return "wrong min max interval exception";
     }
 };
-
 
 /**
  * @brief       Class used to thrown exceptions when the minimum and maximum number of values is
@@ -292,8 +276,6 @@ public:
     }
 };
 
-
 }
-
 
 #endif

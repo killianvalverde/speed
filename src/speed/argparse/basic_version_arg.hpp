@@ -18,7 +18,7 @@
  */
 
 /**
- * @file       speed/argparse/basic_version_arg.hpp
+ * @file       basic_version_arg.hpp
  * @brief      basic_version_arg class header.
  * @author     Killian Valverde
  * @date       2015/12/30
@@ -36,9 +36,7 @@
 #include "basic_base_arg.hpp"
 #include "basic_key_arg.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Class that represents arguments to get the version information.
@@ -135,8 +133,6 @@ private:
     string_type vers_information_;
 };
 
-
 }
-
 
 #endif

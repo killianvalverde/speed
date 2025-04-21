@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/arg_value_error_flags.hpp
+ * @file        arg_value_error_flags.hpp
  * @brief       arg_value_error_flags enum class header.
  * @author      Killian Valverde
  * @date        2016/08/06
@@ -29,9 +29,7 @@
 
 #include "../lowlevel/lowlevel.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Contains all argument value error flags constants.
@@ -54,14 +52,11 @@ enum class arg_value_error_flags : std::uint8_t
     ALL = 0x7
 };
 
-
 /** Contains all argument value error flags constants. Alias of 'arg_value_error_flags'
  *  enumeration. */
 using avef_t = arg_value_error_flags;
 
-
 }
-
 
 /** @cond */
 namespace speed::lowlevel {
@@ -72,6 +67,5 @@ struct enable_bitwise_operators<speed::argparse::arg_value_error_flags>
 };
 }
 /** @endcond */
-
 
 #endif

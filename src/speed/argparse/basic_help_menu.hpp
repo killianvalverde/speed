@@ -18,7 +18,7 @@
  */
 
 /**
- *  @file       speed/argparse/basic_help_menu.hpp
+ *  @file       basic_help_menu.hpp
  *  @brief      basic_help_menu class header.
  *  @author     Killian Valverde
  *  @date       2024/04/16
@@ -44,9 +44,7 @@
 #include "forward_declarations.hpp"
 #include "help_menu_flags.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Class used to represent a help menu.
@@ -575,8 +573,6 @@ private:
     flags_type<help_menu_flags> flgs_;
 };
 
-
 }
-
 
 #endif

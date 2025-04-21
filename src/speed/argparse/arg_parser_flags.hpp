@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/arg_parser_flags.hpp
+ * @file        arg_parser_flags.hpp
  * @brief       arg_parser_flags enum header.
  * @author      Killian Valverde
  * @date        2016/08/07
@@ -29,9 +29,7 @@
 
 #include "../lowlevel/lowlevel.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Contains all argument parser flags constants.
@@ -64,13 +62,10 @@ enum class arg_parser_flags : std::uint8_t
     ),
 };
 
-
 /** Contains all argument parser flags constants. Alias of 'arg_parser_flags' enumeration. */
 using apf_t = arg_parser_flags;
 
-
 }
-
 
 /** @cond */
 namespace speed::lowlevel {
@@ -81,6 +76,5 @@ struct enable_bitwise_operators<speed::argparse::arg_parser_flags>
 };
 }
 /** @endcond */
-
 
 #endif

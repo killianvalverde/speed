@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_type_caster.hpp
+ * @file        basic_type_caster.hpp
  * @brief       basic_type_caster main header.
  * @author      Killian Valverde
  * @date        2024/05/15
@@ -42,9 +42,7 @@
 
 #include "../type_casting/type_casting.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Classs used as a type casting strategy holder.
@@ -1099,8 +1097,6 @@ private:
     unordered_multiset_type* holdr_;
 };
 
-
 }
-
 
 #endif

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_value_arg.hpp
+ * @file        basic_value_arg.hpp
  * @brief       basic_value_arg class header.
  * @author      Killian Valverde
  * @date        2016/03/10
@@ -41,9 +41,7 @@
 #include "exception.hpp"
 #include "forward_declarations.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Class that represents arguments that have values.
@@ -901,8 +899,6 @@ private:
     bool max_vals_auto_update_;
 };
 
-
 }
-
 
 #endif

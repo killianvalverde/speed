@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_key_arg.hpp
+ * @file        basic_key_arg.hpp
  * @brief       basic_key_arg class header.
  * @author      Killian Valverde
  * @date        2016/03/10
@@ -38,9 +38,7 @@
 #include "exception.hpp"
 #include "forward_declarations.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Class that represents arguments that have keys.
@@ -417,8 +415,6 @@ private:
     std::size_t long_kys_len_;
 };
 
-
 }
-
 
 #endif

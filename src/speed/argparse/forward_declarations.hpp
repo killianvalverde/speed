@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/forward_declarations.hpp
+ * @file        forward_declarations.hpp
  * @brief       forward_declarations header.
  * @author      Killian Valverde
  * @date        2018/10/27
@@ -27,9 +27,7 @@
 #ifndef SPEED_ARGPARSE_FORWARD_DECLARATIONS_HPP
 #define SPEED_ARGPARSE_FORWARD_DECLARATIONS_HPP
 
-
 namespace speed::argparse {
-
 
 template<typename TpAllocator>
 class basic_arg_key;
@@ -100,8 +98,6 @@ class basic_help_menu_setter;
 template<typename TpAllocator>
 class basic_arg_parser_setter;
 
-
 }
-
 
 #endif

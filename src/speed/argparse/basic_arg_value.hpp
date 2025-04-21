@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_arg_value.hpp
+ * @file        basic_arg_value.hpp
  * @brief       basic_arg_value class header.
  * @author      Killian Valverde
  * @date        2015/12/31
@@ -41,9 +41,7 @@
 #include "basic_value_arg.hpp"
 #include "forward_declarations.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Class that represents a value for an argument.
@@ -319,9 +317,7 @@ private:
     friend class basic_value_arg<TpAllocator>;
     friend class basic_arg_parser<TpAllocator>;
 };
-    
-    
-}
 
+}
 
 #endif

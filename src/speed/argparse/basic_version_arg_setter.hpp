@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_version_arg_setter.hpp
+ * @file        basic_version_arg_setter.hpp
  * @brief       basic_version_arg_setter class header.
  * @author      Killian Valverde
  * @date        2024/05/06
@@ -36,9 +36,7 @@
 #include "basic_key_arg_setter.hpp"
 #include "basic_version_arg.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief        Class allowing configuring a version argument.
@@ -234,8 +232,6 @@ public:
     }
 };
 
-
 }
-
 
 #endif

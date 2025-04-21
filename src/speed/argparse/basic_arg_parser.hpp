@@ -18,7 +18,7 @@
  */
 
 /**
- *  @file       speed/argparse/basic_arg_parser.hpp
+ *  @file       basic_arg_parser.hpp
  *  @brief      basic_arg_parser class header.
  *  @author     Killian Valverde
  *  @date       2015/12/31
@@ -58,9 +58,7 @@
 #include "basic_version_arg.hpp"
 #include "basic_version_arg_setter.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Class used to parse arguments.
@@ -1909,12 +1907,9 @@ private:
     friend class basic_arg_parser_setter<TpAllocator>;
 };
 
-
 /** Class used to parse arguments. */
 using arg_parser = basic_arg_parser<std::allocator<int>>;
 
-
 }
-
 
 #endif

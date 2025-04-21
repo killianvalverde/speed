@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/arg_constraint_flags.hpp
+ * @file        arg_constraint_flags.hpp
  * @brief       arg_constraint_flags enum header.
  * @author      Killian Valverde
  * @date        2025/04/20
@@ -29,9 +29,7 @@
 
 #include "../lowlevel/lowlevel.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Contains all argument constraint flags constants.
@@ -51,13 +49,10 @@ enum class arg_constraint_flags : std::uint8_t
     ALL = 0x3
 };
 
-
 /** Contains all argument constraint flags constants. */
 using acf_t = arg_constraint_flags;
 
-
 }
-
 
 /** @cond */
 namespace speed::lowlevel {
@@ -68,6 +63,5 @@ struct enable_bitwise_operators<speed::argparse::arg_constraint_flags>
 };
 }
 /** @endcond */
-
 
 #endif

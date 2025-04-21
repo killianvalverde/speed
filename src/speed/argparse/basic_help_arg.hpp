@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_help_arg.hpp
+ * @file        basic_help_arg.hpp
  * @brief       basic_help_arg class header.
  * @author      Killian Valverde
  * @date        2015/12/30
@@ -41,9 +41,7 @@
 #include "exception.hpp"
 #include "forward_declarations.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Class that represents arguments that print help information.
@@ -205,9 +203,7 @@ private:
     /** Help menus that can be triggered under conditions. */
     vector_type<pair_type<regex_type, string_type>> hlp_menus_triggers_;
 };
-    
-    
-}
 
+}
 
 #endif

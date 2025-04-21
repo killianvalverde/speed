@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_keyless_arg_setter.hpp
+ * @file        basic_keyless_arg_setter.hpp
  * @brief       basic_keyless_arg_setter class header.
  * @author      Killian Valverde
  * @date        2024/05/06
@@ -34,9 +34,7 @@
 #include "basic_keyless_arg.hpp"
 #include "basic_value_arg_setter.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief        Class allowing configuring a keyless argument.
@@ -117,8 +115,6 @@ public:
     basic_keyless_arg_setter& operator =(basic_keyless_arg_setter&& rhs) noexcept = default;
 };
 
-
 }
-
 
 #endif

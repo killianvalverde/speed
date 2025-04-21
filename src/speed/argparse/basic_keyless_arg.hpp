@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_keyless_arg.hpp
+ * @file        basic_keyless_arg.hpp
  * @brief       basic_keyless_arg class header.
  * @author      Killian Valverde
  * @date        2016/03/11
@@ -37,9 +37,7 @@
 #include "basic_value_arg.hpp"
 #include "forward_declarations.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Class that represents arguments without keys.
@@ -240,8 +238,6 @@ private:
     string_type usage_ky_;
 };
 
-
 }
-
 
 #endif
