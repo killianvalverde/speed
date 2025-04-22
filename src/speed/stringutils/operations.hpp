@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/stringutils/operations.hpp
+ * @file        operations.hpp
  * @brief       stringutils operations functions header.
  * @author      Killian Valverde
  * @date        2016/01/08
@@ -37,9 +37,7 @@
 #include "forward_declarations.hpp"
 #include "../type_traits/type_traits.hpp"
 
-
 namespace speed::stringutils {
-
 
 /**
  * @brief       Copies the C string pointed by source into the array pointed by destination,
@@ -65,7 +63,6 @@ TpDestinationChar* strcpy(TpDestinationChar* dest, const TpSourceChar* src) noex
     
     return orig_dest;
 }
-
 
 /**
  * @brief       Copies the C string first cnt characters of source to destination. If the end of the
@@ -105,7 +102,6 @@ TpDestinationChar* strncpy(
     return orig_dest;
 }
 
-
 /**
  * @brief       Copies the C string pointed by source at the end of the array pointed by
  *              destination, including the terminating null character (and stopping at that point).
@@ -134,7 +130,6 @@ TpDestinationChar* strcat(TpDestinationChar* dest, const TpSourceChar* src) noex
     
     return orig_dest;
 }
-
 
 /**
  * @brief       Appended the C string first cnt characters of source to destination. If the end of
@@ -181,7 +176,6 @@ TpDestinationChar* strncat(
     return orig_dest;
 }
 
-
 /**
  * @brief       Returns the length of a C string str.
  * @param       str : A C string.
@@ -203,7 +197,6 @@ template<typename TpChar>
     return len;
 }
 
-
 /**
  * @brief       Returns the length of a string.
  * @param       str : A string.
@@ -216,7 +209,6 @@ template<typename TpChar, typename TpCharTraits, typename TpCharAlloc>
 {
     return str.length();
 }
-
 
 /**
  * @brief       Compare the target string to the destination.
@@ -253,7 +245,6 @@ template<typename TpSourceChar, typename TpTargetChar>
     }
     return 1;
 }
-
 
 /**
  * @brief       Compare the first nbr characters of source to the destination.
@@ -306,7 +297,6 @@ template<typename TpSourceChar, typename TpTargetChar>
     return 0;
 }
 
-
 /**
  * @brief       Returns a pointer to the first occurrence of a value in the C string str.
  * @param       str : The C string.
@@ -332,7 +322,6 @@ template<typename TpChar, typename TpIntegral>
     
     return nullptr;
 }
-
 
 /**
  * @brief       Returns a pointer to the first occurrence of a value in the C string str. Only the
@@ -364,7 +353,6 @@ template<typename TpChar, typename TpIntegral>
     return nullptr;
 }
 
-
 /**
  * @brief       Returns a pointer to the last occurrence of a value in the C string str.
  * @param       str : The C string.
@@ -392,7 +380,6 @@ template<typename TpChar, typename TpIntegral>
     
     return lst;
 }
-
 
 /**
  * @brief       Returns a pointer to the last occurrence of a value in the C string str. Only the
@@ -424,7 +411,6 @@ template<typename TpChar, typename TpIntegral>
     
     return lst;
 }
-
 
 /**
  * @brief       Searches for the first occurrence of a substring in a string.
@@ -463,7 +449,6 @@ const TpChar* strstr(const TpChar* str, const TpChar* substr)
     return nullptr;
 }
 
-
 /**
  * @brief       Erase the characters after the last specified value in the C string.
  * @param       str : The C string.
@@ -497,7 +482,6 @@ TpChar* strcut(TpChar* str, TpIntegral val, bool erase_val) noexcept
     return nullptr;
 }
 
-
 /**
  * @brief       Escapes special regex characters in a string.
  * @param       str : Pointer to a null-terminated C-style string.
@@ -530,7 +514,6 @@ template<typename TpChar>
     return res;
 }
 
-
 /**
  * @brief       Escapes special regex characters in a string.
  * @param       str : The input `std::basic_string` containing characters to be escaped.
@@ -561,7 +544,6 @@ template<typename TpChar, typename TpCharTraits, typename TpCharAlloc>
     
     return res;
 }
-
 
 /**
  * @brief       Get a C string without the values lower than the specified value.
@@ -611,7 +593,6 @@ for_end:
     return str;
 }
 
-
 /**
  * @brief       Discard the last character of a C string if it is the same that the specified one.
  * @param       str : The C string.
@@ -634,7 +615,6 @@ bool strrmlast(TpChar* str, TpIntegral val) noexcept
     
     return false;
 }
-
 
 /**
  * @brief       Split a C string by a specified separator.
@@ -701,7 +681,6 @@ template<
     return values;
 }
 
-
 /**
  * @brief       Split a C string by a specified separator.
  * @param       str : The C string to split.
@@ -721,7 +700,6 @@ template<
 {
     return strsplit(str.c_str(), sep);
 }
-
 
 /**
  * @brief       Converts a character to lowercase using the specified locale.
@@ -745,7 +723,6 @@ TpChar strtolower(TpChar ch)
     return ch;
 }
 
-
 /**
  * @brief       Converts all characters in a string to lowercase.
  * @param       str : The input string to convert.
@@ -761,7 +738,6 @@ std::basic_string<TpChar, TpCharTraits, TpCharAlloc> strtolower(
     
     return lowr;
 }
-
 
 /**
  * @brief       Compares a string to a pattern with wildcard characters '*' and '?'.
@@ -821,8 +797,6 @@ template<typename TpChar1, typename TpChar2>
     return *pattrn == '\0';
 }
 
-
 }
-
 
 #endif
