@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/memory/operations.hpp
+ * @file        operations.hpp
  * @brief       memory functions header.
  * @author      Killian Valverde
  * @date        2024/10/10
@@ -29,9 +29,7 @@
 
 #include <memory>
 
-
 namespace speed::memory {
-
 
 /**
  * @brief       Allocate using an allocator and construct the object.
@@ -54,7 +52,6 @@ allocate_and_construct(
     return ptr;
 }
 
-
 /**
  * @brief       Construct the given object pointer.
  * @param       ptr : The pointer to the object to construct.
@@ -66,7 +63,6 @@ Tp* construct_at(Tp* ptr, Ts&&... args)
 {
     return ::new (static_cast<void*>(ptr)) Tp(std::forward<Ts>(args)...);
 }
-
 
 /**
  * @brief       Destroy the object pointer by the pointer.
@@ -80,7 +76,6 @@ void destroy_at(Tp* ptr)
         ptr->~Tp();
     }
 }
-
 
 /**
  * @brief       Destroy and deallocate using an allocator.
@@ -97,9 +92,6 @@ void destruct_and_deallocate(
     std::allocator_traits<TpAllocator>::deallocate(alloc, ptr, 1);
 }
 
-
-
 }
-
 
 #endif

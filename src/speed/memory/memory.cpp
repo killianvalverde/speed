@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/memory/memory.cpp
+ * @file        memory.cpp
  * @brief       memory module object.
  * @author      Killian Valverde
  * @date        2024/10/11
