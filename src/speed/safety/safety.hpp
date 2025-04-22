@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/safety/safety.hpp
+ * @file        safety.hpp
  * @brief       safety main header
  * @author      Killian Valverde
  * @date        2024/10/09
@@ -30,27 +30,20 @@
 #include "exception.hpp"
 #include "operations.hpp"
 
-
 namespace speed {
-
 
 /**
  * @brief       Contians safety resources.
  */
 namespace safety {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contians safety resources.
  */
 namespace saf = safety;
-
 #endif
 
-
 }
-
 
 #endif

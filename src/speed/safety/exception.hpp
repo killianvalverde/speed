@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/safety/exception.hpp
+ * @file        exception.hpp
  * @brief       safety exception main header.
  * @author      Killian Valverde
  * @date        2017/10/20
@@ -29,9 +29,7 @@
 
 #include "../exceptions/exceptions.hpp"
 
-
 namespace speed::safety {
-
 
 /**
  * @brief       Base class used to throw exceptions when a lowlevel operation fails.
@@ -49,7 +47,6 @@ public:
     }
 };
 
-
 /**
  * @brief       Class used to throw exceptions when a overflow error occurs.
  */
@@ -66,8 +63,6 @@ public:
     }
 };
 
-
 }
-
 
 #endif
