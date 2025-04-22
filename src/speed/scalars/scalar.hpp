@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/scalars/scalar.hpp
+ * @file        scalar.hpp
  * @brief       scalar class header.
  * @author      Killian Valverde
  * @date        2018/01/10
@@ -29,9 +29,7 @@
 
 #include <type_traits>
 
-
 namespace speed::scalars {
-
 
 /**
  * @brief       Class that represents a scalar type encapsulation.
@@ -186,8 +184,6 @@ private:
     scalar_type value_;
 };
 
-
 }
-
 
 #endif

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/scalars/operations.hpp
+ * @file        operations.hpp
  * @brief       scalars functions header.
  * @author      Killian Valverde
  * @date        2018/04/28
@@ -29,9 +29,7 @@
 
 #include "../math/math.hpp"
 
-
 namespace speed::scalars {
-
 
 /**
  * @brief       Get the number of digits of the given scalar.
@@ -53,8 +51,6 @@ TpIntegral count_digits(TpIntegral val) noexcept
     return n_digits;
 }
 
-
 }
-
 
 #endif
