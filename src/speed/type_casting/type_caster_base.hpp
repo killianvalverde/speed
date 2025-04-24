@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/type_casting/type_caster_base.hpp
+ * @file        type_caster_base.hpp
  * @brief       type_caster_base main header.
  * @author      Killian Valverde
  * @date        2024/01/24
@@ -31,9 +31,7 @@
 
 #include "try_type_cast.hpp"
 
-
 namespace speed::type_casting {
-
 
 /**
  * @brief       Interface used as base of type casting strategies holders.
@@ -97,8 +95,6 @@ public:
     }
 };
 
-
 }
-
 
 #endif

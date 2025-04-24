@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/type_casting/type_cast.hpp
+ * @file        type_cast.hpp
  * @brief       type_cast main header.
  * @author      Killian Valverde
  * @date        2016/08/19
@@ -39,13 +39,10 @@
 #include "error_category.hpp"
 #include "error_codes.hpp"
 
-
 namespace speed::type_casting {
-
 
 /** @cond */
 namespace __private {
-
 
 /**
  * @brief       Tries to convert a c_string into an unsigned inegral.
@@ -134,7 +131,6 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 
     return true;
 }
-
 
 /**
  * @brief       Tries to convert a c_string into a signed inegral.
@@ -239,7 +235,6 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
     return true;
 }
 
-
 /**
  * @brief       Tries to convert a c_string into a float.
  * @param       arg : The value to convert.
@@ -294,7 +289,6 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 
     return true;
 }
-
 
 /**
  * @brief       Tries to convert a c_string into a double.
@@ -351,7 +345,6 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
     return true;
 }
 
-
 /**
  * @brief       Tries to convert a c_string into a long double.
  * @param       arg : The value to convert.
@@ -407,7 +400,6 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
     return true;
 }
 
-
 /**
  * @brief       Tries to convert a c_string into a string.
  * @param       arg : The value to convert.
@@ -438,7 +430,6 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
     return false;
 }
 
-
 /**
  * @brief       Tries to convert a c_string into a wstring.
  * @param       arg : The value to convert.
@@ -465,7 +456,6 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 
     return true;
 }
-
 
 /**
  * @brief       Tries to convert a w_string into a wstring.
@@ -497,7 +487,6 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
     return false;
 }
 
-
 /**
  * @brief       Tries to convert a w_string into a string.
  * @param       arg : The value to convert.
@@ -524,7 +513,6 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 
     return true;
 }
-
 
 /**
  * @brief       Tries to convert a c_string into a basic_regex when types are not compatible.
@@ -566,7 +554,6 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
     return false;
 }
 
-
 /**
  * @brief       Tries to convert a c_string into a basic_regex when types are compatible.
  * @param       arg : The value to convert.
@@ -598,7 +585,6 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
 
     return false;
 }
-
 
 /**
  * @brief       Tries to convert a c_string into a path when types are not compatible.
@@ -640,7 +626,6 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
     }
 }
 
-
 /**
  * @brief       Tries to convert a c_string into a path when types are compatible.
  * @param       arg : The value to convert.
@@ -672,7 +657,6 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
         return false;
     }
 }
-
 
 /**
  * @brief       Tries to convert a c_string into a valid_path.
@@ -709,7 +693,6 @@ __try_type_cast(const TpSource& arg, TpTarget* res, std::error_code* err_code) n
     }
 }
 
-
 /**
  * @brief       Tries to convert a basic_string into a type.
  * @param       arg : The value to convert.
@@ -727,10 +710,8 @@ inline bool __try_type_cast(
     return __try_type_cast(arg.c_str(), res, err_code);
 }
 
-
 } /* __private */
 /** @endcond */
-
 
 /**
  * @brief       Tries to convert the source into the target.
@@ -749,8 +730,6 @@ inline bool try_type_cast(
     return __private::__try_type_cast(arg, res, err_code);
 }
 
-
 }
-
 
 #endif

@@ -18,18 +18,17 @@
  */
 
 /**
- * @file        speed/type_casting/error_category.cpp
+ * @file        error_category.cpp
  * @brief       error_category source file.
  * @author      Killian Valverde
  * @date        2024/04/16
  */
 
 #include "error_category.hpp"
+
 #include "error_codes.hpp"
 
-
 namespace speed::type_casting {
-
 
 std::error_condition error_category::default_error_condition(int val) const noexcept
 {
@@ -54,7 +53,6 @@ std::error_condition error_category::default_error_condition(int val) const noex
     
     return {error_conditions::NIL};
 }
-
 
 std::string error_category::message(int val) const
 {
@@ -89,12 +87,10 @@ std::string error_category::message(int val) const
     }
 }
 
-
 /** @cond */
 namespace __private {
 error_category error_category_obj;
 }
 /** @endcond */
-
 
 }
