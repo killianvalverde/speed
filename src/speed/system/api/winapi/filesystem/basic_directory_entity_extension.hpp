@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/winapi/filesystem/basic_directory_entity_extension.hpp
+ * @file        basic_directory_entity_extension.hpp
  * @brief       basic_directory_entity_extension struct header.
  * @author      Killian Valverde
  * @date        2019/04/10
@@ -32,16 +32,13 @@
 
 #include "../../../filesystem/types.hpp"
 
-
 namespace speed::system::api::winapi::filesystem {
-
 
 /** Struct that represents a directory entity extension. */
 template<typename TpChar>
 struct basic_directory_entity_extension
 {
 };
-
 
 /**
  * @brief       Struct that represents a directory entity extension.
@@ -62,7 +59,6 @@ struct basic_directory_entity_extension<char>
     bool read_dne;
 };
 
-
 /**
  * @brief       Struct that represents a directory entity extension.
  */
@@ -82,18 +78,13 @@ struct basic_directory_entity_extension<wchar_t>
     bool read_dne;
 };
 
-
 }
-
 
 namespace speed::system::filesystem {
 
-
 using speed::system::api::winapi::filesystem::basic_directory_entity_extension;
 
-
 }
-
 
 #endif
 #endif

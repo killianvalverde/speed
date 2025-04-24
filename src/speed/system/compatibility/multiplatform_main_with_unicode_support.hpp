@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/compatibility/multiplatform_main_with_unicode_support.hpp
+ * @file        multiplatform_main_with_unicode_support.hpp
  * @brief       multiplatform_main_with_unicode_support header.
  * @author      Killian Valverde
  * @date        2024/10/26
@@ -28,7 +28,6 @@
 #define SPEED_SYSTEM_COMPATIBILITY_MULTIPLATFORM_MAIN_WITH_UNICODE_SUPPORT_HPP
 
 #include "platform.hpp"
-
 
 /** @cond */
 #ifdef SPEED_MULTIPLATFORM_MAIN_WITH_UNICODE_SUPPORT
@@ -74,6 +73,5 @@ cleanup: \
 #endif
 #endif
 /** @endcond */
-
 
 #endif

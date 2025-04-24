@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/glibc/codecs/operations.hpp
+ * @file        operations.hpp
  * @brief       codecs operations functions header.
  * @author      Killian Valverde
  * @date        2024/10/16
@@ -30,17 +30,14 @@
 #include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_GLIBC
 
-#include "../../../errors/errors.hpp"
-
 #include <cstring>
 #include <cwchar>
 #include <string>
-
 #include <iconv.h>
 
+#include "../../../errors/errors.hpp"
 
 namespace speed::system::api::glibc::codecs {
-
 
 /**
  * @brief       Converts a specified c_string into a wstring.
@@ -110,7 +107,6 @@ bool convert_c_str_to_wstring(
     return false;
 }
 
-
 /**
  * @brief       Converts a specified w_string into a string.
  * @param       w_str : The w_string to convert.
@@ -179,9 +175,7 @@ bool convert_w_str_to_string(
     return false;
 }
 
-
 }
-
 
 #endif
 #endif

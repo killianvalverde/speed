@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/exceptions/exception.hpp
+ * @file        exception.hpp
  * @brief       system exception class header.
  * @author      Killian Valverde
  * @date        2017/10/18
@@ -29,9 +29,7 @@
 
 #include "../../exceptions/exceptions.hpp"
 
-
 namespace speed::system::exceptions {
-
 
 /**
  * @brief       Class that represents the base of system exceptions.
@@ -49,7 +47,6 @@ public:
     }
 };
 
-
 /**
  * @brief       Class that represents a system not suported exception.
  */
@@ -66,8 +63,6 @@ public:
     }
 };
 
-
 }
-
 
 #endif

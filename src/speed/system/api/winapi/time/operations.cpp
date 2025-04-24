@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/winapi/time/operations.hpp
+ * @file        operations.hpp
  * @brief       time operations definitions.
  * @author      Killian Valverde
  * @date        2017/10/18
@@ -29,9 +29,7 @@
 
 #include "operations.hpp"
 
-
 namespace speed::system::api::winapi::time {
-
 
 bool get_monotonic_time(
         system::time::time_specification* time_spec,
@@ -55,7 +53,6 @@ bool get_monotonic_time(
 
     return true;
 }
-
 
 bool get_cpu_time(
         system::time::time_specification* time_spec,
@@ -86,8 +83,6 @@ bool get_cpu_time(
     return true;
 }
 
-
 }
-
 
 #endif

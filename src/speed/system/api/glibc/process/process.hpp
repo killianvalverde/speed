@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/glibc/process/process.hpp
+ * @file        process.hpp
  * @brief       glibc process main header.
  * @author      Killian Valverde
  * @date        2023/10/31
@@ -32,18 +32,14 @@
 
 #include "operations.hpp"
 
-
 namespace speed::system::api::glibc {
-
 
 /**
  * @brief       Contains resources for process interactions.
  */
 namespace process {}
 
-
 }
-
 
 #endif
 #endif

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/glibc/glibc.hpp
+ * @file        glibc.hpp
  * @brief       glibc api main header.
  * @author      Killian Valverde
  * @date        2023/10/31
@@ -36,18 +36,14 @@
 #include "terminal/terminal.hpp"
 #include "time/time.hpp"
 
-
 namespace speed::system::api {
-
 
 /**
  * @brief       Contains all the implementation of the system functions using the glibc API.
  */
 namespace glibc {}
 
-
 }
-
 
 #endif
 #endif

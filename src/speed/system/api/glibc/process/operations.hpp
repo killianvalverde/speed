@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/glibc/process/operations.hpp
+ * @file        operations.hpp
  * @brief       process operations header.
  * @author      Killian Valverde
  * @date        2017/01/08
@@ -39,9 +39,7 @@
 #include "../../../process/types.hpp"
 #include "../../../time/time_specification.hpp"
 
-
 namespace speed::system::api::glibc::process {
-
 
 /**
  * @brief       Execute the specified command.
@@ -56,13 +54,11 @@ bool execute_command(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Get the PID of the current process.
  * @return      The PID of the current process.
  */
 system::process::pid_t get_pid() noexcept;
-
 
 /**
  * @brief       Get the PPID of the current process.
@@ -70,20 +66,17 @@ system::process::pid_t get_pid() noexcept;
  */
 system::process::ppid_t get_ppid() noexcept;
 
-
 /**
  * @brief       Get the UID of the current process.
  * @return      The UID of the current process.
  */
 system::process::uid_t get_uid() noexcept;
 
-
 /**
  * @brief       Get the GID of the current process.
  * @return      The GID of the current process.
  */
 system::process::gid_t get_gid() noexcept;
-
 
 /**
  * @brief       Suspends  the  execution  of the calling thread until either at least the time
@@ -100,9 +93,7 @@ bool nanosleep(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 }
-
 
 #endif
 #endif

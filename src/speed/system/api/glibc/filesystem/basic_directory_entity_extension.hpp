@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/glibc/filesystem/basic_directory_entity_extension.hpp
+ * @file        basic_directory_entity_extension.hpp
  * @brief       basic_directory_entity_extension struct header.
  * @author      Killian Valverde
  * @date        2019/04/10
@@ -34,16 +34,13 @@
 
 #include "../../../filesystem/types.hpp"
 
-
 namespace speed::system::api::glibc::filesystem {
-
 
 /** Struct that represents a directory entity extension. */
 template<typename TpChar>
 struct basic_directory_entity_extension
 {
 };
-
 
 /**
  * @brief       Struct that represents a directory entity extension.
@@ -60,7 +57,6 @@ struct basic_directory_entity_extension<char>
     /** Inode number of the current entity. */
     system::filesystem::inode_t ino;
 };
-
 
 /**
  * @brief       Struct that represents a directory entity extension.
@@ -81,18 +77,13 @@ struct basic_directory_entity_extension<wchar_t>
     system::filesystem::inode_t ino;
 };
 
-
 }
-
 
 namespace speed::system::filesystem {
 
-
 using speed::system::api::glibc::filesystem::basic_directory_entity_extension;
 
-
 }
-
 
 #endif
 #endif

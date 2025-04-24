@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/winapi/time/time.hpp
+ * @file        time.hpp
  * @brief       winapi time main header.
  * @author      Killian Valverde
  * @date        2023/10/31
@@ -32,18 +32,14 @@
 
 #include "operations.hpp"
 
-
 namespace speed::system::api::winapi {
-
 
 /**
  * @brief       Contains resources and facilities related to time manipulation.
  */
 namespace time {}
 
-
 }
-
 
 #endif
 #endif

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/process/process.hpp
+ * @file        process.hpp
  * @brief       system process main header.
  * @author      Killian Valverde
  * @date        2023/10/10
@@ -30,27 +30,20 @@
 #include "operations.hpp"
 #include "types.hpp"
 
-
 namespace speed::system {
-
 
 /**
  * @brief       Contains resources for process interactions.
  */
 namespace process {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contains resources for process interactions.
  */
 namespace proc = process;
-
 #endif
 
-
 }
-
 
 #endif

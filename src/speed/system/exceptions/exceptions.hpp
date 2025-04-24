@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/exceptions/exceptions.hpp
+ * @file        exceptions.hpp
  * @brief       system exceptions main header.
  * @author      Killian Valverde
  * @date        2023/10/10
@@ -29,9 +29,7 @@
 
 #include "exception.hpp"
 
-
 namespace speed::system {
-
 
 /**
  * @brief       Contains resources for all system exceptions thrown by the elements of speed along
@@ -39,19 +37,14 @@ namespace speed::system {
  */
 namespace exceptions {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contains resources for all system exceptions thrown by the elements of speed along
  *              with several types and utilities to assist handling exceptions.
  */
 namespace except = exceptions;
-
 #endif
 
-
 }
-
 
 #endif

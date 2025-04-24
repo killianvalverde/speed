@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/time/time_specification.hpp
+ * @file        time_specification.hpp
  * @brief       time_specification functions header.
  * @author      Killian Valverde
  * @date        2019/04/04
@@ -30,9 +30,7 @@
 #include <cstdint>
 #include <memory>
 
-
 namespace speed::system::time {
-
 
 /**
  * @brief       Represents a time specification.
@@ -289,8 +287,6 @@ private:
     std::uint64_t nsec_;
 };
 
-
 }
-
 
 #endif

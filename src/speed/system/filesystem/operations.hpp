@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/filesystem/operations.hpp
+ * @file        operations.hpp
  * @brief       filesystem operations header.
  * @author      Killian Valverde
  * @date        2017/05/26
@@ -38,10 +38,8 @@
 #include "file_types.hpp"
 #include "types.hpp"
 
-
 namespace speed::system::filesystem {
 
-
 /**
  * @brief       Checks whether the calling process can access the file path. If pathname is a
  *              symbolic link, it is dereferenced.
@@ -59,7 +57,6 @@ inline bool access(
     return SPEED_SELECT_API(filesystem::access, false, file_pth, access_mods, err_code);
 }
 
-
 /**
  * @brief       Checks whether the calling process can access the file path. If pathname is a
  *              symbolic link, it is dereferenced.
@@ -76,7 +73,6 @@ inline bool access(
 {
     return SPEED_SELECT_API(filesystem::access, false, file_pth, access_mods, err_code);
 }
-
 
 /**
  * @brief       Checks whether the calling process can access the file path. If pathname is a
@@ -97,7 +93,6 @@ inline bool access(
     return SPEED_SELECT_API(filesystem::access, false, file_pth, access_mods, file_typs, err_code);
 }
 
-
 /**
  * @brief       Checks whether the calling process can access the file path. If pathname is a
  *              symbolic link, it is dereferenced.
@@ -116,7 +111,6 @@ inline bool access(
 {
     return SPEED_SELECT_API(filesystem::access, false, file_pth, access_mods, file_typs, err_code);
 }
-
 
 /**
  * @brief       Check whether a specified directory can be created.
@@ -132,7 +126,6 @@ inline bool can_directory_be_created(
     return SPEED_SELECT_API(filesystem::can_directory_be_created, false, directory_pth, err_code);
 }
 
-
 /**
  * @brief       Check whether a specified directory can be created.
  * @param       directory_pth : The specified directory.
@@ -146,7 +139,6 @@ inline bool can_directory_be_created(
 {
     return SPEED_SELECT_API(filesystem::can_directory_be_created, false, directory_pth, err_code);
 }
-
 
 /**
  * @brief       Check whether a specified regular file can be created.
@@ -163,7 +155,6 @@ inline bool can_regular_file_be_created(
                             err_code);
 }
 
-
 /**
  * @brief       Check whether a specified regular file can be created.
  * @param       regular_file_pth : The specified regular files.
@@ -179,7 +170,6 @@ inline bool can_regular_file_be_created(
                             err_code);
 }
 
-
 /**
  * @brief       Change the current execution directory.
  * @param       directory_pth : The path of the new current directory.
@@ -191,7 +181,6 @@ inline bool chdir(const char* directory_pth, std::error_code* err_code = nullptr
     return SPEED_SELECT_API(filesystem::chdir, false, directory_pth, err_code);
 }
 
-
 /**
  * @brief       Change the current execution directory.
  * @param       directory_pth : The path of the new current directory.
@@ -202,7 +191,6 @@ inline bool chdir(const wchar_t* directory_pth, std::error_code* err_code = null
 {
     return SPEED_SELECT_API(filesystem::chdir, false, directory_pth, err_code);
 }
-
 
 /**
  * @brief       Closes the directory stream.
@@ -216,7 +204,6 @@ inline bool closedir(directory_entity* directory_ent, std::error_code* err_code 
     return SPEED_SELECT_API(filesystem::closedir, false, directory_ent, err_code);
 }
 
-
 /**
  * @brief       Closes the directory stream.
  * @param       directory_ent : The directory entity.
@@ -229,7 +216,6 @@ inline bool closedir(wdirectory_entity* directory_ent, std::error_code* err_code
     return SPEED_SELECT_API(filesystem::closedir, false, directory_ent, err_code);
 }
 
-
 /**
  * @brief       Check if a file exists.
  * @param       file_pth : The path of the file to check.
@@ -241,7 +227,6 @@ inline bool file_exists(const char* file_pth, std::error_code* err_code = nullpt
     return SPEED_SELECT_API(filesystem::file_exists, false, file_pth, err_code);
 }
 
-
 /**
  * @brief       Check if a file exists.
  * @param       file_pth : The path of the file to check.
@@ -252,7 +237,6 @@ inline bool file_exists(const wchar_t* file_pth, std::error_code* err_code = nul
 {
     return SPEED_SELECT_API(filesystem::file_exists, false, file_pth, err_code);
 }
-
 
 /**
  * @brief       Get the inode number of the specified file.
@@ -269,7 +253,6 @@ inline inode_t get_file_inode(
     return SPEED_SELECT_API(filesystem::get_file_inode, -1, file_pth, err_code);
 }
 
-
 /**
  * @brief       Get the inode number of the specified file.
  * @param       file_pth : The file to get the inode number.
@@ -284,7 +267,6 @@ inline inode_t get_file_inode(
 {
     return SPEED_SELECT_API(filesystem::get_file_inode, -1, file_pth, err_code);
 }
-
 
 /**
  * @brief       Get the inode number of the specified file.
@@ -301,7 +283,6 @@ inline inode_t get_file_inode(
     return SPEED_SELECT_API(filesystem::get_file_inode, -1, directory_ent, err_code);
 }
 
-
 /**
  * @brief       Get the inode number of the specified file.
  * @param       directory_ent : The directory entity current file to get the inode number.
@@ -317,7 +298,6 @@ inline inode_t get_file_inode(
     return SPEED_SELECT_API(filesystem::get_file_inode, -1, directory_ent, err_code);
 }
 
-
 /**
  * @brief       Get the UID of the specified file.
  * @param       file_pth : The file to get the UID.
@@ -332,7 +312,6 @@ inline process::uid_t get_file_uid(
     return SPEED_SELECT_API(filesystem::get_file_uid, -1, file_pth, err_code);
 }
 
-
 /**
  * @brief       Get the UID of the specified file.
  * @param       file_pth : The file to get the UID.
@@ -346,7 +325,6 @@ inline process::uid_t get_file_uid(
 {
     return SPEED_SELECT_API(filesystem::get_file_uid, -1, file_pth, err_code);
 }
-
 
 /**
  * @brief       Get the GID of the specified file.
@@ -362,7 +340,6 @@ inline process::gid_t get_file_gid(
     return SPEED_SELECT_API(filesystem::get_file_gid, -1, file_pth, err_code);
 }
 
-
 /**
  * @brief       Get the GID of the specified file.
  * @param       file_pth : The file to get the GID.
@@ -376,7 +353,6 @@ inline process::gid_t get_file_gid(
 {
     return SPEED_SELECT_API(filesystem::get_file_gid, -1, file_pth, err_code);
 }
-
 
 /**
  * @brief       Get the size in bytes of a specified file path.
@@ -392,7 +368,6 @@ inline std::size_t get_file_size(
     return SPEED_SELECT_API(filesystem::get_file_size, ~0ull, file_pth, err_code);
 }
 
-
 /**
  * @brief       Get the size in bytes of a specified file path.
  * @param       file_pth : The path of the file to get the size.
@@ -406,7 +381,6 @@ inline std::size_t get_file_size(
 {
     return SPEED_SELECT_API(filesystem::get_file_size, ~0ull, file_pth, err_code);
 }
-
 
 /**
  * @brief       Get the modification time of the specified file.
@@ -425,7 +399,6 @@ inline bool get_modification_time(
                             err_code);
 }
 
-
 /**
  * @brief       Get the modification time of the specified time.
  * @param       file_pth : The file to get the modification time.
@@ -443,7 +416,6 @@ inline bool get_modification_time(
                             err_code);
 }
 
-
 /**
  * @brief       Get a temporal path.
  * @return      If function was successful a temporal path is returned otherwise a null pointer
@@ -453,7 +425,6 @@ inline const char* get_temporal_path() noexcept
 {
     return SPEED_SELECT_API(filesystem::get_temporal_path, nullptr);
 }
-
 
 /**
  * @brief       Checks if the given path corresponds to a block device.
@@ -466,7 +437,6 @@ inline bool is_block_device(const char* file_pth, std::error_code* err_code = nu
     return SPEED_SELECT_API(filesystem::is_block_device, false, file_pth, err_code);
 }
 
-
 /**
  * @brief       Checks if the given path corresponds to a block device.
  * @param       file_pth : Path to check.
@@ -478,7 +448,6 @@ inline bool is_block_device(const wchar_t* file_pth, std::error_code* err_code =
     return SPEED_SELECT_API(filesystem::is_block_device, false, file_pth, err_code);
 }
 
-
 /**
  * @brief       Checks if the given path corresponds to a character device.
  * @param       file_pth : Path to check.
@@ -489,7 +458,6 @@ inline bool is_character_device(const char* file_pth, std::error_code* err_code 
 {
     return SPEED_SELECT_API(filesystem::is_character_device, false, file_pth, err_code);
 }
-
 
 /**
  * @brief       Checks if the given path corresponds to a character device.
@@ -505,7 +473,6 @@ inline bool is_character_device(
     return SPEED_SELECT_API(filesystem::is_character_device, false, file_pth, err_code);
 }
 
-
 /**
  * @brief       Checks if the given path corresponds to a directory.
  * @param       file_pth : Path to check.
@@ -517,7 +484,6 @@ inline bool is_directory(const char* file_pth, std::error_code* err_code = nullp
     return SPEED_SELECT_API(filesystem::is_directory, false, file_pth, err_code);
 }
 
-
 /**
  * @brief       Checks if the given path corresponds to a directory.
  * @param       file_pth : Path to check.
@@ -528,7 +494,6 @@ inline bool is_directory(const wchar_t* file_pth, std::error_code* err_code = nu
 {
     return SPEED_SELECT_API(filesystem::is_directory, false, file_pth, err_code);
 }
-
 
 /**
  * @brief       Checks if the given path corresponds to a specified file type.
@@ -547,7 +512,6 @@ inline bool is_file_type(
     return SPEED_SELECT_API(filesystem::is_file_type, false, file_pth, file_typ, err_code);
 }
 
-
 /**
  * @brief       Checks if the given path corresponds to a specified file type.
  * @param       file_pth : Path to check.
@@ -564,7 +528,6 @@ inline bool is_file_type(
     return SPEED_SELECT_API(filesystem::is_file_type, false, file_pth, file_typ, err_code);
 }
 
-
 /**
  * @brief       Checks if the given path corresponds to a named pipe.
  * @param       file_pth : Path to check.
@@ -575,7 +538,6 @@ inline bool is_pipe(const char* file_pth, std::error_code* err_code = nullptr) n
 {
     return SPEED_SELECT_API(filesystem::is_pipe, false, file_pth, err_code);
 }
-
 
 /**
  * @brief       Checks if the given path corresponds to a named pipe.
@@ -588,7 +550,6 @@ inline bool is_pipe(const wchar_t* file_pth, std::error_code* err_code = nullptr
     return SPEED_SELECT_API(filesystem::is_pipe, false, file_pth, err_code);
 }
 
-
 /**
  * @brief       Checks if the given path corresponds to a regular file.
  * @param       file_pth : Path to check.
@@ -599,7 +560,6 @@ inline bool is_regular_file(const char* file_pth, std::error_code* err_code = nu
 {
     return SPEED_SELECT_API(filesystem::is_regular_file, false, file_pth, err_code);
 }
-
 
 /**
  * @brief       Checks if the given path corresponds to a regular file.
@@ -612,7 +572,6 @@ inline bool is_regular_file(const wchar_t* file_pth, std::error_code* err_code =
     return SPEED_SELECT_API(filesystem::is_regular_file, false, file_pth, err_code);
 }
 
-
 /**
  * @brief       Checks if the given path corresponds to a socket.
  * @param       file_pth : Path to check.
@@ -623,7 +582,6 @@ inline bool is_socket(const char* file_pth, std::error_code* err_code = nullptr)
 {
     return SPEED_SELECT_API(filesystem::is_socket, false, file_pth, err_code);
 }
-
 
 /**
  * @brief       Checks if the given path corresponds to a socket.
@@ -636,7 +594,6 @@ inline bool is_socket(const wchar_t* file_pth, std::error_code* err_code = nullp
     return SPEED_SELECT_API(filesystem::is_socket, false, file_pth, err_code);
 }
 
-
 /**
  * @brief       Checks if the given path corresponds to a socket.
  * @param       file_pth : Path to check.
@@ -647,7 +604,6 @@ inline bool is_symlink(const char* file_pth, std::error_code* err_code = nullptr
 {
     return SPEED_SELECT_API(filesystem::is_symlink, false, file_pth, err_code);
 }
-
 
 /**
  * @brief       Checks if the given path corresponds to a socket.
@@ -660,7 +616,6 @@ inline bool is_symlink(const wchar_t* file_pth, std::error_code* err_code = null
     return SPEED_SELECT_API(filesystem::is_symlink, false, file_pth, err_code);
 }
 
-
 /**
  * @brief       Attempts to create a directory.
  * @param       directory_pth : The path of the new directory.
@@ -674,7 +629,6 @@ inline bool mkdir(
 {
     return SPEED_SELECT_API(filesystem::mkdir, false, directory_pth, err_code);
 }
-
 
 /**
  * @brief       Attempts to create a directory.
@@ -690,7 +644,6 @@ inline bool mkdir(
     return SPEED_SELECT_API(filesystem::mkdir, false, directory_pth, err_code);
 }
 
-
 /**
  * @brief       Attemps to create a directory path.
  * @param       directory_pth : The path of directories to create.
@@ -705,7 +658,6 @@ inline bool mkdir_recursively(
     return SPEED_SELECT_API(filesystem::mkdir_recursively, false, directory_pth, err_code);
 }
 
-
 /**
  * @brief       Attemps to create a directory path.
  * @param       directory_pth : The path of directories to create.
@@ -719,7 +671,6 @@ inline bool mkdir_recursively(
 {
     return SPEED_SELECT_API(filesystem::mkdir_recursively, false, directory_pth, err_code);
 }
-
 
 /**
  * @brief       Opens a directory stream corresponding to the directory name, and returns a pointer
@@ -738,7 +689,6 @@ inline bool opendir(
     return SPEED_SELECT_API(filesystem::opendir, false, directory_ent, directory_pth, err_code);
 }
 
-
 /**
  * @brief       Opens a directory stream corresponding to the directory name, and returns a pointer
  *              to the directory stream.
@@ -756,7 +706,6 @@ inline bool opendir(
     return SPEED_SELECT_API(filesystem::opendir, false, directory_ent, directory_pth, err_code);
 }
 
-
 /**
  * @brief       Read the next directory entry in the directory stream.
  * @param       directory_ent : The current directory entity.
@@ -767,7 +716,6 @@ inline bool readdir(directory_entity* directory_ent, std::error_code* err_code =
 {
     return SPEED_SELECT_API(filesystem::readdir, false, directory_ent, err_code);
 }
-
 
 /**
  * @brief       Read the next directory entry in the directory stream.
@@ -780,7 +728,6 @@ inline bool readdir(wdirectory_entity* directory_ent, std::error_code* err_code 
     return SPEED_SELECT_API(filesystem::readdir, false, directory_ent, err_code);
 }
 
-
 /**
  * @brief       Delete the specified directory.
  * @param       directory_pth : The path of the directory to delete.
@@ -792,7 +739,6 @@ inline bool rmdir(const char* directory_pth, std::error_code* err_code = nullptr
     return SPEED_SELECT_API(filesystem::rmdir, false, directory_pth, err_code);
 }
 
-
 /**
  * @brief       Delete the specified directory.
  * @param       directory_pth : The path of the directory to delete.
@@ -803,7 +749,6 @@ inline bool rmdir(const wchar_t* directory_pth, std::error_code* err_code = null
 {
     return SPEED_SELECT_API(filesystem::rmdir, false, directory_pth, err_code);
 }
-
 
 /**
  * @brief       Creates a shortcut stored at shortcut_pth that points at target_pth.
@@ -821,7 +766,6 @@ inline bool shortcut(
     return SPEED_SELECT_API(filesystem::shortcut, false, target_pth, shortcut_pth, err_code);
 }
 
-
 /**
  * @brief       Creates a shortcut stored at shortcut_pth that points at target_pth.
  * @param       target_pth : Path of the target.
@@ -837,7 +781,6 @@ inline bool shortcut(
 {
     return SPEED_SELECT_API(filesystem::shortcut, false, target_pth, shortcut_pth, err_code);
 }
-
 
 /**
  * @brief       Creates a symbolic link named lnk_pth which contains the string trg.
@@ -855,7 +798,6 @@ inline bool symlink(
     return SPEED_SELECT_API(filesystem::symlink, false, target_pth, link_pth, err_code);
 }
 
-
 /**
  * @brief       Creates a symbolic link named lnk_pth which contains the string trg.
  * @param       target_pth : The string to contain in the symlink.
@@ -872,7 +814,6 @@ inline bool symlink(
     return SPEED_SELECT_API(filesystem::symlink, false, target_pth, link_pth, err_code);
 }
 
-
 /**
  * @brief       Attempts to create a regular file.
  * @param       regular_file_pth : The path of the new regular file.
@@ -886,7 +827,6 @@ inline bool touch(
 {
     return SPEED_SELECT_API(filesystem::touch, false, regular_file_pth, err_code);
 }
-
 
 /**
  * @brief       Attempts to create a regular file.
@@ -902,7 +842,6 @@ inline bool touch(
     return SPEED_SELECT_API(filesystem::touch, false, regular_file_pth, err_code);
 }
 
-
 /**
  * @brief       Delete the specified regular file.
  * @param       regular_file_pth : The path of the regular file to delete.
@@ -913,7 +852,6 @@ inline bool unlink(const char* regular_file_pth, std::error_code* err_code = nul
 {
     return SPEED_SELECT_API(filesystem::unlink, false, regular_file_pth, err_code);
 }
-
 
 /**
  * @brief       Delete the specified regular file.
@@ -926,8 +864,6 @@ inline bool unlink(const wchar_t* regular_file_pth, std::error_code* err_code = 
     return SPEED_SELECT_API(filesystem::unlink, false, regular_file_pth, err_code);
 }
 
-
 }
-
 
 #endif

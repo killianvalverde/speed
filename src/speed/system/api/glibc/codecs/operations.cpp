@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/glibc/codecs/operations.cpp
+ * @file        operations.cpp
  * @brief       codecs operations source.
  * @author      Killian Valverde
  * @date        2024/10/16
@@ -29,11 +29,8 @@
 
 #include "operations.hpp"
 
-
 namespace speed::system::api::glibc::codecs {
 
-
 }
-
 
 #endif

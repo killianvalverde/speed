@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/terminal/text_attribute.hpp
+ * @file        text_attribute.hpp
  * @brief       terminal_text_attribute header.
  * @author      Killian Valverde
  * @date        2019/03/22
@@ -29,9 +29,7 @@
 
 #include <cstdint>
 
-
 namespace speed::system::terminal {
-
 
 /**
  * @brief       Represents terminal text attributes.
@@ -93,12 +91,9 @@ enum class text_attribute : std::uint8_t
     YELLOW,
 };
 
-
 /** Represents terminal text attributes. */
 using ta_t = text_attribute;
 
-
 }
-
 
 #endif

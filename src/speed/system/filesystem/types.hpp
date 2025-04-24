@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/filesystem/types.hpp
+ * @file        types.hpp
  * @brief       types header.
  * @author      Killian Valverde
  * @date        2024/11/02
@@ -29,15 +29,11 @@
 
 #include <cstdint>
 
-
 namespace speed::system::filesystem {
-
 
 /** Inode type. */
 using inode_t = std::uint64_t;
 
-
 }
-
 
 #endif

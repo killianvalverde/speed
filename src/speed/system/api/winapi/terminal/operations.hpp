@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/winapi/terminal/operations.hpp
+ * @file        operations.hpp
  * @brief       terminal operations header.
  * @author      Killian Valverde
  * @date        2017/10/18
@@ -35,9 +35,7 @@
 #include "../../../errors/errors.hpp"
 #include "../../../terminal/text_attribute.hpp"
 
-
 namespace speed::system::api::winapi::terminal {
-
 
 /**
  * @brief       Get the current texte attibute set in the console.
@@ -47,7 +45,6 @@ namespace speed::system::api::winapi::terminal {
  */
 static bool get_current_text_attribute(HANDLE console_handl, WORD* text_attr) noexcept;
 
-
 /**
  * @brief       Flush the input terminal buffer.
  * @param       input_strm : Terminal input stream.
@@ -56,7 +53,6 @@ static bool get_current_text_attribute(HANDLE console_handl, WORD* text_attr) no
  */
 bool flush_input_terminal(::FILE* input_strm, std::error_code* err_code = nullptr) noexcept;
 
-
 /**
  * @brief       Flush the output terminal buffer.
  * @param       output_strm : Terminal output stream.
@@ -64,7 +60,6 @@ bool flush_input_terminal(::FILE* input_strm, std::error_code* err_code = nullpt
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 bool flush_output_terminal(::FILE* output_strm, std::error_code* err_code = nullptr) noexcept;
-
 
 /**
  * @brief       Print a message and pause de program execution until a key is pressed
@@ -81,7 +76,6 @@ bool kbhit(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Set a terminal text attribute.
  * @param       terminal_strm : Stream in which set the attribute.
@@ -93,9 +87,7 @@ bool set_foreground_text_attribute(
         system::terminal::text_attribute text_attr
 ) noexcept;
 
-
 }
-
 
 #endif
 #endif

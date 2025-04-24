@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/codecs/codecs.hpp
+ * @file        codecs.hpp
  * @brief       system codecs main header.
  * @author      Killian Valverde
  * @date        2024/10/16
@@ -29,27 +29,20 @@
 
 #include "operations.hpp"
 
-
 namespace speed::system {
-
 
 /**
  * @brief       Contains utilities encoding and decoding.
  */
 namespace codecs {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contains utilities encoding and decoding.
  */
 namespace cod = codecs;
-
 #endif
 
-
 }
-
 
 #endif

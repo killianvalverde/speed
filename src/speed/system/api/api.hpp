@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/api.hpp
+ * @file        api.hpp
  * @brief       system api main header.
  * @author      Killian Valverde
  * @date        2023/10/31
@@ -30,17 +30,13 @@
 #include "glibc/glibc.hpp"
 #include "winapi/winapi.hpp"
 
-
 namespace speed::system {
-
 
 /**
  * @brief       Contains all the implementation of the system functions using all supported APIs.
  */
 namespace api {}
 
-
 }
-
 
 #endif

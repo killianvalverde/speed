@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/winapi/filesystem/operations.hpp
+ * @file        operations.hpp
  * @brief       filesystem operations header.
  * @author      Killian Valverde
  * @date        2017/05/26
@@ -38,10 +38,8 @@
 #include "../../../process/types.hpp"
 #include "../../../time/system_time.hpp"
 
-
 namespace speed::system::api::winapi::filesystem {
 
-
 /**
  * @brief       Checks whether the calling process can access the file path. If pathname is a
  *              symbolic link, it is dereferenced.
@@ -56,7 +54,6 @@ bool access(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Checks whether the calling process can access the file path. If pathname is a
  *              symbolic link, it is dereferenced.
@@ -70,7 +67,6 @@ bool access(
         system::filesystem::access_modes access_mods,
         std::error_code* err_code = nullptr
 ) noexcept;
-
 
 /**
  * @brief       Checks whether the calling process can access the file path. If pathname is a
@@ -88,7 +84,6 @@ bool access(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Checks whether the calling process can access the file path. If pathname is a
  *              symbolic link, it is dereferenced.
@@ -104,7 +99,6 @@ bool access(
         system::filesystem::file_types file_typs,
         std::error_code* err_code = nullptr
 ) noexcept;
-
 
 /**
  * @brief       Check whether a specified directory can be created.
@@ -117,7 +111,6 @@ bool can_directory_be_created(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Check whether a specified directory can be created.
  * @param       directory_pth : The specified directory.
@@ -128,7 +121,6 @@ bool can_directory_be_created(
         const wchar_t* directory_pth,
         std::error_code* err_code = nullptr
 ) noexcept;
-
 
 /**
  * @brief       Check whether a specified regular file can be created.
@@ -141,7 +133,6 @@ bool can_regular_file_be_created(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Check whether a specified regular file can be created.
  * @param       regular_file_pth : The specified regular files.
@@ -153,7 +144,6 @@ bool can_regular_file_be_created(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Change the current execution directory.
  * @param       directory_pth : The path of the new current directory.
@@ -161,7 +151,6 @@ bool can_regular_file_be_created(
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 bool chdir(const char* directory_pth, std::error_code* err_code = nullptr) noexcept;
-
 
 /**
  * @brief       Change the current execution directory.
@@ -171,7 +160,6 @@ bool chdir(const char* directory_pth, std::error_code* err_code = nullptr) noexc
  */
 bool chdir(const wchar_t* directory_pth, std::error_code* err_code = nullptr) noexcept;
 
-
 /**
  * @brief       Closes the directory stream.
  * @param       directory_ent : The directory entity.
@@ -183,7 +171,6 @@ bool closedir(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Closes the directory stream.
  * @param       directory_ent : The directory entity.
@@ -194,7 +181,6 @@ bool closedir(
         system::filesystem::wdirectory_entity* directory_ent,
         std::error_code* err_code = nullptr
 ) noexcept;
-
 
 /**
  * @brief       Check if a file exists.
@@ -204,7 +190,6 @@ bool closedir(
  */
 bool file_exists(const char* file_pth, std::error_code* err_code = nullptr) noexcept;
 
-
 /**
  * @brief       Check if a file exists.
  * @param       file_pth : The path of the file to check.
@@ -212,7 +197,6 @@ bool file_exists(const char* file_pth, std::error_code* err_code = nullptr) noex
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 bool file_exists(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept;
-
 
 /**
  * @brief       Get the inode number of the specified file.
@@ -226,7 +210,6 @@ system::filesystem::inode_t get_file_inode(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Get the inode number of the specified file.
  * @param       file_pth : The file to get the inode number.
@@ -238,7 +221,6 @@ system::filesystem::inode_t get_file_inode(
         const wchar_t* file_pth,
         std::error_code* err_code = nullptr
 ) noexcept;
-
 
 /**
  * @brief       Get the inode number of the specified file.
@@ -252,7 +234,6 @@ system::filesystem::inode_t get_file_inode(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Get the inode number of the specified file.
  * @param       directory_ent : The directory entity current file to get the inode number.
@@ -265,7 +246,6 @@ system::filesystem::inode_t get_file_inode(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Get the UID of the specified file.
  * @param       file_pth : The file to get the UID.
@@ -276,7 +256,6 @@ system::process::uid_t get_file_uid(
         const char* file_pth,
         std::error_code* err_code = nullptr
 ) noexcept;
-
 
 /**
  * @brief       Get the UID of the specified file.
@@ -289,7 +268,6 @@ system::process::uid_t get_file_uid(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Get the GID of the specified file.
  * @param       file_pth : The file to get the GID.
@@ -301,7 +279,6 @@ system::process::gid_t get_file_gid(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Get the GID of the specified file.
  * @param       file_pth : The file to get the GID.
@@ -312,7 +289,6 @@ system::process::gid_t get_file_gid(
         const wchar_t* file_pth,
         std::error_code* err_code = nullptr
 ) noexcept;
-
 
 /**
  * @brief       Get the size in bytes of a specified file path.
@@ -322,7 +298,6 @@ system::process::gid_t get_file_gid(
  */
 std::size_t get_file_size(const char* file_pth, std::error_code* err_code = nullptr) noexcept;
 
-
 /**
  * @brief       Get the size in bytes of a specified file path.
  * @param       file_pth : The path of the file to get the size.
@@ -330,7 +305,6 @@ std::size_t get_file_size(const char* file_pth, std::error_code* err_code = null
  * @return      On success the file size in bytes in returned, otherwise -1 is returned.
  */
 std::size_t get_file_size(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept;
-
 
 /**
  * @brief       Get the modification time of the specified file.
@@ -345,7 +319,6 @@ bool get_modification_time(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Get the modification time of the specified time.
  * @param       file_pth : The file to get the modification time.
@@ -359,13 +332,11 @@ bool get_modification_time(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Get a temporal path.
  * @return      A temporal path.
  */
 const char* get_temporal_path() noexcept;
-
 
 /**
  * @brief       Checks if the given path corresponds to a block device.
@@ -375,7 +346,6 @@ const char* get_temporal_path() noexcept;
  */
 bool is_block_device(const char* file_pth, std::error_code* err_code = nullptr) noexcept;
 
-
 /**
  * @brief       Checks if the given path corresponds to a block device.
  * @param       file_pth : Path to check.
@@ -383,7 +353,6 @@ bool is_block_device(const char* file_pth, std::error_code* err_code = nullptr) 
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 bool is_block_device(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept;
-
 
 /**
  * @brief       Checks if the given path corresponds to a character device.
@@ -393,7 +362,6 @@ bool is_block_device(const wchar_t* file_pth, std::error_code* err_code = nullpt
  */
 bool is_character_device(const char* file_pth, std::error_code* err_code = nullptr) noexcept;
 
-
 /**
  * @brief       Checks if the given path corresponds to a character device.
  * @param       file_pth : Path to check.
@@ -401,7 +369,6 @@ bool is_character_device(const char* file_pth, std::error_code* err_code = nullp
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 bool is_character_device(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept;
-
 
 /**
  * @brief       Checks if the given path corresponds to a directory.
@@ -411,7 +378,6 @@ bool is_character_device(const wchar_t* file_pth, std::error_code* err_code = nu
  */
 bool is_directory(const char* file_pth, std::error_code* err_code = nullptr) noexcept;
 
-
 /**
  * @brief       Checks if the given path corresponds to a directory.
  * @param       file_pth : Path to check.
@@ -419,7 +385,6 @@ bool is_directory(const char* file_pth, std::error_code* err_code = nullptr) noe
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 bool is_directory(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept;
-
 
 /**
  * @brief       Checks if the given path corresponds to a specified file type.
@@ -434,7 +399,6 @@ bool is_file_type(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Checks if the given path corresponds to a specified file type.
  * @param       file_pth : Path to check.
@@ -448,7 +412,6 @@ bool is_file_type(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Checks if the given path corresponds to a regular file.
  * @param       file_pth : Path to check.
@@ -456,7 +419,6 @@ bool is_file_type(
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 bool is_regular_file(const char* file_pth, std::error_code* err_code = nullptr) noexcept;
-
 
 /**
  * @brief       Checks if the given path corresponds to a named pipe.
@@ -466,7 +428,6 @@ bool is_regular_file(const char* file_pth, std::error_code* err_code = nullptr) 
  */
 bool is_pipe(const char* file_pth, std::error_code* err_code = nullptr) noexcept;
 
-
 /**
  * @brief       Checks if the given path corresponds to a named pipe.
  * @param       file_pth : Path to check.
@@ -474,7 +435,6 @@ bool is_pipe(const char* file_pth, std::error_code* err_code = nullptr) noexcept
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 bool is_pipe(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept;
-
 
 /**
  * @brief       Checks if the given path corresponds to a regular file.
@@ -484,7 +444,6 @@ bool is_pipe(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexc
  */
 bool is_regular_file(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept;
 
-
 /**
  * @brief       Checks if the given path corresponds to a socket.
  * @param       file_pth : Path to check.
@@ -492,7 +451,6 @@ bool is_regular_file(const wchar_t* file_pth, std::error_code* err_code = nullpt
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 bool is_socket(const char* file_pth, std::error_code* err_code = nullptr) noexcept;
-
 
 /**
  * @brief       Checks if the given path corresponds to a socket.
@@ -502,7 +460,6 @@ bool is_socket(const char* file_pth, std::error_code* err_code = nullptr) noexce
  */
 bool is_socket(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept;
 
-
 /**
  * @brief       Checks if the given path corresponds to a socket.
  * @param       file_pth : Path to check.
@@ -510,7 +467,6 @@ bool is_socket(const wchar_t* file_pth, std::error_code* err_code = nullptr) noe
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 bool is_symlink(const char* file_pth, std::error_code* err_code = nullptr) noexcept;
-
 
 /**
  * @brief       Checks if the given path corresponds to a socket.
@@ -520,7 +476,6 @@ bool is_symlink(const char* file_pth, std::error_code* err_code = nullptr) noexc
  */
 bool is_symlink(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept;
 
-
 /**
  * @brief       Attempts to create a directory.
  * @param       directory_pth : The path of the new directory.
@@ -532,7 +487,6 @@ bool mkdir(
         const char* directory_pth,
         std::error_code* err_code = nullptr
 ) noexcept;
-
 
 /**
  * @brief       Attempts to create a directory.
@@ -546,7 +500,6 @@ bool mkdir(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Attemps to create a directory path.
  * @param       directory_pth : The path of directories to create.
@@ -559,7 +512,6 @@ bool mkdir_recursively(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Attemps to create a directory path.
  * @param       directory_pth : The path of directories to create.
@@ -571,7 +523,6 @@ bool mkdir_recursively(
         const wchar_t* directory_pth,
         std::error_code* err_code = nullptr
 ) noexcept;
-
 
 /**
  * @brief       Opens a directory stream corresponding to the directory name, and returns a pointer
@@ -587,7 +538,6 @@ bool opendir(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Opens a directory stream corresponding to the directory name, and returns a pointer
  *              to the directory stream.
@@ -602,7 +552,6 @@ bool opendir(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Read the next directory entry in the directory stream.
  * @param       directory_ent : The current directory entity.
@@ -614,7 +563,6 @@ bool readdir(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Read the next directory entry in the directory stream.
  * @param       directory_ent : The current directory entity.
@@ -625,7 +573,6 @@ bool readdir(
         system::filesystem::wdirectory_entity* directory_ent,
         std::error_code* err_code = nullptr
 ) noexcept;
-
 
 /**
  * @brief       Delete the specified directory.
@@ -635,7 +582,6 @@ bool readdir(
  */
 bool rmdir(const char* directory_pth, std::error_code* err_code = nullptr) noexcept;
 
-
 /**
  * @brief       Delete the specified directory.
  * @param       directory_pth : The path of the directory to delete.
@@ -643,7 +589,6 @@ bool rmdir(const char* directory_pth, std::error_code* err_code = nullptr) noexc
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 bool rmdir(const wchar_t* directory_pth, std::error_code* err_code = nullptr) noexcept;
-
 
 /**
  * @brief       Creates a shortcut stored at shortcut_pth that points at target_pth.
@@ -658,7 +603,6 @@ bool shortcut(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Creates a shortcut stored at shortcut_pth that points at target_pth.
  * @param       target_pth : Path of the target.
@@ -671,7 +615,6 @@ bool shortcut(
         const wchar_t* shortcut_pth,
         std::error_code* err_code = nullptr
 ) noexcept;
-
 
 /**
  * @brief       Creates a symbolic link named link_pth which contains the string target_pth.
@@ -686,7 +629,6 @@ bool symlink(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Creates a symbolic link named lnk_pth which contains the string trg.
  * @param       target_pth : The string to contain in the symlink.
@@ -700,7 +642,6 @@ bool symlink(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Attempts to create a regular file.
  * @param       regular_file_pth : The path of the new regular file.
@@ -712,7 +653,6 @@ bool touch(
         const char* regular_file_pth,
         std::error_code* err_code = nullptr
 ) noexcept;
-
 
 /**
  * @brief       Attempts to create a regular file.
@@ -726,7 +666,6 @@ bool touch(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Delete the specified regular file.
  * @param       regular_file_pth : The path of the regular file to delete.
@@ -734,7 +673,6 @@ bool touch(
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 bool unlink(const char* regular_file_pth, std::error_code* err_code = nullptr) noexcept;
-
 
 /**
  * @brief       Delete the specified regular file.
@@ -744,9 +682,7 @@ bool unlink(const char* regular_file_pth, std::error_code* err_code = nullptr) n
  */
 bool unlink(const wchar_t* regular_file_pth, std::error_code* err_code = nullptr) noexcept;
 
-
 }
-
 
 #endif
 #endif

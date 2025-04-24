@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/errors/errors.hpp
+ * @file        errors.hpp
  * @brief       system errors main header.
  * @author      Killian Valverde
  * @date        2023/10/10
@@ -29,27 +29,20 @@
 
 #include "operations.hpp"
 
-
 namespace speed::system {
-
 
 /**
  * @brief       Constains ressources to assist handling with function errors.
  */
 namespace errors {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Constains ressources to assist handling with function errors.
  */
 namespace err = errors;
-
 #endif
 
-
 }
-
 
 #endif

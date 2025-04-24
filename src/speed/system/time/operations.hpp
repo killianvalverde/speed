@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/time/operations.hpp
+ * @file        operations.hpp
  * @brief       operations functions header.
  * @author      Killian Valverde
  * @date        2017/10/18
@@ -34,9 +34,7 @@
 #include "../compatibility/compatibility.hpp"
 #include "time_specification.hpp"
 
-
 namespace speed::system::time {
-
 
 /**
  * @brief       Get a monotonic time since some unspecified starting point.
@@ -52,7 +50,6 @@ inline bool get_monotonic_time(
     return SPEED_SELECT_API(time::get_monotonic_time, false, time_spec, err_code);
 }
 
-
 /**
  * @brief       Get a cpu time since some unspecified starting point.
  * @param       time_spec : The value in which store the result.
@@ -67,8 +64,6 @@ inline bool get_cpu_time(
     return SPEED_SELECT_API(time::get_cpu_time, false, time_spec, err_code);
 }
 
-
 }
-
 
 #endif

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/system.cpp
+ * @file        system.cpp
  * @brief       system module object.
  * @author      Killian Valverde
  * @date        2024/10/11

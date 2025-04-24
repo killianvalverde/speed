@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/system.hpp
+ * @file        system.hpp
  * @brief       system functions header.
  * @author      Killian Valverde
  * @date        2017/01/08
@@ -37,27 +37,20 @@
 #include "terminal/terminal.hpp"
 #include "time/time.hpp"
 
-
 namespace speed {
-
 
 /**
  * @brief       Contains resources for interact with the system.
  */
 namespace system {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contains resources for interact with the system.
  */
 namespace sys = system;
-
 #endif
 
-
 }
-
 
 #endif

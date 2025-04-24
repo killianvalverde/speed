@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/time/time.hpp
+ * @file        time.hpp
  * @brief       system time main header.
  * @author      Killian Valverde
  * @date        2023/10/10
@@ -31,27 +31,20 @@
 #include "system_time.hpp"
 #include "time_specification.hpp"
 
-
 namespace speed::system {
-
 
 /**
  * @brief       Contains resources and facilities related to time manipulation.
  */
 namespace time {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contains resources and facilities related to time manipulation.
  */
 namespace tm = time;
-
 #endif
 
-
 }
-
 
 #endif

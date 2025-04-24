@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/process/operations.hpp
+ * @file        operations.hpp
  * @brief       process operations header.
  * @author      Killian Valverde
  * @date        2017/01/08
@@ -32,9 +32,7 @@
 #include "../time/time.hpp"
 #include "types.hpp"
 
-
 namespace speed::system::process {
-
 
 /**
  * @brief       Execute the specified command.
@@ -52,7 +50,6 @@ inline bool execute_command(
     return SPEED_SELECT_API(process::execute_command, false, cmd, return_val, err_code);
 }
 
-
 /**
  * @brief       Get the PID of the current process.
  * @return      The PID of the current process.
@@ -61,7 +58,6 @@ inline pid_t get_pid() noexcept
 {
     return SPEED_SELECT_API(process::get_pid, -1);
 }
-
 
 /**
  * @brief       Get the PPID of the current process.
@@ -72,7 +68,6 @@ inline ppid_t get_ppid() noexcept
     return SPEED_SELECT_API(process::get_ppid, -1);
 }
 
-
 /**
  * @brief       Get the UID of the current process.
  * @return      The UID of the current process.
@@ -82,7 +77,6 @@ inline uid_t get_uid() noexcept
     return SPEED_SELECT_API(process::get_uid, -1);
 }
 
-
 /**
  * @brief       Get the GID of the current process.
  * @return      The GID of the current process.
@@ -91,7 +85,6 @@ inline gid_t get_gid() noexcept
 {
     return SPEED_SELECT_API(process::get_gid, -1);
 }
-
 
 /**
  * @brief       Suspends  the  execution  of the calling thread until either at least the time
@@ -111,7 +104,6 @@ inline bool nanosleep(
     return SPEED_SELECT_API(process::nanosleep, false, sec, nsec, err_code);
 }
 
-
 /**
  * @brief       Suspends  the  execution  of the calling thread until either at least the time
  *              specified has elapsed, or the delivery of a signal that triggers the invocation of a
@@ -128,8 +120,6 @@ inline bool nanosleep(
     return nanosleep(time_spec.get_seconds(), time_spec.get_nseconds(), err_code);
 }
 
-
 }
-
 
 #endif

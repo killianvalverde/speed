@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/glibc/filesystem/operations.cpp
+ * @file        operations.cpp
  * @brief       filesystem operations source.
  * @author      Killian Valverde
  * @date        2017/05/26
@@ -27,16 +27,15 @@
 #include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_GLIBC
 
+#include "operations.hpp"
+
 #include <sys/stat.h>
 #include <cstdlib>
 
 #include "../../../../stringutils/stringutils.hpp"
 #include "../../../codecs/codecs.hpp"
-#include "operations.hpp"
-
 
 namespace speed::system::api::glibc::filesystem {
-
 
 bool access(
         const char* file_pth,
@@ -80,7 +79,6 @@ bool access(
     return true;
 }
 
-
 bool access(
         const wchar_t* file_pth,
         system::filesystem::access_modes access_mods,
@@ -95,7 +93,6 @@ bool access(
     return false;
 }
 
-
 bool access(
         const char* file_pth,
         system::filesystem::access_modes access_mods,
@@ -106,7 +103,6 @@ bool access(
     return (is_file_type(file_pth, file_typ, err_code) &&
             access(file_pth, access_mods, err_code));
 }
-
 
 bool access(
         const wchar_t* file_pth,
@@ -122,7 +118,6 @@ bool access(
     }
     return false;
 }
-
 
 bool can_directory_be_created(const char* directory_pth, std::error_code* err_code) noexcept
 {
@@ -152,7 +147,6 @@ bool can_directory_be_created(const char* directory_pth, std::error_code* err_co
             system::filesystem::access_modes::EXECUTE, err_code);
 }
 
-
 bool can_directory_be_created(const wchar_t* directory_pth, std::error_code* err_code) noexcept
 {
     std::string str;
@@ -162,7 +156,6 @@ bool can_directory_be_created(const wchar_t* directory_pth, std::error_code* err
     }
     return false;
 }
-
 
 bool can_regular_file_be_created(const char* regular_file_pth, std::error_code* err_code) noexcept
 {
@@ -196,7 +189,6 @@ bool can_regular_file_be_created(const char* regular_file_pth, std::error_code* 
             system::filesystem::access_modes::EXECUTE, err_code);
 }
 
-
 bool can_regular_file_be_created(
         const wchar_t* regular_file_pth,
         std::error_code* err_code
@@ -210,7 +202,6 @@ bool can_regular_file_be_created(
     return false;
 }
 
-
 bool chdir(const char* directory_pth, std::error_code* err_code) noexcept
 {
     if (::chdir(directory_pth) == -1)
@@ -222,7 +213,6 @@ bool chdir(const char* directory_pth, std::error_code* err_code) noexcept
     return true;
 }
 
-
 bool chdir(const wchar_t* directory_pth, std::error_code* err_code) noexcept
 {
     std::string str;
@@ -232,7 +222,6 @@ bool chdir(const wchar_t* directory_pth, std::error_code* err_code) noexcept
     }
     return false;
 }
-
 
 bool closedir(
         system::filesystem::directory_entity* directory_ent,
@@ -250,7 +239,6 @@ bool closedir(
     return true;
 }
 
-
 bool closedir(
         system::filesystem::wdirectory_entity* directory_ent,
         std::error_code* err_code
@@ -267,18 +255,15 @@ bool closedir(
     return true;
 }
 
-
 bool file_exists(const char* file_pth, std::error_code* err_code) noexcept
 {
     return access(file_pth, system::filesystem::access_modes::EXISTS, err_code);
 }
 
-
 bool file_exists(const wchar_t* file_pth, std::error_code* err_code) noexcept
 {
     return access(file_pth, system::filesystem::access_modes::EXISTS, err_code);
 }
-
 
 system::filesystem::inode_t get_file_inode(
         const char* file_pth,
@@ -297,7 +282,6 @@ system::filesystem::inode_t get_file_inode(
     return stt.st_ino;
 }
 
-
 system::filesystem::inode_t get_file_inode(
         const wchar_t* file_pth,
         std::error_code* err_code
@@ -311,7 +295,6 @@ system::filesystem::inode_t get_file_inode(
     return false;
 }
 
-
 system::filesystem::inode_t get_file_inode(
         system::filesystem::directory_entity* directory_ent,
         std::error_code* err_code
@@ -320,7 +303,6 @@ system::filesystem::inode_t get_file_inode(
     return directory_ent->__priv.ino;
 }
 
-
 system::filesystem::inode_t get_file_inode(
         system::filesystem::wdirectory_entity* directory_ent,
         std::error_code* err_code
@@ -328,7 +310,6 @@ system::filesystem::inode_t get_file_inode(
 {
     return directory_ent->__priv.ino;
 }
-
 
 uid_t get_file_uid(const char* file_pth, std::error_code* err_code) noexcept
 {
@@ -344,7 +325,6 @@ uid_t get_file_uid(const char* file_pth, std::error_code* err_code) noexcept
     return stt.st_uid;
 }
 
-
 uid_t get_file_uid(const wchar_t* file_pth, std::error_code* err_code) noexcept
 {
     std::string str;
@@ -354,7 +334,6 @@ uid_t get_file_uid(const wchar_t* file_pth, std::error_code* err_code) noexcept
     }
     return false;
 }
-
 
 gid_t get_file_gid(const char* file_pth, std::error_code* err_code) noexcept
 {
@@ -370,7 +349,6 @@ gid_t get_file_gid(const char* file_pth, std::error_code* err_code) noexcept
     return stt.st_gid;
 }
 
-
 gid_t get_file_gid(const wchar_t* file_pth, std::error_code* err_code) noexcept
 {
     std::string str;
@@ -380,7 +358,6 @@ gid_t get_file_gid(const wchar_t* file_pth, std::error_code* err_code) noexcept
     }
     return false;
 }
-
 
 std::size_t get_file_size(const char* file_pth, std::error_code* err_code) noexcept
 {
@@ -395,7 +372,6 @@ std::size_t get_file_size(const char* file_pth, std::error_code* err_code) noexc
     return (std::size_t)file_stt.st_size;
 }
 
-
 std::size_t get_file_size(const wchar_t* file_pth, std::error_code* err_code) noexcept
 {
     std::string str;
@@ -405,7 +381,6 @@ std::size_t get_file_size(const wchar_t* file_pth, std::error_code* err_code) no
     }
     return false;
 }
-
 
 bool get_modification_time(
         const char* file_pth,
@@ -434,7 +409,6 @@ bool get_modification_time(
     return true;
 }
 
-
 bool get_modification_time(
         const wchar_t* file_pth,
         system::time::system_time* system_tme,
@@ -449,12 +423,10 @@ bool get_modification_time(
     return false;
 }
 
-
 const char* get_temporal_path() noexcept
 {
     return "/tmp/";
 }
-
 
 bool is_block_device(const char* file_pth, std::error_code* err_code) noexcept
 {
@@ -470,7 +442,6 @@ bool is_block_device(const char* file_pth, std::error_code* err_code) noexcept
     return S_ISBLK(infos.st_mode);
 }
 
-
 bool is_block_device(const wchar_t* file_pth, std::error_code* err_code) noexcept
 {
     std::string str;
@@ -480,7 +451,6 @@ bool is_block_device(const wchar_t* file_pth, std::error_code* err_code) noexcep
     }
     return false;
 }
-
 
 bool is_character_device(const char* file_pth, std::error_code* err_code) noexcept
 {
@@ -496,7 +466,6 @@ bool is_character_device(const char* file_pth, std::error_code* err_code) noexce
     return S_ISCHR(infos.st_mode);
 }
 
-
 bool is_character_device(const wchar_t* file_pth, std::error_code* err_code) noexcept
 {
     std::string str;
@@ -506,7 +475,6 @@ bool is_character_device(const wchar_t* file_pth, std::error_code* err_code) noe
     }
     return false;
 }
-
 
 bool is_directory(const char* file_pth, std::error_code* err_code) noexcept
 {
@@ -522,7 +490,6 @@ bool is_directory(const char* file_pth, std::error_code* err_code) noexcept
     return S_ISDIR(infos.st_mode);
 }
 
-
 bool is_directory(const wchar_t* file_pth, std::error_code* err_code) noexcept
 {
     std::string str;
@@ -532,7 +499,6 @@ bool is_directory(const wchar_t* file_pth, std::error_code* err_code) noexcept
     }
     return false;
 }
-
 
 bool is_file_type(
         const char* file_pth,
@@ -579,7 +545,6 @@ bool is_file_type(
     return false;
 }
 
-
 bool is_file_type(
         const wchar_t* file_pth,
         system::filesystem::file_types file_typ,
@@ -594,7 +559,6 @@ bool is_file_type(
     return false;
 }
 
-
 bool is_pipe(const char* file_pth, std::error_code* err_code) noexcept
 {
     struct ::stat infos;
@@ -608,7 +572,6 @@ bool is_pipe(const char* file_pth, std::error_code* err_code) noexcept
     return S_ISFIFO(infos.st_mode);
 }
 
-
 bool is_pipe(const wchar_t* file_pth, std::error_code* err_code) noexcept
 {
     std::string str;
@@ -618,7 +581,6 @@ bool is_pipe(const wchar_t* file_pth, std::error_code* err_code) noexcept
     }
     return false;
 }
-
 
 bool is_regular_file(const char* file_pth, std::error_code* err_code) noexcept
 {
@@ -633,7 +595,6 @@ bool is_regular_file(const char* file_pth, std::error_code* err_code) noexcept
     return S_ISREG(infos.st_mode);
 }
 
-
 bool is_regular_file(const wchar_t* file_pth, std::error_code* err_code) noexcept
 {
     std::string str;
@@ -643,7 +604,6 @@ bool is_regular_file(const wchar_t* file_pth, std::error_code* err_code) noexcep
     }
     return false;
 }
-
 
 bool is_socket(const char* file_pth, std::error_code* err_code) noexcept
 {
@@ -658,7 +618,6 @@ bool is_socket(const char* file_pth, std::error_code* err_code) noexcept
     return S_ISSOCK(infos.st_mode);
 }
 
-
 bool is_socket(const wchar_t* file_pth, std::error_code* err_code) noexcept
 {
     std::string str;
@@ -668,7 +627,6 @@ bool is_socket(const wchar_t* file_pth, std::error_code* err_code) noexcept
     }
     return false;
 }
-
 
 bool is_symlink(const char* file_pth, std::error_code* err_code) noexcept
 {
@@ -683,7 +641,6 @@ bool is_symlink(const char* file_pth, std::error_code* err_code) noexcept
     return S_ISLNK(infos.st_mode);
 }
 
-
 bool is_symlink(const wchar_t* file_pth, std::error_code* err_code) noexcept
 {
     std::string str;
@@ -693,7 +650,6 @@ bool is_symlink(const wchar_t* file_pth, std::error_code* err_code) noexcept
     }
     return false;
 }
-
 
 bool mkdir(const char* directory_pth, std::error_code* err_code) noexcept
 {
@@ -706,7 +662,6 @@ bool mkdir(const char* directory_pth, std::error_code* err_code) noexcept
     return true;
 }
 
-
 bool mkdir(const wchar_t* directory_pth, std::error_code* err_code) noexcept
 {
     std::string str;
@@ -716,7 +671,6 @@ bool mkdir(const wchar_t* directory_pth, std::error_code* err_code) noexcept
     }
     return false;
 }
-
 
 bool mkdir_recursively(
         const char* directory_pth,
@@ -775,7 +729,6 @@ bool mkdir_recursively(
     return true;
 }
 
-
 bool mkdir_recursively(
         const wchar_t* directory_pth,
         std::error_code* err_code
@@ -788,7 +741,6 @@ bool mkdir_recursively(
     }
     return false;
 }
-
 
 bool opendir(
         system::filesystem::directory_entity* directory_ent,
@@ -806,7 +758,6 @@ bool opendir(
     
     return true;
 }
-
 
 bool opendir(
         system::filesystem::wdirectory_entity* directory_ent,
@@ -830,7 +781,6 @@ bool opendir(
 
     return true;
 }
-
 
 bool readdir(
         system::filesystem::directory_entity* directory_ent,
@@ -856,7 +806,6 @@ bool readdir(
     
     return true;
 }
-
 
 bool readdir(
         system::filesystem::wdirectory_entity* directory_ent,
@@ -888,7 +837,6 @@ bool readdir(
     return true;
 }
 
-
 bool rmdir(const char* directory_pth, std::error_code* err_code) noexcept
 {
     if (::rmdir(directory_pth) == -1)
@@ -900,7 +848,6 @@ bool rmdir(const char* directory_pth, std::error_code* err_code) noexcept
     return true;
 }
 
-
 bool rmdir(const wchar_t* directory_pth, std::error_code* err_code) noexcept
 {
     std::string str;
@@ -911,7 +858,6 @@ bool rmdir(const wchar_t* directory_pth, std::error_code* err_code) noexcept
     return false;
 }
 
-
 bool shortcut(
         const char* target_pth,
         const char* shortcut_pth,
@@ -921,7 +867,6 @@ bool shortcut(
     return symlink(target_pth, shortcut_pth, err_code);
 }
 
-
 bool shortcut(
         const wchar_t* target_pth,
         const wchar_t* shortcut_pth,
@@ -930,7 +875,6 @@ bool shortcut(
 {
     return symlink(target_pth, shortcut_pth, err_code);
 }
-
 
 bool symlink(const char* target_pth, const char* link_pth, std::error_code* err_code) noexcept
 {
@@ -942,7 +886,6 @@ bool symlink(const char* target_pth, const char* link_pth, std::error_code* err_
     
     return true;
 }
-
 
 bool symlink(const wchar_t* target_pth, const wchar_t* link_pth, std::error_code* err_code) noexcept
 {
@@ -956,7 +899,6 @@ bool symlink(const wchar_t* target_pth, const wchar_t* link_pth, std::error_code
     return false;
 }
 
-
 bool touch(const char* regular_file_pth, std::error_code* err_code) noexcept
 {
     if (::mknod(regular_file_pth, 0755, S_IFREG) == -1)
@@ -968,7 +910,6 @@ bool touch(const char* regular_file_pth, std::error_code* err_code) noexcept
     return true;
 }
 
-
 bool touch(const wchar_t* regular_file_pth, std::error_code* err_code) noexcept
 {
     std::string str;
@@ -978,7 +919,6 @@ bool touch(const wchar_t* regular_file_pth, std::error_code* err_code) noexcept
     }
     return false;
 }
-
 
 bool unlink(const char* regular_file_pth, std::error_code* err_code) noexcept
 {
@@ -991,7 +931,6 @@ bool unlink(const char* regular_file_pth, std::error_code* err_code) noexcept
     return true;
 }
 
-
 bool unlink(const wchar_t* regular_file_pth, std::error_code* err_code) noexcept
 {
     std::string str;
@@ -1002,8 +941,6 @@ bool unlink(const wchar_t* regular_file_pth, std::error_code* err_code) noexcept
     return false;
 }
 
-
 }
-
 
 #endif

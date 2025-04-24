@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/terminal/terminal.hpp
+ * @file        terminal.hpp
  * @brief       system terminal main header.
  * @author      Killian Valverde
  * @date        2023/10/10
@@ -30,27 +30,20 @@
 #include "operations.hpp"
 #include "text_attribute.hpp"
 
-
 namespace speed::system {
-
 
 /**
  * @brief       Contains resources for interacting and customizing the terminal.
  */
 namespace terminal {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contains resources for interacting and customizing the terminal.
  */
 namespace term = terminal;
-
 #endif
 
-
 }
-
 
 #endif

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/winapi/terminal/terminal.hpp
+ * @file        terminal.hpp
  * @brief       winapi terminal main header.
  * @author      Killian Valverde
  * @date        2023/10/31
@@ -32,18 +32,14 @@
 
 #include "operations.hpp"
 
-
 namespace speed::system::api::winapi {
-
 
 /**
  * @brief       Contains resources for interacting and customizing the terminal.
  */
 namespace terminal {}
 
-
 }
-
 
 #endif
 #endif

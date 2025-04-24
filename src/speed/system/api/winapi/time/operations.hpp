@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/winapi/time/operations.hpp
+ * @file        operations.hpp
  * @brief       time operations header.
  * @author      Killian Valverde
  * @date        2017/10/18
@@ -33,9 +33,7 @@
 #include "../../../errors/errors.hpp"
 #include "../../../time/time_specification.hpp"
 
-
 namespace speed::system::api::winapi::time {
-
 
 /**
  * @brief       Get a monotonic time since some unspecified starting point.
@@ -48,7 +46,6 @@ bool get_monotonic_time(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 /**
  * @brief       Get a cpu time since some unspecified starting point.
  * @param       time_spec : The value in which store the result.
@@ -60,9 +57,7 @@ bool get_cpu_time(
         std::error_code* err_code = nullptr
 ) noexcept;
 
-
 }
-
 
 #endif
 #endif

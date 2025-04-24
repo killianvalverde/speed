@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/filesystem/access_modes.hpp
+ * @file        access_modes.hpp
  * @brief       access_modes header.
  * @author      Killian Valverde
  * @date        2019/03/22
@@ -31,9 +31,7 @@
 
 #include "../../lowlevel/lowlevel.hpp"
 
-
 namespace speed::system::filesystem {
-
 
 /**
  * @brief       Represents the files access modes.
@@ -59,13 +57,10 @@ enum class access_modes : std::uint8_t
     FULL = 0xF
 };
 
-
 /** Represents the files access modes. */
 using am_t = access_modes;
 
-
 }
-
 
 /** @cond */
 namespace speed::lowlevel {
@@ -76,6 +71,5 @@ struct enable_bitwise_operators<speed::system::filesystem::access_modes>
 };
 }
 /** @endcond */
-
 
 #endif
