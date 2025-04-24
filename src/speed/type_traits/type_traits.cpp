@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/type_traits/type_traits.cpp
+ * @file        type_traits.cpp
  * @brief       type_traits module object.
  * @author      Killian Valverde
  * @date        2024/10/11
