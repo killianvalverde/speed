@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/version.hpp
+ * @file        version.hpp
  * @brief       File that include the library version macros.
  * @author      Killian Valverde
  * @date        2018/06/09
