@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/time/time.hpp
+ * @file        time.hpp
  * @brief       time functions header.
  * @author      Killian Valverde
  * @date        2017/10/29
@@ -32,27 +32,20 @@
 #include "cpu_chrono.hpp"
 #include "monotonic_chrono.hpp"
 
-
 namespace speed {
-
 
 /**
  * @brief       Contains resources and facilities related to time manipulation.
  */
 namespace time {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contains resources and facilities related to time manipulation.
  */
 namespace tm = time;
-
 #endif
 
-
 }
-
 
 #endif

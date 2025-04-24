@@ -18,7 +18,7 @@
  */
 
 /**
- * @file       speed/time/chrono_base.cpp
+ * @file       chrono_base.cpp
  * @brief      chrono_base class methods definition.
  * @author     Killian Valverde
  * @date       2017/10/28
@@ -26,9 +26,7 @@
 
 #include "chrono_base.hpp"
 
-
 namespace speed::time {
-
 
 chrono_base::chrono_base() noexcept
         : start_time_spec_()
@@ -36,7 +34,6 @@ chrono_base::chrono_base() noexcept
         , chrn_state_(chrono_states::READY)
 {
 }
-
 
 bool chrono_base::start() noexcept
 {
@@ -50,7 +47,6 @@ bool chrono_base::start() noexcept
     return false;
 }
 
-
 bool chrono_base::stop() noexcept
 {
     if (chrn_state_ == chrono_states::RUNNING)
@@ -62,7 +58,6 @@ bool chrono_base::stop() noexcept
     
     return false;
 }
-
 
 bool chrono_base::resume() noexcept
 {
@@ -76,7 +71,6 @@ bool chrono_base::resume() noexcept
     return false;
 }
 
-
 bool chrono_base::restart() noexcept
 {
     if (chrn_state_ != chrono_states::READY)
@@ -89,12 +83,10 @@ bool chrono_base::restart() noexcept
     return false;
 }
 
-
 long double chrono_base::get_elapsed_time() const noexcept
 {
     return get_elapsed_raw_time().get_time();
 }
-
 
 speed::system::time::time_specification chrono_base::get_elapsed_raw_time() const noexcept
 {
@@ -111,7 +103,6 @@ speed::system::time::time_specification chrono_base::get_elapsed_raw_time() cons
     
     return elapsed_tme;
 }
-
 
 template<typename TpChar, typename TpCharTraits>
 std::basic_ostream<TpChar, TpCharTraits>& chrono_base::print(
@@ -145,6 +136,5 @@ std::basic_ostream<TpChar, TpCharTraits>& chrono_base::print(
 
     return os;
 }
-
 
 }

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file       speed/time/chrono_base.hpp
+ * @file       chrono_base.hpp
  * @brief      chrono_base class header.
  * @author     Killian Valverde
  * @date       2017/10/28
@@ -33,9 +33,7 @@
 #include "../system/system.hpp"
 #include "chrono_states.hpp"
 
-
 namespace speed::time {
-
 
 /**
  * @brief       Class that represents the base of all chronos.
@@ -163,7 +161,6 @@ private:
     chrono_states chrn_state_;
 };
 
-
 /**
  * @brief       Print the elapsed time with the object specified.
  * @param       os : The object used to print the elapsed time.
@@ -180,8 +177,6 @@ std::basic_ostream<TpChar, TpCharTraits>& operator <<(
     return os;
 }
 
-
 }
-
 
 #endif
