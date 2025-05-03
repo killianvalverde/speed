@@ -38,6 +38,13 @@ TEST(type_casting_try_type_cast, basic_string_to_type)
     ASSERT_TRUE(res == 347865);
 }
 
+TEST(type_casting_try_type_cast, path_to_type)
+{
+    int res;
+    ASSERT_TRUE(speed::type_casting::try_type_cast<int>(std::filesystem::path("347865"), &res));
+    ASSERT_TRUE(res == 347865);
+}
+
 TEST(type_casting_try_type_cast, c_string_to_string)
 {
     std::string res;
