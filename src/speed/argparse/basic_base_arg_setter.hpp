@@ -153,7 +153,7 @@ public:
 
     /**
      * @brief       Allows to specify whether is mandatory to found the argument in the program
-     *              call. By defaul only keyless arguments are mandatory.
+     *              call. By defaul only positional arguments are mandatory.
      * @param       enabl : Specify wheter the feature is enable.
      * @return      The object who call the method.
      */

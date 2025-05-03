@@ -38,7 +38,7 @@
 #include "basic_help_arg.hpp"
 #include "basic_key_arg.hpp"
 #include "basic_key_value_arg.hpp"
-#include "basic_keyless_arg.hpp"
+#include "basic_positional_arg.hpp"
 #include "basic_value_arg.hpp"
 #include "basic_version_arg.hpp"
 #include "forward_declarations.hpp"
@@ -81,7 +81,7 @@ public:
     using version_arg_type = basic_version_arg<TpAllocator>;
 
     /** Type that represents arguments without keys. */
-    using keyless_arg_type = basic_keyless_arg<TpAllocator>;
+    using positional_arg_type = basic_positional_arg<TpAllocator>;
     
     /** Type that represents arguments that have keys and values. */
     using key_value_arg_type = basic_key_value_arg<TpAllocator>;
@@ -147,10 +147,10 @@ public:
      */
     void add_entry(base_arg_type* bse_arg)
     {
-        auto* kyless_arg = dynamic_cast<keyless_arg_type*>(bse_arg);
-        if (kyless_arg != nullptr)
+        auto* positionl_arg = dynamic_cast<positional_arg_type*>(bse_arg);
+        if (positionl_arg != nullptr)
         {
-            kyless_args_.push_back(kyless_arg);
+            positionl_args_.push_back(positionl_arg);
         }
         else
         {
@@ -164,14 +164,14 @@ public:
      */
     void remove_entry(base_arg_type* bse_arg)
     {
-        auto* kyless_arg = dynamic_cast<keyless_arg_type*>(bse_arg);
-        if (kyless_arg != nullptr)
+        auto* positionl_arg = dynamic_cast<positional_arg_type*>(bse_arg);
+        if (positionl_arg != nullptr)
         {
-            for (auto it = kyless_args_.begin(); it != kyless_args_.end(); ++it)
+            for (auto it = positionl_args_.begin(); it != positionl_args_.end(); ++it)
             {
-                if (kyless_arg == *it)
+                if (positionl_arg == *it)
                 {
-                    kyless_args_.erase(it);
+                    positionl_args_.erase(it);
                     break;
                 }
             }
@@ -204,11 +204,11 @@ public:
             }
         }
 
-        for (auto& kyless_arg : kyless_args_)
+        for (auto& positionl_arg : positionl_args_)
         {
-            if (flgs_.is_set(help_menu_flags::PRINT_VALUES) && !kyless_arg->is_help_text_empty())
+            if (flgs_.is_set(help_menu_flags::PRINT_VALUES) && !positionl_arg->is_help_text_empty())
             {
-                update_max_keys_length_from_keyless_arg(kyless_arg);
+                update_max_keys_length_from_positional_arg(positionl_arg);
             }
         }
     }
@@ -233,12 +233,12 @@ public:
     }
 
     /**
-     * @brief       Update the maximum keys length fron a keyless argument.
-     * @param       kyless_arg : Keyless argument to check.
+     * @brief       Update the maximum keys length fron a positional argument.
+     * @param       positionl_arg : positional argument to check.
      */
-    void update_max_keys_length_from_keyless_arg(keyless_arg_type* kyless_arg) noexcept
+    void update_max_keys_length_from_positional_arg(positional_arg_type* positionl_arg) noexcept
     {
-        std::size_t short_kys_len = kyless_arg->get_short_keys_length();
+        std::size_t short_kys_len = positionl_arg->get_short_keys_length();
         std::size_t totl = max_short_kys_len_ + max_long_kys_len_;
 
         if (short_kys_len > totl)
@@ -452,9 +452,9 @@ public:
 
         bool fnd = false;
 
-        for (auto& kyless_arg : kyless_args_)
+        for (auto& positionl_arg : positionl_args_)
         {
-            if (!kyless_arg->is_help_text_empty())
+            if (!positionl_arg->is_help_text_empty())
             {
                 fnd = true;
             }
@@ -466,9 +466,9 @@ public:
 
         std::cout << "Values:\n";
 
-        for (auto& kyless_arg : kyless_args_)
+        for (auto& positionl_arg : positionl_args_)
         {
-            print_arg(kyless_arg);
+            print_arg(positionl_arg);
         }
 
         std::cout << '\n';
@@ -544,8 +544,8 @@ private:
     /** They key args of the help menu. */
     vector_type<key_arg_type*> ky_args_;
 
-    /** The keyless args of the help menu. */
-    vector_type<keyless_arg_type*> kyless_args_;
+    /** The positional args of the help menu. */
+    vector_type<positional_arg_type*> positionl_args_;
 
     /** Reference to the argument parser that holds this object. */
     arg_parser_type* arg_parsr_;

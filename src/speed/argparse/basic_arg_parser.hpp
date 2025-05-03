@@ -54,8 +54,8 @@
 #include "basic_key_arg_setter.hpp"
 #include "basic_key_value_arg.hpp"
 #include "basic_key_value_arg_setter.hpp"
-#include "basic_keyless_arg.hpp"
-#include "basic_keyless_arg_setter.hpp"
+#include "basic_positional_arg.hpp"
+#include "basic_positional_arg_setter.hpp"
 #include "basic_version_arg.hpp"
 #include "basic_version_arg_setter.hpp"
 
@@ -120,17 +120,17 @@ public:
     /** Type that represents arguments that have values. */
     using value_arg_type = basic_value_arg<TpAllocator>;
     
-    /** Type that represents the argument to get the version information. */
-    using version_arg_type = basic_version_arg<TpAllocator>;
-
-    /** Type that represents arguments without keys. */
-    using keyless_arg_type = basic_keyless_arg<TpAllocator>;
-    
     /** Type that represents arguments that have keys and values. */
     using key_value_arg_type = basic_key_value_arg<TpAllocator>;
 
+    /** Type that represents arguments without keys. */
+    using positional_arg_type = basic_positional_arg<TpAllocator>;
+
     /** Type that represents the option to get the help information. */
     using help_arg_type = basic_help_arg<TpAllocator>;
+    
+    /** Type that represents the argument to get the version information. */
+    using version_arg_type = basic_version_arg<TpAllocator>;
 
     /** Type that represents a constraint for a set of arguments. */
     using arg_constraint_type = basic_arg_constraint<TpAllocator>;
@@ -141,17 +141,17 @@ public:
     /** Type used to configure an added key argument. */
     using key_arg_setter_type = basic_key_arg_setter<TpAllocator>;
 
-    /** Type used to configure an added version argument. */
-    using version_arg_setter_type = basic_version_arg_setter<TpAllocator>;
-
-    /** Type used to configure an added keyless argument. */
-    using keyless_arg_setter_type = basic_keyless_arg_setter<TpAllocator>;
-
     /** Type used to configure an added key value argument. */
     using key_value_arg_setter_type = basic_key_value_arg_setter<TpAllocator>;
 
+    /** Type used to configure an added positional argument. */
+    using positional_arg_setter_type = basic_positional_arg_setter<TpAllocator>;
+
     /** Type used to configure an added help argument. */
     using help_arg_setter_type = basic_help_arg_setter<TpAllocator>;
+
+    /** Type used to configure an added version argument. */
+    using version_arg_setter_type = basic_version_arg_setter<TpAllocator>;
 
     /** Type used to configure an added argument constraint. */
     using arg_constraint_setter_type = basic_arg_constraint_setter<TpAllocator>;
@@ -270,22 +270,22 @@ public:
 
     /**
      * @brief       Add an argument that just has values and doesn't have keys.
-     * @param       usage_ky : The ID that will be used to make refence to this argument in the
+     * @param       ky : The ID that will be used to make refence to this argument in the
      *              parser as well as being used during the printing of the usage message.
      */
     template<typename TpString_>
-    keyless_arg_setter_type add_keyless_arg(TpString_&& usage_ky)
+    positional_arg_setter_type add_positional_arg(TpString_&& ky)
     {
-        assert_valid_key(usage_ky);
+        assert_valid_key(ky);
         
-        unique_ptr_type<keyless_arg_type> kyless_arg =
-                speed::memory::allocate_unique<keyless_arg_type>(
-                        allocator_type<keyless_arg_type>(), this, usage_ky);
+        unique_ptr_type<positional_arg_type> positionl_arg =
+                speed::memory::allocate_unique<positional_arg_type>(
+                        allocator_type<positional_arg_type>(), this, ky);
         
-        keyless_arg_setter_type kyless_arg_settr(kyless_arg.get());
-        register_keyless_arg(std::move(kyless_arg), std::forward<TpString_>(usage_ky));
+        positional_arg_setter_type positionl_arg_settr(positionl_arg.get());
+        register_positional_arg(std::move(positionl_arg), std::forward<TpString_>(ky));
         
-        return kyless_arg_settr;
+        return positionl_arg_settr;
     }
     
     /**
@@ -364,7 +364,7 @@ public:
         enum class dfa_t : std::uint8_t
         {
             START, READ_ARG, PARSE_KEY, PARSE_KEY_ARG, PARSE_EQ_OPERATOR, PARSE_GROUPING_ARGS,
-            PARSE_KEYLESS_ARG, PARSE_UNRECOGNIZED_ARG, QUIT, FINISH
+            PARSE_POSITIONAL_ARG, PARSE_UNRECOGNIZED_ARG, QUIT, FINISH
         };
 
         dfa_t cur_state;
@@ -376,12 +376,12 @@ public:
         std::size_t eq_pos;
         key_arg_type *ky_arg = nullptr;
         key_value_arg_type *ky_val_arg = nullptr;
-        keyless_arg_type *kyless_arg = nullptr;
+        positional_arg_type *positionl_arg = nullptr;
         base_arg_type *prev_arg = nullptr;
         vector_type<key_arg_type*> chaind_args;
         bool insertd;
         bool prefix_err;
-        auto cur_bse_arg_it = get_first_keyless_arg(bse_arg_list_.begin());
+        auto cur_bse_arg_it = get_first_positional_arg(bse_arg_list_.begin());
 
         for (cur_state = dfa_t::START; cur_state != dfa_t::FINISH; )
         {
@@ -474,31 +474,32 @@ public:
                     prev_arg = static_cast<base_arg_type*>(chaind_args.back());
                     continue;
                 }
-                cur_state = dfa_t::PARSE_KEYLESS_ARG;
+                cur_state = dfa_t::PARSE_POSITIONAL_ARG;
                 continue;
 
-            case dfa_t::PARSE_KEYLESS_ARG:
+            case dfa_t::PARSE_POSITIONAL_ARG:
                 insertd = false;
                 while (cur_bse_arg_it != bse_arg_list_.end() &&
-                       dynamic_cast<keyless_arg_type*>(cur_bse_arg_it->get())->max_values_reached())
+                       dynamic_cast<positional_arg_type*>(cur_bse_arg_it->get())
+                            ->max_values_reached())
                 {
-                    cur_bse_arg_it = get_first_keyless_arg(++cur_bse_arg_it);
+                    cur_bse_arg_it = get_first_positional_arg(++cur_bse_arg_it);
                 }
                 while (cur_bse_arg_it != bse_arg_list_.end())
                 {
-                    kyless_arg = dynamic_cast<keyless_arg_type*>(cur_bse_arg_it->get());
-                    prefix_err = has_value_with_prefix_error(kyless_arg, cur_argv);
-                    if (prefix_err || !kyless_arg->try_add_value(cur_argv))
+                    positionl_arg = dynamic_cast<positional_arg_type*>(cur_bse_arg_it->get());
+                    prefix_err = has_value_with_prefix_error(positionl_arg, cur_argv);
+                    if (prefix_err || !positionl_arg->try_add_value(cur_argv))
                     {
-                        if (kyless_arg->min_values_reached() ||
-                            (kyless_arg->get_number_of_values() > 0 && prefix_err))
+                        if (positionl_arg->min_values_reached() ||
+                            (positionl_arg->get_number_of_values() > 0 && prefix_err))
                         {
-                            cur_bse_arg_it = get_first_keyless_arg(++cur_bse_arg_it);
+                            cur_bse_arg_it = get_first_positional_arg(++cur_bse_arg_it);
                             continue;
                         }
                         else if (!prefix_err)
                         {
-                            kyless_arg->add_value(std::move(cur_argv));
+                            positionl_arg->add_value(std::move(cur_argv));
                             insertd = true;
                         }
                         break;
@@ -508,14 +509,14 @@ public:
                 }
                 if (insertd)
                 {
-                    if (static_cast<base_arg_type*>(kyless_arg) !=  prev_arg)
+                    if (static_cast<base_arg_type*>(positionl_arg) !=  prev_arg)
                     {
-                        kyless_arg->execute_action();
-                        kyless_arg->set_found(true);
+                        positionl_arg->execute_action();
+                        positionl_arg->set_found(true);
                     }
                     ++cur_idx;
                     cur_state = dfa_t::READ_ARG;
-                    prev_arg = kyless_arg;
+                    prev_arg = positionl_arg;
                     continue;
                 }
                 cur_state = dfa_t::PARSE_UNRECOGNIZED_ARG;
@@ -958,19 +959,19 @@ private:
     }
 
     /**
-     * @brief       Register in the data stuctures a specified keyless argument and its usage key.
-     * @param       kyless_arg : Keyless argument to register.
-     * @param       usage_ky : Usage key of the keyless argument.
+     * @brief       Register in the data stuctures a specified positional argument and its key.
+     * @param       positionl_arg : positional argument to register.
+     * @param       ky : Key of the positional argument.
      */
     template<typename TpString_>
-    inline void register_keyless_arg(
-            unique_ptr_type<keyless_arg_type> kyless_arg,
-            TpString_&& usage_ky
+    inline void register_positional_arg(
+            unique_ptr_type<positional_arg_type> positionl_arg,
+            TpString_&& ky
     )
     {
-        bse_arg_map_.emplace(std::forward<TpString_>(usage_ky), kyless_arg.get());
-        register_into_help_menus(kyless_arg.get());
-        bse_arg_list_.emplace_back(std::move(kyless_arg));
+        bse_arg_map_.emplace(std::forward<TpString_>(ky), positionl_arg.get());
+        register_into_help_menus(positionl_arg.get());
+        bse_arg_list_.emplace_back(std::move(positionl_arg));
     }
 
     /**
@@ -1459,18 +1460,20 @@ private:
     }
     
     /**
-     * @brief       Get a reference to a keyless argument.
-     * @param       usage_ky : Usage key of the argument to get.
+     * @brief       Get a reference to a positional argument.
+     * @param       ky : Key of the argument to get.
      * @return      If function was successful a reference to the argument found is returned, if not
      *              a null pointer is returned.
      */
-    [[nodiscard]] keyless_arg_type* get_keyless_arg(const string_type& usage_ky) const noexcept
+    [[nodiscard]] positional_arg_type* get_positional_arg(
+            const string_type& ky
+    ) const noexcept
     {
-        auto it = bse_arg_map_.find(usage_ky);
+        auto it = bse_arg_map_.find(ky);
         
         if (it != bse_arg_map_.end())
         {
-            return dynamic_cast<keyless_arg_type*>(it->second);
+            return dynamic_cast<positional_arg_type*>(it->second);
         }
         
         return nullptr;
@@ -1523,19 +1526,19 @@ private:
     }
     
     /**
-     * @brief       Finds the first keyless argument in the argument list starting from the given
+     * @brief       Finds the first positional argument in the argument list starting from the given
      *              iterator.
      * @param       it : An iterator to the starting position in a vector of `unique_ptr` to
      *              `base_arg_type`.
-     * @return      An iterator pointing to the first `keyless_arg_type` element found, or to the
+     * @return      An iterator pointing to the first `positional_arg_type` element found, or to the
      *              end of the list.
      */
-    inline vector_type<unique_ptr_type<base_arg_type>>::iterator get_first_keyless_arg(
+    inline vector_type<unique_ptr_type<base_arg_type>>::iterator get_first_positional_arg(
             vector_type<unique_ptr_type<base_arg_type>>::iterator it
     ) const noexcept
     {
         while (it != bse_arg_list_.end() &&
-                dynamic_cast<keyless_arg_type*>(it->get()) == nullptr)
+                dynamic_cast<positional_arg_type*>(it->get()) == nullptr)
         {
             ++it;
         }
@@ -1595,12 +1598,12 @@ private:
     }
     
     /**
-     * @brief       Retrieves the next keyless argument from the given iterator position.
+     * @brief       Retrieves the next positional argument from the given iterator position.
      * @param       it : An iterator pointing to the current position in the base argument list.
-     * @return      An iterator pointing to the next keyless argument, or `bse_arg_list_.end()` if
-     *              none is found.
+     * @return      An iterator pointing to the next positional argument, or `bse_arg_list_.end()`
+     *              if none is found.
      */
-    inline vector_type<unique_ptr_type<base_arg_type>>::iterator get_next_keyless_arg(
+    inline vector_type<unique_ptr_type<base_arg_type>>::iterator get_next_positional_arg(
             vector_type<unique_ptr_type<base_arg_type>>::iterator it
     ) const noexcept
     {
@@ -1609,7 +1612,7 @@ private:
             ++it;
         }
         
-        return get_first_keyless_arg(std::move(it));
+        return get_first_positional_arg(std::move(it));
     }
     
     /**
@@ -1783,15 +1786,15 @@ private:
      */
     inline void print_values_usage()
     {
-        keyless_arg_type * kyless_arg;
+        positional_arg_type* positionl_arg;
 
         for (auto& bse_arg : bse_arg_list_)
         {
-            kyless_arg = dynamic_cast<keyless_arg_type*>(bse_arg.get());
-            if (kyless_arg != nullptr)
+            positionl_arg = dynamic_cast<positional_arg_type*>(bse_arg.get());
+            if (positionl_arg != nullptr)
             {
                 std::cout << ' ';
-                kyless_arg->print_usage();
+                positionl_arg->print_usage();
             }
         }
     }
@@ -1903,10 +1906,10 @@ private:
     friend class basic_base_arg<TpAllocator>;
     friend class basic_key_arg<TpAllocator>;
     friend class basic_value_arg<TpAllocator>;
-    friend class basic_version_arg<TpAllocator>;
-    friend class basic_keyless_arg<TpAllocator>;
     friend class basic_key_value_arg<TpAllocator>;
+    friend class basic_positional_arg<TpAllocator>;
     friend class basic_help_arg<TpAllocator>;
+    friend class basic_version_arg<TpAllocator>;
     friend class basic_arg_constraint<TpAllocator>;
     friend class basic_help_menu<TpAllocator>;
     friend class basic_arg_parser_setter<TpAllocator>;

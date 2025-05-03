@@ -264,7 +264,7 @@ public:
 
     /**
      * @brief       Allows to specify whether the values have to be printed. The values are the
-     *              keyless arguments. This feature is enabled by default.
+     *              positional arguments. This feature is enabled by default.
      * @param       enabl : Specify wheter the feature is enable.
      * @return      The object who call the method.
      */

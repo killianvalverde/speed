@@ -18,14 +18,14 @@
  */
 
 /**
- * @file        basic_keyless_arg.hpp
- * @brief       basic_keyless_arg class header.
+ * @file        basic_positional_arg.hpp
+ * @brief       basic_positional_arg class header.
  * @author      Killian Valverde
  * @date        2016/03/11
  */
 
-#ifndef SPEED_ARGPARSE_BASIC_KEYLESS_ARG_HPP
-#define SPEED_ARGPARSE_BASIC_KEYLESS_ARG_HPP
+#ifndef SPEED_ARGPARSE_BASIC_POSITIONAL_ARG_HPP
+#define SPEED_ARGPARSE_BASIC_POSITIONAL_ARG_HPP
 
 #include <memory>
 #include <string>
@@ -43,7 +43,7 @@ namespace speed::argparse {
  * @brief       Class that represents arguments without keys.
  */
 template<typename TpAllocator>
-class basic_keyless_arg : public basic_value_arg<TpAllocator>
+class basic_positional_arg : public basic_value_arg<TpAllocator>
 {
 public:
     /** Allocator type used in the class. */
@@ -71,52 +71,52 @@ public:
      * @param       usage_ky : Key used in the usage message.
      */
     template<typename TpString_>
-    basic_keyless_arg(arg_parser_type* arg_parsr, TpString_&& usage_ky)
+    basic_positional_arg(arg_parser_type* arg_parsr, TpString_&& usage_ky)
             : base_arg_type(arg_parsr)
             , value_arg_type(arg_parsr)
-            , usage_ky_(std::forward<TpString_>(usage_ky))
+            , ky_(std::forward<TpString_>(usage_ky))
     {
         base_arg_type::clear_flags();
-        base_arg_type::set_flags(arg_flags::DEFAULT_KEYLESS_ARG_FLAGS);
+        base_arg_type::set_flags(arg_flags::DEFAULT_positional_ARG_FLAGS);
 
-        if (usage_ky_.empty())
+        if (ky_.empty())
         {
             throw no_key_specified_exception();
         }
 
-        base_arg_type::set_error_name(usage_ky_);
+        base_arg_type::set_error_name(ky_);
     }
     
     /**
      * @brief       Copy constructor.
      * @param       rhs : Object to copy.
      */
-    basic_keyless_arg(const basic_keyless_arg& rhs) = default;
+    basic_positional_arg(const basic_positional_arg& rhs) = default;
     
     /**
      * @brief       Move constructor.
      * @param       rhs : Object to move.
      */
-    basic_keyless_arg(basic_keyless_arg&& rhs) noexcept = default;
+    basic_positional_arg(basic_positional_arg&& rhs) noexcept = default;
     
     /**
      * @brief       Destructor.
      */
-    ~basic_keyless_arg() = default;
+    ~basic_positional_arg() = default;
     
     /**
      * @brief       Copy assignment operator.
      * @param       rhs : Object to copy.
      * @return      The object who call the method.
      */
-    basic_keyless_arg& operator =(const basic_keyless_arg& rhs) = default;
+    basic_positional_arg& operator =(const basic_positional_arg& rhs) = default;
     
     /**
      * @brief       Move assignment operator.
      * @param       rhs : Object to move.
      * @return      The object who call the method.
      */
-    basic_keyless_arg& operator =(basic_keyless_arg&& rhs) noexcept = default;
+    basic_positional_arg& operator =(basic_positional_arg&& rhs) noexcept = default;
 
     /**
      * @brief       Only used for polymorphic propose.
@@ -133,7 +133,7 @@ public:
      */
     [[nodiscard]] virtual std::size_t get_name_length() const override
     {
-        return usage_ky_.size();
+        return ky_.size();
     }
 
     /**
@@ -147,7 +147,7 @@ public:
             return 0;
         }
 
-        return speed::safety::addm(usage_ky_.length(), 2);
+        return speed::safety::addm(ky_.length(), 2);
     }
 
     /**
@@ -164,7 +164,7 @@ public:
      */
     void print_name() override
     {
-        std::cout << usage_ky_;
+        std::cout << ky_;
     }
     
     /**
@@ -174,11 +174,11 @@ public:
     {
         if (base_arg_type::is_flag_set(arg_flags::MANDATORY))
         {
-            std::cout << usage_ky_;
+            std::cout << ky_;
         }
         else
         {
-            std::cout << "[" << usage_ky_ << "]";
+            std::cout << "[" << ky_ << "]";
         }
         
         if (value_arg_type::get_max_values() > 1)
@@ -208,7 +208,7 @@ public:
             return;
         }
         
-        std::size_t current_id_len = speed::safety::addm(usage_ky_.length(), 2);
+        std::size_t current_id_len = speed::safety::addm(ky_.length(), 2);
         std::size_t total_id_len = speed::safety::addm(short_kys_len, long_kys_len);
         std::size_t i;
     
@@ -217,7 +217,7 @@ public:
             std::cout << ' ';
         }
     
-        std::cout << usage_ky_ << "  ";
+        std::cout << ky_ << "  ";
         
         if (current_id_len < total_id_len)
         {
@@ -235,7 +235,7 @@ public:
 
 private:
     /** The id used to reference a value argument in the help menu. */
-    string_type usage_ky_;
+    string_type ky_;
 };
 
 }

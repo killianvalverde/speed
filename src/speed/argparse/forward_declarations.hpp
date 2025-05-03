@@ -45,16 +45,16 @@ template<typename TpAllocator>
 class basic_value_arg;
 
 template<typename TpAllocator>
-class basic_version_arg;
-
-template<typename TpAllocator>
-class basic_keyless_arg;
-
-template<typename TpAllocator>
 class basic_key_value_arg;
 
 template<typename TpAllocator>
+class basic_positional_arg;
+
+template<typename TpAllocator>
 class basic_help_arg;
+
+template<typename TpAllocator>
+class basic_version_arg;
 
 template<typename TpAllocator>
 class basic_arg_constraint;
@@ -75,16 +75,16 @@ template<typename TpAllocator, typename TpActual>
 class basic_value_arg_setter;
 
 template<typename TpAllocator, typename TpActual>
-class basic_version_arg_setter;
-
-template<typename TpAllocator, typename TpActual>
-class basic_keyless_arg_setter;
-
-template<typename TpAllocator, typename TpActual>
 class basic_key_value_arg_setter;
 
 template<typename TpAllocator, typename TpActual>
+class basic_positional_arg_setter;
+
+template<typename TpAllocator, typename TpActual>
 class basic_help_arg_setter;
+
+template<typename TpAllocator, typename TpActual>
+class basic_version_arg_setter;
 
 template<typename TpAllocator>
 class basic_help_menu_setter;

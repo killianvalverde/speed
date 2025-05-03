@@ -85,8 +85,8 @@ enum class arg_flags : std::uint16_t
             ASSIGNMENT_OPERATOR
     ),
     
-    /** The default flags used for the keyless arguments. */
-    DEFAULT_KEYLESS_ARG_FLAGS = (
+    /** The default flags used for the positional arguments. */
+    DEFAULT_positional_ARG_FLAGS = (
             UNIQUE_INSTANCE |
             MANDATORY
     ),

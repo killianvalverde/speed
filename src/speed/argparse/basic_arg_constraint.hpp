@@ -39,7 +39,7 @@
 #include "basic_help_arg.hpp"
 #include "basic_key_arg.hpp"
 #include "basic_key_value_arg.hpp"
-#include "basic_keyless_arg.hpp"
+#include "basic_positional_arg.hpp"
 #include "basic_value_arg.hpp"
 #include "basic_version_arg.hpp"
 #include "exception.hpp"
@@ -87,7 +87,7 @@ public:
     using version_arg_type = basic_version_arg<TpAllocator>;
 
     /** Type that represents arguments without keys. */
-    using keyless_arg_type = basic_keyless_arg<TpAllocator>;
+    using positional_arg_type = basic_positional_arg<TpAllocator>;
     
     /** Type that represents arguments that have keys and values. */
     using key_value_arg_type = basic_key_value_arg<TpAllocator>;
