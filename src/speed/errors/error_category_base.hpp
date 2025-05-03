@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/errors/error_category_base.hpp
+ * @file        error_category_base.hpp
  * @brief       error_category_base class header.
  * @author      Killian Valverde
  * @date        2024/04/16
@@ -29,9 +29,7 @@
 
 #include <system_error>
 
-
 namespace speed::errors {
-
 
 /**
  * @brief       This type serves as a base class for specific category types
@@ -40,8 +38,6 @@ class error_category_base : public std::error_category
 {
 };
 
-
 }
-
 
 #endif

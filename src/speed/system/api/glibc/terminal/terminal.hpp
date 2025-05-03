@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/glibc/terminal/terminal.hpp
+ * @file        terminal.hpp
  * @brief       glibc terminal main header.
  * @author      Killian Valverde
  * @date        2023/10/31
@@ -32,18 +32,14 @@
 
 #include "operations.hpp"
 
-
 namespace speed::system::api::glibc {
-
 
 /**
  * @brief       Contains resources for interacting and customizing the terminal.
  */
 namespace terminal {}
 
-
 }
-
 
 #endif
 #endif

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_base_arg.hpp
+ * @file        basic_base_arg.hpp
  * @brief       basic_base_arg class header.
  * @author      Killian Valverde
  * @date        2015/12/28
@@ -40,9 +40,7 @@
 #include "exception.hpp"
 #include "forward_declarations.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Class that represents the base of the arguments hierarchy.
@@ -77,11 +75,7 @@ public:
      * @param       arg_parsr : Argument parser that holds this object.
      */
     explicit basic_base_arg(arg_parser_type* arg_parsr)
-            : hlp_menus_ids_assignd_()
-            , desc_()
-            , err_name_()
-            , actn_()
-            , arg_parsr_(arg_parsr)
+            : arg_parsr_(arg_parsr)
             , presence_holdr_(nullptr)
             , flgs_(arg_flags::NIL)
             , err_flgs_(arg_error_flags::NIL)
@@ -169,6 +163,12 @@ public:
      * @return      The necessary length to print long arguments keys.
      */
     [[nodiscard]] virtual std::size_t get_long_keys_length() noexcept = 0;
+
+    /**
+     * @brief       Get the necessary length to print the name of the argument.
+     * @return      The necessary length to print long argument name.
+     */
+    [[nodiscard]] virtual std::size_t get_name_length() const = 0;
 
     /**
      * @brief       Get the program name.
@@ -527,8 +527,6 @@ private:
     flags_type<arg_error_flags> err_flgs_;
 };
 
-
 }
-
 
 #endif

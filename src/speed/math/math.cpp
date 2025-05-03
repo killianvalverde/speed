@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/math/math.cpp
+ * @file        math.cpp
  * @brief       math module object.
  * @author      Killian Valverde
  * @date        2024/10/11

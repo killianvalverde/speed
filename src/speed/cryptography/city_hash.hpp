@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/cryptography/city_hash.hpp
+ * @file        city_hash.hpp
  * @brief       city_hash functions header.
  * @author      Killian Valverde
  * @date        2024/11/01
@@ -31,9 +31,7 @@
 
 #include "../stringutils/stringutils.hpp"
 
-
 namespace speed::cryptography {
-
 
 /**
  * @brief       Compute the city-hash of a specific value.
@@ -55,8 +53,6 @@ inline std::uint64_t city_hash_64(const TpChar* str)
     return city_hash_64(str, speed::stringutils::strlen(str) * sizeof(TpChar));
 }
 
-
 }
-
 
 #endif

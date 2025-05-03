@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/time/time_specification.cpp
+ * @file        time_specification.cpp
  * @brief       time_specification class methods definition.
  * @author      Killian Valverde
  * @date        2019/04/05
@@ -26,9 +26,7 @@
  
 #include "time_specification.hpp"
 
-
 namespace speed::system::time {
-
 
 time_specification time_specification::get_elapsed_time(
         const time_specification& rhs
@@ -57,7 +55,6 @@ time_specification time_specification::get_elapsed_time(
     return elapsed_tm;
 }
 
-
 void time_specification::balance_nseconds() noexcept
 {
     while (nsec_ >= 1000000000L)
@@ -66,6 +63,5 @@ void time_specification::balance_nseconds() noexcept
         ++sec_;
     }
 }
-
 
 }

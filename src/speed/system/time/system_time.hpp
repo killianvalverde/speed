@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/time/system_time.hpp
+ * @file        system_time.hpp
  * @brief       system_time class header.
  * @author      Killian Valverde
  * @date        2024/10/21
@@ -29,9 +29,7 @@
 
 #include <cstdint>
 
-
 namespace speed::system::time {
-
 
 /**
  * @brief       Represents a system time.
@@ -39,6 +37,7 @@ namespace speed::system::time {
 class system_time
 {
 public:
+    /** @brief Type alias for a unsigned integer to represent time. */
     using time_type = std::uint16_t;
     
     /**
@@ -352,8 +351,6 @@ private:
     time_type sec_;
 };
 
-
 }
-
 
 #endif

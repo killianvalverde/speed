@@ -18,7 +18,7 @@
  */
 
 /**
- * @file       speed/time/cpu_chrono.hpp
+ * @file       cpu_chrono.hpp
  * @brief      cpu_chrono class header.
  * @author     Killian Valverde
  * @date       2018/06/06
@@ -29,9 +29,7 @@
 
 #include "chrono_base.hpp"
 
-
 namespace speed::time {
-
 
 /**
  * @brief       Class that represents a cpu chrono.
@@ -51,8 +49,6 @@ public:
     }
 };
 
-
 }
-
 
 #endif

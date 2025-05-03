@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_help_menu_setter.hpp
+ * @file        basic_help_menu_setter.hpp
  * @brief       basic_help_menu_setter class header.
  * @author      Killian Valverde
  * @date        2024/05/08
@@ -32,9 +32,7 @@
 
 #include "basic_help_menu.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief        Class allowing configuring a help menu.
@@ -71,13 +69,13 @@ public:
      * @brief       Copy constructor.
      * @param       rhs : Object to copy.
      */
-    basic_help_menu_setter(const basic_help_menu_setter& rhs) = delete;
+    basic_help_menu_setter(const basic_help_menu_setter& rhs) = default;
     
     /**
      * @brief       Move constructor.
      * @param       rhs : Object to move.
      */
-    basic_help_menu_setter(basic_help_menu_setter&& rhs) noexcept = delete;
+    basic_help_menu_setter(basic_help_menu_setter&& rhs) noexcept = default;
     
     /**
      * @brief       Destructor.
@@ -89,14 +87,14 @@ public:
      * @param       rhs : Object to copy.
      * @return      The object who call the method.
      */
-    basic_help_menu_setter& operator =(const basic_help_menu_setter& rhs) = delete;
+    basic_help_menu_setter& operator =(const basic_help_menu_setter& rhs) = default;
     
     /**
      * @brief       Move assignment operator.
      * @param       rhs : Object to move.
      * @return      The object who call the method.
      */
-    basic_help_menu_setter& operator =(basic_help_menu_setter&& rhs) noexcept = delete;
+    basic_help_menu_setter& operator =(basic_help_menu_setter&& rhs) noexcept = default;
 
     /**
      * @brief       Allows to specify the indentation that the arguments keys will have when
@@ -178,7 +176,7 @@ public:
             hlp_menu_->unset_flag(help_menu_flags::PRINT_ARGS_KEYS);
         }
 
-        return dynamic_cast<self_type&>(*this);
+        return *this;
     }
 
     /**
@@ -199,7 +197,27 @@ public:
             hlp_menu_->unset_flag(help_menu_flags::PRINT_COMMANDS);
         }
 
-        return dynamic_cast<self_type&>(*this);
+        return *this;
+    }
+    
+    /**
+     * @brief       Enables or disables the printing of constraints in the help menu.
+     * @param       enabl : A boolean value indicating whether to enable or disable the printing of
+     *              constraints. This feature is enabled by default.
+     * @return      A reference to the current object.
+     */
+    self_type& print_constraints(bool enabl)
+    {
+        if (enabl)
+        {
+            hlp_menu_->set_flag(help_menu_flags::PRINT_CONSTRAINTS);
+        }
+        else
+        {
+            hlp_menu_->unset_flag(help_menu_flags::PRINT_CONSTRAINTS);
+        }
+
+        return *this;
     }
 
     /**
@@ -220,7 +238,7 @@ public:
             hlp_menu_->unset_flag(help_menu_flags::PRINT_OPTIONS);
         }
 
-        return dynamic_cast<self_type&>(*this);
+        return *this;
     }
 
     /**
@@ -241,12 +259,12 @@ public:
             hlp_menu_->unset_flag(help_menu_flags::PRINT_USAGE);
         }
 
-        return dynamic_cast<self_type&>(*this);
+        return *this;
     }
 
     /**
      * @brief       Allows to specify whether the values have to be printed. The values are the
-     *              keyless arguments. This feature is enabled by default.
+     *              positional arguments. This feature is enabled by default.
      * @param       enabl : Specify wheter the feature is enable.
      * @return      The object who call the method.
      */
@@ -261,7 +279,7 @@ public:
             hlp_menu_->unset_flag(help_menu_flags::PRINT_VALUES);
         }
 
-        return dynamic_cast<self_type&>(*this);
+        return *this;
     }
 
 private:
@@ -269,8 +287,6 @@ private:
     help_menu_type* hlp_menu_;
 };
 
-
 }
-
 
 #endif

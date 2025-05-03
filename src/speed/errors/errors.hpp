@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/errors/errors.hpp
+ * @file        errors.hpp
  * @brief       error main header.
  * @author      Killian Valverde
  * @date        2024/04/16
@@ -29,9 +29,7 @@
 
 #include "error_category_base.hpp"
 
-
 namespace speed {
-
 
 /**
  * @brief       Defines a series of standardized elements to report errors originating from the 
@@ -39,19 +37,14 @@ namespace speed {
  */
 namespace errors {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Defines a series of standardized elements to report errors originating from the
  *              speed library.
  */
 namespace err = errors;
-
 #endif
 
-
 }
-
 
 #endif

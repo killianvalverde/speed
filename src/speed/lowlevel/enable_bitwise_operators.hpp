@@ -18,7 +18,7 @@
  */
 
 /**
- * @file       speed/lowlevel/enable_bitwise_operators.hpp
+ * @file       enable_bitwise_operators.hpp
  * @brief      enable_bitwise_operators functions header.
  * @author     Killian Valverde
  * @date       2016/08/05
@@ -32,9 +32,7 @@
 
 #include "../type_traits/type_traits.hpp"
 
-
 namespace speed::lowlevel {
-
 
 /** @cond */
 template<typename T>
@@ -46,7 +44,6 @@ struct enable_bitwise_operators
     static constexpr bool enable_basic_ostream_stdout = false;
 };
 
-
 template<typename T>
 std::enable_if_t<
         enable_bitwise_operators<T>::enable_with_same_type,
@@ -57,7 +54,6 @@ operator |(const T& lhs, const T& rhs)
     typedef std::underlying_type_t<T> underlying_type;
     return static_cast<T>(static_cast<underlying_type>(lhs) | static_cast<underlying_type>(rhs));
 }
-
 
 template<typename TpEnum, typename TpIntegral>
 std::enable_if_t<
@@ -71,7 +67,6 @@ operator |(const TpEnum& lhs, const TpIntegral& rhs)
             static_cast<underlying_type>(rhs));
 }
 
-
 template<typename TpIntegral, typename TpEnum>
 std::enable_if_t<
         enable_bitwise_operators<TpEnum>::enable_with_lhs_integrals,
@@ -84,7 +79,6 @@ operator |(const TpIntegral& lhs, const TpEnum& rhs)
             static_cast<underlying_type>(rhs));
 }
 
-
 template<typename T>
 std::enable_if_t<
         enable_bitwise_operators<T>::enable_with_same_type,
@@ -95,7 +89,6 @@ operator &(const T& lhs, const T& rhs)
     typedef std::underlying_type_t<T> underlying_type;
     return static_cast<T>(static_cast<underlying_type>(lhs) & static_cast<underlying_type>(rhs));
 }
-
 
 template<typename TpEnum, typename TpIntegral>
 std::enable_if_t<
@@ -109,7 +102,6 @@ operator &(const TpEnum& lhs, const TpIntegral& rhs)
             static_cast<underlying_type>(rhs));
 }
 
-
 template<typename TpIntegral, typename TpEnum>
 std::enable_if_t<
         enable_bitwise_operators<TpEnum>::enable_with_lhs_integrals,
@@ -122,7 +114,6 @@ operator &(const TpIntegral& lhs, const TpEnum& rhs)
             static_cast<underlying_type>(rhs));
 }
 
-
 template<typename T>
 std::enable_if_t<
         enable_bitwise_operators<T>::enable_with_same_type,
@@ -133,7 +124,6 @@ operator ^(const T& lhs, const T& rhs)
     typedef std::underlying_type_t<T> underlying_type;
     return static_cast<T>(static_cast<underlying_type>(lhs) ^ static_cast<underlying_type>(rhs));
 }
-
 
 template<typename TpEnum, typename TpIntegral>
 std::enable_if_t<
@@ -147,7 +137,6 @@ operator ^(const TpEnum& lhs, const TpIntegral& rhs)
             static_cast<underlying_type>(rhs));
 }
 
-
 template<typename TpIntegral, typename TpEnum>
 std::enable_if_t<
         enable_bitwise_operators<TpEnum>::enable_with_lhs_integrals,
@@ -160,7 +149,6 @@ operator ^(const TpIntegral& lhs, const TpEnum& rhs)
             static_cast<underlying_type>(rhs));
 }
 
-
 template<typename T>
 std::enable_if_t<
         enable_bitwise_operators<T>::enable_with_same_type,
@@ -171,7 +159,6 @@ operator <<(const T& lhs, const T& rhs)
     typedef std::underlying_type_t<T> underlying_type;
     return static_cast<T>(static_cast<underlying_type>(lhs) << static_cast<underlying_type>(rhs));
 }
-
 
 template<typename TpEnum, typename TpIntegral>
 std::enable_if_t<
@@ -185,7 +172,6 @@ operator <<(const TpEnum& lhs, const TpIntegral& rhs)
             static_cast<underlying_type>(rhs));
 }
 
-
 template<typename TpIntegral, typename TpEnum>
 std::enable_if_t<
         enable_bitwise_operators<TpEnum>::enable_with_lhs_integrals,
@@ -198,7 +184,6 @@ operator <<(const TpIntegral& lhs, const TpEnum& rhs)
             static_cast<underlying_type>(rhs));
 }
 
-
 template<typename T>
 std::enable_if_t<
         enable_bitwise_operators<T>::enable_with_same_type,
@@ -209,7 +194,6 @@ operator >>(const T& lhs, const T& rhs)
     typedef std::underlying_type_t<T> underlying_type;
     return static_cast<T>(static_cast<underlying_type>(lhs) >> static_cast<underlying_type>(rhs));
 }
-
 
 template<typename TpEnum, typename TpIntegral>
 std::enable_if_t<
@@ -223,7 +207,6 @@ operator >>(const TpEnum& lhs, const TpIntegral& rhs)
             static_cast<underlying_type>(rhs));
 }
 
-
 template<typename TpIntegral, typename TpEnum>
 std::enable_if_t<
         enable_bitwise_operators<TpEnum>::enable_with_lhs_integrals,
@@ -236,7 +219,6 @@ operator >>(const TpIntegral& lhs, const TpEnum& rhs)
                                static_cast<underlying_type>(rhs));
 }
 
-
 template<typename T>
 std::enable_if_t<
         enable_bitwise_operators<T>::enable_with_same_type,
@@ -247,7 +229,6 @@ operator ~(const T& lhs)
     typedef std::underlying_type_t<T> underlying_type;
     return static_cast<T>(~static_cast<underlying_type>(lhs));
 }
-
 
 template<typename T>
 std::enable_if_t<
@@ -261,7 +242,6 @@ operator |=(T& lhs, const T& rhs)
                                  static_cast<underlying_type>(rhs)));
 }
 
-
 template<typename TpEnum, typename TpIntegral>
 std::enable_if_t<
         enable_bitwise_operators<TpEnum>::enable_with_rhs_integrals,
@@ -273,7 +253,6 @@ operator |=(TpEnum& lhs, const TpIntegral& rhs)
     return (lhs = static_cast<TpEnum>(static_cast<underlying_type>(lhs) |
                                       static_cast<underlying_type>(rhs)));
 }
-
 
 template<typename TpIntegral, typename TpEnum>
 std::enable_if_t<
@@ -287,7 +266,6 @@ operator |=(TpIntegral& lhs, const TpEnum& rhs)
                                           static_cast<underlying_type>(rhs)));
 }
 
-
 template<typename T>
 std::enable_if_t<
         enable_bitwise_operators<T>::enable_with_same_type,
@@ -299,7 +277,6 @@ operator &=(T& lhs, const T& rhs)
     return (lhs = static_cast<T>(static_cast<underlying_type>(lhs) &
             static_cast<underlying_type>(rhs)));
 }
-
 
 template<typename TpEnum, typename TpIntegral>
 std::enable_if_t<
@@ -313,7 +290,6 @@ operator &=(TpEnum& lhs, const TpIntegral& rhs)
             static_cast<underlying_type>(rhs)));
 }
 
-
 template<typename TpIntegral, typename TpEnum>
 std::enable_if_t<
         enable_bitwise_operators<TpEnum>::enable_with_lhs_integrals,
@@ -325,7 +301,6 @@ operator &=(TpIntegral& lhs, const TpEnum& rhs)
     return (lhs = static_cast<TpIntegral>(static_cast<underlying_type>(lhs) &
             static_cast<underlying_type>(rhs)));
 }
-
 
 template<typename T>
 std::enable_if_t<
@@ -339,7 +314,6 @@ operator ^=(T& lhs, const T& rhs)
             static_cast<underlying_type>(rhs)));
 }
 
-
 template<typename TpEnum, typename TpIntegral>
 std::enable_if_t<
         enable_bitwise_operators<TpEnum>::enable_with_rhs_integrals,
@@ -351,7 +325,6 @@ operator ^=(TpEnum& lhs, const TpIntegral& rhs)
     return (lhs = static_cast<TpEnum>(static_cast<underlying_type>(lhs) ^
             static_cast<underlying_type>(rhs)));
 }
-
 
 template<typename TpIntegral, typename TpEnum>
 std::enable_if_t<
@@ -365,7 +338,6 @@ operator ^=(TpIntegral& lhs, const TpEnum& rhs)
             static_cast<underlying_type>(rhs)));
 }
 
-
 template<typename T>
 std::enable_if_t<
         enable_bitwise_operators<T>::enable_with_same_type,
@@ -377,7 +349,6 @@ operator <<=(T& lhs, const T& rhs)
     return (lhs = static_cast<T>(static_cast<underlying_type>(lhs) <<
             static_cast<underlying_type>(rhs)));
 }
-
 
 template<typename TpEnum, typename TpIntegral>
 std::enable_if_t<
@@ -391,7 +362,6 @@ operator <<=(TpEnum& lhs, const TpIntegral& rhs)
             static_cast<underlying_type>(rhs)));
 }
 
-
 template<typename TpIntegral, typename TpEnum>
 std::enable_if_t<
         enable_bitwise_operators<TpEnum>::enable_with_lhs_integrals,
@@ -403,7 +373,6 @@ operator <<=(TpIntegral& lhs, const TpEnum& rhs)
     return (lhs = static_cast<TpIntegral>(static_cast<underlying_type>(lhs) <<
             static_cast<underlying_type>(rhs)));
 }
-
 
 template<typename T>
 std::enable_if_t<
@@ -417,7 +386,6 @@ operator >>=(T& lhs, const T& rhs)
             static_cast<underlying_type>(rhs)));
 }
 
-
 template<typename TpEnum, typename TpIntegral>
 std::enable_if_t<
         enable_bitwise_operators<TpEnum>::enable_with_rhs_integrals,
@@ -430,7 +398,6 @@ operator >>=(TpEnum& lhs, const TpIntegral& rhs)
             static_cast<underlying_type>(rhs)));
 }
 
-
 template<typename TpIntegral, typename TpEnum>
 std::enable_if_t<
         enable_bitwise_operators<TpEnum>::enable_with_lhs_integrals,
@@ -442,7 +409,6 @@ operator >>=(TpIntegral& lhs, const TpEnum& rhs)
     return (lhs = static_cast<TpIntegral>(static_cast<underlying_type>(lhs) >>
             static_cast<underlying_type>(rhs)));
 }
-
 
 template<typename TpChar, typename TpCharTraits, typename TpBitmask>
 std::enable_if_t<
@@ -475,9 +441,7 @@ operator <<(
 }
 /** @endcond */
 
-
 }
-
 
 using speed::lowlevel::operator |;
 using speed::lowlevel::operator &;
@@ -490,6 +454,5 @@ using speed::lowlevel::operator &=;
 using speed::lowlevel::operator ^=;
 using speed::lowlevel::operator <<=;
 using speed::lowlevel::operator >>=;
-
 
 #endif

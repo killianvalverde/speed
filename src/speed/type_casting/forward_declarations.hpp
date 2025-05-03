@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/type_casting/forward_declarations.hpp
+ * @file        forward_declarations.hpp
  * @brief       forward_declarations header.
  * @author      Killian Valverde
  * @date        2024/10/15
@@ -29,9 +29,7 @@
 
 #include <system_error>
 
-
 namespace speed::type_casting {
-
 
 template<typename TpTarget, typename TpSource, typename TpComponent>
 class basic_type_caster;
@@ -58,8 +56,6 @@ inline void assign_type_casting_error_code(int, std::error_code*);
 
 inline std::error_condition make_error_condition(speed::type_casting::error_conditions);
 
-
 }
-
 
 #endif

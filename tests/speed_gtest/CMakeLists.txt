@@ -13,7 +13,7 @@ set(SPEED_ARGPARSE_TEST_SOURCE_FILES
 )
 
 set(SPEED_CONTAINERS_TEST_SOURCE_FILES
-        containers_test/circular_doubly_linked_lists_test.cpp
+        containers_test/linked_lists_test.cpp
         containers_test/flags_test.cpp
         containers_test/static_cache_test.cpp
 )
@@ -100,6 +100,7 @@ add_executable(speed_test
 target_link_libraries(speed_algorithm_test speed_algorithm ${GTEST_LIBRARIES})
 target_link_libraries(speed_argparse_test speed_argparse ${GTEST_LIBRARIES})
 target_link_libraries(speed_containers_test speed_containers ${GTEST_LIBRARIES})
+target_link_libraries(speed_filesystem_test speed_filesystem ${GTEST_LIBRARIES})
 target_link_libraries(speed_iostream_test speed_iostream ${GTEST_LIBRARIES})
 target_link_libraries(speed_lowlevel_test speed_lowlevel ${GTEST_LIBRARIES})
 target_link_libraries(speed_safety_test speed_safety ${GTEST_LIBRARIES})

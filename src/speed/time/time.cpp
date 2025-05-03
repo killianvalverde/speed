@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/time/time.cpp
+ * @file        time.cpp
  * @brief       time module object.
  * @author      Killian Valverde
  * @date        2024/10/11

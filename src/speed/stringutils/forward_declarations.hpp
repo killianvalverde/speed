@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/stringutils/forward_declarations.hpp
+ * @file        forward_declarations.hpp
  * @brief       forward_declarations header.
  * @author      Killian Valverde
  * @date        2024/11/16
@@ -31,9 +31,7 @@
 #include <system_error>
 #include <type_traits>
 
-
 namespace speed::stringutils {
-
 
 template<typename TpDestinationChar, typename TpSourceChar>
 TpDestinationChar* strcpy(TpDestinationChar* dest, const TpSourceChar* src) noexcept;
@@ -138,8 +136,6 @@ template<typename TpChar1, typename TpChar2>
         const TpChar2* pattrn
 ) noexcept;
 
-
 }
-
 
 #endif

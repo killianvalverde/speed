@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/type_casting/error_category.hpp
+ * @file        error_category.hpp
  * @brief       error_category main header.
  * @author      Killian Valverde
  * @date        2024/04/16
@@ -32,9 +32,7 @@
 #include "../errors/errors.hpp"
 #include "error_conditions.hpp"
 
-
 namespace speed::type_casting {
-
 
 /**
  * @brief       Error category class for the type_casting module.
@@ -81,13 +79,11 @@ public:
     [[nodiscard]] std::string message(int val) const override;
 };
 
-
 /** @cond */
 namespace __private {
 extern error_category error_category_obj;
 } /* __private */
 /** @endcond */
-
 
 /**
  * @brief       Assign the value to the error_code if it is not null using a system category.
@@ -102,7 +98,6 @@ inline void assign_type_casting_error_code(int value, std::error_code* err_code)
     }
 }
 
-
 /**
  * @brief       Allows getting an error condition from the error condition enum.
  * @param       errc : Error condition enul object.
@@ -113,8 +108,6 @@ inline std::error_condition make_error_condition(speed::type_casting::error_cond
     return {static_cast<int>(errc), __private::error_category_obj};
 }
 
-
 }
-
 
 #endif

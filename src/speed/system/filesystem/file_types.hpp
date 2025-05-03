@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/filesystem/file_types.hpp
+ * @file        file_types.hpp
  * @brief       file_types header.
  * @author      Killian Valverde
  * @date        2019/03/22
@@ -29,9 +29,7 @@
 
 #include <cstdint>
 
-
 namespace speed::system::filesystem {
-
 
 /**
  * @brief       Represents a file type.
@@ -66,13 +64,10 @@ enum class file_types : std::uint8_t
     ALL = 0x7F
 };
 
-
 /** Represents the file types. */
 using ft_t = file_types;
 
-
 }
-
 
 /** @cond */
 namespace speed::lowlevel {
@@ -83,6 +78,5 @@ struct enable_bitwise_operators<speed::system::filesystem::file_types>
 };
 }
 /** @endcond */
-
 
 #endif

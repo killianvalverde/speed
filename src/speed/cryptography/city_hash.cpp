@@ -18,40 +18,34 @@
  */
 
 /**
- * @file        speed/cryptography/operations.cpp
- * @brief       operations functions source.
+ * @file        city_hash.cpp
+ * @brief       city_hash functions source.
  * @author      Killian Valverde
  * @date        2024/11/01
  */
 
-#include <cstring>
-
-#include "../stringutils/stringutils.hpp"
 #include "city_hash.hpp"
 
+#include <cstring>
 
 namespace speed::cryptography {
 
-
+/** @cond */
 typedef std::pair<std::uint64_t, std::uint64_t> uint128_t;
-
 
 static const std::uint64_t k0 = 0xc3a5c85c97cb3127ULL;
 static const std::uint64_t k1 = 0xb492b66fbe98f273ULL;
 static const std::uint64_t k2 = 0x9ae16a3b2f90404fULL;
-
 
 inline std::uint64_t uint_128_low_64(const uint128_t& x)
 {
     return x.first;
 }
 
-
 inline std::uint64_t uint_128_high_64(const uint128_t& x)
 {
     return x.second;
 }
-
 
 static std::uint32_t unaligned_load_32(const char *p)
 {
@@ -60,14 +54,12 @@ static std::uint32_t unaligned_load_32(const char *p)
     return res;
 }
 
-
 static std::uint64_t unaligned_load_64(const char *p)
 {
     std::uint64_t res;
     memcpy(&res, p, sizeof(res));
     return res;
 }
-
 
 uint32_t byteswap_32(uint32_t x)
 {
@@ -76,7 +68,6 @@ uint32_t byteswap_32(uint32_t x)
            ((x & 0x00FF0000) >> 8)  |
            ((x & 0xFF000000) >> 24);
 }
-
 
 std::uint64_t byteswap_64(std::uint64_t x)
 {
@@ -90,7 +81,6 @@ std::uint64_t byteswap_64(std::uint64_t x)
            ((x & 0xFF00000000000000ULL) >> 56);
 }
 
-
 #ifdef WORDS_BIGENDIAN
 #define uint32_in_expected_order(x) (byteswap_32(x))
 #define uint64_in_expected_order(x) (byteswap_64(x))
@@ -99,36 +89,30 @@ std::uint64_t byteswap_64(std::uint64_t x)
 #define uint64_in_expected_order(x) (x)
 #endif
 
-
 static std::uint32_t fetch_32(const char *p)
 {
     return uint32_in_expected_order(unaligned_load_32(p));
 }
-
 
 static std::uint64_t fetch_64(const char *p)
 {
     return uint64_in_expected_order(unaligned_load_64(p));
 }
 
-
 static std::uint32_t rotate_32(std::uint32_t val, int shft)
 {
     return shft == 0 ? val : ((val >> shft) | (val << (32 - shft)));
 }
-
 
 static std::uint64_t rotate_64(std::uint64_t val, int shft)
 {
     return shft == 0 ? val : ((val >> shft) | (val << (64 - shft)));
 }
 
-
 static std::uint64_t shift_mix(std::uint64_t val)
 {
     return val ^ (val >> 47);
 }
-
 
 static uint128_t weak_hash_len_32_with_seeds(
         std::uint64_t w,
@@ -151,13 +135,11 @@ static uint128_t weak_hash_len_32_with_seeds(
     return {a + z, b + c};
 }
 
-
 static uint128_t weak_hash_len_32_with_seeds(const char* s, std::uint64_t a, std::uint64_t b)
 {
     return weak_hash_len_32_with_seeds(fetch_64(s), fetch_64(s + 8), fetch_64(s + 16),
                                        fetch_64(s + 24), a, b);
 }
-
 
 inline std::uint64_t hash_128_to_64(const uint128_t& x)
 {
@@ -174,12 +156,10 @@ inline std::uint64_t hash_128_to_64(const uint128_t& x)
     return b;
 }
 
-
 static std::uint64_t hash_len_16(std::uint64_t u, std::uint64_t v)
 {
     return hash_128_to_64(uint128_t(u, v));
 }
-
 
 static std::uint64_t hash_len_16(std::uint64_t u, std::uint64_t v, std::uint64_t mul)
 {
@@ -194,7 +174,6 @@ static std::uint64_t hash_len_16(std::uint64_t u, std::uint64_t v, std::uint64_t
     
     return b;
 }
-
 
 std::uint64_t hash_len_0_to_16(const char *s, size_t len)
 {
@@ -228,7 +207,6 @@ std::uint64_t hash_len_0_to_16(const char *s, size_t len)
     return k2;
 }
 
-
 static std::uint64_t hash_len_17_to_32(const char *s, size_t len)
 {
     std::uint64_t mul = k2 + len * 2;
@@ -239,7 +217,6 @@ static std::uint64_t hash_len_17_to_32(const char *s, size_t len)
     return hash_len_16(rotate_64(a + b, 43) + rotate_64(c, 30) + d,
                        a + rotate_64(b + k2, 18) + c, mul);
 }
-
 
 static std::uint64_t hash_len_33_to_64(const char *s, size_t len)
 {
@@ -262,7 +239,7 @@ static std::uint64_t hash_len_33_to_64(const char *s, size_t len)
     b = shift_mix((z + a) * mul + d + h) * mul;
     return b + x;
 }
-
+/** @endcond */
 
 std::uint64_t city_hash_64(const void* ptr, std::size_t sz)
 {
@@ -311,6 +288,5 @@ std::uint64_t city_hash_64(const void* ptr, std::size_t sz)
     return hash_len_16(hash_len_16(v.first, w.first) + shift_mix(y) * k1 + z,
                        hash_len_16(v.second, w.second) + x);
 }
-
 
 }

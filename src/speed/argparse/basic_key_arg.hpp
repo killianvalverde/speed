@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_key_arg.hpp
+ * @file        basic_key_arg.hpp
  * @brief       basic_key_arg class header.
  * @author      Killian Valverde
  * @date        2016/03/10
@@ -38,9 +38,7 @@
 #include "exception.hpp"
 #include "forward_declarations.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Class that represents arguments that have keys.
@@ -77,7 +75,6 @@ public:
     template<typename... Ts_>
     explicit basic_key_arg(arg_parser_type* arg_parsr, Ts_&&... kys)
             : base_arg_type(arg_parsr)
-            , kys_()
             , sub_arg_parsr_(nullptr)
             , short_kys_len_(0)
             , long_kys_len_(0)
@@ -181,7 +178,7 @@ public:
      * @brief       Function to call when prefixes change in the argument parser in order to update
      *              the short and long keys total length.
      */
-    void update_prefixes()
+    void update_prefixes_length()
     {
         short_kys_len_ = 0;
         long_kys_len_ = 0;
@@ -239,6 +236,20 @@ public:
     }
 
     /**
+     * @brief       Get the necessary length to print the name of the argument.
+     * @return      The necessary length to print long argument name.
+     */
+    [[nodiscard]] virtual std::size_t get_name_length() const override
+    {
+        if (kys_.empty())
+        {
+            throw key_not_found_exception();
+        }
+        
+        return kys_.front().get_string_length();
+    }
+
+    /**
      * @brief       Get the necessary length to print short arguments keys.
      * @return      The necessary length to print short arguments keys.
      */
@@ -288,12 +299,7 @@ public:
      */
     void print_usage() override
     {
-        if (kys_.empty())
-        {
-            throw key_not_found_exception();
-        }
-        
-        std::cout << kys_.front().get_string();
+        print_name();
     }
 
     /**
@@ -408,8 +414,6 @@ private:
     std::size_t long_kys_len_;
 };
 
-
 }
-
 
 #endif

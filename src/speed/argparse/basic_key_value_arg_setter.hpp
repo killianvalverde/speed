@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_key_value_arg_setter.hpp
+ * @file        basic_key_value_arg_setter.hpp
  * @brief       basic_key_value_arg_setter class header.
  * @author      Killian Valverde
  * @date        2024/05/06
@@ -36,9 +36,7 @@
 #include "basic_key_value_arg.hpp"
 #include "basic_value_arg_setter.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief        Class allowing configuring a key value argument.
@@ -165,8 +163,6 @@ public:
     }
 };
 
-
 }
-
 
 #endif

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/winapi/filesystem/filesystem.hpp
+ * @file        filesystem.hpp
  * @brief       winapi filesystem main header.
  * @author      Killian Valverde
  * @date        2023/10/31
@@ -33,18 +33,14 @@
 #include "basic_directory_entity_extension.hpp"
 #include "operations.hpp"
 
-
 namespace speed::system::api::winapi {
-
 
 /**
  * @brief       Contains filesystem interaction resources.
  */
 namespace filesystem {}
 
-
 }
-
 
 #endif
 #endif

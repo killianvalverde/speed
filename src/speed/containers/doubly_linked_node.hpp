@@ -18,7 +18,7 @@
  */
 
 /**
- * @file       speed/containers/doubly_linked_node.hpp
+ * @file       doubly_linked_node.hpp
  * @brief      doubly_linked_node struct header.
  * @author     Killian Valverde
  * @date       2018/01/19
@@ -29,9 +29,7 @@
 
 #include <utility>
 
-
 namespace speed::containers {
-
 
 // TODO: Replace this class by linked_node
 /**
@@ -118,8 +116,6 @@ struct doubly_linked_node
     value_type val_;
 };
 
-
 }
-
 
 #endif

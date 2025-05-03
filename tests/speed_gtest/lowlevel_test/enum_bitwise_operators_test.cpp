@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed_gtest/lowlevel_test/enum_bitwise_operators_test.cpp
+ * @file        enum_bitwise_operators_test.cpp
  * @brief       enum_bitwise_operators unit test.
  * @author      Killian Valverde
  * @date        2018/06/08
@@ -27,7 +27,6 @@
 #include <gtest/gtest.h>
 
 #include "speed/lowlevel/lowlevel.hpp"
-
 
 enum class colors : std::uint8_t
 {
@@ -39,7 +38,6 @@ enum class colors : std::uint8_t
     FULL = 0xF
 };
 
-
 namespace speed {
 namespace lowlevel {
 template<>
@@ -49,7 +47,6 @@ struct enable_bitwise_operators<colors>
 };
 }
 }
-
 
 TEST(lowlevel_enum_bitwise_operators, enable)
 {
@@ -79,5 +76,3 @@ TEST(lowlevel_enum_bitwise_operators, enable)
     colrs1 >>= colors::RED;
     EXPECT_TRUE(colrs1 == colors::RED);
 }
-
-// TODO: Implement the test for the operators with scalars.

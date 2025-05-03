@@ -18,54 +18,46 @@
  */
 
 /**
- * @file        access_modes.hpp
- * @brief       access_modes header.
+ * @file        arg_constraint_flags.hpp
+ * @brief       arg_constraint_flags enum header.
  * @author      Killian Valverde
- * @date        2019/03/22
+ * @date        2025/04/20
  */
 
-#ifndef SPEED_SYSTEM_FILESYSTEM_ACCESS_MODES_HPP
-#define SPEED_SYSTEM_FILESYSTEM_ACCESS_MODES_HPP
+#ifndef SPEED_ARGPARSE_ARG_CONSTRAINT_FLAGS_HPP
+#define SPEED_ARGPARSE_ARG_CONSTRAINT_FLAGS_HPP
 
-#include <cstdint>
+#include "../lowlevel/lowlevel.hpp"
 
-#include "../../lowlevel/lowlevel.hpp"
-
-namespace speed::system::filesystem {
+namespace speed::argparse {
 
 /**
- * @brief       Represents the files access modes.
+ * @brief       Contains all argument constraint flags constants.
  */
-enum class access_modes : std::uint8_t
+enum class arg_constraint_flags : std::uint8_t
 {
-    /** Any access mode. */
-    NIL = 0,
+    /** Null flag. */
+    NIL = 0x0,
     
-    /** The file exists. */
-    EXISTS = 0x1,
+    /** One of the arguments has to be present in the program call. */
+    ONE_OR_MORE_REQUIRED = 0x1,
     
-    /** Read is available. */
-    READ = 0x2,
+    /** All the arguments are mutually exclusive. */
+    MUTUALLY_EXCLUSIVE = 0x2,
     
-    /** Write is available. */
-    WRITE = 0x4,
-    
-    /** Execute is available. */
-    EXECUTE = 0x8,
-    
-    /** All access modes. */
-    FULL = 0xF
+    /** All argument flags. */
+    ALL = 0x3
 };
 
-/** Represents the files access modes. */
-using am_t = access_modes;
+/** Contains all argument constraint flags constants. */
+using acf_t = arg_constraint_flags;
 
 }
 
 /** @cond */
 namespace speed::lowlevel {
 template<>
-struct enable_bitwise_operators<speed::system::filesystem::access_modes>
+struct enable_bitwise_operators<speed::argparse::arg_constraint_flags>
 {
     static constexpr bool enable_with_same_type = true;
 };

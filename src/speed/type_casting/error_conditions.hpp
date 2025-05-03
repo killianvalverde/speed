@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/type_casting/error_conditions.hpp
+ * @file        error_conditions.hpp
  * @brief       error_conditions main header.
  * @author      Killian Valverde
  * @date        2024/04/16
@@ -31,9 +31,7 @@
 
 #include "../errors/errors.hpp"
 
-
 namespace speed::type_casting {
-
 
 /**
  * @brief       The type casting error condition enum.
@@ -53,9 +51,7 @@ enum class error_conditions : std::uint8_t
     OTHER = 0x3
 };
 
-
 }
-
 
 namespace std {
 template<> struct is_error_condition_enum<speed::type_casting::error_conditions>
@@ -63,6 +59,5 @@ template<> struct is_error_condition_enum<speed::type_casting::error_conditions>
 {
 };
 }
-
 
 #endif

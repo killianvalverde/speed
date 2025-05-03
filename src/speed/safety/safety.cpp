@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/safety/safety.cpp
+ * @file        safety.cpp
  * @brief       safety module object.
  * @author      Killian Valverde
  * @date        2024/10/11

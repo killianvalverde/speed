@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/glibc/time/time.hpp
+ * @file        time.hpp
  * @brief       glibc time main header.
  * @author      Killian Valverde
  * @date        2023/10/31
@@ -32,18 +32,14 @@
 
 #include "operations.hpp"
 
-
 namespace speed::system::api::glibc {
-
 
 /**
  * @brief       Contains resources and facilities related to time manipulation.
  */
 namespace time {}
 
-
 }
-
 
 #endif
 #endif

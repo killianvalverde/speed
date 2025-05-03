@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed_gtest/containers_test/static_cache_test.cpp
+ * @file        static_cache_test.cpp
  * @brief       static_cache unit test.
  * @author      Killian Valverde
  * @date        2018/01/12
@@ -28,12 +28,10 @@
 
 #include "speed/containers/containers.hpp"
 
-
 TEST(cotainers_static_cache, default_constructor)
 {
     speed::containers::static_cache<std::uint32_t, std::string, 16> buf_cache;
 }
-
 
 TEST(cotainers_static_cache, insert)
 {
@@ -55,14 +53,12 @@ TEST(cotainers_static_cache, insert)
     EXPECT_TRUE(buf_cache.find(1) == buf_cache.end());
 }
 
-
 TEST(cotainers_static_cache, find)
 {
     speed::containers::static_cache<std::uint32_t, std::string, 16> buf_cache;
     
     EXPECT_TRUE(buf_cache.find(1) == buf_cache.end());
 }
-
 
 TEST(cotainers_static_cache, find_and_lock)
 {
@@ -84,7 +80,6 @@ TEST(cotainers_static_cache, find_and_lock)
     EXPECT_TRUE(buf_cache.find(1) != buf_cache.end());
     EXPECT_TRUE(buf_cache.find(2) == buf_cache.end());
 }
-
 
 TEST(cotainers_static_cache, unlock)
 {

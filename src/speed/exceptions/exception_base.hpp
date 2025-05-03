@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/exceptions/exception_base.hpp
+ * @file        exception_base.hpp
  * @brief       exception_base class header.
  * @author      Killian Valverde
  * @date        2016/08/19
@@ -30,9 +30,7 @@
 #include <exception>
 #include <string>
 
-
 namespace speed::exceptions {
-
 
 /**
  * @brief       Base class for standard speed exceptions. All objects thrown by components speed are
@@ -85,8 +83,6 @@ public:
     [[nodiscard]] const char* what() const noexcept override = 0;
 };
 
-
 }
-
 
 #endif

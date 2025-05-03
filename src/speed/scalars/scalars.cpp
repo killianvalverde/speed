@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/scalars/scalars.cpp
+ * @file        scalars.cpp
  * @brief       scalars module object.
  * @author      Killian Valverde
  * @date        2024/10/11

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/iostream/operations.cpp
+ * @file        operations.cpp
  * @brief       operations functions source.
  * @author      Killian Valverde
  * @date        2016/08/24
@@ -33,9 +33,7 @@
 
 #include "operations.hpp"
 
-
 namespace speed::iostream {
-
 
 void fpurge(::FILE* fp) noexcept
 {
@@ -45,7 +43,6 @@ void fpurge(::FILE* fp) noexcept
     ::fflush(fp);
 #endif
 }
-
 
 int printf(const char* formt, ...) noexcept
 {
@@ -57,7 +54,6 @@ int printf(const char* formt, ...) noexcept
     return dne;
 }
 
-
 int printf(const wchar_t* formt, ...) noexcept
 {
     int dne;
@@ -67,6 +63,5 @@ int printf(const wchar_t* formt, ...) noexcept
     va_end(args);
     return dne;
 }
-
 
 }

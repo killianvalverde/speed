@@ -18,7 +18,7 @@
  */
 
 /**
- *  @file       speed/argparse/basic_help_menu.hpp
+ *  @file       basic_help_menu.hpp
  *  @brief      basic_help_menu class header.
  *  @author     Killian Valverde
  *  @date       2024/04/16
@@ -38,15 +38,13 @@
 #include "basic_help_arg.hpp"
 #include "basic_key_arg.hpp"
 #include "basic_key_value_arg.hpp"
-#include "basic_keyless_arg.hpp"
+#include "basic_positional_arg.hpp"
 #include "basic_value_arg.hpp"
 #include "basic_version_arg.hpp"
 #include "forward_declarations.hpp"
 #include "help_menu_flags.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Class used to represent a help menu.
@@ -83,7 +81,7 @@ public:
     using version_arg_type = basic_version_arg<TpAllocator>;
 
     /** Type that represents arguments without keys. */
-    using keyless_arg_type = basic_keyless_arg<TpAllocator>;
+    using positional_arg_type = basic_positional_arg<TpAllocator>;
     
     /** Type that represents arguments that have keys and values. */
     using key_value_arg_type = basic_key_value_arg<TpAllocator>;
@@ -102,11 +100,7 @@ public:
      * @param       arg_parsr : Argument parser that holds this object.
      */
     explicit basic_help_menu(arg_parser_type* arg_parsr)
-            : desc_()
-            , epilg_()
-            , ky_args_()
-            , kyless_args_()
-            , arg_parsr_(arg_parsr)
+            : arg_parsr_(arg_parsr)
             , args_indent_(2)
             , max_line_len_(80)
             , new_line_indent_(2)
@@ -153,10 +147,10 @@ public:
      */
     void add_entry(base_arg_type* bse_arg)
     {
-        auto* kyless_arg = dynamic_cast<keyless_arg_type*>(bse_arg);
-        if (kyless_arg != nullptr)
+        auto* positionl_arg = dynamic_cast<positional_arg_type*>(bse_arg);
+        if (positionl_arg != nullptr)
         {
-            kyless_args_.push_back(kyless_arg);
+            positionl_args_.push_back(positionl_arg);
         }
         else
         {
@@ -170,14 +164,14 @@ public:
      */
     void remove_entry(base_arg_type* bse_arg)
     {
-        auto* kyless_arg = dynamic_cast<keyless_arg_type*>(bse_arg);
-        if (kyless_arg != nullptr)
+        auto* positionl_arg = dynamic_cast<positional_arg_type*>(bse_arg);
+        if (positionl_arg != nullptr)
         {
-            for (auto it = kyless_args_.begin(); it != kyless_args_.end(); ++it)
+            for (auto it = positionl_args_.begin(); it != positionl_args_.end(); ++it)
             {
-                if (kyless_arg == *it)
+                if (positionl_arg == *it)
                 {
-                    kyless_args_.erase(it);
+                    positionl_args_.erase(it);
                     break;
                 }
             }
@@ -210,11 +204,11 @@ public:
             }
         }
 
-        for (auto& kyless_arg : kyless_args_)
+        for (auto& positionl_arg : positionl_args_)
         {
-            if (flgs_.is_set(help_menu_flags::PRINT_VALUES) && !kyless_arg->is_help_text_empty())
+            if (flgs_.is_set(help_menu_flags::PRINT_VALUES) && !positionl_arg->is_help_text_empty())
             {
-                update_max_keys_length_from_keyless_arg(kyless_arg);
+                update_max_keys_length_from_positional_arg(positionl_arg);
             }
         }
     }
@@ -225,27 +219,31 @@ public:
      */
     void update_max_keys_length_from_key_arg(key_arg_type* ky_arg) noexcept
     {
-        if (max_short_kys_len_ < ky_arg->get_short_keys_length())
+        auto short_kys_len = ky_arg->get_short_keys_length();
+        auto long_kys_len = ky_arg->get_long_keys_length();
+        
+        if (max_short_kys_len_ < short_kys_len)
         {
-            max_short_kys_len_ = ky_arg->get_short_keys_length();
+            max_short_kys_len_ = short_kys_len;
         }
-        if (max_long_kys_len_ < ky_arg->get_long_keys_length())
+        if (max_long_kys_len_ < long_kys_len)
         {
-            max_long_kys_len_ = ky_arg->get_long_keys_length();
+            max_long_kys_len_ = long_kys_len;
         }
     }
 
     /**
-     * @brief       Update the maximum keys length fron a keyless argument.
-     * @param       kyless_arg : Keyless argument to check.
+     * @brief       Update the maximum keys length fron a positional argument.
+     * @param       positionl_arg : positional argument to check.
      */
-    void update_max_keys_length_from_keyless_arg(keyless_arg_type* kyless_arg) noexcept
+    void update_max_keys_length_from_positional_arg(positional_arg_type* positionl_arg) noexcept
     {
+        std::size_t short_kys_len = positionl_arg->get_short_keys_length();
         std::size_t totl = max_short_kys_len_ + max_long_kys_len_;
 
-        if (kyless_arg->get_short_keys_length() > totl)
+        if (short_kys_len > totl)
         {
-            max_long_kys_len_ =  kyless_arg->get_short_keys_length() - max_short_kys_len_;
+            max_long_kys_len_ =  short_kys_len - max_short_kys_len_;
         }
     }
 
@@ -280,11 +278,11 @@ public:
 
     /**
      * @brief       Set the indentation after printing new lines.
-     * @param       desc_new_line_indentation : The indentation after printing new lines.
+     * @param       new_line_indent : The indentation after printing new lines.
      */
-    void set_new_line_indentation(std::size_t desc_new_line_indentation)
+    void set_new_line_indentation(std::size_t new_line_indent)
     {
-        new_line_indent_ = desc_new_line_indentation;
+        new_line_indent_ = new_line_indent;
     }
 
     /**
@@ -338,6 +336,7 @@ public:
         print_options();
         print_commands();
         print_values();
+        print_constraints();
         print_epilog();
 
         std::flush(std::cout);
@@ -348,11 +347,10 @@ public:
      */
     void print_usage()
     {
-        if (flgs_.is_not_set(help_menu_flags::PRINT_USAGE))
+        if (flgs_.is_set(help_menu_flags::PRINT_USAGE))
         {
-            return;
+            arg_parsr_->print_usage();
         }
-        arg_parsr_->print_usage();
     }
 
     /**
@@ -360,13 +358,10 @@ public:
      */
     inline void print_description()
     {
-        if (flgs_.is_set(help_menu_flags::PRINT_DESCRIPTION))
+        if (flgs_.is_set(help_menu_flags::PRINT_DESCRIPTION) && !desc_.empty())
         {
-            if (!desc_.empty())
-            {
-                speed::iostream::print_wrapped(std::cout, desc_, max_line_len_, 0);
-                std::cout << "\n\n";
-            }
+            speed::iostream::print_wrapped(std::cout, desc_, max_line_len_, 0);
+            std::cout << "\n\n";
         }
     }
 
@@ -457,9 +452,9 @@ public:
 
         bool fnd = false;
 
-        for (auto& kyless_arg : kyless_args_)
+        for (auto& positionl_arg : positionl_args_)
         {
-            if (!kyless_arg->is_help_text_empty())
+            if (!positionl_arg->is_help_text_empty())
             {
                 fnd = true;
             }
@@ -471,12 +466,38 @@ public:
 
         std::cout << "Values:\n";
 
-        for (auto& kyless_arg : kyless_args_)
+        for (auto& positionl_arg : positionl_args_)
         {
-            print_arg(kyless_arg);
+            print_arg(positionl_arg);
         }
 
         std::cout << '\n';
+    }
+
+    /**
+     * @brief       Print the constraints.
+     */
+    void print_constraints()
+    {
+        if (flgs_.is_not_set(help_menu_flags::PRINT_CONSTRAINTS))
+        {
+            return;
+        }
+        
+        // TODO: Don't print every constraint in every help menu.
+        auto& constrnts = arg_parsr_->get_constraints();
+        if (constrnts.empty())
+        {
+            return;
+        }
+
+        std::cout << "Constraints:\n";
+        
+        for (auto& constrnt : constrnts)
+        {
+            constrnt.print_help(args_indent_, max_line_len_, new_line_indent_, max_short_kys_len_,
+                                max_long_kys_len_);
+        }
     }
 
     /**
@@ -484,13 +505,10 @@ public:
      */
     void print_epilog()
     {
-        if (flgs_.is_set(help_menu_flags::PRINT_EPILOGUE))
+        if (flgs_.is_set(help_menu_flags::PRINT_EPILOGUE) && !epilg_.empty())
         {
-            if (!epilg_.empty())
-            {
-                speed::iostream::print_wrapped(std::cout, epilg_, max_line_len_, 0);
-                std::cout << "\n\n";
-            }
+            speed::iostream::print_wrapped(std::cout, epilg_, max_line_len_, 0);
+            std::cout << "\n\n";
         }
     }
 
@@ -526,8 +544,8 @@ private:
     /** They key args of the help menu. */
     vector_type<key_arg_type*> ky_args_;
 
-    /** The keyless args of the help menu. */
-    vector_type<keyless_arg_type*> kyless_args_;
+    /** The positional args of the help menu. */
+    vector_type<positional_arg_type*> positionl_args_;
 
     /** Reference to the argument parser that holds this object. */
     arg_parser_type* arg_parsr_;
@@ -551,8 +569,6 @@ private:
     flags_type<help_menu_flags> flgs_;
 };
 
-
 }
-
 
 #endif

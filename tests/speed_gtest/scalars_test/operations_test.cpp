@@ -18,18 +18,15 @@
  */
 
 /**
- * @file        speed_gtest/scalars_test/operations_test.cpp
- * @brief       operations unit test.
+ * @file        operations_test.cpp
+ * @brief       scalars operations unit test.
  * @author      Killian Valverde
  * @date        2018/04/28
  */
 
-#include <type_traits>
-
 #include <gtest/gtest.h>
 
 #include "speed/scalars/scalars.hpp"
-
 
 TEST(scalars_operations, count_digits)
 {

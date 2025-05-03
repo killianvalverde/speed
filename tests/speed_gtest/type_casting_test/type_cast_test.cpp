@@ -18,30 +18,26 @@
  */
 
 /**
- * @file        speed_gtest/type_casting_test/type_cast_test.cpp
+ * @file        type_cast_test.cpp
  * @brief       type_cast unit test.
  * @author      Killian Valverde
  * @date        2018/06/06
  */
 
 #include <filesystem>
-
 #include <gtest/gtest.h>
 
 #include "speed/type_casting/type_casting.hpp"
-
 
 TEST(type_casting_type_cast, basic_string_to_type)
 {
     ASSERT_TRUE(speed::type_casting::type_cast<int>(std::string("347865")) == 347865);
 }
 
-
 TEST(type_casting_type_cast, c_string_to_basic_string)
 {
     ASSERT_TRUE(speed::type_casting::type_cast<std::string>("23.345").length() > 0);
 }
-
 
 TEST(type_casting_type_cast, c_string_to_floating_point)
 {
@@ -49,7 +45,6 @@ TEST(type_casting_type_cast, c_string_to_floating_point)
     ASSERT_TRUE(speed::type_casting::type_cast<double>("23.345") == 23.345);
     ASSERT_TRUE(speed::type_casting::type_cast<long double>("23.345") == 23.345l);
 }
-
 
 TEST(type_casting_type_cast, c_string_to_integral_signed)
 {
@@ -61,7 +56,6 @@ TEST(type_casting_type_cast, c_string_to_integral_signed)
     EXPECT_THROW(speed::type_casting::type_cast<int>("\0"), speed::type_casting::exception);
     EXPECT_THROW(speed::type_casting::type_cast<int>("1238*7645"), speed::type_casting::exception);
 }
-
 
 TEST(type_casting_type_cast, c_string_to_integral_unsigned)
 {
@@ -76,7 +70,6 @@ TEST(type_casting_type_cast, c_string_to_integral_unsigned)
     EXPECT_THROW(speed::type_casting::type_cast<unsigned int>("1238*7645"),
                  speed::type_casting::exception);
 }
-
 
 TEST(type_casting_type_cast, c_string_to_path)
 {

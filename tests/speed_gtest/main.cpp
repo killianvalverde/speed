@@ -18,14 +18,13 @@
  */
 
 /**
- * @file        speed_gtest/main.cpp
+ * @file        main.cpp
  * @brief       speed_gtest entry point.
  * @author      Killian Valverde
  * @date        2017/05/15
  */
 
 #include <gtest/gtest.h>
-
 
 int main(int argc, char* argv[])
 {

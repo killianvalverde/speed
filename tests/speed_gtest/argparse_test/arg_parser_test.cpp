@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed_gtest/argparse_test/arg_parser_test.cpp
+ * @file        arg_parser_test.cpp
  * @brief       arg_parser unit test.
  * @author      Killian Valverde
  * @date        2017/05/16
@@ -27,7 +27,6 @@
 #include <gtest/gtest.h>
 
 #include "speed/argparse/argparse.hpp"
-
 
 class argparse_arg_parser : public ::testing::Test
 {
@@ -48,7 +47,6 @@ protected:
     speed::argparse::arg_parser ap;
 };
 
-
 TEST_F(argparse_arg_parser, configure)
 {
     ap.configure()
@@ -63,7 +61,6 @@ TEST_F(argparse_arg_parser, configure)
             .short_prefixes("-")
             .short_prefixes("-");
 }
-
 
 TEST_F(argparse_arg_parser, add_key_arg)
 {
@@ -86,7 +83,6 @@ TEST_F(argparse_arg_parser, add_key_arg)
     EXPECT_THROW(ap.add_key_arg("--long"), speed::argparse::exception);
     EXPECT_TRUE(!ap.was_found("-l"));
 }
-
 
 TEST_F(argparse_arg_parser, add_key_value_arg)
 {
@@ -120,15 +116,14 @@ TEST_F(argparse_arg_parser, add_key_value_arg)
     EXPECT_TRUE(!ap.was_found("-s"));
 }
 
-
-TEST_F(argparse_arg_parser, add_keyless_arg)
+TEST_F(argparse_arg_parser, add_positional_arg)
 {
     std::vector<std::string> vals;
     std::uint64_t holdr1 = 0;
     double holdr2 = 0;
     bool presnc;
 
-    ap.add_keyless_arg("FILE")
+    ap.add_positional_arg("FILE")
             .action([&]() {})
             .description("The file path.")
             .error_name("error")
@@ -144,11 +139,10 @@ TEST_F(argparse_arg_parser, add_keyless_arg)
             .values_with_prefix(false)
             .values_with_prefix(false);
 
-    EXPECT_THROW(ap.add_keyless_arg(""), speed::argparse::exception);
-    EXPECT_THROW(ap.add_keyless_arg("FILE"), speed::argparse::exception);
+    EXPECT_THROW(ap.add_positional_arg(""), speed::argparse::exception);
+    EXPECT_THROW(ap.add_positional_arg("FILE"), speed::argparse::exception);
     EXPECT_TRUE(!ap.was_found("FILE"));
 }
-
 
 TEST_F(argparse_arg_parser, add_help_arg)
 {
@@ -185,7 +179,6 @@ TEST_F(argparse_arg_parser, add_help_arg)
     EXPECT_TRUE(!ap.was_found("-h"));
 }
 
-
 TEST_F(argparse_arg_parser, add_version_arg)
 {
     bool presnc;
@@ -212,7 +205,6 @@ TEST_F(argparse_arg_parser, add_version_arg)
     EXPECT_TRUE(!ap.was_found("-v"));
 }
 
-
 TEST_F(argparse_arg_parser, add_help_menu)
 {
     ap.add_help_menu()
@@ -225,7 +217,6 @@ TEST_F(argparse_arg_parser, add_help_menu)
             .description("Output version information and exit")
             .gplv3_version_information("1.0.0", "2024", "Killian");
 }
-
 
 TEST_F(argparse_arg_parser, parse_key_args)
 {
@@ -262,7 +253,6 @@ TEST_F(argparse_arg_parser, parse_key_args)
     EXPECT_TRUE(ap.was_found("-r"));
     EXPECT_TRUE(dee == 1);
 }
-
 
 TEST_F(argparse_arg_parser, parse_key_value_args)
 {
@@ -311,8 +301,7 @@ TEST_F(argparse_arg_parser, parse_key_value_args)
     EXPECT_THROW(dm = ap.get_front_as<std::uint64_t>("-h"), speed::type_casting::exception);
 }
 
-
-TEST_F(argparse_arg_parser, parse_keyless_args)
+TEST_F(argparse_arg_parser, parse_positional_args)
 {
     std::vector<const char *> argv = {
         "speed",
@@ -340,25 +329,25 @@ TEST_F(argparse_arg_parser, parse_keyless_args)
             .minmax_values(1, ~0ull)
             .store_into(&secs);
 
-    ap.add_keyless_arg("DESTINATION1")
+    ap.add_positional_arg("DESTINATION1")
             .description("Destination directory.")
             .store_into(&pths1);
 
-    ap.add_keyless_arg("DESTINATION2")
+    ap.add_positional_arg("DESTINATION2")
             .description("Destination directory.")
             .store_into(&pths2);
 
-    ap.add_keyless_arg("DESTINATION3")
+    ap.add_positional_arg("DESTINATION3")
             .description("Destination directory.")
             .store_into(&pths3)
             .minmax_values(1, 2);
 
-    ap.add_keyless_arg("NUMBER1")
+    ap.add_positional_arg("NUMBER1")
             .description("Some number.")
             .store_into(&numbr1)
             .minmax_values(1, 2);
 
-    ap.add_keyless_arg("NUMBER2")
+    ap.add_positional_arg("NUMBER2")
             .description("Some number.")
             .store_into(&numbr2)
             .minmax_values(1, 2);
@@ -386,7 +375,6 @@ TEST_F(argparse_arg_parser, parse_keyless_args)
     EXPECT_TRUE(ap.has_errors());
 }
 
-
 TEST_F(argparse_arg_parser, parse_help_args)
 {
     std::vector<const char*> argv = {
@@ -413,7 +401,6 @@ TEST_F(argparse_arg_parser, parse_help_args)
     EXPECT_THROW(dm = ap.get_at_as<std::string>("-h", 1), speed::argparse::exception);
 }
 
-
 TEST_F(argparse_arg_parser, parse_version_args)
 {
     std::vector<const char*> argv = {
@@ -434,7 +421,6 @@ TEST_F(argparse_arg_parser, parse_version_args)
     EXPECT_TRUE(ap.was_found("-v"));
     EXPECT_TRUE(ap.was_found("--version"));
 }
-
 
 TEST_F(argparse_arg_parser, parse_eq_operator)
 {
@@ -483,7 +469,6 @@ TEST_F(argparse_arg_parser, parse_eq_operator)
     EXPECT_THROW(dm = ap.get_front_as<std::uint64_t>("-h"), speed::type_casting::exception);
 }
 
-
 TEST_F(argparse_arg_parser, parse_grouping)
 {
     std::vector<const char*> argv = {
@@ -530,8 +515,7 @@ TEST_F(argparse_arg_parser, parse_grouping)
     EXPECT_THROW(dm = ap.get_front_as<std::uint64_t>("-h"), speed::type_casting::exception);
 }
 
-
-TEST_F(argparse_arg_parser, parse_alof_constraint)
+TEST_F(argparse_arg_parser, parse_one_or_more_required_constraint)
 {
     std::vector<const char*> argv1 = {
         "speed"
@@ -551,7 +535,8 @@ TEST_F(argparse_arg_parser, parse_alof_constraint)
     ap.add_key_arg("-r", "--recursive")
             .description("Execute the process in a recursive way.");
     
-    ap.add_constraint_one_or_more("-a", "-l", "-r");
+    ap.add_constraint("-a", "-l", "-r")
+            .one_or_more_required(true);
 
     ap.parse_args(argv1.size(), argv1);
     EXPECT_TRUE(ap.has_errors());
@@ -559,7 +544,6 @@ TEST_F(argparse_arg_parser, parse_alof_constraint)
     ap.parse_args(argv2.size(), argv2);
     EXPECT_TRUE(!ap.has_errors());
 }
-
 
 TEST_F(argparse_arg_parser, parse_mutually_exclusive_constraint)
 {
@@ -583,7 +567,8 @@ TEST_F(argparse_arg_parser, parse_mutually_exclusive_constraint)
     ap.add_key_arg("-r", "--recursive")
             .description("Execute the process in a recursive way.");
     
-    ap.add_constraint_mutually_exclusive("-a", "-l", "-r");
+    ap.add_constraint("-a", "-l", "-r")
+            .mutually_exclusive(true);
 
     ap.parse_args(argv1.size(), argv1);
     EXPECT_TRUE(ap.was_found("-a"));
@@ -597,7 +582,6 @@ TEST_F(argparse_arg_parser, parse_mutually_exclusive_constraint)
     EXPECT_TRUE(!ap.was_found("-r"));
     EXPECT_TRUE(!ap.has_errors());
 }
-
 
 TEST_F(argparse_arg_parser, parse_all_constraints)
 {
@@ -625,8 +609,9 @@ TEST_F(argparse_arg_parser, parse_all_constraints)
     ap.add_key_arg("-r", "--recursive")
             .description("Execute the process in a recursive way.");
     
-    ap.add_constraint_one_or_more("-a", "-l", "-r");
-    ap.add_constraint_mutually_exclusive("-a", "-l", "-r");
+    ap.add_constraint("-a", "-l", "-r")
+            .mutually_exclusive(true)
+            .one_or_more_required(true);
 
     ap.parse_args(argv1.size(), argv1);
     EXPECT_TRUE(ap.was_found("-a"));
@@ -646,7 +631,6 @@ TEST_F(argparse_arg_parser, parse_all_constraints)
     EXPECT_TRUE(!ap.was_found("-r"));
     EXPECT_TRUE(!ap.has_errors());
 }
-
 
 TEST_F(argparse_arg_parser, parse_sub_parser)
 {
@@ -676,7 +660,7 @@ TEST_F(argparse_arg_parser, parse_sub_parser)
     std::string messag;
     bool interactv = false;
 
-    add_parsr.add_keyless_arg("FILE")
+    add_parsr.add_positional_arg("FILE")
             .store_into(&pth);
 
     commit_parsr.add_key_value_arg("-m")
@@ -703,7 +687,6 @@ TEST_F(argparse_arg_parser, parse_sub_parser)
     ap.parse_args(argv3.size(), argv3);
     EXPECT_TRUE(interactv);
 }
-
 
 TEST_F(argparse_arg_parser, check_errors)
 {
@@ -742,7 +725,6 @@ TEST_F(argparse_arg_parser, check_errors)
     EXPECT_TRUE(!ap.arg_has_errors("-r"));
     EXPECT_TRUE(ap.has_errors());
 }
-
 
 TEST_F(argparse_arg_parser, print_usage)
 {
@@ -787,14 +769,13 @@ TEST_F(argparse_arg_parser, print_usage)
             .mandatory(true)
             .minmax_values(0, 4);
 
-    ap.add_keyless_arg("DESTINATION")
+    ap.add_positional_arg("DESTINATION")
             .description("Destination directory.");
 
     ap.print_help();
 
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
-
 
 TEST_F(argparse_arg_parser, print_description)
 {
@@ -828,7 +809,6 @@ TEST_F(argparse_arg_parser, print_description)
 
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
-
 
 TEST_F(argparse_arg_parser, print_options)
 {
@@ -875,14 +855,13 @@ TEST_F(argparse_arg_parser, print_options)
             .values_names("INTEGER")
             .minmax_values(0, 4);
 
-    ap.add_keyless_arg("DESTINATION")
+    ap.add_positional_arg("DESTINATION")
             .description("Destination directory.");
 
     ap.print_help();
 
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
-
 
 TEST_F(argparse_arg_parser, print_commands)
 {
@@ -938,14 +917,13 @@ TEST_F(argparse_arg_parser, print_commands)
             .values_names("INTEGER")
             .minmax_values(0, 4);
 
-    ap.add_keyless_arg("DESTINATION")
+    ap.add_positional_arg("DESTINATION")
             .description("Destination directory.");
 
     ap.print_help();
 
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
-
 
 TEST_F(argparse_arg_parser, print_values)
 {
@@ -991,14 +969,13 @@ TEST_F(argparse_arg_parser, print_values)
             .mandatory(true)
             .minmax_values(0, 4);
 
-    ap.add_keyless_arg("DESTINATION")
+    ap.add_positional_arg("DESTINATION")
             .description("Destination directory.");
 
     ap.print_help();
 
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
-
 
 TEST_F(argparse_arg_parser, print_epilogue)
 {
@@ -1032,7 +1009,6 @@ TEST_F(argparse_arg_parser, print_epilogue)
 
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
-
 
 TEST_F(argparse_arg_parser, print_help)
 {
@@ -1110,14 +1086,13 @@ TEST_F(argparse_arg_parser, print_help)
             .mandatory(true)
             .minmax_values(0, 4);
 
-    ap.add_keyless_arg("DESTINATION")
+    ap.add_positional_arg("DESTINATION")
             .description("Destination directory.");
 
     ap.print_help();
 
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
-
 
 TEST_F(argparse_arg_parser, print_version)
 {
@@ -1137,7 +1112,6 @@ TEST_F(argparse_arg_parser, print_version)
 
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
-
 
 TEST_F(argparse_arg_parser, print_number_errors)
 {
@@ -1162,7 +1136,6 @@ TEST_F(argparse_arg_parser, print_number_errors)
 
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
-
 
 TEST_F(argparse_arg_parser, change_prefix)
 {
@@ -1240,7 +1213,7 @@ TEST_F(argparse_arg_parser, change_prefix)
             .mandatory(true)
             .minmax_values(0, 4);
 
-    ap.add_keyless_arg("DESTINATION")
+    ap.add_positional_arg("DESTINATION")
             .description("Destination directory.");
 
     ap.configure()

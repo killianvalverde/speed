@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/type_casting/type_cast.hpp
+ * @file        type_cast.hpp
  * @brief       type_cast main header.
  * @author      Killian Valverde
  * @date        2016/08/19
@@ -31,9 +31,7 @@
 #include "exception.hpp"
 #include "try_type_cast.hpp"
 
-
 namespace speed::type_casting {
-
 
 /**
  * @brief       Convert the source to the target.
@@ -71,7 +69,6 @@ TpTarget type_cast(const TpSource& arg)
     return res;
 }
 
-
 /**
  * @brief       Convert the source to the target.
  * @param       arg : The value to convert.
@@ -98,8 +95,6 @@ TpTarget type_cast(const TpSource& arg, TpDefaultValue&& default_val) noexcept
     return std::forward<TpDefaultValue>(default_val);
 }
 
-
 }
-
 
 #endif

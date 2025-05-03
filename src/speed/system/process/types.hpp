@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/process/types.hpp
+ * @file        types.hpp
  * @brief       types header.
  * @author      Killian Valverde
  * @date        2024/11/01
@@ -29,9 +29,7 @@
 
 #include <cstdint>
 
-
 namespace speed::system::process {
-
 
 /** PID type. */
 using pid_t = std::int64_t;
@@ -45,8 +43,6 @@ using uid_t = std::uint64_t;
 /** GID type. */
 using gid_t = std::uint64_t;
 
-
 }
-
 
 #endif

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/math/math.hpp
+ * @file        math.hpp
  * @brief       math main header.
  * @author      Killian Valverde
  * @date        2017/01/28
@@ -29,9 +29,7 @@
 
 #include "operations.hpp"
 
-
 namespace speed {
-
 
 /**
  * @brief       Contains a set of resources to compute common mathematical operations and
@@ -39,19 +37,14 @@ namespace speed {
  */
 namespace math {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contains a set of resources to compute common mathematical operations and
  *              transformations.
  */
 namespace mth = math;
-
 #endif
 
-
 }
-
 
 #endif

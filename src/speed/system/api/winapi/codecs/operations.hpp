@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/winapi/codecs/operations.hpp
+ * @file        operations.hpp
  * @brief       codecs operations functions header.
  * @author      Killian Valverde
  * @date        2024/10/16
@@ -30,13 +30,11 @@
 #include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_WINAPI
 
-#include "../../../errors/errors.hpp"
-
 #include <string>
 
+#include "../../../errors/errors.hpp"
 
 namespace speed::system::api::winapi::codecs {
-
 
 /**
  * @brief       Converts a specified c_string into a wstring.
@@ -84,7 +82,6 @@ bool convert_c_str_to_wstring(
 
     return false;
 }
-
 
 /**
  * @brief       Converts a specified w_string into a string.
@@ -135,9 +132,7 @@ bool convert_w_str_to_string(
     return false;
 }
 
-
 }
-
 
 #endif
 #endif

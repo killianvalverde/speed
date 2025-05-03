@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/compatibility/compatibility.hpp
+ * @file        compatibility.hpp
  * @brief       system compatibility main header.
  * @author      Killian Valverde
  * @date        2023/10/10
@@ -31,27 +31,20 @@
 #include "platform.hpp"
 #include "select_api.hpp"
 
-
 namespace speed::system {
-
 
 /**
  * @brief       Contains utilities for compile-time introspection and modification.
  */
 namespace compatibility {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contains utilities for compile-time introspection and modification.
  */
 namespace compat = compatibility;
-
 #endif
 
-
 }
-
 
 #endif

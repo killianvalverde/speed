@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/containers/containers.hpp
+ * @file        containers.hpp
  * @brief       containers main header
  * @author      Killian Valverde
  * @date        2018/01/13
@@ -27,34 +27,27 @@
 #ifndef SPEED_CONTAINERS_CONTAINERS_HPP
 #define SPEED_CONTAINERS_CONTAINERS_HPP
 
-#include "circular_doubly_linked_list.hpp"
+#include "linked_list.hpp"
 #include "doubly_linked_node.hpp"
 #include "exception.hpp"
 #include "flags.hpp"
 #include "iterator_base.hpp"
 #include "static_cache.hpp"
 
-
 namespace speed {
-
 
 /**
  * @brief       Contians definitions of containers.
  */
 namespace containers {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contians definitions of containers.
  */
 namespace contain = containers;
-
 #endif
 
-
 }
-
 
 #endif

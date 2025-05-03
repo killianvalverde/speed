@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/type_casting/type_casting.hpp
+ * @file        type_casting.hpp
  * @brief       compatibility main header.
  * @author      Killian Valverde
  * @date        2016/08/05
@@ -37,27 +37,20 @@
 #include "type_cast.hpp"
 #include "type_caster_base.hpp"
 
-
 namespace speed {
-
 
 /**
  * @brief       Contains utilities for type casting.
  */
 namespace type_casting {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contains utilities for type casting.
  */
 namespace cast = type_casting;
-
 #endif
 
-
 }
-
 
 #endif

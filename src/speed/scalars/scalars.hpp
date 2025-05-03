@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/scalars/scalars.hpp
+ * @file        scalars.hpp
  * @brief       scalars main header.
  * @author      Killian Valverde
  * @date        2018/04/28
@@ -30,27 +30,20 @@
 #include "scalar.hpp"
 #include "operations.hpp"
 
-
 namespace speed {
-
 
 /**
  * @brief       Contains a set of resources to compute common scalars operations.
  */
 namespace scalars {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contains a set of resources to compute common scalars operations.
  */
 namespace scals = scalars;
-
 #endif
 
-
 }
-
 
 #endif

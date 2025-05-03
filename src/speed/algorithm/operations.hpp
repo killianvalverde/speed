@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/algorithm/operations.hpp
+ * @file        operations.hpp
  * @brief       algorithm operations header.
  * @author      Killian Valverde
  * @date        2018/08/07
@@ -32,13 +32,10 @@
 
 #include "simple_compare.hpp"
 
-
 namespace speed::algorithm {
-
 
 /** @cond */
 namespace __private {
-
 
 template<typename TpArray, typename TpCompare>
 std::size_t __get_partition(TpArray& array, std::size_t lo, std::size_t hi, const TpCompare& comp)
@@ -66,7 +63,6 @@ std::size_t __get_partition(TpArray& array, std::size_t lo, std::size_t hi, cons
     return partition_index;
 }
 
-
 template<typename TpArray, typename TpCompare>
 void __quicksort(TpArray& array, std::size_t lo, std::size_t hi, const TpCompare& comp)
 {
@@ -83,10 +79,8 @@ void __quicksort(TpArray& array, std::size_t lo, std::size_t hi, const TpCompare
     }
 }
 
-
 } /* __private */
 /** @endcond */
-
 
 /**
  * @brief       Quicksort the array elements.
@@ -102,7 +96,6 @@ void quicksort(TpArray& array, std::size_t sz, const TpCompare& comp)
     __private::__quicksort(array, 0, sz - 1, comp);
 }
 
-
 /**
  * @brief       Quicksort the array elements.
  * @param       array : The array to sort.
@@ -115,8 +108,6 @@ void quicksort(TpArray& array, std::size_t sz)
     __private::__quicksort(array, 0, sz - 1, comp);
 }
 
-
 }
-
 
 #endif

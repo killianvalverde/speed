@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/cryptography/cryptography.hpp
+ * @file        cryptography.hpp
  * @brief       cryptography main header
  * @author      Killian Valverde
  * @date        2024/11/01
@@ -29,27 +29,20 @@
 
 #include "city_hash.hpp"
 
-
 namespace speed {
-
 
 /**
  * @brief       Contains cryptography operation resources.
  */
 namespace cryptography {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contains cryptography operation resources.
  */
 namespace crypt = cryptography;
-
 #endif
 
-
 }
-
 
 #endif

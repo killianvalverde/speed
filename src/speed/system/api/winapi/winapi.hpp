@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/winapi/winapi.hpp
+ * @file        winapi.hpp
  * @brief       winapi main header.
  * @author      Killian Valverde
  * @date        2024/10/11
@@ -36,18 +36,14 @@
 #include "terminal/terminal.hpp"
 #include "time/time.hpp"
 
-
 namespace speed::system::api {
-
 
 /**
  * @brief       Contains all the implementation of the system functions using the WinAPI.
  */
 namespace winapi {}
 
-
 }
-
 
 #endif
 #endif

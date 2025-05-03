@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/help_menu_flags.hpp
+ * @file        help_menu_flags.hpp
  * @brief       help_menu_flags enum header.
  * @author      Killian Valverde
  * @date        2024/04/29
@@ -29,9 +29,7 @@
 
 #include "../lowlevel/lowlevel.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Contains all help menu flags constants.
@@ -47,42 +45,43 @@ enum class help_menu_flags : std::uint16_t
     /** Whether the description has to be printed. */
     PRINT_DESCRIPTION = 0x2,
 
-    /** Whether the arguements keys has to be printed. */
+    /** Whether the arguements keys have to be printed. */
     PRINT_ARGS_KEYS = 0x4,
 
-    /** Whether the options has to be printed. */
+    /** Whether the options have to be printed. */
     PRINT_OPTIONS = 0x8,
 
-    /** Whether the commands has to be printed. */
+    /** Whether the commands have to be printed. */
     PRINT_COMMANDS = 0x10,
 
-    /** Whether the values has to be printed. */
+    /** Whether the values have to be printed. */
     PRINT_VALUES = 0x20,
+    
+    /** Whether the constraints have to be printed. */
+    PRINT_CONSTRAINTS = 0x40,
 
     /** Whether the epilogue has to be printed. */
-    PRINT_EPILOGUE = 0x40,
+    PRINT_EPILOGUE = 0x80,
     
     /** All help menu flags. */
-    ALL = 0x7F,
+    ALL = 0xFF,
     
     /** The default flags used for the help menu. */
     DEFAULT = (
             PRINT_USAGE |
             PRINT_DESCRIPTION |
+            PRINT_ARGS_KEYS |
             PRINT_OPTIONS |
             PRINT_COMMANDS |
-            PRINT_ARGS_KEYS |
+            PRINT_CONSTRAINTS |
             PRINT_EPILOGUE
     )
 };
 
-
 /** Contains all help menu flags constants. Alias of 'help_menu_flags' enumeration. */
 using hmf_t = help_menu_flags;
 
-
 }
-
 
 /** @cond */
 namespace speed::lowlevel {
@@ -93,6 +92,5 @@ struct enable_bitwise_operators<speed::argparse::help_menu_flags>
 };
 }
 /** @endcond */
-
 
 #endif

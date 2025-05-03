@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_arg_value.hpp
+ * @file        basic_arg_value.hpp
  * @brief       basic_arg_value class header.
  * @author      Killian Valverde
  * @date        2015/12/31
@@ -41,9 +41,7 @@
 #include "basic_value_arg.hpp"
 #include "forward_declarations.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Class that represents a value for an argument.
@@ -101,14 +99,13 @@ public:
     basic_arg_value(
             TpRegex_&& regx,
             TpString_&& val,
-            shared_ptr_type<caster_base_type> castr,
+            caster_base_type* castr,
             arg_parser_type* arg_parsr,
             value_arg_type* val_arg
     )
             : regx_(std::forward<TpRegex_>(regx))
             , val_(std::forward<TpString_>(val))
-            , err_message_()
-            , castr_(std::move(castr))
+            , castr_(castr)
             , arg_parsr_(arg_parsr)
             , val_arg_(val_arg)
             , err_flgs_(arg_value_error_flags::NIL)
@@ -165,7 +162,7 @@ public:
             return false;
         }
 
-        succs = (!castr_) || castr_->try_type_cast(val_, &err_code);
+        succs = !castr_ || castr_->try_type_cast(val_, &err_code);
 
         if (!succs)
         {
@@ -305,7 +302,7 @@ private:
     string_type err_message_;
 
     /** Type caster used to validate the value syntax. */
-    shared_ptr_type<caster_base_type> castr_;
+    caster_base_type* castr_;
 
     /** Holds a reference to the argument parser object. */
     arg_parser_type* arg_parsr_;
@@ -315,13 +312,8 @@ private:
 
     /** Error flags that allows knowing whether there are errors. */
     flags_type<arg_value_error_flags> err_flgs_;
-
-    friend class basic_value_arg<TpAllocator>;
-    friend class basic_arg_parser<TpAllocator>;
 };
-    
-    
-}
 
+}
 
 #endif

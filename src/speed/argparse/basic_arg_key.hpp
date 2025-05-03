@@ -18,7 +18,7 @@
  */
  
 /**
- * @file        speed/argparse/basic_arg_key.hpp
+ * @file        basic_arg_key.hpp
  * @brief       basic_arg_key class header.
  * @author      Killian Valverde
  * @date        2017/01/05
@@ -29,12 +29,10 @@
 
 #include <string>
 
-#include "basic_arg_parser.hpp"
 #include "forward_declarations.hpp"
-
+#include "basic_arg_parser.hpp"
 
 namespace speed::argparse {
-
 
 /**
  * @brief       Class that represents a key for an argument.
@@ -218,7 +216,6 @@ private:
     bool is_prefx_long_;
 };
 
-
 /**
  * @brief       Allows to use an objects to print in standard output the value that constains the
  *              key.
@@ -237,8 +234,6 @@ std::basic_ostream<TpChar, TpCharTraits>& operator <<(
     return os;
 }
 
-
 }
-
 
 #endif

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/cryptography/cryptography.cpp
+ * @file        cryptography.cpp
  * @brief       cryptography module object.
  * @author      Killian Valverde
  * @date        2024/11/01

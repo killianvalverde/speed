@@ -18,8 +18,8 @@
  */
 
 /**
- * @file        speed_gtest/safety/operations_test.cpp
- * @brief       operations unit test.
+ * @file        operations_test.cpp
+ * @brief       safety operations unit test.
  * @author      Killian Valverde
  * @date        2018/06/08
  */
@@ -27,7 +27,6 @@
 #include <gtest/gtest.h>
 
 #include "speed/safety/safety.hpp"
-
 
 TEST(safety_operations, add)
 {
@@ -38,7 +37,6 @@ TEST(safety_operations, add)
     EXPECT_THROW(speed::safety::add(val2, 1), speed::safety::overflow_exception);
 }
 
-
 TEST(safety_operations, addl)
 {
     std::uint32_t val1 = 4294967293;
@@ -47,7 +45,6 @@ TEST(safety_operations, addl)
     EXPECT_TRUE(speed::safety::addl(val1, 1, 1) == 4294967295);
     EXPECT_THROW(speed::safety::addl(val2, 1, 1), speed::safety::overflow_exception);
 }
-
 
 TEST(safety_operations, try_add)
 {
@@ -58,7 +55,6 @@ TEST(safety_operations, try_add)
     EXPECT_TRUE(!speed::safety::try_add(&val2, 1));
 }
 
-
 TEST(safety_operations, try_addl)
 {
     std::uint32_t val1 = 4294967293;
@@ -67,7 +63,6 @@ TEST(safety_operations, try_addl)
     EXPECT_TRUE(speed::safety::try_addl(&val1, 1, 1));
     EXPECT_TRUE(!speed::safety::try_addl(&val2, 1, 1));
 }
-
 
 TEST(safety_operations, addm)
 {
@@ -78,7 +73,6 @@ TEST(safety_operations, addm)
     EXPECT_TRUE(speed::safety::addm(val2, 1) == 4294967295);
 }
 
-
 TEST(safety_operations, addml)
 {
     std::uint32_t val1 = 4294967293;
@@ -88,7 +82,6 @@ TEST(safety_operations, addml)
     EXPECT_TRUE(speed::safety::addml(val2, 1, 1) == 4294967295);
 }
 
-
 TEST(safety_operations, try_addm)
 {
     std::uint32_t val1 = 4294967294;
@@ -97,7 +90,6 @@ TEST(safety_operations, try_addm)
     EXPECT_TRUE(speed::safety::try_addm(&val1, 1) && val1 == 4294967295);
     EXPECT_TRUE(!speed::safety::try_addm(&val2, 1) && val2 == 4294967295);
 }
-
 
 TEST(safety_operations, try_addml)
 {

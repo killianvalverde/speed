@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/winapi/terminal/operations.cpp
+ * @file        operations.cpp
  * @brief       terminal operations source.
  * @author      Killian Valverde
  * @date        2017/10/18
@@ -32,9 +32,7 @@
 
 #include "operations.hpp"
 
-
 namespace speed::system::api::winapi::terminal {
-
 
 bool get_current_text_attribute(HANDLE console_handl, WORD* text_attr) noexcept
 {
@@ -50,7 +48,6 @@ bool get_current_text_attribute(HANDLE console_handl, WORD* text_attr) noexcept
     return true;
 }
 
-
 bool flush_input_terminal(::FILE* input_strm, std::error_code* err_code) noexcept
 {
     if (!::FlushConsoleInputBuffer((HANDLE)::_get_osfhandle(_fileno(input_strm))))
@@ -62,7 +59,6 @@ bool flush_input_terminal(::FILE* input_strm, std::error_code* err_code) noexcep
     return true;
 }
 
-
 bool flush_output_terminal(::FILE* output_strm, std::error_code* err_code) noexcept
 {
     if (::fflush(output_strm))
@@ -73,7 +69,6 @@ bool flush_output_terminal(::FILE* output_strm, std::error_code* err_code) noexc
 
     return true;
 }
-
 
 bool kbhit(
         const char* mess,
@@ -126,7 +121,6 @@ bool kbhit(
     
     return true;
 }
-
 
 bool set_foreground_text_attribute(
         ::FILE* terminal_strm,
@@ -231,8 +225,6 @@ bool set_foreground_text_attribute(
     return true;
 }
 
-
 }
-
 
 #endif

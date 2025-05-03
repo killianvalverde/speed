@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/terminal/operations.hpp
+ * @file        operations.hpp
  * @brief       terminal operations header.
  * @author      Killian Valverde
  * @date        2017/10/18
@@ -33,9 +33,7 @@
 #include "../compatibility/compatibility.hpp"
 #include "text_attribute.hpp"
 
-
 namespace speed::system::terminal {
-
 
 /**
  * @brief       Flush the input terminal buffer.
@@ -48,7 +46,6 @@ inline bool flush_input_terminal(::FILE* input_strm, std::error_code* err_code =
     return SPEED_SELECT_API(terminal::flush_input_terminal, false, input_strm, err_code);
 }
 
-
 /**
  * @brief       Flush the output terminal buffer.
  * @param       output_strm : Terminal output stream.
@@ -59,7 +56,6 @@ inline bool flush_output_terminal(::FILE* output_strm, std::error_code* err_code
 {
     return SPEED_SELECT_API(terminal::flush_output_terminal, false, output_strm, err_code);
 }
-
 
 /**
  * @brief       Print a message and pause de program execution until a key is pressed
@@ -79,7 +75,6 @@ inline bool kbhit(
     return SPEED_SELECT_API(terminal::kbhit, false, mess, flush_input_term, err_code);
 }
 
-
 /**
  * @brief       Set a terminal text attribute.
  * @param       terminal_strm : Terminal stream in which set the attribute.
@@ -95,8 +90,6 @@ inline bool set_foreground_text_attribute(
                             text_attr);
 }
 
-
 }
-
 
 #endif

@@ -18,19 +18,17 @@
  */
 
 /**
- * @file        speed/filesystem/directory_iteration.cpp
+ * @file        directory_iteration.cpp
  * @brief       directory_iteration class methods definition.
  * @author      Killian Valverde
  * @date        2024/10/15
  */
 
-#include "../stringutils/stringutils.hpp"
-
 #include "directory_iteration.hpp"
 
+#include "../stringutils/stringutils.hpp"
 
 namespace speed::filesystem {
-
 
 directory_iteration::const_iterator::const_iterator(const directory_iteration* composit)
        : cur_dir_()
@@ -56,7 +54,6 @@ directory_iteration::const_iterator::const_iterator(const directory_iteration* c
     }
 }
 
-
 directory_iteration::const_iterator::~const_iterator() noexcept
 {
     while (!directory_entity_stck_.empty())
@@ -67,7 +64,6 @@ directory_iteration::const_iterator::~const_iterator() noexcept
 
     end_ = true;
 }
-
 
 directory_iteration::const_iterator::self_type& directory_iteration::const_iterator::operator ++()
 {
@@ -105,7 +101,6 @@ directory_iteration::const_iterator::self_type& directory_iteration::const_itera
     return *this;
 }
 
-
 bool directory_iteration::const_iterator::operator ==(const self_type& rhs) const noexcept
 {
     if (end_ && rhs.end_)
@@ -119,7 +114,6 @@ bool directory_iteration::const_iterator::operator ==(const self_type& rhs) cons
 
     return true;
 }
-
 
 bool directory_iteration::const_iterator::open_directory()
 {
@@ -158,7 +152,6 @@ bool directory_iteration::const_iterator::open_directory()
     return true;
 }
 
-
 bool directory_iteration::const_iterator::read_directory()
 {
     bool succss;
@@ -174,13 +167,11 @@ bool directory_iteration::const_iterator::read_directory()
     return succss;
 }
 
-
 void directory_iteration::const_iterator::close_directory()
 {
     speed::system::filesystem::closedir(&directory_entity_stck_.top());
     exit_directory();
 }
-
 
 void directory_iteration::const_iterator::exit_directory()
 {
@@ -194,7 +185,6 @@ void directory_iteration::const_iterator::exit_directory()
         end_ = true;
     }
 }
-
 
 bool directory_iteration::const_iterator::is_file_valid()
 {
@@ -230,7 +220,6 @@ bool directory_iteration::const_iterator::is_file_valid()
 
     return true;
 }
-
 
 int directory_iteration::const_iterator::strncmp(
         const char_type* src,
@@ -282,7 +271,6 @@ int directory_iteration::const_iterator::strncmp(
 
     return 0;
 }
-
 
 const directory_iteration::char_type* directory_iteration::const_iterator::strstr(
         const char_type* str,
@@ -380,7 +368,6 @@ const directory_iteration::char_type* directory_iteration::const_iterator::strst
     return *pattrn == '\0';
 }
 
-
 void directory_iteration::update_regex()
 {
     typename regex_type::flag_type flg;
@@ -396,6 +383,5 @@ void directory_iteration::update_regex()
     
     regex_to_mtch_.assign(regex_to_mtch_str_, flg);
 }
-
 
 }

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/errors/operations.hpp
+ * @file        operations.hpp
  * @brief       errors operations functions header.
  * @author      Killian Valverde
  * @date        2017/11/02
@@ -29,9 +29,7 @@
 
 #include <system_error>
 
-
 namespace speed::system::errors {
-
 
 /**
  * @brief       Assign the value to the error_code if it is not null using a system category.
@@ -46,7 +44,6 @@ inline void assign_system_error_code(int val, std::error_code* err_code)
     }
 }
 
-
 /**
  * @brief       Assign the value to the error_code if it is not null using a generic category.
  * @param       val : The value to assign.
@@ -60,8 +57,6 @@ inline void assign_generic_error_code(int val, std::error_code* err_code)
     }
 }
 
-
 }
-
 
 #endif

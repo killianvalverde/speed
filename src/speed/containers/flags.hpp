@@ -18,7 +18,7 @@
  */
 
 /**
- * @file       speed/containers/flags.hpp
+ * @file       flags.hpp
  * @brief      flags class header.
  * @author     Killian Valverde
  * @date       2016/01/08
@@ -34,9 +34,7 @@
 #include "exception.hpp"
 #include "iterator_base.hpp"
 
-
 namespace speed::containers {
-
 
 /**
  * @brief       Class that represents flags conteiner.
@@ -545,28 +543,23 @@ public:
      
     /**
      * @brief       Print the flag in the standard output with a byte separator.
-     * @param       os : The object used to print in standard output.
      * @param       sequence_len : The number of flags to print until print a white space.
      */
-    template<typename CharT, typename CharTraitsT>
-    void print(
-            std::basic_ostream<CharT, CharTraitsT>& os,
-            std::uint8_t sequence_len = 8
-    ) const
+    void print(std::uint8_t sequence_len = 8) const
     {
         constexpr std::uint8_t n_bits = sizeof(value_type) * 8;
         
         for (std::uint8_t i = 0; i < n_bits; i++)
         {
-            os << (static_cast<underlying_type>(val_) >> (n_bits - 1 - i) & 1);
+            std::cout << (static_cast<underlying_type>(val_) >> (n_bits - 1 - i) & 1);
     
             if (sequence_len != 0 && (i + 1) % sequence_len == 0 && i + 1 < n_bits)
             {
-                os << ' ';
+                std::cout << ' ';
             }
         }
         
-        os << speed::iostream::newl;
+        speed::iostream::newl(std::cout);
     }
     
     /**
@@ -593,7 +586,6 @@ private:
     /** The raw value hold by the object. */
     value_type val_;
 };
-
 
 /**
  * @brief       Allows to use an object to print in standard output the value that constains the
@@ -623,8 +615,6 @@ std::basic_ostream<TpChar, TpCharTraits>& operator <<(
     return os;
 }
 
-
 }
-
 
 #endif

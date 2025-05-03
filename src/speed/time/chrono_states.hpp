@@ -18,7 +18,7 @@
  */
 
 /**
- * @file       speed/time/chrono_states.hpp
+ * @file       chrono_states.hpp
  * @brief      chrono_states enum class header.
  * @author     Killian Valverde
  * @date       2017/10/28
@@ -29,9 +29,7 @@
 
 #include <cstdint>
 
-
 namespace speed::time {
-
 
 /**
  * @brief       Enumeration that represents the chronos states.
@@ -43,12 +41,9 @@ enum class chrono_states : std::uint8_t
     STOPED
 };
 
-
 /** Enumeration that represents the chronos states. */
 using cs_t = chrono_states;
 
-
 }
-
 
 #endif

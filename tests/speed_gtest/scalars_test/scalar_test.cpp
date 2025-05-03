@@ -18,18 +18,16 @@
  */
 
 /**
- * @file        speed_gtest/scalars_test/scalar_test.cpp
+ * @file        scalar_test.cpp
  * @brief       scalar unit test.
  * @author      Killian Valverde
  * @date        2018/01/10
  */
 
 #include <type_traits>
-
 #include <gtest/gtest.h>
 
 #include "speed/scalars/scalars.hpp"
-
 
 TEST(scalars_scalar, constructor_with_parameters)
 {
@@ -37,7 +35,6 @@ TEST(scalars_scalar, constructor_with_parameters)
     
     EXPECT_TRUE(nbr == 8);
 }
-
 
 TEST(scalars_scalar, copy_constructor)
 {
@@ -47,7 +44,6 @@ TEST(scalars_scalar, copy_constructor)
     EXPECT_TRUE(nbr_copy == 8);
 }
 
-
 TEST(scalars_scalar, move_constructor)
 {
     speed::scalars::scalar<int> nbr_moved = 8;
@@ -55,7 +51,6 @@ TEST(scalars_scalar, move_constructor)
     
     EXPECT_TRUE(nbr_moved == 0);
 }
-
 
 TEST(scalars_scalar, copy_assignment_operator)
 {
@@ -67,7 +62,6 @@ TEST(scalars_scalar, copy_assignment_operator)
     EXPECT_TRUE(nbr_copy == 8);
 }
 
-
 TEST(scalars_scalar, move_assignment_operator)
 {
     speed::scalars::scalar<int> nbr_moved = 8;
@@ -78,7 +72,6 @@ TEST(scalars_scalar, move_assignment_operator)
     EXPECT_TRUE(nbr_moved == 0);
 }
 
-
 TEST(scalars_scalar, value)
 {
     speed::scalars::scalar<int> nbr = 8;
@@ -86,7 +79,6 @@ TEST(scalars_scalar, value)
     nbr.value() <<= 1;
     EXPECT_TRUE(nbr == 16);
 }
-
 
 TEST(scalars_scalar, TpScalar_address_of_operator)
 {
@@ -127,7 +119,6 @@ TEST(scalars_scalar, TpScalar_address_of_operator)
     }
 }
 
-
 TEST(scalars_scalar, address_of_operator)
 {
     speed::scalars::scalar<int> nbr = 8;
@@ -137,7 +128,6 @@ TEST(scalars_scalar, address_of_operator)
     EXPECT_TRUE(nbr == 16);
 }
 
-
 TEST(scalars_scalar, indirection_operator)
 {
     speed::scalars::scalar<int> nbr = 8;
@@ -146,7 +136,6 @@ TEST(scalars_scalar, indirection_operator)
     *pnbr *= 2;
     EXPECT_TRUE(nbr == 16);
 }
-
 
 TEST(scalars_scalar, class_member_operator)
 {

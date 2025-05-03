@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/filesystem/forward_declarations.hpp
+ * @file        forward_declarations.hpp
  * @brief       forward_declarations header.
  * @author      Killian Valverde
  * @date        2024/10/15
@@ -27,9 +27,7 @@
 #ifndef SPEED_FILESYSTEM_FORWARD_DECLARATIONS_HPP
 #define SPEED_FILESYSTEM_FORWARD_DECLARATIONS_HPP
 
-
 namespace speed::filesystem {
-
 
 class directory_iteration;
 
@@ -56,8 +54,6 @@ class output_regular_file_path_decorator;
 template<typename TpComponent>
 class output_directory_path_decorator;
 
-
 }
-
 
 #endif

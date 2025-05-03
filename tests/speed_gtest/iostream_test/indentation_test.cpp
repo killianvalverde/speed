@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed_gtest/iostream_test/indentation_test.cpp
+ * @file        indentation_test.cpp
  * @brief       indentation unit test.
  * @author      Killian Valverde
  * @date        2018/06/09
@@ -27,7 +27,6 @@
 #include <gtest/gtest.h>
 
 #include "speed/iostream/iostream.hpp"
-
 
 TEST(iostream_indentation, operator_pre_increment)
 {
@@ -44,7 +43,6 @@ TEST(iostream_indentation, operator_pre_increment)
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_result);
 }
 
-
 TEST(iostream_indentation, operator_post_increment)
 {
     speed::iostream::indentation indent(2, 0);
@@ -59,7 +57,6 @@ TEST(iostream_indentation, operator_post_increment)
     
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_result);
 }
-
 
 TEST(iostream_indentation, operator_pre_decrement)
 {
@@ -78,7 +75,6 @@ TEST(iostream_indentation, operator_pre_decrement)
     
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_result);
 }
-
 
 TEST(iostream_indentation, operator_post_decrement)
 {

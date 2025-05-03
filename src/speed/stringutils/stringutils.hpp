@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/stringutils/stringutils.hpp
+ * @file        stringutils.hpp
  * @brief       stringutils main header.
  * @author      Killian Valverde
  * @date        2016/01/08
@@ -30,27 +30,20 @@
 #include "forward_declarations.hpp"
 #include "operations.hpp"
 
-
 namespace speed {
-
 
 /**
  * @brief       Contains resources for common strings operations.
  */
 namespace stringutils {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contains resources for common strings operations.
  */
 namespace str = stringutils;
-
 #endif
 
-
 }
-
 
 #endif

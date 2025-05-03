@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/arg_flags.hpp
+ * @file        arg_flags.hpp
  * @brief       arg_flags enum header.
  * @author      Killian Valverde
  * @date        2016/03/10
@@ -29,9 +29,7 @@
 
 #include "../lowlevel/lowlevel.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Contains all argument flags constants.
@@ -87,8 +85,8 @@ enum class arg_flags : std::uint16_t
             ASSIGNMENT_OPERATOR
     ),
     
-    /** The default flags used for the keyless arguments. */
-    DEFAULT_KEYLESS_ARG_FLAGS = (
+    /** The default flags used for the positional arguments. */
+    DEFAULT_positional_ARG_FLAGS = (
             UNIQUE_INSTANCE |
             MANDATORY
     ),
@@ -110,13 +108,10 @@ enum class arg_flags : std::uint16_t
     )
 };
 
-
 /** Contains all argument flags constants. */
 using af_t = arg_flags;
 
-
 }
-
 
 /** @cond */
 namespace speed::lowlevel {
@@ -127,6 +122,5 @@ struct enable_bitwise_operators<speed::argparse::arg_flags>
 };
 }
 /** @endcond */
-
 
 #endif

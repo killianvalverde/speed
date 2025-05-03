@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_value_arg.hpp
+ * @file        basic_value_arg.hpp
  * @brief       basic_value_arg class header.
  * @author      Killian Valverde
  * @date        2016/03/10
@@ -41,9 +41,7 @@
 #include "exception.hpp"
 #include "forward_declarations.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Class that represents arguments that have values.
@@ -55,10 +53,10 @@ public:
     /** Allocator type used in the class. */
     template<typename T>
     using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
-
+    
     /** Shared pointer type used in the class. */
     template<typename T>
-    using shared_ptr_type = std::shared_ptr<T>;
+    using unique_ptr_type = std::unique_ptr<T>;
 
     /** String type used in the class. */
     using string_type = std::basic_string<char, std::char_traits<char>, allocator_type<char>>;
@@ -186,16 +184,13 @@ public:
 
     /** Type that represents the argument parser. */
     using arg_parser_type = basic_arg_parser<TpAllocator>;
-    
+
     /**
      * @brief       Constructor with parameters.
      * @param       arg_parsr : Argument parser that holds this object.
      */
     explicit basic_value_arg(arg_parser_type* arg_parsr)
             : base_arg_type(arg_parsr)
-            , vals_()
-            , castrs_()
-            , regxes_()
             , minmax_vals_(1, 1)
             , max_vals_auto_update_(true)
     {
@@ -521,15 +516,15 @@ public:
      * @brief       Get the caster associated witht the current value.
      * @return      The caster associated witht the current value.
      */
-    [[nodiscard]] shared_ptr_type<caster_base_type> get_next_caster()
+    [[nodiscard]] caster_base_type* get_next_caster()
     {
         if (vals_.size() < castrs_.size())
         {
-            return castrs_[vals_.size()];
+            return castrs_[vals_.size()].get();
         }
         else if (!castrs_.empty())
         {
-            return castrs_.back();
+            return castrs_.back().get();
         }
 
         return nullptr;
@@ -596,8 +591,8 @@ public:
     void set_holders(array_type<TpValue_, Nm>* holdr)
     {
         castrs_.clear();
-
-        castrs_.emplace_back(std::allocate_shared<array_caster_type<TpValue_, Nm>>(
+        
+        castrs_.emplace_back(speed::memory::allocate_unique<array_caster_type<TpValue_, Nm>>(
                 allocator_type<array_caster_type<TpValue_, Nm>>(), holdr));
 
         update_max_values(1);
@@ -612,7 +607,7 @@ public:
     {
         castrs_.clear();
 
-        castrs_.emplace_back(std::allocate_shared<vector_caster_type<TpValue_>>(
+        castrs_.emplace_back(speed::memory::allocate_unique<vector_caster_type<TpValue_>>(
                 allocator_type<vector_caster_type<TpValue_>>(), holdr));
 
         update_max_values(1);
@@ -627,7 +622,7 @@ public:
     {
         castrs_.clear();
 
-        castrs_.emplace_back(std::allocate_shared<deque_caster_type<TpValue_>>(
+        castrs_.emplace_back(speed::memory::allocate_unique<deque_caster_type<TpValue_>>(
                 allocator_type<deque_caster_type<TpValue_>>(), holdr));
 
         update_max_values(1);
@@ -642,7 +637,7 @@ public:
     {
         castrs_.clear();
 
-        castrs_.emplace_back(std::allocate_shared<queue_caster_type<TpValue_>>(
+        castrs_.emplace_back(speed::memory::allocate_unique<queue_caster_type<TpValue_>>(
                 allocator_type<queue_caster_type<TpValue_>>(), holdr));
 
         update_max_values(1);
@@ -657,7 +652,7 @@ public:
     {
         castrs_.clear();
 
-        castrs_.emplace_back(std::allocate_shared<priority_queue_caster_type<TpValue_>>(
+        castrs_.emplace_back(speed::memory::allocate_unique<priority_queue_caster_type<TpValue_>>(
                 allocator_type<priority_queue_caster_type<TpValue_>>(), holdr));
 
         update_max_values(1);
@@ -672,7 +667,7 @@ public:
     {
         castrs_.clear();
 
-        castrs_.emplace_back(std::allocate_shared<stack_caster_type<TpValue_>>(
+        castrs_.emplace_back(speed::memory::allocate_unique<stack_caster_type<TpValue_>>(
                 allocator_type<stack_caster_type<TpValue_>>(), holdr));
 
         update_max_values(1);
@@ -687,7 +682,7 @@ public:
     {
         castrs_.clear();
 
-        castrs_.emplace_back(std::allocate_shared<forward_list_caster_type<TpValue_>>(
+        castrs_.emplace_back(speed::memory::allocate_unique<forward_list_caster_type<TpValue_>>(
                 allocator_type<forward_list_caster_type<TpValue_>>(), holdr));
 
         update_max_values(1);
@@ -702,7 +697,7 @@ public:
     {
         castrs_.clear();
 
-        castrs_.emplace_back(std::allocate_shared<list_caster_type<TpValue_>>(
+        castrs_.emplace_back(speed::memory::allocate_unique<list_caster_type<TpValue_>>(
                 allocator_type<list_caster_type<TpValue_>>(), holdr));
 
         update_max_values(1);
@@ -717,7 +712,7 @@ public:
     {
         castrs_.clear();
 
-        castrs_.emplace_back(std::allocate_shared<set_caster_type<TpValue_>>(
+        castrs_.emplace_back(speed::memory::allocate_unique<set_caster_type<TpValue_>>(
                 allocator_type<set_caster_type<TpValue_>>(), holdr));
 
         update_max_values(1);
@@ -732,7 +727,7 @@ public:
     {
         castrs_.clear();
 
-        castrs_.emplace_back(std::allocate_shared<unordered_set_caster_type<TpValue_>>(
+        castrs_.emplace_back(speed::memory::allocate_unique<unordered_set_caster_type<TpValue_>>(
                 allocator_type<unordered_set_caster_type<TpValue_>>(), holdr));
 
         update_max_values(1);
@@ -747,8 +742,9 @@ public:
     {
         castrs_.clear();
 
-        castrs_.emplace_back(std::allocate_shared<unordered_multiset_caster_type<TpValue_>>(
-                allocator_type<unordered_multiset_caster_type<TpValue_>>(), holdr));
+        castrs_.emplace_back(
+                speed::memory::allocate_unique<unordered_multiset_caster_type<TpValue_>>(
+                        allocator_type<unordered_multiset_caster_type<TpValue_>>(), holdr));
 
         update_max_values(1);
     }
@@ -763,7 +759,7 @@ public:
         castrs_.clear();
 
         int foreach[sizeof...(Ts_) + 1] = { (
-                castrs_.emplace_back(std::allocate_shared<caster_type<Ts_>>(
+                castrs_.emplace_back(speed::memory::allocate_unique<caster_type<Ts_>>(
                         allocator_type<caster_type<Ts_>>(), holdrs)), 0)... };
 
         update_max_values(castrs_.size());
@@ -889,7 +885,7 @@ private:
     vector_type<arg_value_type> vals_;
     
     /** Type casters used to validate the values syntax. */
-    vector_type<shared_ptr_type<caster_base_type>> castrs_;
+    vector_type<unique_ptr_type<caster_base_type>> castrs_;
     
     /** Regular expressions that the values has to match. */
     vector_type<regex_type> regxes_;
@@ -901,8 +897,6 @@ private:
     bool max_vals_auto_update_;
 };
 
-
 }
-
 
 #endif

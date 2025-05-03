@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/speed.hpp
+ * @file        speed.hpp
  * @brief       File that include all speed librarie headers.
  * @author      Killian Valverde
  * @date        2016/01/08
@@ -46,21 +46,16 @@
 #include "type_traits/type_traits.hpp"
 #include "version.hpp"
 
-
 /**
  * @brief       Contians all speed librarie.
  */
 namespace speed {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contians all speed librarie.
  */
 namespace spd = speed;
-
 #endif
-
 
 #endif

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/safety/operations.hpp
+ * @file        operations.hpp
  * @brief       operations functions header.
  * @author      Killian Valverde
  * @date        2017/01/28
@@ -33,9 +33,7 @@
 #include "../system/system.hpp"
 #include "exception.hpp"
 
-
 namespace speed::safety {
-
 
 // TODO: Add support for signed integrals.
 /**
@@ -59,7 +57,6 @@ inline TpTarget add(
     return trg + static_cast<TpTarget>(val);
 }
 
-
 /**
  * @brief       Fonction that allows to do an addition with overflow detection.
  * @param       trg : Integral to increment.
@@ -81,7 +78,6 @@ inline TpTarget addl(
     
     return trg;
 }
-
 
 /**
  * @brief       Fonction that allows to do an addition with overflow detection.
@@ -108,7 +104,6 @@ inline bool try_add(
     return scs;
 }
 
-
 /**
  * @brief       Fonction that allows to do an addition with overflow detection.
  * @param       trg : Integral to increment.
@@ -132,7 +127,6 @@ inline bool try_addl(
     
     return scs;
 }
-
 
 /**
  * @brief       Fonction that allows to do an addition with overflow detection and in the overflow
@@ -160,7 +154,6 @@ inline TpTarget addm(
     return trg;
 }
 
-
 /**
  * @brief       Fonction that allows to do an addition with overflow detection and in the overflow
  *              case the maximum value of the type will be set to target.
@@ -183,7 +176,6 @@ inline TpTarget addml(
     
     return trg;
 }
-
 
 /**
  * @brief       Fonction that allows to do an addition with overflow detection and in the overflow
@@ -214,7 +206,6 @@ inline bool try_addm(
     return scs;
 }
 
-
 /**
  * @brief       Fonction that allows to do an addition with overflow detection and in the overflow
  *              case the maximum value of the type will be set to target.
@@ -239,9 +230,7 @@ inline bool try_addml(
     
     return scs;
 }
-    
-    
-}
 
+}
 
 #endif

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/type_traits/type_traits.hpp
+ * @file        type_traits.hpp
  * @brief       type_traits main header.
  * @author      Killian Valverde
  * @date        2016/08/05
@@ -29,9 +29,7 @@
 
 #include "operations.hpp"
 
-
 namespace speed {
-
 
 /**
  * @brief       Contains utilities for compile-time introspection and modification, including type
@@ -40,20 +38,15 @@ namespace speed {
  */
 namespace type_traits {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contains utilities for compile-time introspection and modification, including type
  *              classification traits, type property inspection traits and type transformation
  *              traits.
  */
 namespace traits = type_traits;
-
 #endif
 
-
 }
-
 
 #endif

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/glibc/process/operations.cpp
+ * @file        operations.cpp
  * @brief       process operations source.
  * @author      Killian Valverde
  * @date        2017/01/08
@@ -27,13 +27,11 @@
 #include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_GLIBC
 
-#include <cstring>
-
 #include "operations.hpp"
 
+#include <cstring>
 
 namespace speed::system::api::glibc::process {
-
 
 bool execute_command(
         const char* cmd,
@@ -213,30 +211,25 @@ alloc_fail:
     }
 }
 
-
 system::process::pid_t get_pid() noexcept
 {
     return ::getpid();
 }
-
 
 system::process::ppid_t get_ppid() noexcept
 {
     return ::getppid();
 }
 
-
 system::process::uid_t get_uid() noexcept
 {
     return ::getuid();
 }
 
-
 system::process::gid_t get_gid() noexcept
 {
     return ::getgid();
 }
-
 
 bool nanosleep(
         std::uint64_t sec,
@@ -259,8 +252,6 @@ bool nanosleep(
     return true;
 }
 
-
 }
-
 
 #endif

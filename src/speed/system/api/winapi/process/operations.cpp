@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/winapi/process/operations.cpp
+ * @file        operations.cpp
  * @brief       process operations source.
  * @author      Killian Valverde
  * @date        2017/01/08
@@ -27,15 +27,14 @@
 #include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_WINAPI
 
+#include "operations.hpp"
+
 #include <sddl.h>
 #include <tlhelp32.h>
 
 #include "../../../../cryptography/cryptography.hpp"
-#include "operations.hpp"
-
 
 namespace speed::system::api::winapi::process {
-
 
 bool execute_command(
         const char* cmd,
@@ -87,12 +86,10 @@ bool execute_command(
     return true;
 }
 
-
 system::process::pid_t get_pid() noexcept
 {
     return ::GetCurrentProcessId();
 }
-
 
 system::process::ppid_t get_ppid() noexcept
 {
@@ -122,7 +119,6 @@ system::process::ppid_t get_ppid() noexcept
 
     return -1;
 }
-
 
 system::process::uid_t get_uid() noexcept
 {
@@ -156,7 +152,6 @@ system::process::uid_t get_uid() noexcept
     return uid;
 }
 
-
 system::process::gid_t get_gid() noexcept
 {
     HANDLE tokn;
@@ -189,7 +184,6 @@ system::process::gid_t get_gid() noexcept
     return gid;
 }
 
-
 bool nanosleep(
         std::uint64_t sec,
         std::uint64_t nsec,
@@ -207,8 +201,6 @@ bool nanosleep(
     return true;
 }
 
-
 }
-
 
 #endif

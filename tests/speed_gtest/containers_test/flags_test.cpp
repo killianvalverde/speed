@@ -18,19 +18,17 @@
  */
 
 /**
- * @file        speed_gtest/containers_test/flags_test.cpp
+ * @file        flags_test.cpp
  * @brief       flags unit test.
  * @author      Killian Valverde
  * @date        2018/06/10
  */
 
 #include <iostream>
-
 #include <gtest/gtest.h>
 
 #include "speed/containers/containers.hpp"
 #include "speed/iostream/iostream.hpp"
-
 
 enum class colors : std::uint8_t
 {
@@ -41,7 +39,6 @@ enum class colors : std::uint8_t
     GREEN = 0x8,
     ALL = 0xF,
 };
-
 
 TEST(containers_flags, begin)
 {
@@ -54,7 +51,6 @@ TEST(containers_flags, begin)
     EXPECT_TRUE(*clrs.begin() == colors::BLUE);
 }
 
-
 TEST(containers_flags, cbegin)
 {
     speed::containers::flags<colors> clrs;
@@ -65,7 +61,6 @@ TEST(containers_flags, cbegin)
     
     EXPECT_TRUE(*clrs.cbegin() == colors::BLUE);
 }
-
 
 TEST(containers_flags, end)
 {
@@ -85,7 +80,6 @@ TEST(containers_flags, end)
     EXPECT_TRUE(clrs == clrs_cp);
 }
 
-
 TEST(containers_flags, cend)
 {
     speed::containers::flags<colors> clrs;
@@ -103,7 +97,6 @@ TEST(containers_flags, cend)
     EXPECT_TRUE(i == 3);
 }
 
-
 TEST(containers_flags, get_value)
 {
     speed::containers::flags<colors> clrs = colors::BLUE;
@@ -111,14 +104,12 @@ TEST(containers_flags, get_value)
     EXPECT_TRUE(clrs.get_value() == colors::BLUE);
 }
 
-
 TEST(containers_flags, get_underlying_value)
 {
     speed::containers::flags<colors> clrs = colors::BLUE;
     
     EXPECT_TRUE(clrs.get_underlying_value() == 1);
 }
-
 
 TEST(containers_flags, set)
 {
@@ -129,7 +120,6 @@ TEST(containers_flags, set)
     EXPECT_TRUE(clrs.get_value() == colors::BLUE);
 }
 
-
 TEST(containers_flags, set_by_index)
 {
     speed::containers::flags<colors> clrs;
@@ -138,7 +128,6 @@ TEST(containers_flags, set_by_index)
     
     EXPECT_TRUE(clrs.get_value() == colors::BLUE);
 }
-
 
 TEST(containers_flags, unset)
 {
@@ -149,7 +138,6 @@ TEST(containers_flags, unset)
     EXPECT_TRUE(clrs.get_value() == colors::NIL);
 }
 
-
 TEST(containers_flags, unset_by_index)
 {
     speed::containers::flags<colors> clrs = colors::BLUE;
@@ -158,7 +146,6 @@ TEST(containers_flags, unset_by_index)
     
     EXPECT_TRUE(clrs.get_value() == colors::NIL);
 }
-
 
 TEST(containers_flags, clear)
 {
@@ -171,7 +158,6 @@ TEST(containers_flags, clear)
     EXPECT_TRUE(clrs.get_value() == colors::NIL);
 }
 
-
 TEST(containers_flags, is_set)
 {
     speed::containers::flags<colors> clrs = colors::BLUE;
@@ -179,14 +165,12 @@ TEST(containers_flags, is_set)
     EXPECT_TRUE(clrs.is_set(colors::BLUE));
 }
 
-
 TEST(containers_flags, is_set_by_index)
 {
     speed::containers::flags<colors> clrs = colors::BLUE;
     
     EXPECT_TRUE(clrs.is_set_by_index(0));
 }
-
 
 TEST(containers_flags, is_empty)
 {
@@ -199,7 +183,6 @@ TEST(containers_flags, is_empty)
     EXPECT_TRUE(clrs.is_empty());
 }
 
-
 TEST(containers_flags, print)
 {
     speed::containers::flags<colors> clrs;
@@ -210,11 +193,10 @@ TEST(containers_flags, print)
     
     clrs.set(colors::BLUE);
     clrs.set(colors::YELLOW);
-    clrs.print(std::cout);
+    clrs.print();
     
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_result);
 }
-
 
 TEST(containers_flags, operator_equal)
 {
@@ -224,7 +206,6 @@ TEST(containers_flags, operator_equal)
     EXPECT_TRUE(clrs1 == clrs2);
 }
 
-
 TEST(containers_flags, operator_inequal)
 {
     speed::containers::flags<colors> clrs1 = colors::BLUE;
@@ -232,7 +213,6 @@ TEST(containers_flags, operator_inequal)
     
     EXPECT_TRUE(clrs1 != clrs2);
 }
-
 
 TEST(containers_flags, operator_left_shift)
 {

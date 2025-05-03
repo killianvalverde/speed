@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_arg_parser_setter.hpp
+ * @file        basic_arg_parser_setter.hpp
  * @brief       basic_arg_parser_setter class header.
  * @author      Killian Valverde
  * @date        2024/05/09
@@ -32,9 +32,7 @@
 #include "arg_parser_flags.hpp"
 #include "basic_arg_parser.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief        Class allowing configuring an argument parser.
@@ -71,13 +69,13 @@ public:
      * @brief       Copy constructor.
      * @param       rhs : Object to copy.
      */
-    basic_arg_parser_setter(const basic_arg_parser_setter& rhs) = delete;
+    basic_arg_parser_setter(const basic_arg_parser_setter& rhs) = default;
     
     /**
      * @brief       Move constructor.
      * @param       rhs : Object to move.
      */
-    basic_arg_parser_setter(basic_arg_parser_setter&& rhs) noexcept = delete;
+    basic_arg_parser_setter(basic_arg_parser_setter&& rhs) noexcept = default;
     
     /**
      * @brief       Destructor.
@@ -89,14 +87,14 @@ public:
      * @param       rhs : Object to copy.
      * @return      The object who call the method.
      */
-    basic_arg_parser_setter& operator =(const basic_arg_parser_setter& rhs) = delete;
+    basic_arg_parser_setter& operator =(const basic_arg_parser_setter& rhs) = default;
     
     /**
      * @brief       Move assignment operator.
      * @param       rhs : Object to move.
      * @return      The object who call the method.
      */
-    basic_arg_parser_setter& operator =(basic_arg_parser_setter&& rhs) noexcept = delete;
+    basic_arg_parser_setter& operator =(basic_arg_parser_setter&& rhs) noexcept = default;
 
     /**
      * @brief       Allows to specify whether the argument parser is allowed to use colors while
@@ -249,8 +247,6 @@ private:
     arg_parser_type* arg_parsr_;
 };
 
-
 }
-
 
 #endif

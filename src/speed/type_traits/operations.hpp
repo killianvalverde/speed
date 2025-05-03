@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/type_traits/operations.hpp
+ * @file        operations.hpp
  * @brief       operations functions header.
  * @author      Killian Valverde
  * @date        2016/08/05
@@ -33,9 +33,7 @@
 #include <type_traits>
 #include <vector>
 
-
 namespace speed::type_traits {
-
 
 /** @cond */
 namespace __private {
@@ -57,7 +55,6 @@ struct __or<Tp1, Tp2, Tp3, TpN...>
 } /* __private */
 /** @endcond */
 
-
 /** @cond */
 namespace __private {
 template<typename...>
@@ -78,7 +75,6 @@ struct __and<Tp1, Tp2, Tp3, TpN...>
 } /* __private */
 /** @endcond */
 
-
 /** @cond */
 namespace __private {
 template<typename>
@@ -95,7 +91,6 @@ struct __is_char_helper<unsigned char> : public std::true_type {};
 } /* __private */
 /** @endcond */
 
-
 /**
  * @brief       Trait class that identifies whether T is a 'char' type.
  */
@@ -104,7 +99,6 @@ struct is_char
         : public __private::__is_char_helper<typename std::remove_cv<Tp>::type>::type
 {
 };
-
 
 /** @cond */
 namespace __private {
@@ -116,7 +110,6 @@ struct __is_wchar_helper<wchar_t> : public std::true_type {};
 } /* __private */
 /** @endcond */
 
-
 /**
  * @brief       Trait class that identifies whether T is a 'wchat_t' type.
  */
@@ -125,7 +118,6 @@ struct is_wchar
         : public __private::__is_wchar_helper<typename std::remove_cv<Tp>::type>::type
 {
 };
-
 
 /** @cond */
 namespace __private {
@@ -152,7 +144,6 @@ struct __is_character_helper<char32_t> : public std::true_type {};
 } /* __private */
 /** @endcond */
 
-
 /**
  * @brief       Trait class that identifies whether T is a character type.
  */
@@ -163,7 +154,6 @@ struct is_character
           >::type
 {
 };
-
 
 /**
  * @brief       Trait class that identifies whether T is a char pointer type.
@@ -177,7 +167,6 @@ struct is_char_pointer
 {
 };
 
-
 /**
  * @brief       Trait class that identifies whether T is a wchar pointer type.
  */
@@ -189,7 +178,6 @@ struct is_wchar_pointer
           >::type
 {
 };
-
 
 /**
  * @brief       Trait class that identifies whether T is a character pointer type.
@@ -203,7 +191,6 @@ struct is_character_pointer
 {
 };
 
-
 /**
  * @brief       Trait class that identifies whether T is a character that can be used in standard io
  *              operations.
@@ -213,7 +200,6 @@ struct is_stdio_character
         : public __private::__or<is_char<Tp>, is_wchar<Tp>>::type
 {
 };
-
 
 /** @cond */
 namespace __private {
@@ -225,7 +211,6 @@ struct __is_float_helper<float> : public std::true_type {};
 } /* __private */
 /** @endcond */
 
-
 /**
  * @brief       Trait class that identifies whether T is a 'float' type.
  */
@@ -234,7 +219,6 @@ struct is_float
         : public __private::__is_float_helper<typename std::remove_cv<Tp>::type>::type
 {
 };
-
 
 /** @cond */
 namespace __private {
@@ -246,7 +230,6 @@ struct __is_double_helper<double> : public std::true_type {};
 } /* __private */
 /** @endcond */
 
-
 /**
  * @brief       Trait class that identifies whether T is a 'double' type.
  */
@@ -255,7 +238,6 @@ struct is_double
         : public __private::__is_double_helper<typename std::remove_cv<Tp>::type>::type
 {
 };
-
 
 /** @cond */
 namespace __private {
@@ -267,7 +249,6 @@ struct __is_long_double_helper<long double> : public std::true_type {};
 } /* __private */
 /** @endcond */
 
-
 /**
  * @brief       Trait class that identifies whether T is a 'double' type.
  */
@@ -278,7 +259,6 @@ struct is_long_double
           >::type
 {
 };
-
 
 /** @cond */
 namespace __private {
@@ -297,7 +277,6 @@ struct __is_basic_string_helper<std::basic_string<TpChar, TpCharTraits, TpCharAl
 } /* __private */
 /** @endcond */
 
-
 /**
  * @brief       Trait class that identifies whether T is a 'std::basic_string' type.
  */
@@ -308,7 +287,6 @@ struct is_basic_string
           >::type
 {
 };
-
 
 /** @cond */
 namespace __private {
@@ -327,7 +305,6 @@ struct __is_string_helper<std::basic_string<TpChar, TpCharTraits, TpCharAlloc>>
 } /* __private */
 /** @endcond */
 
-
 /**
  * @brief       Trait class that identifies whether T is a 'std::string' type.
  */
@@ -338,7 +315,6 @@ struct is_string
           >::type
 {
 };
-
 
 /** @cond */
 namespace __private {
@@ -357,7 +333,6 @@ struct __is_wstring_helper<std::basic_string<TpChar, TpCharTraits, TpCharAlloc>>
 } /* __private */
 /** @endcond */
 
-
 /**
  * @brief       Trait class that identifies whether T is a 'std::wstring' type.
  */
@@ -368,7 +343,6 @@ struct is_wstring
           >::type
 {
 };
-
 
 /** @cond */
 namespace __private {
@@ -386,7 +360,6 @@ struct __is_basic_regex_helper<std::basic_regex<TpChar, TpRegexTraits>>
 } /* __private */
 /** @endcond */
 
-
 /**
  * @brief       Trait class that identifies whether T is a 'std::basic_regex' type.
  */
@@ -397,7 +370,6 @@ struct is_basic_regex
           >::type
 {
 };
-
 
 /** @cond */
 namespace __private {
@@ -415,7 +387,6 @@ struct __is_basic_string_vector_helper<std::vector<TpBasicString, TpBasicStringA
 } /* __private */
 /** @endcond */
 
-
 /**
  * @brief       Trait class that identifies whether T is a 'std::basic_string' type.
  */
@@ -426,7 +397,6 @@ struct is_basic_string_vector
           >::type
 {
 };
-
 
 /** @cond */
 namespace __private {
@@ -444,7 +414,6 @@ struct __is_basic_ostream_helper<std::basic_ostream<TpChar, TpCharTraits>>
 } /* __private */
 /** @endcond */
 
-
 /**
  * @brief       Trait class that identifies whether T is a 'std::basic_ostream' type.
  */
@@ -456,7 +425,6 @@ struct is_basic_ostream
 {
 };
 
-
 /** @cond */
 namespace __private {
 template<typename>
@@ -466,7 +434,6 @@ template<>
 struct __is_path_helper<std::filesystem::path> : public std::true_type {};
 } /* __private */
 /** @endcond */
-
 
 /**
  * @brief       Trait class that identifies whether T is a 'std::filesystem::path' type.
@@ -479,26 +446,24 @@ struct is_path
 {
 };
 
-
 /**
  * @brief       Trait class that tries to obtains the fundamental type of Tp.
  */
 template<typename Tp>
 struct fundamental_type
 {
+    /** The fundamental type of Tp. */
     using type = std::remove_cv_t<
             std::remove_pointer_t<
                     std::remove_all_extents_t<
                             std::remove_cvref_t<Tp>>>>;
 };
 
-
 /**
  * @brief       Trait class that tries to obtains the fundamental type of Tp.
  */
 template <typename Tp>
 using fundamental_type_t = typename fundamental_type<Tp>::type;
-
 
 /**
  * @brief       Trait class that try to obtains the underlying type of enum type T.
@@ -514,12 +479,10 @@ struct try_underlying_type
     > type;
 };
 
-
 /** Trait class that try to obtains the underlying type of enum type T. Alias of
  *  'try_underlying_type<T>::type'. */
 template<typename TpEnum>
 using try_underlying_type_t = typename try_underlying_type<TpEnum>::type;
-
 
 /**
  * @brief       Alias that simplifies to inherit from the base class in the context of a CRTP
@@ -538,7 +501,6 @@ using basic_crtp_base = typename std::conditional<
         TpBase<Ts..., TpActual>
 >::type;
 
-
 /**
  * @brief       Alias that simplifies getting access to the self type in a CRTP context.
  */
@@ -554,8 +516,6 @@ using basic_crtp_self = typename std::conditional<
         TpActual
 >::type;
 
-
 }
-
 
 #endif

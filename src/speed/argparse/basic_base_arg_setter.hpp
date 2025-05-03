@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_base_arg_setter.hpp
+ * @file        basic_base_arg_setter.hpp
  * @brief       basic_base_arg_setter class header.
  * @author      Killian Valverde
  * @date        2024/05/06
@@ -32,9 +32,7 @@
 #include "arg_flags.hpp"
 #include "basic_base_arg.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief        Class allowing configuring a base argument.
@@ -71,13 +69,13 @@ public:
      * @brief       Copy constructor.
      * @param       rhs : Object to copy.
      */
-    basic_base_arg_setter(const basic_base_arg_setter& rhs) = delete;
+    basic_base_arg_setter(const basic_base_arg_setter& rhs) = default;
     
     /**
      * @brief       Move constructor.
      * @param       rhs : Object to move.
      */
-    basic_base_arg_setter(basic_base_arg_setter&& rhs) noexcept = delete;
+    basic_base_arg_setter(basic_base_arg_setter&& rhs) noexcept = default;
     
     /**
      * @brief       Destructor.
@@ -89,14 +87,14 @@ public:
      * @param       rhs : Object to copy.
      * @return      The object who call the method.
      */
-    basic_base_arg_setter& operator =(const basic_base_arg_setter& rhs) = delete;
+    basic_base_arg_setter& operator =(const basic_base_arg_setter& rhs) = default;
     
     /**
      * @brief       Move assignment operator.
      * @param       rhs : Object to move.
      * @return      The object who call the method.
      */
-    basic_base_arg_setter& operator =(basic_base_arg_setter&& rhs) noexcept = delete;
+    basic_base_arg_setter& operator =(basic_base_arg_setter&& rhs) noexcept = default;
 
     /**
      * @brief       Allows to specify a function to be called when the argument is found during
@@ -155,7 +153,7 @@ public:
 
     /**
      * @brief       Allows to specify whether is mandatory to found the argument in the program
-     *              call. By defaul only keyless arguments are mandatory.
+     *              call. By defaul only positional arguments are mandatory.
      * @param       enabl : Specify wheter the feature is enable.
      * @return      The object who call the method.
      */
@@ -233,8 +231,6 @@ protected:
     base_arg_type* bse_arg_;
 };
 
-
 }
-
 
 #endif

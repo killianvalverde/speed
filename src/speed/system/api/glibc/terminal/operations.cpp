@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/glibc/terminal/operations.cpp
+ * @file        operations.cpp
  * @brief       terminal operations source.
  * @author      Killian Valverde
  * @date        2017/10/18
@@ -27,14 +27,12 @@
 #include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_GLIBC
 
+#include "operations.hpp"
+
 #include <termios.h>
 #include <cstring>
 
-#include "operations.hpp"
-
-
 namespace speed::system::api::glibc::terminal {
-
 
 bool flush_input_terminal(::FILE* input_strm, std::error_code* err_code) noexcept
 {
@@ -47,7 +45,6 @@ bool flush_input_terminal(::FILE* input_strm, std::error_code* err_code) noexcep
     return true;
 }
 
-
 bool flush_output_terminal(::FILE* output_strm, std::error_code* err_code) noexcept
 {
     if (::tcflush(::fileno(output_strm), TCOFLUSH) == -1)
@@ -58,7 +55,6 @@ bool flush_output_terminal(::FILE* output_strm, std::error_code* err_code) noexc
     
     return true;
 }
-
 
 bool kbhit(
         const char* mess,
@@ -120,7 +116,6 @@ bool kbhit(
     
     return true;
 }
-
 
 bool set_foreground_text_attribute(
         ::FILE* terminal_strm,
@@ -190,8 +185,6 @@ bool set_foreground_text_attribute(
     return (res >= 0);
 }
 
-
 }
-
 
 #endif

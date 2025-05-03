@@ -18,7 +18,7 @@
  */
 
 /**
- * @file       speed/time/monotonic_chrono.hpp
+ * @file       monotonic_chrono.hpp
  * @brief      monotonic_chrono class header.
  * @author     Killian Valverde
  * @date       2017/10/28
@@ -29,9 +29,7 @@
 
 #include "chrono_base.hpp"
 
-
 namespace speed::time {
-
 
 /**
  * @brief       Class that represents a monotonic chrono.
@@ -51,8 +49,6 @@ public:
     }
 };
 
-
 }
-
 
 #endif

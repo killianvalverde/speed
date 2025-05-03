@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/type_casting/exception.hpp
+ * @file        exception.hpp
  * @brief       exception main header.
  * @author      Killian Valverde
  * @date        2016/08/19
@@ -29,9 +29,7 @@
 
 #include "../exceptions/exceptions.hpp"
 
-
 namespace speed::type_casting {
-
 
 /**
  * @brief       Base class used to throw exceptions when a type casting fails.
@@ -49,7 +47,6 @@ public:
     }
 };
 
-
 /**
  * @brief       Class used to throw exceptions when somme undefined error has occured.
  */
@@ -65,7 +62,6 @@ public:
         return "conversion fails exception";
     }
 };
-
 
 /**
  * @brief       Class used to throw exceptions when a source value cannot be interpreted as target.
@@ -83,7 +79,6 @@ public:
     }
 };
 
-
 /**
  * @brief       Class used to throw exceptions when an overflow range error occur.
  */
@@ -99,7 +94,6 @@ public:
         return "overflow range exception";
     }
 };
-
 
 /**
  * @brief       Class used to throw exceptions when an underflow range error occur.
@@ -117,7 +111,6 @@ public:
     }
 };
 
-
 /**
  * @brief       Class used to throw exceptions when an underflow range error occur.
  */
@@ -133,9 +126,7 @@ public:
         return "unknown exception";
     }
 };
-    
-    
-}
 
+}
 
 #endif

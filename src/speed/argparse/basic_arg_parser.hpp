@@ -18,7 +18,7 @@
  */
 
 /**
- *  @file       speed/argparse/basic_arg_parser.hpp
+ *  @file       basic_arg_parser.hpp
  *  @brief      basic_arg_parser class header.
  *  @author     Killian Valverde
  *  @date       2015/12/31
@@ -27,6 +27,7 @@
 #ifndef SPEED_ARGPARSE_BASIC_ARG_PARSER_HPP
 #define SPEED_ARGPARSE_BASIC_ARG_PARSER_HPP
 
+#include <list>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -36,14 +37,15 @@
 #include "../containers/containers.hpp"
 #include "../memory/memory.hpp"
 #include "../stringutils/stringutils.hpp"
+#include "forward_declarations.hpp"
 #include "arg_error_flags.hpp"
 #include "arg_flags.hpp"
 #include "arg_parser_error_flags.hpp"
 #include "arg_parser_flags.hpp"
 #include "arg_value_error_flags.hpp"
 #include "basic_arg_constraint.hpp"
+#include "basic_arg_constraint_setter.hpp"
 #include "basic_arg_parser_setter.hpp"
-#include "basic_one_or_more_constraint.hpp"
 #include "basic_help_arg.hpp"
 #include "basic_help_arg_setter.hpp"
 #include "basic_help_menu.hpp"
@@ -52,16 +54,12 @@
 #include "basic_key_arg_setter.hpp"
 #include "basic_key_value_arg.hpp"
 #include "basic_key_value_arg_setter.hpp"
-#include "basic_keyless_arg.hpp"
-#include "basic_keyless_arg_setter.hpp"
-#include "basic_mutually_exclusive_constraint.hpp"
+#include "basic_positional_arg.hpp"
+#include "basic_positional_arg_setter.hpp"
 #include "basic_version_arg.hpp"
 #include "basic_version_arg_setter.hpp"
-#include "forward_declarations.hpp"
-
 
 namespace speed::argparse {
-
 
 /**
  * @brief       Class used to parse arguments.
@@ -73,6 +71,10 @@ public:
     /** Allocator type used in the class. */
     template<typename T>
     using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
+    
+    /** Shared pointer type used in the class. */
+    template<typename T>
+    using unique_ptr_type = std::unique_ptr<T>;
 
     /** String type used in the class. */
     using string_type = std::basic_string<char, std::char_traits<char>, allocator_type<char>>;
@@ -80,6 +82,10 @@ public:
     /** Vector type used in the class. */
     template<typename T>
     using vector_type = std::vector<T, allocator_type<T>>;
+    
+    /** Vector type used in the class. */
+    template<typename T>
+    using list_type = std::list<T, allocator_type<T>>;
 
     /** Unordered map type used in the class. */
     template<typename TpKey_, typename TpValue_>
@@ -114,46 +120,41 @@ public:
     /** Type that represents arguments that have values. */
     using value_arg_type = basic_value_arg<TpAllocator>;
     
-    /** Type that represents the argument to get the version information. */
-    using version_arg_type = basic_version_arg<TpAllocator>;
-
-    /** Type that represents arguments without keys. */
-    using keyless_arg_type = basic_keyless_arg<TpAllocator>;
-    
     /** Type that represents arguments that have keys and values. */
     using key_value_arg_type = basic_key_value_arg<TpAllocator>;
 
+    /** Type that represents arguments without keys. */
+    using positional_arg_type = basic_positional_arg<TpAllocator>;
+
     /** Type that represents the option to get the help information. */
     using help_arg_type = basic_help_arg<TpAllocator>;
+    
+    /** Type that represents the argument to get the version information. */
+    using version_arg_type = basic_version_arg<TpAllocator>;
 
     /** Type that represents a constraint for a set of arguments. */
     using arg_constraint_type = basic_arg_constraint<TpAllocator>;
 
-    /** Type that represents an 'at least one found' constraint for a set of arguments. */
-    using one_or_more_constraint_type = basic_one_or_more_constraint<
-            arg_constraint_type, TpAllocator>;
-
-    /** Type that represents a mutually exclusive constraint for a set of arguments. */
-    using mutually_exclusive_constraint_type = basic_mutually_exclusive_constraint<
-            arg_constraint_type, TpAllocator>;
-
     /** Type that represents a help menu. */
     using help_menu_type = basic_help_menu<TpAllocator>;
 
-    /** Type used to configure an added key arg. */
+    /** Type used to configure an added key argument. */
     using key_arg_setter_type = basic_key_arg_setter<TpAllocator>;
 
-    /** Type used to configure an added version arg. */
-    using version_arg_setter_type = basic_version_arg_setter<TpAllocator>;
-
-    /** Type used to configure an added keyless arg. */
-    using keyless_arg_setter_type = basic_keyless_arg_setter<TpAllocator>;
-
-    /** Type used to configure an added key value arg. */
+    /** Type used to configure an added key value argument. */
     using key_value_arg_setter_type = basic_key_value_arg_setter<TpAllocator>;
 
-    /** Type used to configure an added help arg. */
+    /** Type used to configure an added positional argument. */
+    using positional_arg_setter_type = basic_positional_arg_setter<TpAllocator>;
+
+    /** Type used to configure an added help argument. */
     using help_arg_setter_type = basic_help_arg_setter<TpAllocator>;
+
+    /** Type used to configure an added version argument. */
+    using version_arg_setter_type = basic_version_arg_setter<TpAllocator>;
+
+    /** Type used to configure an added argument constraint. */
+    using arg_constraint_setter_type = basic_arg_constraint_setter<TpAllocator>;
 
     /** Type used to configure an added help menu. */
     using help_menu_setter_type = basic_help_menu_setter<TpAllocator>;
@@ -173,28 +174,15 @@ public:
             >
     >
     explicit basic_arg_parser(TpString_&& prog_name = string_type())
-            : max_unrecog_args_(1)
-            , default_hlp_arg_(nullptr)
-            , current_vers_arg_(nullptr)
+            : short_prefxs_({"-"})
+            , long_prefxs_({"--"})
             , prog_name_(std::forward<TpString_>(prog_name))
             , err_id_("error")
-            , bse_arg_list_()
-            , kyless_arg_list_()
-            , constrnts_()
-            , unrecog_args_()
-            , short_prefxs_({"-"})
-            , long_prefxs_({"--"})
-            , bse_arg_map_()
-            , hlp_menu_map_()
+            , default_hlp_arg_(nullptr)
+            , current_vers_arg_(nullptr)
+            , max_unrecog_args_(1)
             , flgs_(arg_parser_flags::DEFAULT_ARG_PARSER_FLAGS)
             , err_flgs_(arg_parser_error_flags::NIL)
-            , key_arg_type_alloc_()
-            , help_arg_type_alloc_()
-            , version_arg_type_alloc_()
-            , key_value_arg_type_alloc_()
-            , keyless_arg_type_alloc_()
-            , at_least_one_found_type_alloc_()
-            , mutually_exclusive_type_alloc_()
             , parsd_(false)
     {
     }
@@ -216,16 +204,7 @@ public:
      */
     ~basic_arg_parser()
     {
-        for (auto& x : bse_arg_list_)
-        {
-            delete_base_arg(x);
-        }
-
-        for (auto& x : constrnts_)
-        {
-            delete_arg_constraint(x);
-        }
-    
+        default_hlp_arg_ = nullptr;
         current_vers_arg_ = nullptr;
     }
     
@@ -259,11 +238,14 @@ public:
     key_arg_setter_type add_key_arg(Ts_&&... kys)
     {
         assert_valid_keys(kys...);
-        key_arg_type* ky_arg;
-        speed::memory::allocate_and_construct(key_arg_type_alloc_, ky_arg, this, kys...);
-        register_key_arg(ky_arg, std::forward<Ts_>(kys)...);
-
-        return key_arg_setter_type(ky_arg);
+        
+        unique_ptr_type<key_arg_type> ky_arg = speed::memory::allocate_unique<key_arg_type>(
+                allocator_type<key_arg_type>(), this, kys...);
+        
+        key_arg_setter_type key_arg_settr(ky_arg.get());
+        register_key_arg(std::move(ky_arg), std::forward<Ts_>(kys)...);
+        
+        return key_arg_settr;
     }
     
     /**
@@ -275,27 +257,35 @@ public:
     key_value_arg_setter_type add_key_value_arg(Ts_&&... kys)
     {
         assert_valid_keys(kys...);
-        key_value_arg_type* ky_val_arg;
-        speed::memory::allocate_and_construct(key_value_arg_type_alloc_, ky_val_arg, this, kys...);
-        register_key_value_arg(ky_val_arg, std::forward<Ts_>(kys)...);
-
-        return key_value_arg_setter_type(ky_val_arg);
+        
+        unique_ptr_type<key_value_arg_type> ky_val_arg =
+                speed::memory::allocate_unique<key_value_arg_type>(
+                        allocator_type<key_value_arg_type>(), this, kys...);
+        
+        key_value_arg_setter_type key_val_arg_settr(ky_val_arg.get());
+        register_key_value_arg(std::move(ky_val_arg), std::forward<Ts_>(kys)...);
+        
+        return key_val_arg_settr;
     }
 
     /**
      * @brief       Add an argument that just has values and doesn't have keys.
-     * @param       usage_ky : The ID that will be used to make refence to this argument in the
+     * @param       ky : The ID that will be used to make refence to this argument in the
      *              parser as well as being used during the printing of the usage message.
      */
     template<typename TpString_>
-    keyless_arg_setter_type add_keyless_arg(TpString_&& usage_ky)
+    positional_arg_setter_type add_positional_arg(TpString_&& ky)
     {
-        assert_valid_key(usage_ky);
-        keyless_arg_type* kyless_arg;
-        speed::memory::allocate_and_construct(keyless_arg_type_alloc_, kyless_arg, this, usage_ky);
-        register_keyless_arg(kyless_arg, std::forward<TpString_>(usage_ky));
-
-        return keyless_arg_setter_type(kyless_arg);
+        assert_valid_key(ky);
+        
+        unique_ptr_type<positional_arg_type> positionl_arg =
+                speed::memory::allocate_unique<positional_arg_type>(
+                        allocator_type<positional_arg_type>(), this, ky);
+        
+        positional_arg_setter_type positionl_arg_settr(positionl_arg.get());
+        register_positional_arg(std::move(positionl_arg), std::forward<TpString_>(ky));
+        
+        return positionl_arg_settr;
     }
     
     /**
@@ -307,11 +297,14 @@ public:
     help_arg_setter_type add_help_arg(Ts_&&... kys)
     {
         assert_valid_keys(kys...);
-        help_arg_type* hlp_arg;
-        speed::memory::allocate_and_construct(help_arg_type_alloc_, hlp_arg, this, kys...);
-        register_help_arg(hlp_arg, std::forward<Ts_>(kys)...);
-
-        return help_arg_setter_type(hlp_arg);
+        
+        unique_ptr_type<help_arg_type> hlp_arg = speed::memory::allocate_unique<help_arg_type>(
+                allocator_type<help_arg_type>(), this, kys...);
+        
+        help_arg_setter_type hlp_arg_settr(hlp_arg.get());
+        register_help_arg(std::move(hlp_arg), std::forward<Ts_>(kys)...);
+        
+        return hlp_arg_settr;
     }
     
     /**
@@ -323,42 +316,28 @@ public:
     version_arg_setter_type add_version_arg(Ts_&&... kys)
     {
         assert_valid_keys(kys...);
-        assert_valid_version_add();
-        version_arg_type* vers_arg;
-        speed::memory::allocate_and_construct(version_arg_type_alloc_, vers_arg, this, kys...);
-        register_version_arg(vers_arg, std::forward<Ts_>(kys)...);
-
-        return version_arg_setter_type(vers_arg);
+        assert_valid_version_addition();
+        
+        unique_ptr_type<version_arg_type> vers_arg =
+                speed::memory::allocate_unique<version_arg_type>(
+                        allocator_type<version_arg_type>(), this, kys...);
+        
+        version_arg_setter_type vers_arg_settr(vers_arg.get());
+        register_version_arg(std::move(vers_arg), std::forward<Ts_>(kys)...);
+        
+        return vers_arg_settr;
     }
     
     /**
      * @brief       Add a constraint that verifies that at least one of the specified arguments has
      *              been found in the program call.
-     * @param       kys : Variadic number of strings to speficy every key in which the constraint
-     *              applies.
+     * @param       kys : Variadic number of strings to speficy every argument in which the
+     *              constraint applies.
      */
     template<typename... Ts_>
-    void add_constraint_one_or_more(const Ts_&... kys)
+    arg_constraint_setter_type add_constraint(const Ts_&... kys)
     {
-        one_or_more_constraint_type* at_least_one_fnd;
-        speed::memory::allocate_and_construct(at_least_one_found_type_alloc_, at_least_one_fnd,
-                                              this, kys...);
-        constrnts_.push_back(at_least_one_fnd);
-    }
-
-    /**
-     * @brief       Add a constraint that verifies that exclusivelly one of the specified arguments
-     *              is found in the program call.
-     * @param       kys : Variadic number of strings to speficy every key in which the constraint
-     *              applies.
-     */
-    template<typename... Ts_>
-    void add_constraint_mutually_exclusive(const Ts_&... kys)
-    {
-        mutually_exclusive_constraint_type* mutually_excl;
-        speed::memory::allocate_and_construct(mutually_exclusive_type_alloc_, mutually_excl,
-                                              this, kys...);
-        constrnts_.push_back(mutually_excl);
+        return arg_constraint_setter_type(&constrnts_.emplace_back(this, kys...));
     }
 
     /**
@@ -385,7 +364,7 @@ public:
         enum class dfa_t : std::uint8_t
         {
             START, READ_ARG, PARSE_KEY, PARSE_KEY_ARG, PARSE_EQ_OPERATOR, PARSE_GROUPING_ARGS,
-            PARSE_KEYLESS_ARG, PARSE_UNRECOGNIZED_ARG, QUIT, FINISH
+            PARSE_POSITIONAL_ARG, PARSE_UNRECOGNIZED_ARG, QUIT, FINISH
         };
 
         dfa_t cur_state;
@@ -397,12 +376,12 @@ public:
         std::size_t eq_pos;
         key_arg_type *ky_arg = nullptr;
         key_value_arg_type *ky_val_arg = nullptr;
-        keyless_arg_type *kyless_arg = nullptr;
+        positional_arg_type *positionl_arg = nullptr;
         base_arg_type *prev_arg = nullptr;
         vector_type<key_arg_type*> chaind_args;
         bool insertd;
         bool prefix_err;
-        auto cur_keyless_arg_it = kyless_arg_list_.begin();
+        auto cur_bse_arg_it = get_first_positional_arg(bse_arg_list_.begin());
 
         for (cur_state = dfa_t::START; cur_state != dfa_t::FINISH; )
         {
@@ -495,31 +474,32 @@ public:
                     prev_arg = static_cast<base_arg_type*>(chaind_args.back());
                     continue;
                 }
-                cur_state = dfa_t::PARSE_KEYLESS_ARG;
+                cur_state = dfa_t::PARSE_POSITIONAL_ARG;
                 continue;
 
-            case dfa_t::PARSE_KEYLESS_ARG:
+            case dfa_t::PARSE_POSITIONAL_ARG:
                 insertd = false;
-                while (cur_keyless_arg_it != kyless_arg_list_.end() &&
-                       (*cur_keyless_arg_it)->max_values_reached())
+                while (cur_bse_arg_it != bse_arg_list_.end() &&
+                       dynamic_cast<positional_arg_type*>(cur_bse_arg_it->get())
+                            ->max_values_reached())
                 {
-                    ++cur_keyless_arg_it;
+                    cur_bse_arg_it = get_first_positional_arg(++cur_bse_arg_it);
                 }
-                while (cur_keyless_arg_it != kyless_arg_list_.end())
+                while (cur_bse_arg_it != bse_arg_list_.end())
                 {
-                    kyless_arg = *cur_keyless_arg_it;
-                    prefix_err = has_value_with_prefix_error(kyless_arg, cur_argv);
-                    if (prefix_err || !kyless_arg->try_add_value(cur_argv))
+                    positionl_arg = dynamic_cast<positional_arg_type*>(cur_bse_arg_it->get());
+                    prefix_err = has_value_with_prefix_error(positionl_arg, cur_argv);
+                    if (prefix_err || !positionl_arg->try_add_value(cur_argv))
                     {
-                        if (kyless_arg->min_values_reached() ||
-                            (kyless_arg->get_number_of_values() > 0 && prefix_err))
+                        if (positionl_arg->min_values_reached() ||
+                            (positionl_arg->get_number_of_values() > 0 && prefix_err))
                         {
-                            ++cur_keyless_arg_it;
+                            cur_bse_arg_it = get_first_positional_arg(++cur_bse_arg_it);
                             continue;
                         }
                         else if (!prefix_err)
                         {
-                            kyless_arg->add_value(std::move(cur_argv));
+                            positionl_arg->add_value(std::move(cur_argv));
                             insertd = true;
                         }
                         break;
@@ -529,14 +509,14 @@ public:
                 }
                 if (insertd)
                 {
-                    if (static_cast<base_arg_type*>(kyless_arg) !=  prev_arg)
+                    if (static_cast<base_arg_type*>(positionl_arg) !=  prev_arg)
                     {
-                        kyless_arg->execute_action();
-                        kyless_arg->set_found(true);
+                        positionl_arg->execute_action();
+                        positionl_arg->set_found(true);
                     }
                     ++cur_idx;
                     cur_state = dfa_t::READ_ARG;
-                    prev_arg = kyless_arg;
+                    prev_arg = positionl_arg;
                     continue;
                 }
                 cur_state = dfa_t::PARSE_UNRECOGNIZED_ARG;
@@ -873,7 +853,7 @@ public:
         {
             for (auto& constrnt : constrnts_)
             {
-                constrnt->print_errors();
+                constrnt.print_errors();
             }
         }
         
@@ -887,8 +867,8 @@ public:
                     if (flgs_.is_set(arg_parser_flags::USE_COLORS))
                     {
                         std::cout << speed::iostream::set_light_red_text
-                                    << err_id_ << ": "
-                                    << speed::iostream::set_default_text;
+                                  << err_id_ << ": "
+                                  << speed::iostream::set_default_text;
                     }
                     else
                     {
@@ -942,9 +922,9 @@ private:
     }
 
     /**
-     * @brief       Assert the validity of adding a version arg.
+     * @brief       Assert the validity of adding a version argument.
      */
-    inline void assert_valid_version_add() const
+    inline void assert_valid_version_addition() const
     {
         if (current_vers_arg_ != nullptr)
         {
@@ -953,74 +933,75 @@ private:
     }
 
     /**
-     * @brief       Register in the data stuctures a specified key arg and its keys.
-     * @param       ky_arg : Key arg to register.
-     * @param       kys : Keys of the key arg.
+     * @brief       Register in the data stuctures a specified key argument and its keys.
+     * @param       ky_arg : Key argument to register.
+     * @param       kys : Keys of the key argument.
      */
     template<typename... Ts_>
-    void register_key_arg(key_arg_type* ky_arg, Ts_&&... kys)
+    void register_key_arg(unique_ptr_type<key_arg_type> ky_arg, Ts_&&... kys)
     {
-        bse_arg_list_.push_back(static_cast<base_arg_type*>(ky_arg));
-
         int foreach[sizeof...(Ts_) + 1] = { (
-                bse_arg_map_.emplace(std::forward<Ts_>(kys), ky_arg), 0)... };
-
-        register_into_help_menus(ky_arg);
+                bse_arg_map_.emplace(std::forward<Ts_>(kys), ky_arg.get()), 0)... };
+        
+        register_into_help_menus(ky_arg.get());
+        bse_arg_list_.emplace_back(std::move(ky_arg));
     }
 
     /**
-     * @brief       Register in the data stuctures a specified key value arg and its keys.
-     * @param       ky_val_arg : Key value arg to register.
-     * @param       kys : Keys of the key value arg.
+     * @brief       Register in the data stuctures a specified key value argument and its keys.
+     * @param       ky_val_arg : Key value argument to register.
+     * @param       kys : Keys of the key value argument.
      */
     template<typename... Ts_>
-    inline void register_key_value_arg(key_value_arg_type* ky_val_arg, Ts_&&... kys)
+    inline void register_key_value_arg(unique_ptr_type<key_value_arg_type> ky_val_arg, Ts_&&... kys)
     {
-        register_key_arg(ky_val_arg, std::forward<Ts_>(kys)...);
+        register_key_arg(std::move(ky_val_arg), std::forward<Ts_>(kys)...);
     }
 
     /**
-     * @brief       Register in the data stuctures a specified keyless arg and its usage key.
-     * @param       kyless_arg : Keyless arg to register.
-     * @param       usage_ky : Usage key of the keyless arg.
+     * @brief       Register in the data stuctures a specified positional argument and its key.
+     * @param       positionl_arg : positional argument to register.
+     * @param       ky : Key of the positional argument.
      */
     template<typename TpString_>
-    inline void register_keyless_arg(keyless_arg_type* kyless_arg, TpString_&& usage_ky)
+    inline void register_positional_arg(
+            unique_ptr_type<positional_arg_type> positionl_arg,
+            TpString_&& ky
+    )
     {
-        bse_arg_list_.push_back(static_cast<base_arg_type*>(kyless_arg));
-        kyless_arg_list_.push_back(kyless_arg);
-        bse_arg_map_.emplace(std::forward<TpString_>(usage_ky), kyless_arg);
-        register_into_help_menus(kyless_arg);
+        bse_arg_map_.emplace(std::forward<TpString_>(ky), positionl_arg.get());
+        register_into_help_menus(positionl_arg.get());
+        bse_arg_list_.emplace_back(std::move(positionl_arg));
     }
 
     /**
-     * @brief       Register in the data stuctures a specified help arg and its keys.
-     * @param       hlp_arg : Help arg to register.
-     * @param       kys : Keys of the help arg.
+     * @brief       Register in the data stuctures a specified help argument and its keys.
+     * @param       hlp_arg : Help argument to register.
+     * @param       kys : Keys of the help argument.
      */
     template<typename... Ts_>
-    inline void register_help_arg(help_arg_type* hlp_arg, Ts_&&... kys)
+    inline void register_help_arg(unique_ptr_type<help_arg_type> hlp_arg, Ts_&&... kys)
     {
         if (default_hlp_arg_ == nullptr)
         {
-            default_hlp_arg_ = hlp_arg;
+            default_hlp_arg_ = hlp_arg.get();
         }
-        register_key_arg(hlp_arg, std::forward<Ts_>(kys)...);
+        register_key_arg(std::move(hlp_arg), std::forward<Ts_>(kys)...);
     }
 
     /**
-     * @brief       Register in the data stuctures a specified version arg and its keys.
-     * @param       vers_arg : Version arg to register.
-     * @param       kys : Keys of the version arg.
+     * @brief       Register in the data stuctures a specified version argument and its keys.
+     * @param       vers_arg : Version argument to register.
+     * @param       kys : Keys of the version argument.
      */
     template<typename... Ts_>
-    inline void register_version_arg(version_arg_type* vers_arg, Ts_&&... kys)
+    inline void register_version_arg(unique_ptr_type<version_arg_type> vers_arg, Ts_&&... kys)
     {
         if (current_vers_arg_ == nullptr)
         {
-            current_vers_arg_ = vers_arg;
+            current_vers_arg_ = vers_arg.get();
         }
-        register_key_arg(vers_arg, std::forward<Ts_>(kys)...);
+        register_key_arg(std::move(vers_arg), std::forward<Ts_>(kys)...);
     }
 
     /**
@@ -1060,70 +1041,11 @@ private:
         }
         else
         {
-            for (auto &hlp_menu_id: hlp_menus_ids)
+            for (auto& hlp_menu_id: hlp_menus_ids)
             {
                 get_help_menu(hlp_menu_id).remove_entry(bse_arg);
             }
         }
-    }
-
-    /**
-     * @brief       Destroy and deallocate the specified argument.
-     * @param       arg : The specified argument.
-     */
-    void delete_base_arg(base_arg_type*& arg) noexcept
-    {
-        key_arg_type* ky_arg;
-        help_arg_type* hlp_arg;
-        version_arg_type* vers_arg;
-        key_value_arg_type* ky_val_arg;
-        keyless_arg_type* kyless_arg;
-
-        if ((hlp_arg = dynamic_cast<help_arg_type*>(arg)) != nullptr)
-        {
-            speed::memory::destruct_and_deallocate(help_arg_type_alloc_, hlp_arg);
-        }
-        else if ((ky_val_arg = dynamic_cast<key_value_arg_type*>(arg)) != nullptr)
-        {
-            speed::memory::destruct_and_deallocate(key_value_arg_type_alloc_, ky_val_arg);
-        }
-        else if ((kyless_arg = dynamic_cast<keyless_arg_type*>(arg)) != nullptr)
-        {
-            speed::memory::destruct_and_deallocate(keyless_arg_type_alloc_, kyless_arg);
-        }
-        else if ((vers_arg = dynamic_cast<version_arg_type*>(arg)) != nullptr)
-        {
-            speed::memory::destruct_and_deallocate(version_arg_type_alloc_, vers_arg);
-        }
-        else if ((ky_arg = dynamic_cast<key_arg_type*>(arg)) != nullptr)
-        {
-            speed::memory::destruct_and_deallocate(key_arg_type_alloc_, ky_arg);
-        }
-
-        arg = nullptr;
-    }
-
-    /**
-     * @brief       Destroy and deallocate the specified argument.
-     * @param       arg : The specified argument.
-     */
-    void delete_arg_constraint(arg_constraint_type*& arg) noexcept
-    {
-        one_or_more_constraint_type* at_least_one_fnd;
-        mutually_exclusive_constraint_type* mutually_excl;
-
-        if ((at_least_one_fnd = dynamic_cast<one_or_more_constraint_type*>(arg)) != nullptr)
-        {
-            speed::memory::destruct_and_deallocate(at_least_one_found_type_alloc_,
-                                                   at_least_one_fnd);
-        }
-        else if ((mutually_excl = dynamic_cast<mutually_exclusive_constraint_type*>(arg)) != nullptr)
-        {
-            speed::memory::destruct_and_deallocate(mutually_exclusive_type_alloc_,
-                                                   mutually_excl);
-        }
-
-        arg = nullptr;
     }
 
     /**
@@ -1137,10 +1059,10 @@ private:
     }
 
     /**
-     * @brief       Parse the specified key arg.
+     * @brief       Parse the specified key argument.
      * @param       argc : Reference to the number of arguments found in the program call.
      * @param       argv : Arguments found in the program call.
-     * @param       ky_arg : The key arg to parse.
+     * @param       ky_arg : The key argument to parse.
      * @param       cur_idx : The current index checked in argv.
      * @param       pos_increment : How much the index will be increased afther the parsing.
      */
@@ -1198,7 +1120,7 @@ private:
         {
             bse_arg->set_found(false);
 
-            if ((value_arg = dynamic_cast<value_arg_type*>(bse_arg)) != nullptr)
+            if ((value_arg = dynamic_cast<value_arg_type*>(bse_arg.get())) != nullptr)
             {
                 value_arg->clear_values();
             }
@@ -1242,7 +1164,7 @@ private:
         err_fnd = false;
         for (auto& constrnt : constrnts_)
         {
-            if (constrnt->violed())
+            if (constrnt.is_violed())
             {
                 err_fnd = true;
                 err_flgs_.set(arg_parser_error_flags::ARGS_CONSTRAINTS_ERROR);
@@ -1264,302 +1186,11 @@ private:
 
         for (auto& bse_arg : bse_arg_list_)
         {
-            if ((ky_arg = dynamic_cast<key_arg_type*>(bse_arg)) != nullptr)
+            if ((ky_arg = dynamic_cast<key_arg_type*>(bse_arg.get())) != nullptr)
             {
-                ky_arg->update_prefixes();
+                ky_arg->update_prefixes_length();
             }
         }
-    }
-
-    /**
-     * @brief       Get a reference to a base argument.
-     * @param       ky : Key of the argument to get.
-     * @return      If function was successful a reference to the argument found is returned,
-     *              otherwise a null pointer is returned.
-     */
-    [[nodiscard]] base_arg_type* get_base_arg(const string_type& ky) const noexcept
-    {
-        auto it = bse_arg_map_.find(ky);
-        
-        if (it != bse_arg_map_.end())
-        {
-            return it->second;
-        }
-        
-        return nullptr;
-    }
-    
-    /**
-     * @brief       Get a reference to a key argument.
-     * @param       ky : Key of the argument to get.
-     * @return      If function was successful a reference to the argument found is returned, if not
-     *              a null pointer is returned.
-     */
-    [[nodiscard]] key_arg_type* get_key_arg(const string_type& ky) const noexcept
-    {
-        auto it = bse_arg_map_.find(ky);
-        
-        if (it != bse_arg_map_.end())
-        {
-            return dynamic_cast<key_arg_type*>(it->second);
-        }
-        
-        return nullptr;
-    }
-    
-    /**
-     * @brief       Get a reference to a value argument.
-     * @param       ky : Key of the argument to get.
-     * @return      If function was successful a reference to the argument found is returned, if not
-     *              a null pointer is returned.
-     */
-    [[nodiscard]] value_arg_type* get_value_arg(const string_type& ky) const noexcept
-    {
-        auto it = bse_arg_map_.find(ky);
-        
-        if (it != bse_arg_map_.end())
-        {
-            return dynamic_cast<value_arg_type*>(it->second);
-        }
-        
-        return nullptr;
-    }
-    
-    /**
-     * @brief       Get a reference to a key value argument.
-     * @param       ky : Key of the argument to get.
-     * @return      If function was successful a reference to the argument found is returned, if not
-     *              a null pointer is returned.
-     */
-    [[nodiscard]] key_value_arg_type* get_key_value_arg(const string_type& ky) const noexcept
-    {
-        auto it = bse_arg_map_.find(ky);
-        
-        if (it != bse_arg_map_.end())
-        {
-            return dynamic_cast<key_value_arg_type*>(it->second);
-        }
-        
-        return nullptr;
-    }
-    
-    /**
-     * @brief       Get a reference to a keyless argument.
-     * @param       usage_ky : Usage key of the argument to get.
-     * @return      If function was successful a reference to the argument found is returned, if not
-     *              a null pointer is returned.
-     */
-    [[nodiscard]] keyless_arg_type* get_keyless_arg(const string_type& usage_ky) const noexcept
-    {
-        auto it = bse_arg_map_.find(usage_ky);
-        
-        if (it != bse_arg_map_.end())
-        {
-            return dynamic_cast<keyless_arg_type*>(it->second);
-        }
-        
-        return nullptr;
-    }
-
-    /**
-     * @brief       Get a reference to a help argument.
-     * @param       ky : Key of the argument to get.
-     * @return      If function was successful a reference to the argument found is returned, if not
-     *              a null pointer is returned.
-     */
-    [[nodiscard]] help_arg_type* get_help_arg(const string_type& ky) const noexcept
-    {
-        auto it = bse_arg_map_.find(ky);
-        
-        if (it != bse_arg_map_.end())
-        {
-            return dynamic_cast<help_arg_type*>(it->second);
-        }
-        
-        return nullptr;
-    }
-
-    /**
-     * @brief       Get the help menu specified an ID.
-     * @param       hlp_menu_id : ID of the help menu to get.
-     * @return      The help menu related witht he specified ID.
-     */
-    template<typename TpString_ = string_type>
-    [[nodiscard]] help_menu_type& get_help_menu(TpString_&& hlp_menu_id = string_type()) noexcept
-    {
-        auto it = hlp_menu_map_.find(hlp_menu_id);
-        
-        if (it == hlp_menu_map_.end())
-        {
-            it = hlp_menu_map_.emplace(std::forward<TpString_>(hlp_menu_id),
-                    help_menu_type(this)).first;
-        }
-
-        return it->second;
-    }
-
-    /**
-     * @brief       Get the number of arguments that are options.
-     * @return      The number of arguments that are options.
-     */
-    [[nodiscard]] inline std::size_t get_nr_options() const noexcept
-    {
-        key_arg_type* ky_arg;
-        std::size_t nr_options_bldr = 0;
-        std::size_t nr_term_not_always_requird = 0;
-
-        for (auto& bse_arg : bse_arg_list_)
-        {
-            ky_arg = dynamic_cast<key_arg_type*>(bse_arg);
-            if (ky_arg != nullptr)
-            {
-                if (!ky_arg->is_flag_set(arg_flags::MANDATORY))
-                {
-                    if (!ky_arg->is_flag_set(arg_flags::TERMINAL) &&
-                        !ky_arg->is_flag_set(arg_flags::PKILL_AFTER_TRIGGERING))
-                    {
-                        speed::safety::try_addm(&nr_options_bldr, 1);
-                    }
-                    else
-                    {
-                        speed::safety::try_addm(&nr_term_not_always_requird, 1);
-                    }
-                }
-            }
-        }
-
-        return (nr_options_bldr == 0 && nr_term_not_always_requird > 0) ? 1 : nr_options_bldr;
-    }
-
-    /**
-     * @brief       Get the program name.
-     * @return      The program name.
-     */
-    [[nodiscard]] inline const string_type& get_program_name() const noexcept
-    {
-        return prog_name_;
-    }
-
-    /**
-     * @brief       Get the prefix of the specified key.
-     * @param       ky : String that contains the prefix.
-     * @return      If function was successful the prefix is returned, if not an empty string is
-     *              returned.
-     */
-    [[nodiscard]] string_type get_key_prefix(const string_type& ky) const
-    {
-        auto long_prefx_it = long_prefxs_.begin();
-        auto short_prefx_it = short_prefxs_.begin();
-        auto res_long_prefx_it = long_prefxs_.end();
-        auto res_short_prefx_it = short_prefxs_.end();
-        std::size_t cur_len;
-
-        for (; long_prefx_it != long_prefxs_.end(); ++long_prefx_it)
-        {
-            cur_len = long_prefx_it->length();
-            if (ky.compare(0, cur_len, *long_prefx_it) == 0)
-            {
-                if (res_long_prefx_it == long_prefxs_.end() ||
-                    res_long_prefx_it->length() < cur_len)
-                {
-                    res_long_prefx_it = long_prefx_it;
-                }
-            }
-        }
-
-        for (; short_prefx_it != short_prefxs_.end(); ++short_prefx_it)
-        {
-            cur_len = short_prefx_it->length();
-            if (ky.compare(0, cur_len, *short_prefx_it) == 0)
-            {
-                if (res_short_prefx_it == short_prefxs_.end() ||
-                    res_short_prefx_it->length() < cur_len)
-                {
-                    res_short_prefx_it = short_prefx_it;
-                }
-            }
-        }
-
-        if (res_long_prefx_it != long_prefxs_.end() && res_short_prefx_it != short_prefxs_.end())
-        {
-            return (res_long_prefx_it->length() >= res_short_prefx_it->length()) ?
-                   *res_long_prefx_it : *res_short_prefx_it;
-        }
-
-        return res_long_prefx_it != long_prefxs_.end() ? *res_long_prefx_it :
-               res_short_prefx_it != short_prefxs_.end() ? *res_short_prefx_it :
-               string_type();
-    }
-
-    /**
-     * @brief       Set the error id used by the parser for generic errors.
-     * @param       err_id : Error id used by the parser for generic errors.
-     */
-    template<typename TpString_>
-    inline void set_error_id(TpString_&& err_id) noexcept
-    {
-        err_id_ = std::forward<TpString_>(err_id);
-    }
-
-    /**
-     * @brief       Set an argument parser flag.
-     * @param       flg : Flag to set.
-     */
-    inline void set_flag(arg_parser_flags flg) noexcept
-    {
-        flgs_.set(flg);
-    }
-
-    /**
-     * @brief       Set the long prefixes.
-     * @param       prefxs : The long prefixes.
-     */
-    template<typename... Ts_>
-    void set_long_prefixes(Ts_&&... prefxs)
-    {
-        long_prefxs_.clear();
-        int foreach[sizeof...(Ts_) + 1] = { (long_prefxs_.emplace(prefxs), 0)... };
-        update_arg_keys_prefixes();
-    }
-
-    /**
-     * @brief       Set the maximum amount of unrecognized arguments.
-     * @param       max : The maximum amount of unrecognized arguments.
-     */
-    inline void set_maximum_unrecognized_args(std::size_t max) noexcept
-    {
-        max_unrecog_args_ = max;
-    }
-
-    /**
-     * @brief       Set the short prefixes.
-     * @param       prefxs : The short prefixes.
-     */
-    template<typename... Ts_>
-    void set_short_prefixes(Ts_&&... prefxs)
-    {
-        short_prefxs_.clear();
-        int foreach[sizeof...(Ts_) + 1] = { (short_prefxs_.emplace(prefxs), 0)... };
-        update_arg_keys_prefixes();
-    }
-
-    /**
-     * @brief       Set the program name.
-     * @param       prog_name : The program name.
-     */
-    template<typename TpString_>
-    inline void set_program_name(TpString_&& prog_name)
-    {
-        prog_name_ = std::forward<TpString_>(prog_name);
-    }
-
-    /**
-     * @brief       Unset an argument parser flag.
-     * @param       flg : Flag to unset.
-     */
-    inline void unset_flag(arg_parser_flags flg) noexcept
-    {
-        flgs_.unset(flg);
     }
 
     /**
@@ -1631,7 +1262,7 @@ private:
     /**
      * @brief       Allows knowing whether a string can't be an argument value due to the
      *              presece of a prefix while the value argument doesn't allow it.
-     * @param       val_arg : The value arg to consider for the checking.
+     * @param       val_arg : The value argument to consider for the checking.
      * @param       str : The string to check.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
@@ -1719,7 +1350,7 @@ private:
 
     /**
      * @brief       Allows knowing whether a string can be interpreted as an argument value.
-     * @param       val_arg : The value arg that the value is currecntly related.
+     * @param       val_arg : The value argument that the value is currecntly related.
      * @param       str : The string to check.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
@@ -1729,41 +1360,7 @@ private:
                (!arg_key_exists(str) || val_arg->is_flag_set(arg_flags::KEYS_AS_VALUES)) &&
                !arg_has_eq_operator(str) && !chained_args_exists(str);
     }
-
-    /**
-     * @brief       Print the help menu or version information if it is necessary.
-     */
-    void trigger_prints()
-    {
-        help_arg_type* hlp_arg;
-
-        for (auto& bse_arg : bse_arg_list_)
-        {
-            hlp_arg = dynamic_cast<help_arg_type*>(bse_arg);
-            if (hlp_arg != nullptr &&
-                hlp_arg->was_found() &&
-                    hlp_arg->is_flag_set(arg_flags::TRIGGER_HELP_PRINTING))
-            {
-                print_help(hlp_arg->get_help_menu_id_assigned());
-                if (hlp_arg->is_flag_set(arg_flags::PKILL_AFTER_TRIGGERING))
-                {
-                    exit_program(0);
-                }
-            }
-        }
-
-        if (current_vers_arg_ != nullptr &&
-            current_vers_arg_->was_found() &&
-                current_vers_arg_->is_flag_set(arg_flags::TRIGGER_VERSION_PRINTING))
-        {
-            print_version();
-            if (current_vers_arg_->is_flag_set(arg_flags::PKILL_AFTER_TRIGGERING))
-            {
-                exit_program(0);
-            }
-        }
-    }
-
+    
     /**
      * @brief       Allows knowing whether a specified value has a prefix.
      * @param       val : Value to check.
@@ -1778,7 +1375,7 @@ private:
                 return true;
             }
         }
-
+        
         for (auto& short_prefx : short_prefxs_)
         {
             if (val.compare(0, short_prefx.length(), short_prefx) == 0)
@@ -1786,8 +1383,349 @@ private:
                 return true;
             }
         }
-
+        
         return false;
+    }
+
+    /**
+     * @brief       Get a reference to a base argument.
+     * @param       ky : Key of the argument to get.
+     * @return      If function was successful a reference to the argument found is returned,
+     *              otherwise a null pointer is returned.
+     */
+    [[nodiscard]] base_arg_type* get_base_arg(const string_type& ky) const noexcept
+    {
+        auto it = bse_arg_map_.find(ky);
+        
+        if (it != bse_arg_map_.end())
+        {
+            return it->second;
+        }
+        
+        return nullptr;
+    }
+    
+    /**
+     * @brief       Get a reference to a key argument.
+     * @param       ky : Key of the argument to get.
+     * @return      If function was successful a reference to the argument found is returned, if not
+     *              a null pointer is returned.
+     */
+    [[nodiscard]] key_arg_type* get_key_arg(const string_type& ky) const noexcept
+    {
+        auto it = bse_arg_map_.find(ky);
+        
+        if (it != bse_arg_map_.end())
+        {
+            return dynamic_cast<key_arg_type*>(it->second);
+        }
+        
+        return nullptr;
+    }
+    
+    /**
+     * @brief       Get a reference to a value argument.
+     * @param       ky : Key of the argument to get.
+     * @return      If function was successful a reference to the argument found is returned, if not
+     *              a null pointer is returned.
+     */
+    [[nodiscard]] value_arg_type* get_value_arg(const string_type& ky) const noexcept
+    {
+        auto it = bse_arg_map_.find(ky);
+        
+        if (it != bse_arg_map_.end())
+        {
+            return dynamic_cast<value_arg_type*>(it->second);
+        }
+        
+        return nullptr;
+    }
+    
+    /**
+     * @brief       Get a reference to a key value argument.
+     * @param       ky : Key of the argument to get.
+     * @return      If function was successful a reference to the argument found is returned, if not
+     *              a null pointer is returned.
+     */
+    [[nodiscard]] key_value_arg_type* get_key_value_arg(const string_type& ky) const noexcept
+    {
+        auto it = bse_arg_map_.find(ky);
+        
+        if (it != bse_arg_map_.end())
+        {
+            return dynamic_cast<key_value_arg_type*>(it->second);
+        }
+        
+        return nullptr;
+    }
+    
+    /**
+     * @brief       Get a reference to a positional argument.
+     * @param       ky : Key of the argument to get.
+     * @return      If function was successful a reference to the argument found is returned, if not
+     *              a null pointer is returned.
+     */
+    [[nodiscard]] positional_arg_type* get_positional_arg(
+            const string_type& ky
+    ) const noexcept
+    {
+        auto it = bse_arg_map_.find(ky);
+        
+        if (it != bse_arg_map_.end())
+        {
+            return dynamic_cast<positional_arg_type*>(it->second);
+        }
+        
+        return nullptr;
+    }
+
+    /**
+     * @brief       Get a reference to a help argument.
+     * @param       ky : Key of the argument to get.
+     * @return      If function was successful a reference to the argument found is returned, if not
+     *              a null pointer is returned.
+     */
+    [[nodiscard]] help_arg_type* get_help_arg(const string_type& ky) const noexcept
+    {
+        auto it = bse_arg_map_.find(ky);
+        
+        if (it != bse_arg_map_.end())
+        {
+            return dynamic_cast<help_arg_type*>(it->second);
+        }
+        
+        return nullptr;
+    }
+    
+    /**
+     * @brief       Retrieves the list of argument constraints.
+     * @return      A reference to the list containing pointers to the argument constraint types.
+     */
+    [[nodiscard]] const list_type<arg_constraint_type>& get_constraints() const noexcept
+    {
+        return constrnts_;
+    }
+
+    /**
+     * @brief       Get the help menu specified an ID.
+     * @param       hlp_menu_id : ID of the help menu to get.
+     * @return      The help menu related witht he specified ID.
+     */
+    template<typename TpString_ = string_type>
+    [[nodiscard]] help_menu_type& get_help_menu(TpString_&& hlp_menu_id = string_type()) noexcept
+    {
+        auto it = hlp_menu_map_.find(hlp_menu_id);
+        
+        if (it == hlp_menu_map_.end())
+        {
+            it = hlp_menu_map_.emplace(std::forward<TpString_>(hlp_menu_id),
+                    help_menu_type(this)).first;
+        }
+
+        return it->second;
+    }
+    
+    /**
+     * @brief       Finds the first positional argument in the argument list starting from the given
+     *              iterator.
+     * @param       it : An iterator to the starting position in a vector of `unique_ptr` to
+     *              `base_arg_type`.
+     * @return      An iterator pointing to the first `positional_arg_type` element found, or to the
+     *              end of the list.
+     */
+    inline vector_type<unique_ptr_type<base_arg_type>>::iterator get_first_positional_arg(
+            vector_type<unique_ptr_type<base_arg_type>>::iterator it
+    ) const noexcept
+    {
+        while (it != bse_arg_list_.end() &&
+                dynamic_cast<positional_arg_type*>(it->get()) == nullptr)
+        {
+            ++it;
+        }
+        
+        return it;
+    }
+    
+    /**
+     * @brief       Get the prefix of the specified key.
+     * @param       ky : String that contains the prefix.
+     * @return      If function was successful the prefix is returned, if not an empty string is
+     *              returned.
+     */
+    [[nodiscard]] string_type get_key_prefix(const string_type& ky) const
+    {
+        auto long_prefx_it = long_prefxs_.begin();
+        auto short_prefx_it = short_prefxs_.begin();
+        auto res_long_prefx_it = long_prefxs_.end();
+        auto res_short_prefx_it = short_prefxs_.end();
+        std::size_t cur_len;
+        
+        for (; long_prefx_it != long_prefxs_.end(); ++long_prefx_it)
+        {
+            cur_len = long_prefx_it->length();
+            if (ky.compare(0, cur_len, *long_prefx_it) == 0)
+            {
+                if (res_long_prefx_it == long_prefxs_.end() ||
+                        res_long_prefx_it->length() < cur_len)
+                {
+                    res_long_prefx_it = long_prefx_it;
+                }
+            }
+        }
+        
+        for (; short_prefx_it != short_prefxs_.end(); ++short_prefx_it)
+        {
+            cur_len = short_prefx_it->length();
+            if (ky.compare(0, cur_len, *short_prefx_it) == 0)
+            {
+                if (res_short_prefx_it == short_prefxs_.end() ||
+                        res_short_prefx_it->length() < cur_len)
+                {
+                    res_short_prefx_it = short_prefx_it;
+                }
+            }
+        }
+        
+        if (res_long_prefx_it != long_prefxs_.end() && res_short_prefx_it != short_prefxs_.end())
+        {
+            return (res_long_prefx_it->length() >= res_short_prefx_it->length()) ?
+                   *res_long_prefx_it : *res_short_prefx_it;
+        }
+        
+        return res_long_prefx_it != long_prefxs_.end() ? *res_long_prefx_it :
+               res_short_prefx_it != short_prefxs_.end() ? *res_short_prefx_it :
+               string_type();
+    }
+    
+    /**
+     * @brief       Retrieves the next positional argument from the given iterator position.
+     * @param       it : An iterator pointing to the current position in the base argument list.
+     * @return      An iterator pointing to the next positional argument, or `bse_arg_list_.end()`
+     *              if none is found.
+     */
+    inline vector_type<unique_ptr_type<base_arg_type>>::iterator get_next_positional_arg(
+            vector_type<unique_ptr_type<base_arg_type>>::iterator it
+    ) const noexcept
+    {
+        if (it != bse_arg_list_.end())
+        {
+            ++it;
+        }
+        
+        return get_first_positional_arg(std::move(it));
+    }
+    
+    /**
+     * @brief       Get the number of arguments that are options.
+     * @return      The number of arguments that are options.
+     */
+    [[nodiscard]] inline std::size_t get_nr_options() const noexcept
+    {
+        key_arg_type* ky_arg;
+        std::size_t nr_options_bldr = 0;
+        std::size_t nr_term_not_always_requird = 0;
+
+        for (auto& bse_arg : bse_arg_list_)
+        {
+            ky_arg = dynamic_cast<key_arg_type*>(bse_arg.get());
+            if (ky_arg != nullptr)
+            {
+                if (!ky_arg->is_flag_set(arg_flags::MANDATORY))
+                {
+                    if (!ky_arg->is_flag_set(arg_flags::TERMINAL) &&
+                        !ky_arg->is_flag_set(arg_flags::PKILL_AFTER_TRIGGERING))
+                    {
+                        speed::safety::try_addm(&nr_options_bldr, 1);
+                    }
+                    else
+                    {
+                        speed::safety::try_addm(&nr_term_not_always_requird, 1);
+                    }
+                }
+            }
+        }
+
+        return (nr_options_bldr == 0 && nr_term_not_always_requird > 0) ? 1 : nr_options_bldr;
+    }
+    
+    /**
+     * @brief       Get the program name.
+     * @return      The program name.
+     */
+    [[nodiscard]] inline const string_type& get_program_name() const noexcept
+    {
+        return prog_name_;
+    }
+
+    /**
+     * @brief       Set the error id used by the parser for generic errors.
+     * @param       err_id : Error id used by the parser for generic errors.
+     */
+    template<typename TpString_>
+    inline void set_error_id(TpString_&& err_id) noexcept
+    {
+        err_id_ = std::forward<TpString_>(err_id);
+    }
+
+    /**
+     * @brief       Set an argument parser flag.
+     * @param       flg : Flag to set.
+     */
+    inline void set_flag(arg_parser_flags flg) noexcept
+    {
+        flgs_.set(flg);
+    }
+
+    /**
+     * @brief       Set the long prefixes.
+     * @param       prefxs : The long prefixes.
+     */
+    template<typename... Ts_>
+    void set_long_prefixes(Ts_&&... prefxs)
+    {
+        long_prefxs_.clear();
+        int foreach[sizeof...(Ts_) + 1] = { (long_prefxs_.emplace(prefxs), 0)... };
+        update_arg_keys_prefixes();
+    }
+
+    /**
+     * @brief       Set the maximum amount of unrecognized arguments.
+     * @param       max : The maximum amount of unrecognized arguments.
+     */
+    inline void set_maximum_unrecognized_args(std::size_t max) noexcept
+    {
+        max_unrecog_args_ = max;
+    }
+
+    /**
+     * @brief       Set the short prefixes.
+     * @param       prefxs : The short prefixes.
+     */
+    template<typename... Ts_>
+    void set_short_prefixes(Ts_&&... prefxs)
+    {
+        short_prefxs_.clear();
+        int foreach[sizeof...(Ts_) + 1] = { (short_prefxs_.emplace(prefxs), 0)... };
+        update_arg_keys_prefixes();
+    }
+
+    /**
+     * @brief       Set the program name.
+     * @param       prog_name : The program name.
+     */
+    template<typename TpString_>
+    inline void set_program_name(TpString_&& prog_name)
+    {
+        prog_name_ = std::forward<TpString_>(prog_name);
+    }
+
+    /**
+     * @brief       Unset an argument parser flag.
+     * @param       flg : Flag to unset.
+     */
+    inline void unset_flag(arg_parser_flags flg) noexcept
+    {
+        flgs_.unset(flg);
     }
 
     /**
@@ -1834,7 +1772,7 @@ private:
 
         for (auto& bse_arg : bse_arg_list_)
         {
-            ky_arg = dynamic_cast<key_arg_type*>(bse_arg);
+            ky_arg = dynamic_cast<key_arg_type*>(bse_arg.get());
             if (ky_arg != nullptr && !ky_arg->is_option())
             {
                 std::cout << ' ';
@@ -1848,15 +1786,15 @@ private:
      */
     inline void print_values_usage()
     {
-        keyless_arg_type * kyless_arg;
+        positional_arg_type* positionl_arg;
 
         for (auto& bse_arg : bse_arg_list_)
         {
-            kyless_arg = dynamic_cast<keyless_arg_type*>(bse_arg);
-            if (kyless_arg != nullptr)
+            positionl_arg = dynamic_cast<positional_arg_type*>(bse_arg.get());
+            if (positionl_arg != nullptr)
             {
                 std::cout << ' ';
-                kyless_arg->print_usage();
+                positionl_arg->print_usage();
             }
         }
     }
@@ -1872,24 +1810,53 @@ private:
         }
 
         std::cout << " ";
-
-        for (auto it = constrnts_.begin(); ; )
+        
+        if (constrnts_.size() > 1)
         {
-            (*it)->print_usage();
+            std::cout << "{CONSTRAINTS}";
+        }
+        else
+        {
+            std::cout << "{CONSTRAINT}";
+        }
+    }
 
-            if (++it != constrnts_.end())
+    /**
+     * @brief       Print the help menu or version information if it is necessary.
+     */
+    void trigger_prints()
+    {
+        help_arg_type* hlp_arg;
+
+        for (auto& bse_arg : bse_arg_list_)
+        {
+            hlp_arg = dynamic_cast<help_arg_type*>(bse_arg.get());
+            if (hlp_arg != nullptr &&
+                hlp_arg->was_found() &&
+                hlp_arg->is_flag_set(arg_flags::TRIGGER_HELP_PRINTING))
             {
-                std::cout << " ";
+                print_help(hlp_arg->get_help_menu_id_assigned());
+                if (hlp_arg->is_flag_set(arg_flags::PKILL_AFTER_TRIGGERING))
+                {
+                    exit_program(0);
+                }
             }
-            else
+        }
+
+        if (current_vers_arg_ != nullptr &&
+            current_vers_arg_->was_found() &&
+                current_vers_arg_->is_flag_set(arg_flags::TRIGGER_VERSION_PRINTING))
+        {
+            print_version();
+            if (current_vers_arg_->is_flag_set(arg_flags::PKILL_AFTER_TRIGGERING))
             {
-                break;
+                exit_program(0);
             }
         }
     }
 
 private:
-    /** Map allowing access to a base arg from one of its keys. */
+    /** Map allowing access to a base argument from one of its keys. */
     unordered_map_type<string_type, base_arg_type*> bse_arg_map_;
 
     /** Map allowing access to a help menu from its key. */
@@ -1908,16 +1875,13 @@ private:
     string_type err_id_;
 
     /** Contains all the arguments. */
-    vector_type<base_arg_type*> bse_arg_list_;
-
-    /** Contains all the keyless arguments. */
-    vector_type<keyless_arg_type*> kyless_arg_list_;
-
-    /** Collection of arguments constraints. */
-    vector_type<arg_constraint_type*> constrnts_;
+    vector_type<unique_ptr_type<base_arg_type>> bse_arg_list_;
 
     /** Contains the unrecognized arguments if an error happen. */
     vector_type<string_type> unrecog_args_;
+
+    /** Collection of arguments constraints. */
+    list_type<arg_constraint_type> constrnts_;
 
     /** Reference to the first added help argument. */
     help_arg_type* default_hlp_arg_;
@@ -1936,48 +1900,24 @@ private:
 
     /** Indicates whether the parsing has been done. */
     bool parsd_;
-
-    /** Allocator of the key_arg_type. */
-    allocator_type<key_arg_type> key_arg_type_alloc_;
-
-    /** Allocator of the help_arg_type. */
-    allocator_type<help_arg_type> help_arg_type_alloc_;
-
-    /** Allocator of the version_arg_type. */
-    allocator_type<version_arg_type> version_arg_type_alloc_;
-
-    /** Allocator of the key_value_arg_type. */
-    allocator_type<key_value_arg_type> key_value_arg_type_alloc_;
-
-    /** Allocator of the keyless_arg_type. */
-    allocator_type<keyless_arg_type> keyless_arg_type_alloc_;
-
-    /** Allocator of the at_least_one_found_type. */
-    allocator_type<one_or_more_constraint_type> at_least_one_found_type_alloc_;
-
-    /** Allocator of the mutually_exclusive_type. */
-    allocator_type<mutually_exclusive_constraint_type> mutually_exclusive_type_alloc_;
     
     friend class basic_arg_key<TpAllocator>;
     friend class basic_arg_value<TpAllocator>;
     friend class basic_base_arg<TpAllocator>;
     friend class basic_key_arg<TpAllocator>;
     friend class basic_value_arg<TpAllocator>;
-    friend class basic_version_arg<TpAllocator>;
-    friend class basic_keyless_arg<TpAllocator>;
     friend class basic_key_value_arg<TpAllocator>;
+    friend class basic_positional_arg<TpAllocator>;
     friend class basic_help_arg<TpAllocator>;
+    friend class basic_version_arg<TpAllocator>;
     friend class basic_arg_constraint<TpAllocator>;
     friend class basic_help_menu<TpAllocator>;
     friend class basic_arg_parser_setter<TpAllocator>;
 };
 
-
 /** Class used to parse arguments. */
 using arg_parser = basic_arg_parser<std::allocator<int>>;
 
-
 }
-
 
 #endif

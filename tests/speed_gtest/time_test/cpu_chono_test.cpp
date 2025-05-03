@@ -18,18 +18,16 @@
  */
 
 /**
- * @file        speed_gtest/system_test/cpu_chono_test.cpp
+ * @file        cpu_chono_test.cpp
  * @brief       cpu_chono unit test.
  * @author      Killian Valverde
  * @date        2018/06/06
  */
 
 #include <cmath>
-
 #include <gtest/gtest.h>
 
 #include "speed/time/time.hpp"
-
 
 TEST(time_cpu_chono, default_constructor)
 {
@@ -40,7 +38,6 @@ TEST(time_cpu_chono, default_constructor)
     ASSERT_TRUE(cpu_chrn.is(speed::time::cs_t::READY));
     ASSERT_TRUE(tme.is_null());
 }
-
 
 TEST(time_cpu_chono, start)
 {
@@ -57,7 +54,6 @@ TEST(time_cpu_chono, start)
     ASSERT_TRUE(cpu_chrn.is(speed::time::cs_t::RUNNING));
     ASSERT_TRUE(!tme.is_null());
 }
-
 
 TEST(time_cpu_chono, stop)
 {
@@ -84,7 +80,6 @@ TEST(time_cpu_chono, stop)
     ASSERT_TRUE(!tme_2.is_null());
     ASSERT_TRUE(tme_1 == tme_2);
 }
-
 
 TEST(time_cpu_chono, resume)
 {
@@ -119,7 +114,6 @@ TEST(time_cpu_chono, resume)
     ASSERT_TRUE(cpu_chrn.is(speed::time::cs_t::RUNNING));
     ASSERT_TRUE(tme_1 != tme_3);
 }
-
 
 TEST(time_cpu_chono, restart)
 {
@@ -156,7 +150,6 @@ TEST(time_cpu_chono, restart)
     ASSERT_TRUE(!tme_3.is_null());
 }
 
-
 TEST(time_cpu_chono, get_elapsed_time)
 {
     speed::time::cpu_chrono cpu_chrn;
@@ -177,7 +170,6 @@ TEST(time_cpu_chono, get_elapsed_time)
     
     ASSERT_TRUE(tme_1 != tme_2);
 }
-
 
 TEST(time_cpu_chono, get_elapsed_raw_time)
 {

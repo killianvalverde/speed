@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/filesystem/filesystem.hpp
+ * @file        filesystem.hpp
  * @brief       filesystem main header.
  * @author      Killian Valverde
  * @date        2018/11/25
@@ -32,27 +32,20 @@
 #include "operations.hpp"
 #include "valid_path.hpp"
 
-
 namespace speed {
-
 
 /**
  * @brief       Contains filesystem interaction resources.
  */
 namespace filesystem {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contains filesystem interaction resources.
  */
 namespace fsys = filesystem;
-
 #endif
 
-
 }
-
 
 #endif

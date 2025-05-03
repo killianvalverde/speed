@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/filesystem/operations.hpp
+ * @file        operations.hpp
  * @brief       filesystem functions header.
  * @author      Killian Valverde
  * @date        2024/11/09
@@ -27,10 +27,14 @@
 #ifndef SPEED_FILESYSTEM_OPERATIONS_HPP
 #define SPEED_FILESYSTEM_OPERATIONS_HPP
 
-
 namespace speed::filesystem {
 
-
+/**
+ * @brief       Normalizes the given filesystem path by replacing alternate slashes with the
+ *              standard slash.
+ * @param       pth : The original filesystem path to normalize.
+ * @return      The normalized filesystem path.
+ */
 inline std::filesystem::path get_normalized_path(const std::filesystem::path& pth)
 {
     auto path_str = pth.native();
@@ -41,8 +45,6 @@ inline std::filesystem::path get_normalized_path(const std::filesystem::path& pt
     return {std::move(path_str)};
 }
 
-
 }
-
 
 #endif

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/math/operations.hpp
+ * @file        operations.hpp
  * @brief       math functions header.
  * @author      Killian Valverde
  * @date        2017/01/28
@@ -29,9 +29,7 @@
 
 #include <type_traits>
 
-
 namespace speed::math {
-
 
 /**
  * @brief       Get the absolute number of a specified integral.
@@ -53,7 +51,6 @@ abs(TpIntegral val) noexcept
     return val;
 }
 
-
 /**
  * @brief       Get the absolute number of a specified integral.
  * @param       val : The integral number to get the absolute number.
@@ -69,8 +66,6 @@ abs(TpIntegral val) noexcept
     return val;
 }
 
-
 }
-
 
 #endif

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/compatibility/platform.hpp
+ * @file        platform.hpp
  * @brief       platform header.
  * @author      Killian Valverde
  * @date        2024/10/11
@@ -77,6 +77,5 @@
 #define SPEED_SYSTEM_FILESYSTEM_SHORTCUT_EXTENSION_CSTR ".lnk"
 #define SPEED_SYSTEM_FILESYSTEM_SHORTCUT_EXTENSION_WSTR L".lnk"
 #endif
-
 
 #endif

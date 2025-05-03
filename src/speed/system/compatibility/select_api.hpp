@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/compatibility/select_api.hpp
+ * @file        select_api.hpp
  * @brief       select_api header.
  * @author      Killian Valverde
  * @date        2018/05/27
@@ -28,7 +28,6 @@
 #define SPEED_SYSTEM_COMPATIBILITY_SELECT_API_HPP
 
 #include "platform.hpp"
-
 
 /** @cond */
 #ifdef SPEED_GLIBC
@@ -50,6 +49,5 @@
 #define SPEED_SELECT_API(a, b, ...) SPEED_CONCAT(SPEED_API_DEFINED_,\
         SPEED_IS_API_DEFINED(SPEED_API_PREFIX))(a, b, __VA_ARGS__)
 /** @endcond */
-
 
 #endif

@@ -18,18 +18,16 @@
  */
 
 /**
- * @file        speed_gtest/algorithm_test/operations_test.cpp
+ * @file        operations_test.cpp
  * @brief       operations_test unit test.
  * @author      Killian Valverde
  * @date        2018/08/07
  */
 
 #include <vector>
-
 #include <gtest/gtest.h>
 
 #include "speed/algorithm/algorithm.hpp"
-
 
 TEST(algorithm_operations, quicksort)
 {

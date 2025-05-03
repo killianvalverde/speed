@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/codecs/operations.hpp
+ * @file        operations.hpp
  * @brief       codecs operations functions header.
  * @author      Killian Valverde
  * @date        2024/10/16
@@ -32,9 +32,7 @@
 #include "../api/api.hpp"
 #include "../compatibility/compatibility.hpp"
 
-
 namespace speed::system::codecs {
-
 
 /**
  * @brief       Converts a specified c_string into a wstring.
@@ -53,7 +51,6 @@ bool convert_c_str_to_wstring(
     return SPEED_SELECT_API(codecs::convert_c_str_to_wstring, false, c_str, wstr, err_code);
 }
 
-
 /**
  * @brief       Converts a specified w_string into a string.
  * @param       w_str : The w_string to convert.
@@ -71,8 +68,6 @@ bool convert_w_str_to_string(
     return SPEED_SELECT_API(codecs::convert_w_str_to_string, false, w_str, str, err_code);
 }
 
-
 }
-
 
 #endif

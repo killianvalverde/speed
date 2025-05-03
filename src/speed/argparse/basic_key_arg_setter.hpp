@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_key_arg_setter.hpp
+ * @file        basic_key_arg_setter.hpp
  * @brief       basic_key_arg_setter class header.
  * @author      Killian Valverde
  * @date        2024/05/06
@@ -34,9 +34,7 @@
 #include "basic_base_arg_setter.hpp"
 #include "basic_key_arg.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief        Class allowing configuring a key argument.
@@ -85,13 +83,13 @@ public:
      * @brief       Copy constructor.
      * @param       rhs : Object to copy.
      */
-    basic_key_arg_setter(const basic_key_arg_setter& rhs) = delete;
+    basic_key_arg_setter(const basic_key_arg_setter& rhs) = default;
     
     /**
      * @brief       Move constructor.
      * @param       rhs : Object to move.
      */
-    basic_key_arg_setter(basic_key_arg_setter&& rhs) noexcept = delete;
+    basic_key_arg_setter(basic_key_arg_setter&& rhs) noexcept = default;
     
     /**
      * @brief       Destructor.
@@ -103,14 +101,14 @@ public:
      * @param       rhs : Object to copy.
      * @return      The object who call the method.
      */
-    basic_key_arg_setter& operator =(const basic_key_arg_setter& rhs) = delete;
+    basic_key_arg_setter& operator =(const basic_key_arg_setter& rhs) = default;
     
     /**
      * @brief       Move assignment operator.
      * @param       rhs : Object to move.
      * @return      The object who call the method.
      */
-    basic_key_arg_setter& operator =(basic_key_arg_setter&& rhs) noexcept = delete;
+    basic_key_arg_setter& operator =(basic_key_arg_setter&& rhs) noexcept = default;
 
     /**
      * @brief       Allows to specify whether the arguement can be grupped with other arguments.
@@ -152,8 +150,6 @@ public:
     }
 };
 
-
 }
-
 
 #endif

@@ -1,22 +1,25 @@
-/* Copyright (C) 2017 Killian Valverde.
-   This file is part of speed.
-
-   speed is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   speed is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with speed. If not, see <http://www.gnu.org/licenses/>. */
+/* speed - Generic C++ library.
+ * Copyright (C) 2015-2024 Killian Valverde.
+ *
+ * This file is part of speed.
+ *
+ * speed is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * speed is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with speed. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /**
- * @file        speed_gtest/stringutils_test/operations.cpp
- * @brief       operations unit test.
+ * @file        operations.cpp
+ * @brief       stringutils operations unit test.
  * @author      Killian Valverde
  * @date        2017/12/24
  */
@@ -24,7 +27,6 @@
 #include <gtest/gtest.h>
 
 #include "speed/stringutils/stringutils.hpp"
-
 
 TEST(stringutils_operations, strcpy)
 {
@@ -37,7 +39,6 @@ TEST(stringutils_operations, strcpy)
     EXPECT_TRUE(str_res == str1);
 }
 
-
 TEST(stringutils_operations, strncpy)
 {
     char str1[32] = "hello";
@@ -48,7 +49,6 @@ TEST(stringutils_operations, strncpy)
     
     EXPECT_TRUE(str_res == str1);
 }
-
 
 TEST(stringutils_operations, strcat)
 {
@@ -61,7 +61,6 @@ TEST(stringutils_operations, strcat)
     EXPECT_TRUE(str_res == str1);
 }
 
-
 TEST(stringutils_operations, strncat)
 {
     char str1[32] = "hello";
@@ -72,7 +71,6 @@ TEST(stringutils_operations, strncat)
     
     EXPECT_TRUE(str_res == str1);
 }
-
 
 TEST(stringutils_operations, strlen)
 {
@@ -93,7 +91,6 @@ TEST(stringutils_operations, strlen)
     EXPECT_TRUE(speed::stringutils::strlen(str7) == 5);
 }
 
-
 TEST(stringutils_operations, strcmp)
 {
     char str1[32] = "kkk";
@@ -105,7 +102,6 @@ TEST(stringutils_operations, strcmp)
     EXPECT_TRUE(speed::stringutils::strcmp(str1, str3) == 1);
     EXPECT_TRUE(speed::stringutils::strcmp(str1, str4) == -1);
 }
-
 
 TEST(stringutils_operations, strncmp)
 {
@@ -120,7 +116,6 @@ TEST(stringutils_operations, strncmp)
     EXPECT_TRUE(speed::stringutils::strncmp(str1, str4, 2) == -1);
 }
 
-
 TEST(stringutils_operations, strchr)
 {
     char str1[32] = "kkbb";
@@ -131,7 +126,6 @@ TEST(stringutils_operations, strchr)
     EXPECT_TRUE(speed::stringutils::strchr(str1, 'l') == nullptr);
     EXPECT_TRUE(speed::stringutils::strchr(str2, 'l') == nullptr);
 }
-
 
 TEST(stringutils_operations, strnchr)
 {
@@ -146,7 +140,6 @@ TEST(stringutils_operations, strnchr)
     EXPECT_TRUE(speed::stringutils::strnchr(str2, 'l', 4) == nullptr);
 }
 
-
 TEST(stringutils_operations, strrchr)
 {
     char str1[32] = "kkbb";
@@ -157,7 +150,6 @@ TEST(stringutils_operations, strrchr)
     EXPECT_TRUE(speed::stringutils::strrchr(str1, 'l') == nullptr);
     EXPECT_TRUE(speed::stringutils::strrchr(str2, 'l') == nullptr);
 }
-
 
 TEST(stringutils_operations, strrnchr)
 {
@@ -171,7 +163,6 @@ TEST(stringutils_operations, strrnchr)
     EXPECT_TRUE(speed::stringutils::strrnchr(str1, 'l', 4) == nullptr);
     EXPECT_TRUE(speed::stringutils::strrnchr(str2, 'l', 4) == nullptr);
 }
-
 
 TEST(stringutils_operations, strescregexchars)
 {
@@ -190,7 +181,6 @@ TEST(stringutils_operations, strescregexchars)
     EXPECT_TRUE(speed::stringutils::strescregexchars(strng3) == "hell\\*o\\*\\$bye");
 }
 
-
 TEST(stringutils_operations, strrmbelow)
 {
     char str1[32] = "123456";
@@ -201,7 +191,6 @@ TEST(stringutils_operations, strrmbelow)
     EXPECT_TRUE(speed::stringutils::strrmbelow(str1, '4') == str1_res);
     EXPECT_TRUE(speed::stringutils::strrmbelow(str2, '5') == str2_res);
 }
-
 
 TEST(stringutils_operations, strsplit)
 {
@@ -225,7 +214,6 @@ TEST(stringutils_operations, strsplit)
         EXPECT_TRUE(x[0] == i++);
     }
 }
-
 
 TEST(stringutils_operations, strwildmatch)
 {

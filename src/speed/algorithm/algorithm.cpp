@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/algorithm/algorithm.cpp
+ * @file        algorithm.cpp
  * @brief       algorithm module object.
  * @author      Killian Valverde
  * @date        2024/10/11

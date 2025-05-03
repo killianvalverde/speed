@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/forward_declarations.hpp
+ * @file        forward_declarations.hpp
  * @brief       forward_declarations header.
  * @author      Killian Valverde
  * @date        2018/10/27
@@ -27,9 +27,7 @@
 #ifndef SPEED_ARGPARSE_FORWARD_DECLARATIONS_HPP
 #define SPEED_ARGPARSE_FORWARD_DECLARATIONS_HPP
 
-
 namespace speed::argparse {
-
 
 template<typename TpAllocator>
 class basic_arg_key;
@@ -47,25 +45,19 @@ template<typename TpAllocator>
 class basic_value_arg;
 
 template<typename TpAllocator>
-class basic_version_arg;
-
-template<typename TpAllocator>
-class basic_keyless_arg;
-
-template<typename TpAllocator>
 class basic_key_value_arg;
+
+template<typename TpAllocator>
+class basic_positional_arg;
 
 template<typename TpAllocator>
 class basic_help_arg;
 
 template<typename TpAllocator>
+class basic_version_arg;
+
+template<typename TpAllocator>
 class basic_arg_constraint;
-
-template<typename TpBase, typename TpAllocator>
-class basic_one_or_more_constraint;
-
-template<typename TpBase, typename TpAllocator>
-class basic_mutually_exclusive_constraint;
 
 template<typename TpAllocator>
 class basic_help_menu;
@@ -83,16 +75,16 @@ template<typename TpAllocator, typename TpActual>
 class basic_value_arg_setter;
 
 template<typename TpAllocator, typename TpActual>
-class basic_version_arg_setter;
-
-template<typename TpAllocator, typename TpActual>
-class basic_keyless_arg_setter;
-
-template<typename TpAllocator, typename TpActual>
 class basic_key_value_arg_setter;
 
 template<typename TpAllocator, typename TpActual>
+class basic_positional_arg_setter;
+
+template<typename TpAllocator, typename TpActual>
 class basic_help_arg_setter;
+
+template<typename TpAllocator, typename TpActual>
+class basic_version_arg_setter;
 
 template<typename TpAllocator>
 class basic_help_menu_setter;
@@ -100,8 +92,6 @@ class basic_help_menu_setter;
 template<typename TpAllocator>
 class basic_arg_parser_setter;
 
-
 }
-
 
 #endif

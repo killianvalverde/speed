@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/type_casting/error_codes.hpp
+ * @file        error_codes.hpp
  * @brief       error_codes main header.
  * @author      Killian Valverde
  * @date        2024/05/09
@@ -29,9 +29,7 @@
 
 #include <cstdint>
 
-
 namespace speed::type_casting {
-
 
 /**
  * @brief       Error codes used by the casting functions.
@@ -87,8 +85,6 @@ enum class error_codes : std::uint8_t
     OTHERS_ENDS = 0x8
 };
 
-
 }
-
 
 #endif

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/stringutils/stringutils.cpp
+ * @file        stringutils.cpp
  * @brief       stringutils module object.
  * @author      Killian Valverde
  * @date        2024/10/11

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/glibc/time/operations.hpp
+ * @file        operations.hpp
  * @brief       time operations definitions.
  * @author      Killian Valverde
  * @date        2017/10/18
@@ -27,14 +27,12 @@
 #include "../../../compatibility/compatibility.hpp"
 #ifdef SPEED_GLIBC
 
+#include "operations.hpp"
+
 #include <ctime>
 #include <sys/times.h>
 
-#include "operations.hpp"
-
-
 namespace speed::system::api::glibc::time {
-
 
 bool get_monotonic_time(
         system::time::time_specification* time_spec,
@@ -65,7 +63,6 @@ bool get_monotonic_time(
     return true;
 }
 
-
 bool get_cpu_time(
         system::time::time_specification* time_spec,
         std::error_code* err_code
@@ -94,7 +91,6 @@ bool get_cpu_time(
     
     return true;
 }
-
 
 bool get_child_cpu_time(
         system::time::time_specification* time_spec,
@@ -125,8 +121,6 @@ bool get_child_cpu_time(
     return true;
 }
 
-
 }
-
 
 #endif

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/winapi/process/process.hpp
+ * @file        process.hpp
  * @brief       winapi process main header.
  * @author      Killian Valverde
  * @date        2023/10/31
@@ -32,18 +32,14 @@
 
 #include "operations.hpp"
 
-
 namespace speed::system::api::winapi {
-
 
 /**
  * @brief       Contains resources for process interactions.
  */
 namespace process {}
 
-
 }
-
 
 #endif
 #endif

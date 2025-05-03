@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/filesystem/directory_iteration.hpp
+ * @file        directory_iteration.hpp
  * @brief       directory_iteration class header.
  * @author      Killian Valverde
  * @date        2024/10/15
@@ -37,9 +37,7 @@
 #include "../type_casting/type_casting.hpp"
 #include "operations.hpp"
 
-
 namespace speed::filesystem {
-
 
 /**
  * @brief       Class that configures and produce directories iterators.
@@ -334,8 +332,8 @@ public:
     }
 
     /**
-     * @brief       Specify the level of recursivity that .
-     * @param       recursivity_level : Access modes that the files are mandatory to have.
+     * @brief       Specify the level of recursivity that.
+     * @param       recursivity_levl : Access modes that the files are mandatory to have.
      * @return      The object who call the method.
      */
     inline directory_iteration& recursivity_level(std::uint64_t recursivity_levl)
@@ -433,8 +431,6 @@ private:
     friend class const_iterator;
 };
 
-
 }
-
 
 #endif

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/system/api/winapi/codecs/codecs.hpp
+ * @file        codecs.hpp
  * @brief       system codecs main header.
  * @author      Killian Valverde
  * @date        2024/10/16
@@ -32,18 +32,14 @@
 
 #include "operations.hpp"
 
-
 namespace speed::system::api::winapi {
-
 
 /**
  * @brief       Contains utilities encoding and decoding.
  */
 namespace codecs {}
 
-
 }
-
 
 #endif
 #endif

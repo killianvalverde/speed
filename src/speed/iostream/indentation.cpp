@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/iostream/indentation.cpp
+ * @file        indentation.cpp
  * @brief       indentation class methods definition.
  * @author      Killian Valverde
  * @date        2018/01/10
@@ -26,16 +26,13 @@
 
 #include "indentation.hpp"
 
-
 namespace speed::iostream {
-
 
 indentation::indentation(std::size_t tab_size, std::size_t curr_size) noexcept
         : tab_size_(tab_size)
         , curr_size_(curr_size)
 {
 }
-
 
 indentation& indentation::operator ++() noexcept
 {
@@ -44,8 +41,6 @@ indentation& indentation::operator ++() noexcept
     return *this;
 }
 
-
-
 const indentation indentation::operator ++(int) noexcept
 {
     indentation old_indent(*this);
@@ -53,7 +48,6 @@ const indentation indentation::operator ++(int) noexcept
     
     return old_indent;
 }
-
 
 indentation& indentation::operator --() noexcept
 {
@@ -68,7 +62,6 @@ indentation& indentation::operator --() noexcept
     
     return *this;
 }
-
 
 const indentation indentation::operator --(int) noexcept
 {
@@ -85,6 +78,5 @@ const indentation indentation::operator --(int) noexcept
     
     return old_indent;
 }
-
 
 }

@@ -18,8 +18,8 @@
  */
 
 /**
- * @file        speed_gtest/lowlevel_test/lowlevel_operations_test.cpp
- * @brief       lowlevel_operations unit test.
+ * @file        operations_test.cpp
+ * @brief       lowlevel operations unit test.
  * @author      Killian Valverde
  * @date        2018/10/10
  */

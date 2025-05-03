@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/memory/memory.hpp
+ * @file        memory.hpp
  * @brief       memory main header.
  * @author      Killian Valverde
  * @date        2024/10/10
@@ -29,27 +29,20 @@
 
 #include "operations.hpp"
 
-
 namespace speed {
-
 
 /**
  * @brief       Contains a set of resources to perform memory operations.
  */
 namespace memory {}
 
-
 #ifndef SPEED_DISABLE_ALIAS
-
 /**
  * @brief       Contains a set of resources to perform memory operations.
  */
 namespace mem = memory;
-
 #endif
 
-
 }
-
 
 #endif

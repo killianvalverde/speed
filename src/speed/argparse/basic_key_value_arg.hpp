@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed/argparse/basic_key_value_arg.hpp
+ * @file        basic_key_value_arg.hpp
  * @brief       basic_key_value_arg class header.
  * @author      Killian Valverde
  * @date        2016/03/11
@@ -40,9 +40,7 @@
 #include "exception.hpp"
 #include "forward_declarations.hpp"
 
-
 namespace speed::argparse {
-
 
 /**
  * @brief       Class that represents arguments that have keys and values.
@@ -92,8 +90,6 @@ public:
             : base_arg_type(arg_parsr)
             , key_arg_type(arg_parsr, std::forward<Ts_>(kys)...)
             , value_arg_type(arg_parsr)
-            , vals_names_()
-            , usage_str_()
             , usage_str_needs_refresh_(true)
     {
         base_arg_type::clear_flags();
@@ -419,8 +415,6 @@ private:
     bool usage_str_needs_refresh_;
 };
 
-
 }
-
 
 #endif
