@@ -543,28 +543,23 @@ public:
      
     /**
      * @brief       Print the flag in the standard output with a byte separator.
-     * @param       os : The object used to print in standard output.
      * @param       sequence_len : The number of flags to print until print a white space.
      */
-    template<typename CharT, typename CharTraitsT>
-    void print(
-            std::basic_ostream<CharT, CharTraitsT>& os,
-            std::uint8_t sequence_len = 8
-    ) const
+    void print(std::uint8_t sequence_len = 8) const
     {
         constexpr std::uint8_t n_bits = sizeof(value_type) * 8;
         
         for (std::uint8_t i = 0; i < n_bits; i++)
         {
-            os << (static_cast<underlying_type>(val_) >> (n_bits - 1 - i) & 1);
+            std::cout << (static_cast<underlying_type>(val_) >> (n_bits - 1 - i) & 1);
     
             if (sequence_len != 0 && (i + 1) % sequence_len == 0 && i + 1 < n_bits)
             {
-                os << ' ';
+                std::cout << ' ';
             }
         }
         
-        os << speed::iostream::newl;
+        speed::iostream::newl(std::cout);
     }
     
     /**
