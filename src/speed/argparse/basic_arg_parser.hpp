@@ -483,7 +483,7 @@ public:
                        dynamic_cast<positional_arg_type*>(cur_bse_arg_it->get())
                             ->max_values_reached())
                 {
-                    cur_bse_arg_it = get_first_positional_arg(++cur_bse_arg_it);
+                    cur_bse_arg_it = get_next_positional_arg(cur_bse_arg_it);
                 }
                 while (cur_bse_arg_it != bse_arg_list_.end())
                 {
@@ -494,7 +494,7 @@ public:
                         if (positionl_arg->min_values_reached() ||
                             (positionl_arg->get_number_of_values() > 0 && prefix_err))
                         {
-                            cur_bse_arg_it = get_first_positional_arg(++cur_bse_arg_it);
+                            cur_bse_arg_it = get_next_positional_arg(cur_bse_arg_it);
                             continue;
                         }
                         else if (!prefix_err)
