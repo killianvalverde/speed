@@ -464,8 +464,8 @@ public:
         node_type* trg = fir_;
 
         erase_node(trg);
-
-        speed::memory::destruct_and_deallocate(alloctr_, trg);
+        
+        speed::memory::destroy_and_deallocate(alloctr_, trg);
     }
     
     /**
@@ -494,8 +494,8 @@ public:
         node_type* trg = fir_->prev_;
 
         erase_node(trg);
-
-        speed::memory::destruct_and_deallocate(alloctr_, trg);
+        
+        speed::memory::destroy_and_deallocate(alloctr_, trg);
     }
     
     /**
@@ -546,8 +546,8 @@ public:
         node_type* trg = pos.cur_->prev_;
 
         erase_before_iterator(pos);
-
-        speed::memory::destruct_and_deallocate(alloctr_, trg);
+        
+        speed::memory::destroy_and_deallocate(alloctr_, trg);
     }
     
     /**
@@ -564,8 +564,8 @@ public:
         node_type* trg = pos.cur_->nxt_;
     
         erase_after_iterator(pos);
-
-        speed::memory::destruct_and_deallocate(alloctr_, trg);
+        
+        speed::memory::destroy_and_deallocate(alloctr_, trg);
     }
     
     /**
@@ -582,8 +582,8 @@ public:
         node_type* trg = pos.cur_;
 
         erase_iterator_and_move_backward(pos);
-
-        speed::memory::destruct_and_deallocate(alloctr_, trg);
+        
+        speed::memory::destroy_and_deallocate(alloctr_, trg);
     }
     
     /**
@@ -600,8 +600,8 @@ public:
         node_type* trg = pos.cur_;
     
         erase_iterator_and_move_forward(pos);
-
-        speed::memory::destruct_and_deallocate(alloctr_, trg);
+        
+        speed::memory::destroy_and_deallocate(alloctr_, trg);
     }
     
     /**
@@ -618,7 +618,7 @@ public:
             {
                 cur = fir_;
                 fir_ = fir_->nxt_;
-                speed::memory::destruct_and_deallocate(alloctr_, cur);
+                speed::memory::destroy_and_deallocate(alloctr_, cur);
 
             } while (fir_ != end);
             
