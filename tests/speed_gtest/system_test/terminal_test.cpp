@@ -18,36 +18,31 @@
  */
 
 /**
- * @file        speed_gtest/system_test/terminal_test.cpp
+ * @file        terminal_test.cpp
  * @brief       terminal unit test.
  * @author      Killian Valverde
  * @date        2018/06/01
  */
 
 #include <iostream>
-
 #include <gtest/gtest.h>
 
 #include "speed/system/system.hpp"
-
 
 TEST(system_terminal, flush_input_terminal)
 {
     // ASSERT_TRUE(speed::system::terminal::flush_input_terminal(stdin));
 }
 
-
 TEST(system_terminal, flush_output_terminal)
 {
     // ASSERT_TRUE(speed::system::terminal::flush_output_terminal(stdout));
 }
 
-
 TEST(system_terminal, kbhit)
 {
     // ASSERT_TRUE(speed::system::terminal::kbhit());
 }
-
 
 TEST(system_terminal, set_terminal_text_attribute_1)
 {
@@ -56,7 +51,6 @@ TEST(system_terminal, set_terminal_text_attribute_1)
     // ASSERT_TRUE(speed::system::terminal::set_text_attribute(
     //         stdout, speed::system::terminal::ta_t::DEFAULT));
 }
-
 
 TEST(system_terminal, set_terminal_text_attribute_2)
 {

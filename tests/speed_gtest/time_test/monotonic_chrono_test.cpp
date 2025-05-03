@@ -18,18 +18,16 @@
  */
 
 /**
- * @file        speed_gtest/system_test/monotonic_chrono_test.cpp
+ * @file        monotonic_chrono_test.cpp
  * @brief       monotonic_chrono unit test.
  * @author      Killian Valverde
  * @date        2018/06/06
  */
 
 #include <cmath>
-
 #include <gtest/gtest.h>
 
 #include "speed/time/time.hpp"
-
 
 TEST(time_monotonic_chrono, default_constructor)
 {
@@ -40,7 +38,6 @@ TEST(time_monotonic_chrono, default_constructor)
     ASSERT_TRUE(monotc_chrn.is(speed::time::cs_t::READY));
     ASSERT_TRUE(tme.is_null());
 }
-
 
 TEST(time_monotonic_chrono, start)
 {
@@ -54,7 +51,6 @@ TEST(time_monotonic_chrono, start)
     ASSERT_TRUE(monotc_chrn.is(speed::time::cs_t::RUNNING));
     ASSERT_TRUE(!tme.is_null());
 }
-
 
 TEST(time_monotonic_chrono, stop)
 {
@@ -77,7 +73,6 @@ TEST(time_monotonic_chrono, stop)
     ASSERT_TRUE(monotc_chrn.is(speed::time::cs_t::STOPED));
     ASSERT_TRUE(tme_1 == tme_2);
 }
-
 
 TEST(time_monotonic_chrono, resume)
 {
@@ -109,7 +104,6 @@ TEST(time_monotonic_chrono, resume)
     ASSERT_TRUE(tme_1 != tme_3);
 }
 
-
 TEST(time_monotonic_chrono, restart)
 {
     speed::time::monotonic_chrono monotc_chrn;
@@ -140,7 +134,6 @@ TEST(time_monotonic_chrono, restart)
     ASSERT_TRUE(!tme_3.is_null());
 }
 
-
 TEST(time_monotonic_chrono, get_elapsed_time)
 {
     speed::time::monotonic_chrono monotc_chrn;
@@ -153,7 +146,6 @@ TEST(time_monotonic_chrono, get_elapsed_time)
     
     ASSERT_TRUE(tme_1 != tme_2);
 }
-
 
 TEST(time_monotonic_chrono, get_elapsed_raw_time)
 {

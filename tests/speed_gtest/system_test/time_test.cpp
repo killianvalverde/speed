@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed_gtest/system_test/time_test.cpp
+ * @file        time_test.cpp
  * @brief       time unit test.
  * @author      Killian Valverde
  * @date        2018/06/01
@@ -27,7 +27,6 @@
 #include <gtest/gtest.h>
 
 #include "speed/system/system.hpp"
-
 
 TEST(system_time, get_elapsed_time)
 {
@@ -38,7 +37,6 @@ TEST(system_time, get_elapsed_time)
     ASSERT_TRUE(res.get_seconds() == 2);
     ASSERT_TRUE(res.get_nseconds() == 0);
 }
-
 
 TEST(system_time, get_monotonic_time)
 {
@@ -54,7 +52,6 @@ TEST(system_time, get_monotonic_time)
 
     ASSERT_TRUE(tme_spec1 != tme_spec2);
 }
-
 
 TEST(system_time, get_cpu_time)
 {

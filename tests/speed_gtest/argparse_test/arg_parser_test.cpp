@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed_gtest/argparse_test/arg_parser_test.cpp
+ * @file        arg_parser_test.cpp
  * @brief       arg_parser unit test.
  * @author      Killian Valverde
  * @date        2017/05/16
@@ -27,7 +27,6 @@
 #include <gtest/gtest.h>
 
 #include "speed/argparse/argparse.hpp"
-
 
 class argparse_arg_parser : public ::testing::Test
 {
@@ -48,7 +47,6 @@ protected:
     speed::argparse::arg_parser ap;
 };
 
-
 TEST_F(argparse_arg_parser, configure)
 {
     ap.configure()
@@ -63,7 +61,6 @@ TEST_F(argparse_arg_parser, configure)
             .short_prefixes("-")
             .short_prefixes("-");
 }
-
 
 TEST_F(argparse_arg_parser, add_key_arg)
 {
@@ -86,7 +83,6 @@ TEST_F(argparse_arg_parser, add_key_arg)
     EXPECT_THROW(ap.add_key_arg("--long"), speed::argparse::exception);
     EXPECT_TRUE(!ap.was_found("-l"));
 }
-
 
 TEST_F(argparse_arg_parser, add_key_value_arg)
 {
@@ -120,7 +116,6 @@ TEST_F(argparse_arg_parser, add_key_value_arg)
     EXPECT_TRUE(!ap.was_found("-s"));
 }
 
-
 TEST_F(argparse_arg_parser, add_positional_arg)
 {
     std::vector<std::string> vals;
@@ -148,7 +143,6 @@ TEST_F(argparse_arg_parser, add_positional_arg)
     EXPECT_THROW(ap.add_positional_arg("FILE"), speed::argparse::exception);
     EXPECT_TRUE(!ap.was_found("FILE"));
 }
-
 
 TEST_F(argparse_arg_parser, add_help_arg)
 {
@@ -185,7 +179,6 @@ TEST_F(argparse_arg_parser, add_help_arg)
     EXPECT_TRUE(!ap.was_found("-h"));
 }
 
-
 TEST_F(argparse_arg_parser, add_version_arg)
 {
     bool presnc;
@@ -212,7 +205,6 @@ TEST_F(argparse_arg_parser, add_version_arg)
     EXPECT_TRUE(!ap.was_found("-v"));
 }
 
-
 TEST_F(argparse_arg_parser, add_help_menu)
 {
     ap.add_help_menu()
@@ -225,7 +217,6 @@ TEST_F(argparse_arg_parser, add_help_menu)
             .description("Output version information and exit")
             .gplv3_version_information("1.0.0", "2024", "Killian");
 }
-
 
 TEST_F(argparse_arg_parser, parse_key_args)
 {
@@ -262,7 +253,6 @@ TEST_F(argparse_arg_parser, parse_key_args)
     EXPECT_TRUE(ap.was_found("-r"));
     EXPECT_TRUE(dee == 1);
 }
-
 
 TEST_F(argparse_arg_parser, parse_key_value_args)
 {
@@ -310,7 +300,6 @@ TEST_F(argparse_arg_parser, parse_key_value_args)
     EXPECT_THROW(dm = ap.get_at_as<std::uint64_t>("-m", 3), speed::argparse::exception);
     EXPECT_THROW(dm = ap.get_front_as<std::uint64_t>("-h"), speed::type_casting::exception);
 }
-
 
 TEST_F(argparse_arg_parser, parse_positional_args)
 {
@@ -386,7 +375,6 @@ TEST_F(argparse_arg_parser, parse_positional_args)
     EXPECT_TRUE(ap.has_errors());
 }
 
-
 TEST_F(argparse_arg_parser, parse_help_args)
 {
     std::vector<const char*> argv = {
@@ -413,7 +401,6 @@ TEST_F(argparse_arg_parser, parse_help_args)
     EXPECT_THROW(dm = ap.get_at_as<std::string>("-h", 1), speed::argparse::exception);
 }
 
-
 TEST_F(argparse_arg_parser, parse_version_args)
 {
     std::vector<const char*> argv = {
@@ -434,7 +421,6 @@ TEST_F(argparse_arg_parser, parse_version_args)
     EXPECT_TRUE(ap.was_found("-v"));
     EXPECT_TRUE(ap.was_found("--version"));
 }
-
 
 TEST_F(argparse_arg_parser, parse_eq_operator)
 {
@@ -483,7 +469,6 @@ TEST_F(argparse_arg_parser, parse_eq_operator)
     EXPECT_THROW(dm = ap.get_front_as<std::uint64_t>("-h"), speed::type_casting::exception);
 }
 
-
 TEST_F(argparse_arg_parser, parse_grouping)
 {
     std::vector<const char*> argv = {
@@ -530,7 +515,6 @@ TEST_F(argparse_arg_parser, parse_grouping)
     EXPECT_THROW(dm = ap.get_front_as<std::uint64_t>("-h"), speed::type_casting::exception);
 }
 
-
 TEST_F(argparse_arg_parser, parse_one_or_more_required_constraint)
 {
     std::vector<const char*> argv1 = {
@@ -560,7 +544,6 @@ TEST_F(argparse_arg_parser, parse_one_or_more_required_constraint)
     ap.parse_args(argv2.size(), argv2);
     EXPECT_TRUE(!ap.has_errors());
 }
-
 
 TEST_F(argparse_arg_parser, parse_mutually_exclusive_constraint)
 {
@@ -599,7 +582,6 @@ TEST_F(argparse_arg_parser, parse_mutually_exclusive_constraint)
     EXPECT_TRUE(!ap.was_found("-r"));
     EXPECT_TRUE(!ap.has_errors());
 }
-
 
 TEST_F(argparse_arg_parser, parse_all_constraints)
 {
@@ -649,7 +631,6 @@ TEST_F(argparse_arg_parser, parse_all_constraints)
     EXPECT_TRUE(!ap.was_found("-r"));
     EXPECT_TRUE(!ap.has_errors());
 }
-
 
 TEST_F(argparse_arg_parser, parse_sub_parser)
 {
@@ -707,7 +688,6 @@ TEST_F(argparse_arg_parser, parse_sub_parser)
     EXPECT_TRUE(interactv);
 }
 
-
 TEST_F(argparse_arg_parser, check_errors)
 {
     std::vector<const char*> argv = {
@@ -745,7 +725,6 @@ TEST_F(argparse_arg_parser, check_errors)
     EXPECT_TRUE(!ap.arg_has_errors("-r"));
     EXPECT_TRUE(ap.has_errors());
 }
-
 
 TEST_F(argparse_arg_parser, print_usage)
 {
@@ -798,7 +777,6 @@ TEST_F(argparse_arg_parser, print_usage)
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
-
 TEST_F(argparse_arg_parser, print_description)
 {
     std::string expected_res =
@@ -831,7 +809,6 @@ TEST_F(argparse_arg_parser, print_description)
 
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
-
 
 TEST_F(argparse_arg_parser, print_options)
 {
@@ -885,7 +862,6 @@ TEST_F(argparse_arg_parser, print_options)
 
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
-
 
 TEST_F(argparse_arg_parser, print_commands)
 {
@@ -949,7 +925,6 @@ TEST_F(argparse_arg_parser, print_commands)
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
-
 TEST_F(argparse_arg_parser, print_values)
 {
     std::string expected_res =
@@ -1002,7 +977,6 @@ TEST_F(argparse_arg_parser, print_values)
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
-
 TEST_F(argparse_arg_parser, print_epilogue)
 {
     std::string expected_res =
@@ -1035,7 +1009,6 @@ TEST_F(argparse_arg_parser, print_epilogue)
 
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
-
 
 TEST_F(argparse_arg_parser, print_help)
 {
@@ -1121,7 +1094,6 @@ TEST_F(argparse_arg_parser, print_help)
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
 
-
 TEST_F(argparse_arg_parser, print_version)
 {
     std::string expected_res = "v1.0.0\n";
@@ -1140,7 +1112,6 @@ TEST_F(argparse_arg_parser, print_version)
 
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
-
 
 TEST_F(argparse_arg_parser, print_number_errors)
 {
@@ -1165,7 +1136,6 @@ TEST_F(argparse_arg_parser, print_number_errors)
 
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_res);
 }
-
 
 TEST_F(argparse_arg_parser, change_prefix)
 {

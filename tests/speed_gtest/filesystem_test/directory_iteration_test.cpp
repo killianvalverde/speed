@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed_gtest/filesystem_test/directory_iteration_test.cpp
+ * @file        directory_iteration_test.cpp
  * @brief       directory_iteration unit test.
  * @author      Killian Valverde
  * @date        2024/10/14
@@ -27,7 +27,6 @@
 #include <gtest/gtest.h>
 
 #include "speed/filesystem/filesystem.hpp"
-
 
 TEST(filesystem_directory_iteration, elementary)
 {

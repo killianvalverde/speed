@@ -18,18 +18,16 @@
  */
 
 /**
- * @file        speed_gtest/type_traits_test/operations_test.cpp
+ * @file        operations_test.cpp
  * @brief       operations unit test.
  * @author      Killian Valverde
  * @date        2018/06/08
  */
 
 #include <filesystem>
-
 #include <gtest/gtest.h>
 
 #include "speed/type_traits/type_traits.hpp"
-
 
 TEST(type_traits_operations, is_char)
 {
@@ -37,13 +35,11 @@ TEST(type_traits_operations, is_char)
     EXPECT_TRUE(!speed::type_traits::is_char<wchar_t>::value);
 }
 
-
 TEST(type_traits_operations, is_wchar)
 {
     EXPECT_TRUE(!speed::type_traits::is_wchar<char>::value);
     EXPECT_TRUE(speed::type_traits::is_wchar<wchar_t>::value);
 }
-
 
 TEST(type_traits_operations, is_character)
 {
@@ -53,7 +49,6 @@ TEST(type_traits_operations, is_character)
     EXPECT_TRUE(speed::type_traits::is_character<char32_t>::value);
     EXPECT_TRUE(!speed::type_traits::is_character<int>::value);
 }
-
 
 TEST(type_traits_operations, is_character_pointer)
 {
@@ -65,7 +60,6 @@ TEST(type_traits_operations, is_character_pointer)
     EXPECT_TRUE(!speed::type_traits::is_character_pointer<char []>::value);
 }
 
-
 TEST(type_traits_operations, is_stdio_character)
 {
     EXPECT_TRUE(speed::type_traits::is_stdio_character<char>::value);
@@ -74,20 +68,17 @@ TEST(type_traits_operations, is_stdio_character)
     EXPECT_TRUE(!speed::type_traits::is_stdio_character<char32_t>::value);
 }
 
-
 TEST(type_traits_operations, is_float)
 {
     EXPECT_TRUE(speed::type_traits::is_float<float>::value);
     EXPECT_TRUE(!speed::type_traits::is_float<double>::value);
 }
 
-
 TEST(type_traits_operations, is_double)
 {
     EXPECT_TRUE(!speed::type_traits::is_double<float>::value);
     EXPECT_TRUE(speed::type_traits::is_double<double>::value);
 }
-
 
 TEST(type_traits_operations, is_long_double)
 {
@@ -96,14 +87,12 @@ TEST(type_traits_operations, is_long_double)
     EXPECT_TRUE(speed::type_traits::is_long_double<long double>::value);
 }
 
-
 TEST(type_traits_operations, is_basic_string)
 {
     EXPECT_TRUE(speed::type_traits::is_basic_string<std::string>::value);
     EXPECT_TRUE(speed::type_traits::is_basic_string<std::wstring>::value);
     EXPECT_TRUE(!speed::type_traits::is_basic_string<int>::value);
 }
-
 
 TEST(type_traits_operations, is_basic_string_vector)
 {
@@ -113,7 +102,6 @@ TEST(type_traits_operations, is_basic_string_vector)
     EXPECT_TRUE(!speed::type_traits::is_basic_string_vector<int>::value);
 }
 
-
 TEST(type_traits_operations, is_basic_ostream)
 {
     EXPECT_TRUE(speed::type_traits::is_basic_ostream<std::ostream>::value);
@@ -121,13 +109,11 @@ TEST(type_traits_operations, is_basic_ostream)
     EXPECT_TRUE(!speed::type_traits::is_basic_ostream<int>::value);
 }
 
-
 TEST(type_traits_operations, is_path)
 {
     EXPECT_TRUE(speed::type_traits::is_path<std::filesystem::path>::value);
     EXPECT_TRUE(!speed::type_traits::is_path<int>::value);
 }
-
 
 TEST(type_traits_operations, try_underlying_type)
 {

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed_gtest/type_casting_test/try_type_cast_test.cpp
+ * @file        try_type_cast_test.cpp
  * @brief       try_type_cast unit test.
  * @author      Killian Valverde
  * @date        2018/06/07
@@ -26,12 +26,10 @@
 
 #include <filesystem>
 #include <regex>
-
 #include <gtest/gtest.h>
 
 #include "speed/filesystem/filesystem.hpp"
 #include "speed/type_casting/type_casting.hpp"
-
 
 TEST(type_casting_try_type_cast, basic_string_to_type)
 {
@@ -40,14 +38,12 @@ TEST(type_casting_try_type_cast, basic_string_to_type)
     ASSERT_TRUE(res == 347865);
 }
 
-
 TEST(type_casting_try_type_cast, c_string_to_string)
 {
     std::string res;
     ASSERT_TRUE(speed::type_casting::try_type_cast<std::string>("☆☆☆", &res));
     ASSERT_TRUE(res == "☆☆☆");
 }
-
 
 TEST(type_casting_try_type_cast, c_string_to_wstring)
 {
@@ -56,7 +52,6 @@ TEST(type_casting_try_type_cast, c_string_to_wstring)
     ASSERT_TRUE(res == L"☆☆☆");
 }
 
-
 TEST(type_casting_try_type_cast, c_wstring_to_wstring)
 {
     std::wstring res;
@@ -64,14 +59,12 @@ TEST(type_casting_try_type_cast, c_wstring_to_wstring)
     ASSERT_TRUE(res == L"☆☆☆");
 }
 
-
 TEST(type_casting_try_type_cast, c_wstring_to_string)
 {
     std::string res;
     ASSERT_TRUE(speed::type_casting::try_type_cast<std::string>(L"☆☆☆", &res));
     ASSERT_TRUE(res == "☆☆☆");
 }
-
 
 TEST(type_casting_try_type_cast, c_string_to_floating_point)
 {
@@ -83,7 +76,6 @@ TEST(type_casting_try_type_cast, c_string_to_floating_point)
     ASSERT_TRUE(speed::type_casting::try_type_cast<double>("23.345", &res_d));
     ASSERT_TRUE(speed::type_casting::try_type_cast<long double>("23.345", &res_ld));
 }
-
 
 TEST(type_casting_try_type_cast, c_string_to_integral_signed)
 {
@@ -98,7 +90,6 @@ TEST(type_casting_try_type_cast, c_string_to_integral_signed)
     ASSERT_TRUE(!speed::type_casting::try_type_cast<int>("1238*7645", &res));
 }
 
-
 TEST(type_casting_try_type_cast, c_string_to_integral_unsigned)
 {
     unsigned int res;
@@ -111,7 +102,6 @@ TEST(type_casting_try_type_cast, c_string_to_integral_unsigned)
     ASSERT_TRUE(!speed::type_casting::try_type_cast<unsigned int>("\0", &res));
     ASSERT_TRUE(!speed::type_casting::try_type_cast<unsigned int>("1238*7645", &res));
 }
-
 
 TEST(type_casting_try_type_cast, c_string_to_regex)
 {
@@ -128,7 +118,6 @@ TEST(type_casting_try_type_cast, c_string_to_regex)
     ASSERT_TRUE(speed::type_casting::try_type_cast<std::wregex>("^☆☆☆$", &rgx2));
     ASSERT_TRUE(std::regex_match(L"☆☆☆", rgx2));
 }
-
 
 TEST(type_casting_try_type_cast, c_string_to_path)
 {
@@ -149,7 +138,6 @@ TEST(type_casting_try_type_cast, c_string_to_path)
         ASSERT_TRUE(pth2 == L"☆☆☆");
     }
 }
-
 
 TEST(type_casting_try_type_cast, c_string_to_valid_path)
 {

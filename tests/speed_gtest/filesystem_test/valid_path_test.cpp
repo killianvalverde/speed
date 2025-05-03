@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed_gtest/iostream_test/valid_path_test.cpp
+ * @file        valid_path_test.cpp
  * @brief       valid_path unit test.
  * @author      Killian Valverde
  * @date        2024/05/20
@@ -27,7 +27,6 @@
 #include <gtest/gtest.h>
 
 #include "speed/filesystem/filesystem.hpp"
-
 
 TEST(filesystem_valid_path, basic)
 {

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file        speed_gtest/system_test/process_test.cpp
+ * @file        process_test.cpp
  * @brief       process unit test.
  * @author      Killian Valverde
  * @date        2018/06/01
@@ -28,7 +28,6 @@
 
 #include "speed/system/system.hpp"
 
-
 TEST(system_process, execute_command)
 {
     // int ret_val;
@@ -36,36 +35,30 @@ TEST(system_process, execute_command)
     // ASSERT_TRUE(ret_val == 0);
 }
 
-
 TEST(system_process, get_pid)
 {
     ASSERT_TRUE(speed::system::process::get_pid() != -1);
 }
-
 
 TEST(system_process, get_ppid)
 {
     ASSERT_TRUE(speed::system::process::get_ppid() != -1);
 }
 
-
 TEST(system_process, get_uid)
 {
     ASSERT_TRUE(speed::system::process::get_uid() != -1);
 }
-
 
 TEST(system_process, get_gid)
 {
     ASSERT_TRUE(speed::system::process::get_gid() != -1);
 }
 
-
 TEST(system_process, nanosleep_1)
 {
     ASSERT_TRUE(speed::system::process::nanosleep(0, 1));
 }
-
 
 TEST(system_process, nanosleep_2)
 {
