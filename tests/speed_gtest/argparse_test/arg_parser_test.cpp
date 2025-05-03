@@ -121,14 +121,14 @@ TEST_F(argparse_arg_parser, add_key_value_arg)
 }
 
 
-TEST_F(argparse_arg_parser, add_keyless_arg)
+TEST_F(argparse_arg_parser, add_positional_arg)
 {
     std::vector<std::string> vals;
     std::uint64_t holdr1 = 0;
     double holdr2 = 0;
     bool presnc;
 
-    ap.add_keyless_arg("FILE")
+    ap.add_positional_arg("FILE")
             .action([&]() {})
             .description("The file path.")
             .error_name("error")
@@ -144,8 +144,8 @@ TEST_F(argparse_arg_parser, add_keyless_arg)
             .values_with_prefix(false)
             .values_with_prefix(false);
 
-    EXPECT_THROW(ap.add_keyless_arg(""), speed::argparse::exception);
-    EXPECT_THROW(ap.add_keyless_arg("FILE"), speed::argparse::exception);
+    EXPECT_THROW(ap.add_positional_arg(""), speed::argparse::exception);
+    EXPECT_THROW(ap.add_positional_arg("FILE"), speed::argparse::exception);
     EXPECT_TRUE(!ap.was_found("FILE"));
 }
 
@@ -312,7 +312,7 @@ TEST_F(argparse_arg_parser, parse_key_value_args)
 }
 
 
-TEST_F(argparse_arg_parser, parse_keyless_args)
+TEST_F(argparse_arg_parser, parse_positional_args)
 {
     std::vector<const char *> argv = {
         "speed",
@@ -340,25 +340,25 @@ TEST_F(argparse_arg_parser, parse_keyless_args)
             .minmax_values(1, ~0ull)
             .store_into(&secs);
 
-    ap.add_keyless_arg("DESTINATION1")
+    ap.add_positional_arg("DESTINATION1")
             .description("Destination directory.")
             .store_into(&pths1);
 
-    ap.add_keyless_arg("DESTINATION2")
+    ap.add_positional_arg("DESTINATION2")
             .description("Destination directory.")
             .store_into(&pths2);
 
-    ap.add_keyless_arg("DESTINATION3")
+    ap.add_positional_arg("DESTINATION3")
             .description("Destination directory.")
             .store_into(&pths3)
             .minmax_values(1, 2);
 
-    ap.add_keyless_arg("NUMBER1")
+    ap.add_positional_arg("NUMBER1")
             .description("Some number.")
             .store_into(&numbr1)
             .minmax_values(1, 2);
 
-    ap.add_keyless_arg("NUMBER2")
+    ap.add_positional_arg("NUMBER2")
             .description("Some number.")
             .store_into(&numbr2)
             .minmax_values(1, 2);
@@ -679,7 +679,7 @@ TEST_F(argparse_arg_parser, parse_sub_parser)
     std::string messag;
     bool interactv = false;
 
-    add_parsr.add_keyless_arg("FILE")
+    add_parsr.add_positional_arg("FILE")
             .store_into(&pth);
 
     commit_parsr.add_key_value_arg("-m")
@@ -790,7 +790,7 @@ TEST_F(argparse_arg_parser, print_usage)
             .mandatory(true)
             .minmax_values(0, 4);
 
-    ap.add_keyless_arg("DESTINATION")
+    ap.add_positional_arg("DESTINATION")
             .description("Destination directory.");
 
     ap.print_help();
@@ -878,7 +878,7 @@ TEST_F(argparse_arg_parser, print_options)
             .values_names("INTEGER")
             .minmax_values(0, 4);
 
-    ap.add_keyless_arg("DESTINATION")
+    ap.add_positional_arg("DESTINATION")
             .description("Destination directory.");
 
     ap.print_help();
@@ -941,7 +941,7 @@ TEST_F(argparse_arg_parser, print_commands)
             .values_names("INTEGER")
             .minmax_values(0, 4);
 
-    ap.add_keyless_arg("DESTINATION")
+    ap.add_positional_arg("DESTINATION")
             .description("Destination directory.");
 
     ap.print_help();
@@ -994,7 +994,7 @@ TEST_F(argparse_arg_parser, print_values)
             .mandatory(true)
             .minmax_values(0, 4);
 
-    ap.add_keyless_arg("DESTINATION")
+    ap.add_positional_arg("DESTINATION")
             .description("Destination directory.");
 
     ap.print_help();
@@ -1113,7 +1113,7 @@ TEST_F(argparse_arg_parser, print_help)
             .mandatory(true)
             .minmax_values(0, 4);
 
-    ap.add_keyless_arg("DESTINATION")
+    ap.add_positional_arg("DESTINATION")
             .description("Destination directory.");
 
     ap.print_help();
@@ -1243,7 +1243,7 @@ TEST_F(argparse_arg_parser, change_prefix)
             .mandatory(true)
             .minmax_values(0, 4);
 
-    ap.add_keyless_arg("DESTINATION")
+    ap.add_positional_arg("DESTINATION")
             .description("Destination directory.");
 
     ap.configure()
