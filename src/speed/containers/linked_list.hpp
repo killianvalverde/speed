@@ -18,14 +18,14 @@
  */
 
 /**
- * @file       circular_doubly_linked_list.hpp
- * @brief      circular_doubly_linked_list class header.
+ * @file       linked_list.hpp
+ * @brief      linked_list class header.
  * @author     Killian Valverde
  * @date       2018/01/19
  */
 
-#ifndef SPEED_CONTAINERS_CIRCULAR_DOUBLY_LINKED_LIST_HPP
-#define SPEED_CONTAINERS_CIRCULAR_DOUBLY_LINKED_LIST_HPP
+#ifndef SPEED_CONTAINERS_LINKED_LIST_HPP
+#define SPEED_CONTAINERS_LINKED_LIST_HPP
 
 #include "../memory/memory.hpp"
 #include "doubly_linked_node.hpp"
@@ -38,7 +38,7 @@ namespace speed::containers {
  * @brief       Class that represents a doubly linked list.
  */
 template<typename TpValue, typename TpAllocator = std::allocator<int>>
-class circular_doubly_linked_list
+class linked_list
 {
 public:
     /** The value type. */
@@ -154,7 +154,7 @@ public:
         node_type* cur_;
         
         template<typename TpValue__, typename TpAllocator__>
-        friend class circular_doubly_linked_list;
+        friend class linked_list;
     };
     
     /**
@@ -245,7 +245,7 @@ public:
         }
         
         template<typename TpValue_, typename TpAllocator_>
-        friend class circular_doubly_linked_list;
+        friend class linked_list;
     };
     
     // TODO: Implement reverce iterators.
@@ -253,7 +253,7 @@ public:
     /**
      * @brief       Default constructor.
      */
-    circular_doubly_linked_list()
+    linked_list()
             : fir_(nullptr)
             , sz_(0)
             , alloctr_()
@@ -264,8 +264,8 @@ public:
      * @brief       Copy constructor.
      * @param       rhs : The object to copy.
      */
-    circular_doubly_linked_list(const circular_doubly_linked_list& rhs)
-            : circular_doubly_linked_list()
+    linked_list(const linked_list& rhs)
+            : linked_list()
     {
         for (auto& x : rhs)
         {
@@ -277,7 +277,7 @@ public:
      * @brief       Move constrcutor.
      * @param       rhs : The object to move.
      */
-    circular_doubly_linked_list(circular_doubly_linked_list&& rhs) noexcept
+    linked_list(linked_list&& rhs) noexcept
             : fir_(rhs.fir_)
             , sz_(rhs.sz_)
             , alloctr_(std::move(rhs.alloctr_))
@@ -289,7 +289,7 @@ public:
     /**
      * @brief       Destructor.
      */
-    ~circular_doubly_linked_list()
+    ~linked_list()
     {
         clear();
     }
@@ -299,7 +299,7 @@ public:
      * @param       rhs : The object to copy.
      * @return      The object who call the method.
      */
-    circular_doubly_linked_list& operator =(const circular_doubly_linked_list& rhs)
+    linked_list& operator =(const linked_list& rhs)
     {
         if (this != &rhs)
         {
@@ -317,7 +317,7 @@ public:
      * @param       rhs : The object to move.
      * @return      The object who call the method.
      */
-    circular_doubly_linked_list& operator =(circular_doubly_linked_list&& rhs) noexcept
+    linked_list& operator =(linked_list&& rhs) noexcept
     {
         if (this != &rhs)
         {

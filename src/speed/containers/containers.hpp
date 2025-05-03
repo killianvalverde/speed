@@ -27,7 +27,7 @@
 #ifndef SPEED_CONTAINERS_CONTAINERS_HPP
 #define SPEED_CONTAINERS_CONTAINERS_HPP
 
-#include "circular_doubly_linked_list.hpp"
+#include "linked_list.hpp"
 #include "doubly_linked_node.hpp"
 #include "exception.hpp"
 #include "flags.hpp"

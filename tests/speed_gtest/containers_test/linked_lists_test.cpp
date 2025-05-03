@@ -33,13 +33,13 @@
 
 TEST(cotainers_circular_doubly_linked_lists, default_constructor)
 {
-    speed::containers::circular_doubly_linked_list<int> lst;
+    speed::containers::linked_list<int> lst;
 }
 
 
 TEST(cotainers_circular_doubly_linked_lists, empty)
 {
-    speed::containers::circular_doubly_linked_list<int> lst;
+    speed::containers::linked_list<int> lst;
     
     ASSERT_TRUE(lst.empty());
     
@@ -51,7 +51,7 @@ TEST(cotainers_circular_doubly_linked_lists, empty)
 
 TEST(cotainers_circular_doubly_linked_lists, size)
 {
-    speed::containers::circular_doubly_linked_list<int> lst;
+    speed::containers::linked_list<int> lst;
     
     ASSERT_TRUE(lst.size() == 0);
     
@@ -67,7 +67,7 @@ TEST(cotainers_circular_doubly_linked_lists, size)
 
 TEST(cotainers_circular_doubly_linked_lists, front)
 {
-    speed::containers::circular_doubly_linked_list<int> lst;
+    speed::containers::linked_list<int> lst;
     
     lst.push_back(32);
     
@@ -77,7 +77,7 @@ TEST(cotainers_circular_doubly_linked_lists, front)
 
 TEST(cotainers_circular_doubly_linked_lists, back)
 {
-    speed::containers::circular_doubly_linked_list<int> lst;
+    speed::containers::linked_list<int> lst;
     
     lst.push_back(32);
     lst.push_back(64);
@@ -89,7 +89,7 @@ TEST(cotainers_circular_doubly_linked_lists, back)
 
 TEST(cotainers_circular_doubly_linked_lists, push_front)
 {
-    speed::containers::circular_doubly_linked_list<int> lst;
+    speed::containers::linked_list<int> lst;
     
     lst.push_front(32);
     lst.push_front(64);
@@ -101,7 +101,7 @@ TEST(cotainers_circular_doubly_linked_lists, push_front)
 
 TEST(cotainers_circular_doubly_linked_lists, pop_front)
 {
-    speed::containers::circular_doubly_linked_list<int> lst;
+    speed::containers::linked_list<int> lst;
     
     lst.push_front(32);
     lst.push_front(64);
@@ -113,7 +113,7 @@ TEST(cotainers_circular_doubly_linked_lists, pop_front)
 
 TEST(cotainers_circular_doubly_linked_lists, push_back)
 {
-    speed::containers::circular_doubly_linked_list<int> lst;
+    speed::containers::linked_list<int> lst;
     
     lst.push_back(32);
     lst.push_back(64);
@@ -125,7 +125,7 @@ TEST(cotainers_circular_doubly_linked_lists, push_back)
 
 TEST(cotainers_circular_doubly_linked_lists, pop_back)
 {
-    speed::containers::circular_doubly_linked_list<int> lst;
+    speed::containers::linked_list<int> lst;
     
     lst.push_front(32);
     lst.push_front(64);
@@ -137,7 +137,7 @@ TEST(cotainers_circular_doubly_linked_lists, pop_back)
 
 TEST(cotainers_circular_doubly_linked_lists, insert_before)
 {
-    speed::containers::circular_doubly_linked_list<int> lst;
+    speed::containers::linked_list<int> lst;
     
     auto it = lst.begin();
     
@@ -151,7 +151,7 @@ TEST(cotainers_circular_doubly_linked_lists, insert_before)
 
 TEST(cotainers_circular_doubly_linked_lists, insert_after)
 {
-    speed::containers::circular_doubly_linked_list<int> lst;
+    speed::containers::linked_list<int> lst;
     
     auto it = lst.begin();
     
@@ -165,7 +165,7 @@ TEST(cotainers_circular_doubly_linked_lists, insert_after)
 
 TEST(cotainers_circular_doubly_linked_lists, erase_before)
 {
-    speed::containers::circular_doubly_linked_list<int> lst;
+    speed::containers::linked_list<int> lst;
     
     lst.push_back(8);
     lst.push_back(16);
@@ -182,7 +182,7 @@ TEST(cotainers_circular_doubly_linked_lists, erase_before)
 
 TEST(cotainers_circular_doubly_linked_lists, erase_after)
 {
-    speed::containers::circular_doubly_linked_list<int> lst;
+    speed::containers::linked_list<int> lst;
     
     lst.push_back(8);
     lst.push_back(16);
@@ -199,7 +199,7 @@ TEST(cotainers_circular_doubly_linked_lists, erase_after)
 
 TEST(cotainers_circular_doubly_linked_lists, erase_and_move_backward)
 {
-    speed::containers::circular_doubly_linked_list<int> lst;
+    speed::containers::linked_list<int> lst;
     
     lst.push_back(8);
     lst.push_back(16);
@@ -217,7 +217,7 @@ TEST(cotainers_circular_doubly_linked_lists, erase_and_move_backward)
 
 TEST(cotainers_circular_doubly_linked_lists, erase_and_move_forward)
 {
-    speed::containers::circular_doubly_linked_list<int> lst;
+    speed::containers::linked_list<int> lst;
     
     lst.push_back(8);
     lst.push_back(16);
@@ -235,7 +235,7 @@ TEST(cotainers_circular_doubly_linked_lists, erase_and_move_forward)
 
 TEST(cotainers_circular_doubly_linked_lists, clear)
 {
-    speed::containers::circular_doubly_linked_list<int> lst;
+    speed::containers::linked_list<int> lst;
     
     lst.push_back(8);
     lst.push_back(16);
