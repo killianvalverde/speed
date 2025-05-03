@@ -193,7 +193,7 @@ TEST(containers_flags, print)
     
     clrs.set(colors::BLUE);
     clrs.set(colors::YELLOW);
-    clrs.print(std::cout);
+    clrs.print();
     
     EXPECT_TRUE(ios_redirect.get_internal_string() == expected_result);
 }
