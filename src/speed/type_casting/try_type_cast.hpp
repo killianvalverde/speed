@@ -710,6 +710,23 @@ inline bool __try_type_cast(
     return __try_type_cast(arg.c_str(), res, err_code);
 }
 
+/**
+ * @brief       Tries to convert a path into a type.
+ * @param       arg : The value to convert.
+ * @param       res : The result of the operation if it was successful.
+ * @param       err_code : If function fails it holds the error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+template<typename TpTarget>
+inline bool __try_type_cast(
+        const std::filesystem::path& arg,
+        TpTarget* res,
+        std::error_code* err_code
+) noexcept
+{
+    return __try_type_cast(arg.c_str(), res, err_code);
+}
+
 } /* __private */
 /** @endcond */
 
