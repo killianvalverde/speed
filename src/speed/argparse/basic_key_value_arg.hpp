@@ -90,8 +90,6 @@ public:
             : base_arg_type(arg_parsr)
             , key_arg_type(arg_parsr, std::forward<Ts_>(kys)...)
             , value_arg_type(arg_parsr)
-            , vals_names_()
-            , usage_str_()
             , usage_str_needs_refresh_(true)
     {
         base_arg_type::clear_flags();

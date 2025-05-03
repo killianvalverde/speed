@@ -69,13 +69,13 @@ public:
      * @brief       Copy constructor.
      * @param       rhs : Object to copy.
      */
-    basic_help_menu_setter(const basic_help_menu_setter& rhs) = delete;
+    basic_help_menu_setter(const basic_help_menu_setter& rhs) = default;
     
     /**
      * @brief       Move constructor.
      * @param       rhs : Object to move.
      */
-    basic_help_menu_setter(basic_help_menu_setter&& rhs) noexcept = delete;
+    basic_help_menu_setter(basic_help_menu_setter&& rhs) noexcept = default;
     
     /**
      * @brief       Destructor.
@@ -87,14 +87,14 @@ public:
      * @param       rhs : Object to copy.
      * @return      The object who call the method.
      */
-    basic_help_menu_setter& operator =(const basic_help_menu_setter& rhs) = delete;
+    basic_help_menu_setter& operator =(const basic_help_menu_setter& rhs) = default;
     
     /**
      * @brief       Move assignment operator.
      * @param       rhs : Object to move.
      * @return      The object who call the method.
      */
-    basic_help_menu_setter& operator =(basic_help_menu_setter&& rhs) noexcept = delete;
+    basic_help_menu_setter& operator =(basic_help_menu_setter&& rhs) noexcept = default;
 
     /**
      * @brief       Allows to specify the indentation that the arguments keys will have when

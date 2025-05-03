@@ -69,13 +69,13 @@ public:
      * @brief       Copy constructor.
      * @param       rhs : Object to copy.
      */
-    basic_base_arg_setter(const basic_base_arg_setter& rhs) = delete;
+    basic_base_arg_setter(const basic_base_arg_setter& rhs) = default;
     
     /**
      * @brief       Move constructor.
      * @param       rhs : Object to move.
      */
-    basic_base_arg_setter(basic_base_arg_setter&& rhs) noexcept = delete;
+    basic_base_arg_setter(basic_base_arg_setter&& rhs) noexcept = default;
     
     /**
      * @brief       Destructor.
@@ -87,14 +87,14 @@ public:
      * @param       rhs : Object to copy.
      * @return      The object who call the method.
      */
-    basic_base_arg_setter& operator =(const basic_base_arg_setter& rhs) = delete;
+    basic_base_arg_setter& operator =(const basic_base_arg_setter& rhs) = default;
     
     /**
      * @brief       Move assignment operator.
      * @param       rhs : Object to move.
      * @return      The object who call the method.
      */
-    basic_base_arg_setter& operator =(basic_base_arg_setter&& rhs) noexcept = delete;
+    basic_base_arg_setter& operator =(basic_base_arg_setter&& rhs) noexcept = default;
 
     /**
      * @brief       Allows to specify a function to be called when the argument is found during

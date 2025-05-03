@@ -100,11 +100,7 @@ public:
      * @param       arg_parsr : Argument parser that holds this object.
      */
     explicit basic_help_menu(arg_parser_type* arg_parsr)
-            : desc_()
-            , epilg_()
-            , ky_args_()
-            , kyless_args_()
-            , arg_parsr_(arg_parsr)
+            : arg_parsr_(arg_parsr)
             , args_indent_(2)
             , max_line_len_(80)
             , new_line_indent_(2)

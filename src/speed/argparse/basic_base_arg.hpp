@@ -75,11 +75,7 @@ public:
      * @param       arg_parsr : Argument parser that holds this object.
      */
     explicit basic_base_arg(arg_parser_type* arg_parsr)
-            : hlp_menus_ids_assignd_()
-            , desc_()
-            , err_name_()
-            , actn_()
-            , arg_parsr_(arg_parsr)
+            : arg_parsr_(arg_parsr)
             , presence_holdr_(nullptr)
             , flgs_(arg_flags::NIL)
             , err_flgs_(arg_error_flags::NIL)

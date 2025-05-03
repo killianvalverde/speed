@@ -75,7 +75,6 @@ public:
     template<typename... Ts_>
     explicit basic_key_arg(arg_parser_type* arg_parsr, Ts_&&... kys)
             : base_arg_type(arg_parsr)
-            , kys_()
             , sub_arg_parsr_(nullptr)
             , short_kys_len_(0)
             , long_kys_len_(0)
