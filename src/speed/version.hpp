@@ -34,9 +34,9 @@
 #define SPEED_VERSION_MINOR 4
 
 /** The patch version number */
-#define SPEED_VERSION_PATCH 0
+#define SPEED_VERSION_PATCH 1
 
 /** The hole version number in string type. */
-#define SPEED_VERSION ("0.4.0")
+#define SPEED_VERSION ("0.4.1")
 
 #endif
