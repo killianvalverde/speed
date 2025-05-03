@@ -18,8 +18,8 @@
  */
 
 /**
- * @file        circular_doubly_linked_lists_test.cpp
- * @brief       circular_doubly_linked_lists unit test.
+ * @file        linked_lists_test.cpp
+ * @brief       linked_lists_test unit test.
  * @author      Killian Valverde
  * @date        2018/01/19
  */
