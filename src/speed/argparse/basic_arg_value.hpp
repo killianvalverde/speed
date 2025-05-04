@@ -80,6 +80,9 @@ public:
 
     /** Type that represents the argument parser. */
     using arg_parser_type = basic_arg_parser<TpAllocator>;
+    
+    /** Type that represents a validator lambda. */
+    using validator_type = value_arg_type::validator_type;
 
     /**
      * @brief       Constructor with parameters.
@@ -97,15 +100,17 @@ public:
             >
     >
     basic_arg_value(
-            TpRegex_&& regx,
             TpString_&& val,
             caster_base_type* castr,
+            validator_type* validatr,
+            regex_type* regx,
             arg_parser_type* arg_parsr,
             value_arg_type* val_arg
     )
-            : regx_(std::forward<TpRegex_>(regx))
-            , val_(std::forward<TpString_>(val))
+            : val_(std::forward<TpString_>(val))
             , castr_(castr)
+            , validatr_(validatr)
+            , regx_(regx)
             , arg_parsr_(arg_parsr)
             , val_arg_(val_arg)
             , err_flgs_(arg_value_error_flags::NIL)
@@ -154,8 +159,15 @@ public:
         bool succs;
 
         err_flgs_.clear();
+        
+        if (validatr_ && !(*validatr_)(val_))
+        {
+            err_flgs_.set(arg_value_error_flags::VALIDATOR_ERROR);
+            err_message_ = "Invalid argument";
+            return false;
+        }
 
-        if (!std::regex_match(val_, regx_))
+        if (regx_ != nullptr && !std::regex_match(val_, *regx_))
         {
             err_flgs_.set(arg_value_error_flags::REGEX_TO_MATCH_ERROR);
             err_message_ = "Invalid argument";
@@ -292,9 +304,6 @@ public:
     }
 
 private:
-    /** Regex that the value has to match. */
-    regex_type regx_;
-
     /** Argument value. */
     string_type val_;
     
@@ -303,6 +312,12 @@ private:
 
     /** Type caster used to validate the value syntax. */
     caster_base_type* castr_;
+    
+    /** Function to execute in order to know if the value is valid. */
+    validator_type* validatr_;
+    
+    /** Regex that the value has to match. */
+    regex_type* regx_;
 
     /** Holds a reference to the argument parser object. */
     arg_parser_type* arg_parsr_;

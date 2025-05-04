@@ -184,6 +184,9 @@ public:
 
     /** Type that represents the argument parser. */
     using arg_parser_type = basic_arg_parser<TpAllocator>;
+    
+    /** Type that represents a validator lambda. */
+    using validator_type = std::function<bool(const string_type&)>;
 
     /**
      * @brief       Constructor with parameters.
@@ -233,6 +236,7 @@ public:
             minmax_vals_ = std::move(rhs.minmax_vals_);
             vals_ = std::move(rhs.vals_);
             castrs_ = std::move(rhs.castrs_);
+            validatrs_ = std::move(rhs.validatrs_);
             regxes_ = std::move(rhs.regxes_);
         }
         
@@ -249,8 +253,8 @@ public:
     {
         if (!max_values_reached())
         {
-            vals_.emplace_back(get_next_regex(), std::forward<TpString_>(val),
-                    get_next_caster(), base_arg_type::get_arg_parser(), this);
+            vals_.emplace_back(std::forward<TpString_>(val), get_next_caster(),
+                    get_next_validator(), get_next_regex(), base_arg_type::get_arg_parser(), this);
 
             return true;
         }
@@ -270,8 +274,8 @@ public:
     {
         if (!max_values_reached())
         {
-            arg_value_type arg_val(get_next_regex(), std::forward<TpString_>(val),
-                    get_next_caster(), base_arg_type::get_arg_parser(), this);
+            arg_value_type arg_val(std::forward<TpString_>(val), get_next_caster(),
+                    get_next_validator(), get_next_regex(), base_arg_type::get_arg_parser(), this);
 
             if (!arg_val.has_errors())
             {
@@ -534,18 +538,40 @@ public:
      * @brief       Get the regex associated with the current value.
      * @return      The regex associated with the current value.
      */
-    [[nodiscard]] regex_type get_next_regex()
+    [[nodiscard]] regex_type* get_next_regex()
     {
         if (vals_.size() < regxes_.size())
         {
-            return regxes_[vals_.size()];
+            auto it = regxes_.begin();
+            std::advance(it, vals_.size());
+            return &*it;
         }
         else if (!regxes_.empty())
         {
-            return regxes_.back();
+            return &regxes_.back();
         }
 
-        return regex_type("^.*$");
+        return nullptr;
+    }
+
+    /**
+     * @brief       Get the validator associated with the current value.
+     * @return      The validator associated with the current value.
+     */
+    [[nodiscard]] validator_type* get_next_validator()
+    {
+        if (vals_.size() < validatrs_.size())
+        {
+            auto it = validatrs_.begin();
+            std::advance(it, vals_.size());
+            return &*it;
+        }
+        else if (!validatrs_.empty())
+        {
+            return &validatrs_.back();
+        }
+
+        return nullptr;
     }
 
     /**
@@ -806,6 +832,19 @@ public:
     }
 
     /**
+     * @brief       Set the functions to execute in order to know if the values are valid.
+     * @param       callabls : Functions to execute in order to know if the values are valid.
+     */
+    template<typename... Ts_>
+    inline void set_validators(Ts_&&... callabls)
+    {
+        validatrs_.clear();
+
+        int foreach[sizeof...(Ts_) + 1] = { (
+                validatrs_.emplace_back(std::forward<Ts_>(callabls)), 0)... };
+    }
+
+    /**
      * @brief       Allows knowing whether the argument has rached the minimal number of values.
      * @return      If function was successfull true is returned, otherwise false is returned.
      */
@@ -887,8 +926,11 @@ private:
     /** Type casters used to validate the values syntax. */
     vector_type<unique_ptr_type<caster_base_type>> castrs_;
     
+    /** Functions to execute in order to know if the values are valid. */
+    list_type<validator_type> validatrs_;
+    
     /** Regular expressions that the values has to match. */
-    vector_type<regex_type> regxes_;
+    list_type<regex_type> regxes_;
 
     /** Minimum and maximum number of values for an option. */
     pair_type<std::size_t, std::size_t> minmax_vals_;

@@ -182,9 +182,9 @@ public:
     }
 
     /**
-     * @brief       Allows to specify the minimum and maximum amount of values that the arguement
-     *              can have. Key value arguements have both at 1 by default, and help arguments
-     *              bot at 0 by default.
+     * @brief       Specifies the minimum and maximum number of values an argument can accept.
+     *              By default, both key-value and positional arguments accept exactly one value,
+     *              while help arguments accept none.
      * @param       min : The minimum amount of values.
      * @param       max : The maximum amount of values.
      * @return      The object who call the method.
@@ -243,6 +243,19 @@ public:
     {
         dynamic_cast<value_arg_type*>(base_arg_setter_type::bse_arg_)
                 ->set_holders(holdrs...);
+        return dynamic_cast<self_type&>(*this);
+    }
+
+    /**
+     * @brief       Set the functions to execute in order to know if the values are valid.
+     * @param       callabls : Functions to execute in order to know if the values are valid.
+     * @return      The object who call the method.
+     */
+    template<typename... Ts_>
+    self_type& validators(Ts_&&... callabls)
+    {
+        dynamic_cast<value_arg_type*>(base_arg_setter_type::bse_arg_)
+                ->set_validators(std::forward<Ts_>(callabls)...);
         return dynamic_cast<self_type&>(*this);
     }
 

@@ -184,7 +184,7 @@ public:
     }
 
     /**
-     * @brief       Allows to specify whether finding this argument will make your program ifnore
+     * @brief       Allows to specify whether finding this argument will make your program ignore
      *              the presence of all the other arguments. This flag is only cosmetic to print
      *              correctly the usage message. By default only help and version arguments are
      *              terminal.

@@ -39,17 +39,20 @@ enum class arg_value_error_flags : std::uint8_t
     /** Null flag. */
     NIL = 0x0,
     
+    /** The argument value validator fails. */
+    VALIDATOR_ERROR = 0x1,
+    
     /** The argument value has not matched the regex. */
-    REGEX_TO_MATCH_ERROR = 0x1,
+    REGEX_TO_MATCH_ERROR = 0x2,
     
     /** The value specified is not correct. */
-    WRONG_VALUE_ERROR = 0x2,
+    WRONG_VALUE_ERROR = 0x4,
 
     /** The specified value is not correct and the error comes from an invalide specified path. */
-    INVALID_PATH_ERROR = 0X4,
+    INVALID_PATH_ERROR = 0X8,
     
     /** All the argument value error flags. */
-    ALL = 0x7
+    ALL = 0xF
 };
 
 /** Contains all argument value error flags constants. Alias of 'arg_value_error_flags'
