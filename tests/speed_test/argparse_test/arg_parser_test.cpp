@@ -515,7 +515,7 @@ TEST_F(argparse_arg_parser, parse_grouping)
     EXPECT_THROW(dm = ap.get_front_as<std::uint64_t>("-h"), speed::type_casting::exception);
 }
 
-TEST_F(argparse_arg_parser, parse_one_or_more_required_constraint)
+TEST_F(argparse_arg_parser, parse_constraint_one_or_more_required)
 {
     std::vector<const char*> argv1 = {
         "speed"
@@ -545,7 +545,7 @@ TEST_F(argparse_arg_parser, parse_one_or_more_required_constraint)
     EXPECT_TRUE(!ap.has_errors());
 }
 
-TEST_F(argparse_arg_parser, parse_mutually_exclusive_constraint)
+TEST_F(argparse_arg_parser, parse_constraint_mutually_exclusive)
 {
     std::vector<const char*> argv1 = {
         "speed",
@@ -686,6 +686,35 @@ TEST_F(argparse_arg_parser, parse_sub_parser)
 
     ap.parse_args(argv3.size(), argv3);
     EXPECT_TRUE(interactv);
+}
+
+TEST_F(argparse_arg_parser, parse_args_with_assertions)
+{
+    std::vector<const char*> argv = {
+        "speed",
+        "-a", "10", "20",
+        "-b", "10", "21"
+    };
+
+    std::vector<std::uint64_t> a_vals;
+    std::vector<std::uint64_t> b_vals;
+    
+    ap.add_key_value_arg("-a")
+            .description("...")
+            .store_into(&a_vals)
+            .minmax_values(2, 2)
+            .assertions([&](const std::string& val) { return val != "21"; });
+    
+    ap.add_key_value_arg("-b")
+            .description("...")
+            .store_into(&b_vals)
+            .minmax_values(2, 2)
+            .assertions([&](const std::string& val) { return val != "21"; });
+
+    EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
+    EXPECT_TRUE(!ap.arg_has_errors("-a"));
+    EXPECT_TRUE(ap.arg_has_errors("-b"));
+    EXPECT_TRUE(ap.has_errors());
 }
 
 TEST_F(argparse_arg_parser, check_errors)
