@@ -118,7 +118,6 @@ private:
     target_type* holdr_;
 };
 
-
 /**
  * @brief       Classs used as a type casting strategy holder.
  */
@@ -210,7 +209,6 @@ private:
     std::size_t idx_;
 };
 
-
 /**
  * @brief       Classs used as a type casting strategy holder.
  */
@@ -297,7 +295,6 @@ private:
     vector_type* holdr_;
 };
 
-
 /**
  * @brief       Classs used as a type casting strategy holder.
  */
@@ -383,7 +380,6 @@ private:
     /** Holds a reference towards the object that will contain the result of the casting. */
     deque_type* holdr_;
 };
-
 
 /**
  * @brief       Classs used as a type casting strategy holder.
@@ -474,7 +470,6 @@ private:
     queue_type* holdr_;
 };
 
-
 /**
  * @brief       Classs used as a type casting strategy holder.
  */
@@ -564,7 +559,6 @@ private:
     priority_queue_type* holdr_;
 };
 
-
 /**
  * @brief       Classs used as a type casting strategy holder.
  */
@@ -653,7 +647,6 @@ private:
     /** Holds a reference towards the object that will contain the result of the casting. */
     stack_type* holdr_;
 };
-
 
 /**
  * @brief       Classs used as a type casting strategy holder.
@@ -745,7 +738,6 @@ private:
     typename forward_list_type::iterator it_;
 };
 
-
 /**
  * @brief       Classs used as a type casting strategy holder.
  */
@@ -832,7 +824,6 @@ private:
     list_type* holdr_;
 };
 
-
 /**
  * @brief       Classs used as a type casting strategy holder.
  */
@@ -918,7 +909,6 @@ private:
     /** Holds a reference towards the object that will contain the result of the casting. */
     set_type* holdr_;
 };
-
 
 /**
  * @brief       Classs used as a type casting strategy holder.
@@ -1007,7 +997,6 @@ private:
     /** Holds a reference towards the object that will contain the result of the casting. */
     unordered_set_type* holdr_;
 };
-
 
 /**
  * @brief       Classs used as a type casting strategy holder.
