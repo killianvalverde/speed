@@ -236,7 +236,7 @@ public:
             minmax_vals_ = std::move(rhs.minmax_vals_);
             vals_ = std::move(rhs.vals_);
             castrs_ = std::move(rhs.castrs_);
-            validatrs_ = std::move(rhs.validatrs_);
+            assertns_ = std::move(rhs.assertns_);
             regxes_ = std::move(rhs.regxes_);
         }
         
@@ -560,15 +560,15 @@ public:
      */
     [[nodiscard]] validator_type* get_next_validator()
     {
-        if (vals_.size() < validatrs_.size())
+        if (vals_.size() < assertns_.size())
         {
-            auto it = validatrs_.begin();
+            auto it = assertns_.begin();
             std::advance(it, vals_.size());
             return &*it;
         }
-        else if (!validatrs_.empty())
+        else if (!assertns_.empty())
         {
-            return &validatrs_.back();
+            return &assertns_.back();
         }
 
         return nullptr;
@@ -836,12 +836,12 @@ public:
      * @param       callabls : Functions to execute in order to know if the values are valid.
      */
     template<typename... Ts_>
-    inline void set_validators(Ts_&&... callabls)
+    inline void set_assertions(Ts_&&... callabls)
     {
-        validatrs_.clear();
+        assertns_.clear();
 
         int foreach[sizeof...(Ts_) + 1] = { (
-                validatrs_.emplace_back(std::forward<Ts_>(callabls)), 0)... };
+                assertns_.emplace_back(std::forward<Ts_>(callabls)), 0)... };
     }
 
     /**
@@ -927,7 +927,7 @@ private:
     vector_type<unique_ptr_type<caster_base_type>> castrs_;
     
     /** Functions to execute in order to know if the values are valid. */
-    list_type<validator_type> validatrs_;
+    list_type<validator_type> assertns_;
     
     /** Regular expressions that the values has to match. */
     list_type<regex_type> regxes_;

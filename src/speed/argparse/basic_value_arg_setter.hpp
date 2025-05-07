@@ -252,10 +252,10 @@ public:
      * @return      The object who call the method.
      */
     template<typename... Ts_>
-    self_type& validators(Ts_&&... callabls)
+    self_type& assertions(Ts_&&... callabls)
     {
         dynamic_cast<value_arg_type*>(base_arg_setter_type::bse_arg_)
-                ->set_validators(std::forward<Ts_>(callabls)...);
+                ->set_assertions(std::forward<Ts_>(callabls)...);
         return dynamic_cast<self_type&>(*this);
     }
 
