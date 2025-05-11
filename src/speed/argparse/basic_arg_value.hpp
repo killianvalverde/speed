@@ -82,7 +82,7 @@ public:
     using arg_parser_type = basic_arg_parser<TpAllocator>;
     
     /** Type that represents a validator lambda. */
-    using validator_type = value_arg_type::validator_type;
+    using function_type = std::function<bool(const string_type&)>;
 
     /**
      * @brief       Constructor with parameters.
@@ -102,14 +102,14 @@ public:
     basic_arg_value(
             TpString_&& val,
             caster_base_type* castr,
-            validator_type* validatr,
+            function_type* assrt,
             regex_type* regx,
             arg_parser_type* arg_parsr,
             value_arg_type* val_arg
     )
             : val_(std::forward<TpString_>(val))
             , castr_(castr)
-            , validatr_(validatr)
+            , assrt_(assrt)
             , regx_(regx)
             , arg_parsr_(arg_parsr)
             , val_arg_(val_arg)
@@ -160,7 +160,7 @@ public:
 
         err_flgs_.clear();
         
-        if (validatr_ && !(*validatr_)(val_))
+        if (assrt_ && !(*assrt_)(val_))
         {
             err_flgs_.set(arg_value_error_flags::VALIDATOR_ERROR);
             err_message_ = "Invalid argument";
@@ -314,7 +314,7 @@ private:
     caster_base_type* castr_;
     
     /** Function to execute in order to know if the value is valid. */
-    validator_type* validatr_;
+    function_type* assrt_;
     
     /** Regex that the value has to match. */
     regex_type* regx_;

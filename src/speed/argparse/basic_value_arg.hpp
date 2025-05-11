@@ -29,6 +29,7 @@
 
 #include <regex>
 #include <string>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -113,6 +114,13 @@ public:
     template<typename T>
     using unordered_multiset_type = std::unordered_multiset<
             T, std::hash<T>, std::equal_to<T>, allocator_type<T>>;
+    
+    /** Tuple type used in the class. */
+    template<typename... Ts>
+    using tuple_type = std::tuple<Ts...>;
+    
+    /** Type that represents a validator lambda. */
+    using function_type = std::function<bool(const string_type&)>;
 
     /** Type that represents the caster base type. */
     using caster_base_type = speed::type_casting::type_caster_base<string_type>;
@@ -176,6 +184,11 @@ public:
     using unordered_multiset_caster_type = speed::argparse::basic_unordered_multiset_caster<
             T, string_type, allocator_type<T>>;
 
+    /** Type that represents the tuple type. */
+    template<typename... Ts>
+    using tuple_caster_type = speed::argparse::basic_tuple_caster<
+            string_type, allocator_type<int>, Ts...>;
+
     /** Type that represents a value for an argument. */
     using arg_value_type = basic_arg_value<TpAllocator>;
     
@@ -184,9 +197,6 @@ public:
 
     /** Type that represents the argument parser. */
     using arg_parser_type = basic_arg_parser<TpAllocator>;
-    
-    /** Type that represents a validator lambda. */
-    using validator_type = std::function<bool(const string_type&)>;
 
     /**
      * @brief       Constructor with parameters.
@@ -254,7 +264,7 @@ public:
         if (!max_values_reached())
         {
             vals_.emplace_back(std::forward<TpString_>(val), get_next_caster(),
-                    get_next_validator(), get_next_regex(), base_arg_type::get_arg_parser(), this);
+                    get_next_assertion(), get_next_regex(), base_arg_type::get_arg_parser(), this);
 
             return true;
         }
@@ -275,7 +285,7 @@ public:
         if (!max_values_reached())
         {
             arg_value_type arg_val(std::forward<TpString_>(val), get_next_caster(),
-                    get_next_validator(), get_next_regex(), base_arg_type::get_arg_parser(), this);
+                    get_next_assertion(), get_next_regex(), base_arg_type::get_arg_parser(), this);
 
             if (!arg_val.has_errors())
             {
@@ -555,10 +565,10 @@ public:
     }
 
     /**
-     * @brief       Get the validator associated with the current value.
-     * @return      The validator associated with the current value.
+     * @brief       Get the assertion associated with the current value.
+     * @return      The assertion associated with the current value.
      */
-    [[nodiscard]] validator_type* get_next_validator()
+    [[nodiscard]] function_type* get_next_assertion()
     {
         if (vals_.size() < assertns_.size())
         {
@@ -620,8 +630,8 @@ public:
         
         castrs_.emplace_back(speed::memory::allocate_unique<array_caster_type<TpValue_, Nm>>(
                 allocator_type<array_caster_type<TpValue_, Nm>>(), holdr));
-
-        update_max_values(1);
+        
+        update_minmax_values(1);
     }
 
     /**
@@ -635,8 +645,8 @@ public:
 
         castrs_.emplace_back(speed::memory::allocate_unique<vector_caster_type<TpValue_>>(
                 allocator_type<vector_caster_type<TpValue_>>(), holdr));
-
-        update_max_values(1);
+        
+        update_minmax_values(1);
     }
 
     /**
@@ -650,8 +660,8 @@ public:
 
         castrs_.emplace_back(speed::memory::allocate_unique<deque_caster_type<TpValue_>>(
                 allocator_type<deque_caster_type<TpValue_>>(), holdr));
-
-        update_max_values(1);
+        
+        update_minmax_values(1);
     }
 
     /**
@@ -665,8 +675,8 @@ public:
 
         castrs_.emplace_back(speed::memory::allocate_unique<queue_caster_type<TpValue_>>(
                 allocator_type<queue_caster_type<TpValue_>>(), holdr));
-
-        update_max_values(1);
+        
+        update_minmax_values(1);
     }
 
     /**
@@ -680,8 +690,8 @@ public:
 
         castrs_.emplace_back(speed::memory::allocate_unique<priority_queue_caster_type<TpValue_>>(
                 allocator_type<priority_queue_caster_type<TpValue_>>(), holdr));
-
-        update_max_values(1);
+        
+        update_minmax_values(1);
     }
 
     /**
@@ -695,8 +705,8 @@ public:
 
         castrs_.emplace_back(speed::memory::allocate_unique<stack_caster_type<TpValue_>>(
                 allocator_type<stack_caster_type<TpValue_>>(), holdr));
-
-        update_max_values(1);
+        
+        update_minmax_values(1);
     }
 
     /**
@@ -710,8 +720,8 @@ public:
 
         castrs_.emplace_back(speed::memory::allocate_unique<forward_list_caster_type<TpValue_>>(
                 allocator_type<forward_list_caster_type<TpValue_>>(), holdr));
-
-        update_max_values(1);
+        
+        update_minmax_values(1);
     }
 
     /**
@@ -725,8 +735,8 @@ public:
 
         castrs_.emplace_back(speed::memory::allocate_unique<list_caster_type<TpValue_>>(
                 allocator_type<list_caster_type<TpValue_>>(), holdr));
-
-        update_max_values(1);
+        
+        update_minmax_values(1);
     }
 
     /**
@@ -740,8 +750,8 @@ public:
 
         castrs_.emplace_back(speed::memory::allocate_unique<set_caster_type<TpValue_>>(
                 allocator_type<set_caster_type<TpValue_>>(), holdr));
-
-        update_max_values(1);
+        
+        update_minmax_values(1);
     }
 
     /**
@@ -755,8 +765,8 @@ public:
 
         castrs_.emplace_back(speed::memory::allocate_unique<unordered_set_caster_type<TpValue_>>(
                 allocator_type<unordered_set_caster_type<TpValue_>>(), holdr));
-
-        update_max_values(1);
+        
+        update_minmax_values(1);
     }
 
     /**
@@ -771,8 +781,23 @@ public:
         castrs_.emplace_back(
                 speed::memory::allocate_unique<unordered_multiset_caster_type<TpValue_>>(
                         allocator_type<unordered_multiset_caster_type<TpValue_>>(), holdr));
+        
+        update_minmax_values(1);
+    }
 
-        update_max_values(1);
+    /**
+     * @brief       Set the collection that will get the cast result of each value.
+     * @param       holdr : The collection that will get the cast result of each value.
+     */
+    template<typename... Ts_>
+    void set_holders(tuple_type<Ts_...>* holdr)
+    {
+        castrs_.clear();
+        castrs_.emplace_back(
+                speed::memory::allocate_unique<tuple_caster_type<Ts_...>>(
+                        allocator_type<tuple_caster_type<Ts_...>>(), holdr));
+        
+        update_minmax_values(std::tuple_size<tuple_type<Ts_...>>::value);
     }
 
     /**
@@ -787,8 +812,8 @@ public:
         int foreach[sizeof...(Ts_) + 1] = { (
                 castrs_.emplace_back(speed::memory::allocate_unique<caster_type<Ts_>>(
                         allocator_type<caster_type<Ts_>>(), holdrs)), 0)... };
-
-        update_max_values(castrs_.size());
+        
+        update_minmax_values(castrs_.size());
     }
 
     /**
@@ -827,8 +852,6 @@ public:
 
         int foreach[sizeof...(Ts_) + 1] = { (
                 regxes_.emplace_back(std::forward<Ts_>(regxes)), 0)... };
-
-        update_max_values(regxes_.size());
     }
 
     /**
@@ -906,17 +929,14 @@ protected:
      * @brief       Update the maximum amount of values.
      * @param       new_max : The new maximum amount of values.
      */
-    void update_max_values(std::size_t new_max)
+    void update_minmax_values(std::size_t new_minmax)
     {
         if (!max_vals_auto_update_)
         {
             return;
         }
 
-        if (new_max > minmax_vals_.second)
-        {
-            set_minmax_values(minmax_vals_.first, new_max);
-        }
+        set_minmax_values(new_minmax, new_minmax);
     }
 
 private:
@@ -927,7 +947,7 @@ private:
     vector_type<unique_ptr_type<caster_base_type>> castrs_;
     
     /** Functions to execute in order to know if the values are valid. */
-    list_type<validator_type> assertns_;
+    list_type<function_type> assertns_;
     
     /** Regular expressions that the values has to match. */
     list_type<regex_type> regxes_;

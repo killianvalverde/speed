@@ -251,8 +251,8 @@ public:
                 throw no_value_id_specified_exception();
             }
         }
-
-        value_arg_type::update_max_values(vals_names_.size());
+        
+        value_arg_type::update_minmax_values(vals_names_.size());
         usage_str_needs_refresh_ = true;
     }
 

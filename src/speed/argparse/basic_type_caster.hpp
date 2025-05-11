@@ -35,6 +35,7 @@
 #include <queue>
 #include <set>
 #include <stack>
+#include <tuple>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -49,10 +50,9 @@ namespace speed::argparse {
  */
 template<
         typename TpTarget,
-        typename TpSource,
-        typename TpComponent = speed::type_casting::type_caster_base<TpSource>
+        typename TpSource
 >
-class basic_type_caster : public TpComponent
+class basic_type_caster : public speed::type_casting::type_caster_base<TpSource>
 {
 public:
     /** Type that represents the target. */
@@ -62,7 +62,7 @@ public:
     using source_type = TpSource;
 
     /** Type that represents the component. */
-    using component_type = TpComponent;
+    using component_type = speed::type_casting::type_caster_base<TpSource>;
 
     /**
      * @brief       Constructor with parameters.
@@ -125,10 +125,9 @@ template<
         typename TpTarget,
         typename TpSource,
         typename TpAllocator,
-        std::size_t Nm,
-        typename TpComponent = speed::type_casting::type_caster_base<TpSource>
+        std::size_t Nm
 >
-class basic_array_caster : public TpComponent
+class basic_array_caster : public speed::type_casting::type_caster_base<TpSource>
 {
 public:
     /** Type that represents the target. */
@@ -138,7 +137,7 @@ public:
     using source_type = TpSource;
 
     /** Type that represents the component. */
-    using component_type = TpComponent;
+    using component_type = speed::type_casting::type_caster_base<TpSource>;
 
     /** Allocator type used in the class. */
     template<typename T>
@@ -215,10 +214,9 @@ private:
 template<
         typename TpTarget,
         typename TpSource,
-        typename TpAllocator,
-        typename TpComponent = speed::type_casting::type_caster_base<TpSource>
+        typename TpAllocator
 >
-class basic_vector_caster : public TpComponent
+class basic_vector_caster : public speed::type_casting::type_caster_base<TpSource>
 {
 public:
     /** Type that represents the target. */
@@ -228,7 +226,7 @@ public:
     using source_type = TpSource;
 
     /** Type that represents the component. */
-    using component_type = TpComponent;
+    using component_type = speed::type_casting::type_caster_base<TpSource>;
 
     /** Allocator type used in the class. */
     template<typename T>
@@ -301,10 +299,9 @@ private:
 template<
         typename TpTarget,
         typename TpSource,
-        typename TpAllocator,
-        typename TpComponent = speed::type_casting::type_caster_base<TpSource>
+        typename TpAllocator
 >
-class basic_deque_caster : public TpComponent
+class basic_deque_caster : public speed::type_casting::type_caster_base<TpSource>
 {
 public:
     /** Type that represents the target. */
@@ -314,7 +311,7 @@ public:
     using source_type = TpSource;
 
     /** Type that represents the component. */
-    using component_type = TpComponent;
+    using component_type = speed::type_casting::type_caster_base<TpSource>;
 
     /** Allocator type used in the class. */
     template<typename T>
@@ -387,10 +384,9 @@ private:
 template<
         typename TpTarget,
         typename TpSource,
-        typename TpAllocator,
-        typename TpComponent = speed::type_casting::type_caster_base<TpSource>
+        typename TpAllocator
 >
-class basic_queue_caster : public TpComponent
+class basic_queue_caster : public speed::type_casting::type_caster_base<TpSource>
 {
 public:
     /** Type that represents the target. */
@@ -400,7 +396,7 @@ public:
     using source_type = TpSource;
 
     /** Type that represents the component. */
-    using component_type = TpComponent;
+    using component_type = speed::type_casting::type_caster_base<TpSource>;
 
     /** Allocator type used in the class. */
     template<typename T>
@@ -476,10 +472,9 @@ private:
 template<
         typename TpTarget,
         typename TpSource,
-        typename TpAllocator,
-        typename TpComponent = speed::type_casting::type_caster_base<TpSource>
+        typename TpAllocator
 >
-class basic_priority_queue_caster : public TpComponent
+class basic_priority_queue_caster : public speed::type_casting::type_caster_base<TpSource>
 {
 public:
     /** Type that represents the target. */
@@ -489,7 +484,7 @@ public:
     using source_type = TpSource;
 
     /** Type that represents the component. */
-    using component_type = TpComponent;
+    using component_type = speed::type_casting::type_caster_base<TpSource>;
 
     /** Allocator type used in the class. */
     template<typename T>
@@ -565,10 +560,9 @@ private:
 template<
         typename TpTarget,
         typename TpSource,
-        typename TpAllocator,
-        typename TpComponent = speed::type_casting::type_caster_base<TpSource>
+        typename TpAllocator
 >
-class basic_stack_caster : public TpComponent
+class basic_stack_caster : public speed::type_casting::type_caster_base<TpSource>
 {
 public:
     /** Type that represents the target. */
@@ -578,7 +572,7 @@ public:
     using source_type = TpSource;
 
     /** Type that represents the component. */
-    using component_type = TpComponent;
+    using component_type = speed::type_casting::type_caster_base<TpSource>;
 
     /** Allocator type used in the class. */
     template<typename T>
@@ -654,10 +648,9 @@ private:
 template<
         typename TpTarget,
         typename TpSource,
-        typename TpAllocator,
-        typename TpComponent = speed::type_casting::type_caster_base<TpSource>
+        typename TpAllocator
 >
-class basic_forward_list_caster : public TpComponent
+class basic_forward_list_caster : public speed::type_casting::type_caster_base<TpSource>
 {
 public:
     /** Type that represents the target. */
@@ -667,7 +660,7 @@ public:
     using source_type = TpSource;
 
     /** Type that represents the component. */
-    using component_type = TpComponent;
+    using component_type = speed::type_casting::type_caster_base<TpSource>;
 
     /** Allocator type used in the class. */
     template<typename T>
@@ -744,10 +737,9 @@ private:
 template<
         typename TpTarget,
         typename TpSource,
-        typename TpAllocator,
-        typename TpComponent = speed::type_casting::type_caster_base<TpSource>
+        typename TpAllocator
 >
-class basic_list_caster : public TpComponent
+class basic_list_caster : public speed::type_casting::type_caster_base<TpSource>
 {
 public:
     /** Type that represents the target. */
@@ -757,7 +749,7 @@ public:
     using source_type = TpSource;
 
     /** Type that represents the component. */
-    using component_type = TpComponent;
+    using component_type = speed::type_casting::type_caster_base<TpSource>;
 
     /** Allocator type used in the class. */
     template<typename T>
@@ -830,10 +822,9 @@ private:
 template<
         typename TpTarget,
         typename TpSource,
-        typename TpAllocator,
-        typename TpComponent = speed::type_casting::type_caster_base<TpSource>
+        typename TpAllocator
 >
-class basic_set_caster : public TpComponent
+class basic_set_caster : public speed::type_casting::type_caster_base<TpSource>
 {
 public:
     /** Type that represents the target. */
@@ -843,7 +834,7 @@ public:
     using source_type = TpSource;
 
     /** Type that represents the component. */
-    using component_type = TpComponent;
+    using component_type = speed::type_casting::type_caster_base<TpSource>;
 
     /** Allocator type used in the class. */
     template<typename T>
@@ -916,10 +907,9 @@ private:
 template<
         typename TpTarget,
         typename TpSource,
-        typename TpAllocator,
-        typename TpComponent = speed::type_casting::type_caster_base<TpSource>
+        typename TpAllocator
 >
-class basic_unordered_set_caster : public TpComponent
+class basic_unordered_set_caster : public speed::type_casting::type_caster_base<TpSource>
 {
 public:
     /** Type that represents the target. */
@@ -929,7 +919,7 @@ public:
     using source_type = TpSource;
 
     /** Type that represents the component. */
-    using component_type = TpComponent;
+    using component_type = speed::type_casting::type_caster_base<TpSource>;
 
     /** Allocator type used in the class. */
     template<typename T>
@@ -1004,10 +994,9 @@ private:
 template<
         typename TpTarget,
         typename TpSource,
-        typename TpAllocator,
-        typename TpComponent = speed::type_casting::type_caster_base<TpSource>
+        typename TpAllocator
 >
-class basic_unordered_multiset_caster : public TpComponent
+class basic_unordered_multiset_caster : public speed::type_casting::type_caster_base<TpSource>
 {
 public:
     /** Type that represents the target. */
@@ -1017,7 +1006,7 @@ public:
     using source_type = TpSource;
 
     /** Type that represents the component. */
-    using component_type = TpComponent;
+    using component_type = speed::type_casting::type_caster_base<TpSource>;
 
     /** Allocator type used in the class. */
     template<typename T>
@@ -1084,6 +1073,117 @@ public:
 private:
     /** Holds a reference towards the object that will contain the result of the casting. */
     unordered_multiset_type* holdr_;
+};
+
+/**
+ * @brief       Classs used as a type casting strategy holder.
+ */
+template<
+        typename TpSource,
+        typename TpAllocator,
+        typename... TpTargets
+>
+class basic_tuple_caster : public speed::type_casting::type_caster_base<TpSource>
+{
+public:
+    /** Type that represents the source. */
+    using source_type = TpSource;
+
+    /** Type that represents the component. */
+    using component_type = speed::type_casting::type_caster_base<TpSource>;
+
+    /** Allocator type used in the class. */
+    template<typename T>
+    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
+    
+    /** Shared pointer type used in the class. */
+    template<typename T>
+    using unique_ptr_type = std::unique_ptr<T>;
+
+    /** String type used in the class. */
+    using string_type = std::basic_string<char, std::char_traits<char>, allocator_type<char>>;
+
+    /** Array type used in the class. */
+    template<typename T, std::size_t N>
+    using array_type = std::array<T, N>;
+    
+    /** Tuple type used in the class. */
+    using tuple_type = std::tuple<TpTargets...>;
+
+    /** Type that represents the caster base type. */
+    using caster_base_type = speed::type_casting::type_caster_base<string_type>;
+
+    /** Type that represents the caster type. */
+    template<typename T>
+    using caster_type = speed::argparse::basic_type_caster<T, string_type>;
+
+    /**
+     * @brief       Constructor with parameters.
+     * @param       holdr : The collection that will be holding the casted values.
+     */
+    explicit basic_tuple_caster(tuple_type* holdr)
+            : holdr_(holdr)
+            , idx_(0)
+    {
+        initialize_helper(std::index_sequence_for<TpTargets...>{});
+    }
+
+    /**
+     * @brief       Allows knowing whether or not an argument is valid.
+     * @param       arg : The value to check.
+     * @param       err_code : If function fails it holds the error code.
+     * @return      If the argument is valid true is returned, otherwise false is returned.
+     */
+    [[nodiscard]] bool is_valid(
+            const source_type& arg,
+            std::error_code* err_code = nullptr
+    ) const noexcept override
+    {
+        if (!castrs_.at(idx_)->is_valid(arg, err_code))
+        {
+            return false;
+        }
+        
+        return true;
+    }
+
+    /**
+     * @brief       Try to convert the source to the target.
+     * @param       arg : The value to convert.
+     * @param       err_code : If function fails it holds the error code.
+     * @return      If function was successful true is returned, otherwise false is returned.
+     */
+    [[nodiscard]] bool try_type_cast(
+            const source_type& arg,
+            std::error_code* err_code = nullptr
+    ) noexcept override
+    {
+        if (!castrs_.at(idx_)->try_type_cast(arg, err_code))
+        {
+            return false;
+        }
+
+        ++idx_;
+        return true;
+    }
+    
+private:
+    template<std::size_t... Is>
+    void initialize_helper(std::index_sequence<Is...>)
+    {
+        ((castrs_.at(Is) = speed::memory::allocate_unique<caster_type<TpTargets>>(
+                allocator_type<caster_type<TpTargets>>(), &std::get<Is>(*holdr_))), ...);
+    }
+
+private:
+    /** Type casters used to validate the values syntax. */
+    array_type<unique_ptr_type<caster_base_type>, std::tuple_size<tuple_type>::value> castrs_;
+    
+    /** Holds a reference towards the object that will contain the result of the casting. */
+    tuple_type* holdr_;
+    
+    /** Index of the next caster to use. */
+    std::size_t idx_;
 };
 
 }
