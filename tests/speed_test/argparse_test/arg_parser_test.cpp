@@ -717,6 +717,35 @@ TEST_F(argparse_arg_parser, parse_args_with_assertions)
     EXPECT_TRUE(ap.has_errors());
 }
 
+TEST_F(argparse_arg_parser, strore_into_tuple)
+{
+    std::vector<const char*> argv = {
+        "speed",
+        "-a", "10", "hello", "9.8",
+        "-b", "10", "21"
+    };
+
+    std::tuple<int, std::string, double, std::string> a_vals;
+    std::tuple<int, int> b_vals;
+    
+    ap.add_key_value_arg("-a")
+            .description("...")
+            .store_into(&a_vals)
+            .minmax_values(1, 4);
+    
+    ap.add_key_value_arg("-b")
+            .description("...")
+            .store_into(&b_vals);
+
+    EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
+    EXPECT_TRUE(!ap.has_errors());
+    EXPECT_TRUE(std::get<0>(a_vals) == 10);
+    EXPECT_TRUE(std::get<1>(a_vals) == "hello");
+    EXPECT_TRUE(std::get<2>(a_vals) == 9.8);
+    EXPECT_TRUE(std::get<0>(b_vals) == 10);
+    EXPECT_TRUE(std::get<1>(b_vals) == 21);
+}
+
 TEST_F(argparse_arg_parser, check_errors)
 {
     std::vector<const char*> argv = {
