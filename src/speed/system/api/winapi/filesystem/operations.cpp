@@ -893,6 +893,22 @@ bool is_directory(const wchar_t* file_pth, std::error_code* err_code) noexcept
     return (attr & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 
+bool is_directory(
+        system::filesystem::directory_entity* directory_ent,
+        std::error_code* err_code
+) noexcept
+{
+    return directory_ent->__priv.find_dat.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
+}
+
+bool is_directory(
+        system::filesystem::wdirectory_entity* directory_ent,
+        std::error_code* err_code
+) noexcept
+{
+    return directory_ent->__priv.find_dat.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
+}
+
 bool is_file_type(
         const char* file_pth,
         system::filesystem::file_types fle_type,

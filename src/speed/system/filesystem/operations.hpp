@@ -496,6 +496,34 @@ inline bool is_directory(const wchar_t* file_pth, std::error_code* err_code = nu
 }
 
 /**
+ * @brief       Checks if the given path corresponds to a directory.
+ * @param       directory_ent : The directory entity.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+inline bool is_directory(
+        directory_entity* directory_ent,
+        std::error_code* err_code = nullptr
+) noexcept
+{
+    return SPEED_SELECT_API(filesystem::is_directory, false, directory_ent, err_code);
+}
+
+/**
+ * @brief       Checks if the given path corresponds to a directory.
+ * @param       directory_ent : The directory entity.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+inline bool is_directory(
+        wdirectory_entity* directory_ent,
+        std::error_code* err_code = nullptr
+) noexcept
+{
+    return SPEED_SELECT_API(filesystem::is_directory, false, directory_ent, err_code);
+}
+
+/**
  * @brief       Checks if the given path corresponds to a specified file type.
  * @param       file_pth : Path to check.
  * @param       file_typ : The specified file type. If more than one flag is set, the function will

@@ -29,6 +29,7 @@
 
 #include "operations.hpp"
 
+#include <fcntl.h>
 #include <sys/stat.h>
 #include <cstdlib>
 
@@ -498,6 +499,44 @@ bool is_directory(const wchar_t* file_pth, std::error_code* err_code) noexcept
         return is_directory(str.c_str(), err_code);
     }
     return false;
+}
+
+bool is_directory(
+        system::filesystem::directory_entity* directory_ent,
+        std::error_code* err_code
+) noexcept
+{
+    auto* directory_ent_ext = &directory_ent->__priv;
+    auto* entry = directory_ent_ext->entry;
+    
+    if (entry->d_type != DT_UNKNOWN)
+    {
+        return entry->d_type == DT_DIR;
+    }
+    
+    struct ::stat st;
+    ::fstatat(::dirfd(directory_ent_ext->dir), entry->d_name, &st, AT_SYMLINK_NOFOLLOW);
+    
+    return S_ISDIR(st.st_mode);
+}
+
+bool is_directory(
+        system::filesystem::wdirectory_entity* directory_ent,
+        std::error_code* err_code
+) noexcept
+{
+    auto* directory_ent_ext = &directory_ent->__priv;
+    auto* entry = directory_ent_ext->entry;
+    
+    if (entry->d_type != DT_UNKNOWN)
+    {
+        return entry->d_type == DT_DIR;
+    }
+    
+    struct ::stat st;
+    ::fstatat(::dirfd(directory_ent_ext->dir), entry->d_name, &st, AT_SYMLINK_NOFOLLOW);
+    
+    return S_ISDIR(st.st_mode);
 }
 
 bool is_file_type(
