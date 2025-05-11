@@ -206,7 +206,8 @@ public:
 
         for (auto& positionl_arg : positionl_args_)
         {
-            if (flgs_.is_set(help_menu_flags::PRINT_VALUES) && !positionl_arg->is_help_text_empty())
+            if (flgs_.is_set(help_menu_flags::PRINT_POSITIONALS) &&
+                !positionl_arg->is_help_text_empty())
             {
                 update_max_keys_length_from_positional_arg(positionl_arg);
             }
@@ -335,7 +336,7 @@ public:
         print_description();
         print_options();
         print_commands();
-        print_values();
+        print_positionals();
         print_constraints();
         print_epilog();
 
@@ -441,11 +442,11 @@ public:
     }
 
     /**
-     * @brief       Print the values.
+     * @brief       Print the positional arguments.
      */
-    void print_values()
+    void print_positionals()
     {
-        if (flgs_.is_not_set(help_menu_flags::PRINT_VALUES))
+        if (flgs_.is_not_set(help_menu_flags::PRINT_POSITIONALS))
         {
             return;
         }

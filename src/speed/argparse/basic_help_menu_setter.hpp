@@ -263,20 +263,20 @@ public:
     }
 
     /**
-     * @brief       Allows to specify whether the values have to be printed. The values are the
-     *              positional arguments. This feature is enabled by default.
+     * @brief       Allows to specify whether the positional arguments have to be printed. This
+     *              feature is enabled by default.
      * @param       enabl : Specify wheter the feature is enable.
      * @return      The object who call the method.
      */
-    self_type& print_values(bool enabl)
+    self_type& print_positionals(bool enabl)
     {
         if (enabl)
         {
-            hlp_menu_->set_flag(help_menu_flags::PRINT_VALUES);
+            hlp_menu_->set_flag(help_menu_flags::PRINT_POSITIONALS);
         }
         else
         {
-            hlp_menu_->unset_flag(help_menu_flags::PRINT_VALUES);
+            hlp_menu_->unset_flag(help_menu_flags::PRINT_POSITIONALS);
         }
 
         return *this;

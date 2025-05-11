@@ -55,7 +55,7 @@ enum class help_menu_flags : std::uint16_t
     PRINT_COMMANDS = 0x10,
 
     /** Whether the values have to be printed. */
-    PRINT_VALUES = 0x20,
+    PRINT_POSITIONALS = 0x20,
     
     /** Whether the constraints have to be printed. */
     PRINT_CONSTRAINTS = 0x40,
