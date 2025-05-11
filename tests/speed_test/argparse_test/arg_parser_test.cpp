@@ -766,11 +766,11 @@ TEST_F(argparse_arg_parser, print_usage)
 
     ap.configure()
             .program_name("speed");
-
+    
     ap.add_help_menu()
             .print_options(false)
             .print_commands(false)
-            .print_values(false);
+            .print_positionals(false);
 
     ap.add_key_arg("-a", "--all")
             .description("Display all the information.");
@@ -819,12 +819,12 @@ TEST_F(argparse_arg_parser, print_description)
 
     ap.configure()
             .program_name("speed");
-
+    
     ap.add_help_menu()
             .print_usage(false)
             .print_options(false)
             .print_commands(false)
-            .print_values(false)
+            .print_positionals(false)
             .description(
                     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ullamcorper metus"
                     " non nisi mattis, sit amet vestibulum ipsum vulputate. Quisque sollicitudin "
@@ -852,11 +852,11 @@ TEST_F(argparse_arg_parser, print_options)
 
     ap.configure()
             .program_name("speed");
-
+    
     ap.add_help_menu()
             .print_usage(false)
             .print_commands(false)
-            .print_values(false);
+            .print_positionals(false);
 
     ap.add_key_arg("-a", "--all")
             .description("Display all the information.");
@@ -910,12 +910,12 @@ TEST_F(argparse_arg_parser, print_commands)
 
     ap.configure()
             .program_name("speed");
-
+    
     ap.add_help_menu()
             .print_usage(false)
             .print_options(false)
             .print_commands(true)
-            .print_values(false);
+            .print_positionals(false);
 
     ap.add_key_arg("-a", "--all")
             .description("Display all the information.");
@@ -965,12 +965,12 @@ TEST_F(argparse_arg_parser, print_values)
 
     ap.configure()
             .program_name("speed");
-
+    
     ap.add_help_menu()
             .print_usage(false)
             .print_options(false)
             .print_commands(false)
-            .print_values(true);
+            .print_positionals(true);
 
     ap.add_key_arg("-a", "--all")
             .description("Display all the information.");
@@ -1019,12 +1019,12 @@ TEST_F(argparse_arg_parser, print_epilogue)
 
     ap.configure()
             .program_name("speed");
-
+    
     ap.add_help_menu()
             .print_usage(false)
             .print_options(false)
             .print_commands(false)
-            .print_values(false)
+            .print_positionals(false)
             .epilogue(
                     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ullamcorper metus"
                     " non nisi mattis, sit amet vestibulum ipsum vulputate. Quisque sollicitudin "
@@ -1072,7 +1072,7 @@ TEST_F(argparse_arg_parser, print_help)
 
     ap.configure()
             .program_name("speed");
-
+    
     ap.add_help_menu()
             .print_usage(true)
             .print_options(true)
@@ -1082,7 +1082,7 @@ TEST_F(argparse_arg_parser, print_help)
                     "enim a felis vehicula, quis faucibus mi molestie. Fusce id justo et tortor "
                     "vehicula porttitor.")
             .print_commands(true)
-            .print_values(true)
+            .print_positionals(true)
             .epilogue(
                     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ullamcorper metus"
                     " non nisi mattis, sit amet vestibulum ipsum vulputate. Quisque sollicitudin "
@@ -1199,7 +1199,7 @@ TEST_F(argparse_arg_parser, change_prefix)
 
     ap.configure()
             .program_name("speed");
-
+    
     ap.add_help_menu()
             .print_usage(true)
             .print_options(true)
@@ -1209,7 +1209,7 @@ TEST_F(argparse_arg_parser, change_prefix)
                     "enim a felis vehicula, quis faucibus mi molestie. Fusce id justo et tortor "
                     "vehicula porttitor.")
             .print_commands(true)
-            .print_values(true)
+            .print_positionals(true)
             .epilogue(
                     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ullamcorper metus"
                     " non nisi mattis, sit amet vestibulum ipsum vulputate. Quisque sollicitudin "
