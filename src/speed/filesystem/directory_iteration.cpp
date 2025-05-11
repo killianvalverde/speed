@@ -67,6 +67,7 @@ directory_iteration::const_iterator::~const_iterator() noexcept
 
 directory_iteration::const_iterator::self_type& directory_iteration::const_iterator::operator ++()
 {
+start:
     directory_entity& cur_dir_ent = directory_entity_stck_.top();
 
     if (!read_directory())
@@ -82,20 +83,20 @@ directory_iteration::const_iterator::self_type& directory_iteration::const_itera
     {
         cur_fle_.replace_filename(cur_dir_ent.nme);
 
-        if (speed::system::filesystem::is_directory(cur_fle_.c_str()))
+        if (speed::system::filesystem::is_directory(&cur_dir_ent))
         {
             cur_dir_ /= cur_dir_ent.nme;
 
             if (open_directory())
             {
-                return this->operator++();
+                goto start;
             }
         }
     }
 
     if (!is_file_valid())
     {
-        return this->operator++();
+        goto start;
     }
 
     return *this;
