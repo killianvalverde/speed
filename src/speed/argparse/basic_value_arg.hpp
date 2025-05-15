@@ -808,10 +808,8 @@ public:
     void set_holders(Ts_*... holdrs)
     {
         castrs_.clear();
-
-        int foreach[sizeof...(Ts_) + 1] = { (
-                castrs_.emplace_back(speed::memory::allocate_unique<caster_type<Ts_>>(
-                        allocator_type<caster_type<Ts_>>(), holdrs)), 0)... };
+        (castrs_.emplace_back(speed::memory::allocate_unique<caster_type<Ts_>>(
+                allocator_type<caster_type<Ts_>>(), holdrs)), ...);
         
         update_minmax_values(castrs_.size());
     }
@@ -849,9 +847,7 @@ public:
     void set_regexes(Ts_&&... regxes)
     {
         regxes_.clear();
-
-        int foreach[sizeof...(Ts_) + 1] = { (
-                regxes_.emplace_back(std::forward<Ts_>(regxes)), 0)... };
+        (regxes_.emplace_back(std::forward<Ts_>(regxes)), ...);
     }
 
     /**
@@ -862,9 +858,7 @@ public:
     inline void set_assertions(Ts_&&... callabls)
     {
         assertns_.clear();
-
-        int foreach[sizeof...(Ts_) + 1] = { (
-                assertns_.emplace_back(std::forward<Ts_>(callabls)), 0)... };
+        (assertns_.emplace_back(std::forward<Ts_>(callabls)), ...);
     }
 
     /**

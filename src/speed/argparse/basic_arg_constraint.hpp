@@ -108,12 +108,9 @@ public:
             : arg_parsr_(arg_parsr)
     {
         base_arg_type* bse_arg;
-
-        int foreach[sizeof...(Ts_) + 1] = { (
-                (bse_arg = arg_parsr_->get_base_arg(kys)) == nullptr ?
-                        throw key_not_found_exception() :
-                        bse_args_.emplace_back(bse_arg),
-                0)... };
+        (((bse_arg = arg_parsr_->get_base_arg(kys)) == nullptr ?
+                throw key_not_found_exception() :
+                bse_args_.emplace_back(bse_arg)), ...);
     }
     
     /**

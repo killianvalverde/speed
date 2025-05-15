@@ -80,10 +80,8 @@ public:
             , long_kys_len_(0)
     {
         base_arg_type::set_flags(arg_flags::DEFAULT_KEY_ARG_FLAGS);
-
-        int foreach[sizeof...(Ts_) + 1] = { (
-                kys_.push_back({std::forward<Ts_>(kys), arg_parsr}), 0)... };
-
+        (kys_.push_back({std::forward<Ts_>(kys), arg_parsr}), ...);
+        
         if (kys_.empty())
         {
             throw no_key_specified_exception();
