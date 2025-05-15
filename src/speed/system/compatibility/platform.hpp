@@ -29,7 +29,9 @@
 
 #ifdef __unix__
 #undef _XOPEN_SOURCE
-#define _XOPEN_SOURCE 700
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 #include <unistd.h>
 #ifdef __linux__
 #include <linux/version.h>
