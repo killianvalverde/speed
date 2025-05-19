@@ -31,9 +31,6 @@
 
 namespace speed::type_casting {
 
-template<typename TpTarget, typename TpSource, typename TpComponent>
-class basic_type_caster;
-
 class error_category;
 
 enum class error_codes : std::uint8_t;
@@ -48,9 +45,6 @@ TpTarget type_cast(const TpSource&);
 
 template<typename TpTarget, typename TpSource, typename TpDefaultValue>
 TpTarget type_cast(const TpSource&, TpDefaultValue&&) noexcept;
-
-template<typename TpSource>
-class type_caster_base;
 
 inline void assign_type_casting_error_code(int, std::error_code*);
 
