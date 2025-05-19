@@ -73,10 +73,10 @@ TEST_F(argparse_arg_parser, add_key_arg)
             .grouping(true)
             .help_menus_assigned("help1", "help2")
             .mandatory(false)
+            .minmax_occurrences(0, 1)
             .store_presence(&presnc)
             .terminal(false)
-            .unique_instance(true)
-            .unique_instance(true);
+            .terminal(false);
 
     EXPECT_THROW(ap.add_key_arg(), speed::argparse::exception);
     EXPECT_THROW(ap.add_key_arg("-l"), speed::argparse::exception);
@@ -99,13 +99,13 @@ TEST_F(argparse_arg_parser, add_key_value_arg)
             .grouping(true)
             .help_menus_assigned("help1", "help2")
             .mandatory(false)
+            .minmax_occurrences(0, 1)
             .minmax_values(1, 1)
             .store_into(&vals)
             .regexes("^.*$")
             .store_into(&holdr1, &holdr2)
             .store_presence(&presnc)
             .terminal(false)
-            .unique_instance(true)
             .values_names("VALUE")
             .values_with_prefix(false)
             .values_with_prefix(false);
@@ -129,13 +129,13 @@ TEST_F(argparse_arg_parser, add_positional_arg)
             .error_name("error")
             .help_menus_assigned("help1", "help2")
             .mandatory(true)
+            .minmax_occurrences(0, 1)
             .minmax_values(1, 1)
             .store_into(&vals)
             .regexes("^.*$")
             .store_into(&holdr1, &holdr2)
             .store_presence(&presnc)
             .terminal(false)
-            .unique_instance(true)
             .values_with_prefix(false)
             .values_with_prefix(false);
 
@@ -160,6 +160,7 @@ TEST_F(argparse_arg_parser, add_help_arg)
             .help_menus_assigned("help1", "help2")
             .help_menus_triggered("^.*$", "help1")
             .mandatory(false)
+            .minmax_occurrences(0, 1)
             .minmax_values(0, 0)
             .pkill_after_triggering(true)
             .store_into(&vals)
@@ -168,7 +169,6 @@ TEST_F(argparse_arg_parser, add_help_arg)
             .store_presence(&presnc)
             .terminal(false)
             .trigger_help_printing(false)
-            .unique_instance(true)
             .values_names("VALUE")
             .values_with_prefix(false)
             .values_with_prefix(false);
@@ -191,11 +191,11 @@ TEST_F(argparse_arg_parser, add_version_arg)
             .grouping(true)
             .help_menus_assigned("help1", "help2")
             .mandatory(false)
+            .minmax_occurrences(0, 1)
             .pkill_after_triggering(false)
             .store_presence(&presnc)
             .terminal(false)
             .trigger_version_printing(false)
-            .unique_instance(true)
             .version_information("v1.0.0")
             .version_information("v1.0.0");
 
@@ -688,7 +688,7 @@ TEST_F(argparse_arg_parser, parse_sub_parser)
     EXPECT_TRUE(interactv);
 }
 
-TEST_F(argparse_arg_parser, parse_args_with_assertions)
+TEST_F(argparse_arg_parser, parse_with_assertions)
 {
     std::vector<const char*> argv = {
         "speed",
@@ -700,13 +700,11 @@ TEST_F(argparse_arg_parser, parse_args_with_assertions)
     std::vector<std::uint64_t> b_vals;
     
     ap.add_key_value_arg("-a")
-            .description("...")
             .store_into(&a_vals)
             .minmax_values(2, 2)
             .assertions([&](const std::string& val) { return val != "21"; });
     
     ap.add_key_value_arg("-b")
-            .description("...")
             .store_into(&b_vals)
             .minmax_values(2, 2)
             .assertions([&](const std::string& val) { return val != "21"; });
@@ -715,6 +713,77 @@ TEST_F(argparse_arg_parser, parse_args_with_assertions)
     EXPECT_TRUE(!ap.arg_has_errors("-a"));
     EXPECT_TRUE(ap.arg_has_errors("-b"));
     EXPECT_TRUE(ap.has_errors());
+}
+
+TEST_F(argparse_arg_parser, parse_nested_container_as_holder)
+{
+    std::vector<const char*> argv = {
+        "speed",
+        "-n", "hello", "world",
+        "-n", "bye", "planet"
+    };
+    
+    std::vector<std::vector<std::string>> containr;
+    
+    ap.add_key_value_arg("-n")
+            .minmax_occurrences(0, ~0ull)
+            .store_into(&containr)
+            .minmax_values(1, 2);
+
+    EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
+    EXPECT_TRUE(!ap.has_errors());
+    EXPECT_TRUE(!ap.arg_has_errors("-n"));
+    EXPECT_TRUE(containr.at(0).at(0) == "hello");
+    EXPECT_TRUE(containr.at(0).at(1) == "world");
+    EXPECT_TRUE(containr.at(1).at(0) == "bye");
+    EXPECT_TRUE(containr.at(1).at(1) == "planet");
+}
+
+TEST_F(argparse_arg_parser, parse_nested_container_as_holder_with_too_few_occurrences)
+{
+    std::vector<const char*> argv = {
+        "speed",
+        "-n", "hello", "world",
+        "-n", "bye", "planet"
+    };
+    
+    std::vector<std::vector<std::string>> containr;
+    
+    ap.add_key_value_arg("-n")
+            .minmax_occurrences(3, ~0ull)
+            .store_into(&containr)
+            .minmax_values(1, 2);
+
+    EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
+    EXPECT_TRUE(ap.has_errors());
+    EXPECT_TRUE(ap.arg_has_errors("-n"));
+    EXPECT_TRUE(containr.at(0).at(0) == "hello");
+    EXPECT_TRUE(containr.at(0).at(1) == "world");
+    EXPECT_TRUE(containr.at(1).at(0) == "bye");
+    EXPECT_TRUE(containr.at(1).at(1) == "planet");
+}
+
+TEST_F(argparse_arg_parser, parse_nested_container_as_holder_with_too_many_occurrences)
+{
+    std::vector<const char*> argv = {
+        "speed",
+        "-n", "hello", "world",
+        "-n", "bye", "planet"
+    };
+    
+    std::vector<std::vector<std::string>> containr;
+    
+    ap.add_key_value_arg("-n")
+            .minmax_occurrences(1, 1)
+            .store_into(&containr)
+            .minmax_values(1, 2);
+
+    EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
+    EXPECT_TRUE(ap.has_errors());
+    EXPECT_TRUE(ap.arg_has_errors("-n"));
+    EXPECT_TRUE(containr.at(0).at(0) == "hello");
+    EXPECT_TRUE(containr.at(0).at(1) == "world");
+    EXPECT_TRUE(containr.size() == 1);
 }
 
 TEST_F(argparse_arg_parser, strore_into_tuple)
