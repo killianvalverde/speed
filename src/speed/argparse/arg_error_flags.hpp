@@ -41,20 +41,20 @@ enum class arg_error_flags : std::uint8_t
     /** Null flag. */
     NIL = 0x0,
     
-    /** The minimum number of values for an option was not obtained. */
-    MIN_VALUES_ERROR = 0x1,
+    /** The minimum number of times the argument needs to be found was not obtained. */
+    MIN_OCCURRENCES_ERROR = 0x1,
     
-    /** The maximum number of values for an option was exceeded. */
-    MAX_VALUES_ERROR = 0x2,
+    /** The maximum number of times the argument needs to be found was exceeded. */
+    MAX_OCCURRENCES_ERROR = 0x2,
+    
+    /** The minimum number of values for an argument was not obtained. */
+    MIN_VALUES_ERROR = 0x4,
+    
+    /** The maximum number of values for an argument was exceeded. */
+    MAX_VALUES_ERROR = 0x8,
     
     /** The argument values have errors. */
-    VALUES_ERROR = 0x4,
-    
-    /** The argument is not present in the program call. */
-    ALLWAYS_REQUIRED_ERROR = 0x8,
-    
-    /** The argument has appeared more than once. */
-    APPEAR_JUST_ONCE_ERROR = 0x10,
+    VALUES_ERROR = 0x10,
     
     /** All argument error flags. */
     ALL = 0x1F

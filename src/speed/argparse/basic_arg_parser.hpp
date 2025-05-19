@@ -185,6 +185,8 @@ public:
             , err_flgs_(arg_parser_error_flags::NIL)
             , parsd_(false)
     {
+        bse_arg_list_.reserve(6);
+        bse_arg_map_.reserve(12);
     }
     
     /**
@@ -509,10 +511,10 @@ public:
                 }
                 if (insertd)
                 {
-                    if (static_cast<base_arg_type*>(positionl_arg) !=  prev_arg)
+                    if (static_cast<base_arg_type*>(positionl_arg) != prev_arg)
                     {
                         positionl_arg->execute_action();
-                        positionl_arg->set_found(true);
+                        positionl_arg->increase_occurrence();
                     }
                     ++cur_idx;
                     cur_state = dfa_t::READ_ARG;
@@ -582,7 +584,7 @@ public:
             throw key_not_found_exception();
         }
 
-        return val_arg->get_number_of_values();
+        return val_arg->get_actual_number_of_values();
     }
     
     /**
@@ -1064,6 +1066,12 @@ private:
     {
         *pos_increment = 0;
         auto* ky_val_arg = dynamic_cast<key_value_arg_type*>(ky_arg);
+        
+        if (!ky_arg->increase_occurrence())
+        {
+            return;
+        }
+        ky_arg->execute_action();
 
         if (ky_val_arg != nullptr)
         {
@@ -1088,9 +1096,7 @@ private:
 
             --*pos_increment;
         }
-
-        ky_arg->execute_action();
-        ky_arg->set_found(true);
+        
         ky_arg->parse_sub_arg_parser(argc, argv, cur_idx, pos_increment);
     }
 
@@ -1100,21 +1106,15 @@ private:
     void reset_args_parse() noexcept
     {
         value_arg_type* value_arg;
-
+        
         parsd_ = false;
-
+        
         for (auto& bse_arg : bse_arg_list_)
         {
-            bse_arg->set_found(false);
-
-            if ((value_arg = dynamic_cast<value_arg_type*>(bse_arg.get())) != nullptr)
-            {
-                value_arg->clear_values();
-            }
+            bse_arg->reset();
         }
-
+        
         unrecog_args_.clear();
-
         update_error_flags();
     }
 
@@ -1617,7 +1617,7 @@ private:
             ky_arg = dynamic_cast<key_arg_type*>(bse_arg.get());
             if (ky_arg != nullptr)
             {
-                if (!ky_arg->is_flag_set(arg_flags::MANDATORY))
+                if (ky_arg->is_option())
                 {
                     if (!ky_arg->is_flag_set(arg_flags::TERMINAL) &&
                         !ky_arg->is_flag_set(arg_flags::PKILL_AFTER_TRIGGERING))

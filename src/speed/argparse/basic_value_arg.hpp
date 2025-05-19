@@ -34,13 +34,14 @@
 #include <vector>
 
 #include "../type_casting/type_casting.hpp"
+#include "forward_declarations.hpp"
 #include "arg_flags.hpp"
 #include "basic_arg_parser.hpp"
 #include "basic_arg_value.hpp"
 #include "basic_base_arg.hpp"
 #include "basic_type_caster.hpp"
 #include "exception.hpp"
-#include "forward_declarations.hpp"
+#include "type_traits.hpp"
 
 namespace speed::argparse {
 
@@ -65,10 +66,6 @@ public:
     /** Regex type used in the class. */
     using regex_type = std::basic_regex<char, std::regex_traits<char>>;
 
-    /** Pair type used in the class. */
-    template<typename T1, typename T2>
-    using pair_type = std::pair<T1, T2>;
-
     /** Array type used in the class. */
     template<typename T, std::size_t N>
     using array_type = std::array<T, N>;
@@ -77,43 +74,13 @@ public:
     template<typename T>
     using vector_type = std::vector<T, allocator_type<T>>;
 
-    /** Double ended queue type used in the class. */
-    template<typename T>
-    using deque_type = std::deque<T, allocator_type<T>>;
-
-    /** Queue type used in the class. */
-    template<typename T>
-    using queue_type = std::queue<T, deque_type<T>>;
-
-    /** Priority queue type used in the class. */
-    template<typename T>
-    using priority_queue_type = std::priority_queue<T, vector_type<T>>;
-
-    /** Stack type used in the class. */
-    template<typename T>
-    using stack_type = std::stack<T, deque_type<T>>;
-
-    /** Forward list type used in the class. */
-    template<typename T>
-    using forward_list_type = std::forward_list<T, allocator_type<T>>;
-
     /** Forward list type used in the class. */
     template<typename T>
     using list_type = std::list<T, allocator_type<T>>;
 
-    /** Set type used in the class. */
-    template<typename T>
-    using set_type = std::set<T, std::less<T>, allocator_type<T>>;
-
-    /** Unordered set type used in the class. */
-    template<typename T>
-    using unordered_set_type = std::unordered_set<
-            T, std::hash<T>, std::equal_to<T>, allocator_type<T>>;
-
-    /** Unordered multi set type used in the class. */
-    template<typename T>
-    using unordered_multiset_type = std::unordered_multiset<
-            T, std::hash<T>, std::equal_to<T>, allocator_type<T>>;
+    /** Pair type used in the class. */
+    template<typename T1, typename T2>
+    using pair_type = std::pair<T1, T2>;
     
     /** Tuple type used in the class. */
     template<typename... Ts>
@@ -123,71 +90,11 @@ public:
     using function_type = std::function<bool(const string_type&)>;
 
     /** Type that represents the caster base type. */
-    using caster_base_type = speed::type_casting::type_caster_base<string_type>;
+    using type_caster_base_type = type_caster_base<string_type>;
 
     /** Type that represents the caster type. */
     template<typename T>
-    using caster_type = speed::argparse::basic_type_caster<T, string_type>;
-
-    /** Type that represents the array caster type. */
-    template<typename T, std::size_t N>
-    using array_caster_type = speed::argparse::basic_array_caster<
-            T, string_type, allocator_type<T>, N>;
-
-    /** Type that represents the vector caster type. */
-    template<typename T>
-    using vector_caster_type = speed::argparse::basic_vector_caster<
-            T, string_type, allocator_type<T>>;
-
-    /** Type that represents the deque caster type. */
-    template<typename T>
-    using deque_caster_type = speed::argparse::basic_deque_caster<
-            T, string_type, allocator_type<T>>;
-
-    /** Type that represents the queue caster type. */
-    template<typename T>
-    using queue_caster_type = speed::argparse::basic_queue_caster<
-            T, string_type, allocator_type<T>>;
-
-    /** Type that represents the priority queue caster type. */
-    template<typename T>
-    using priority_queue_caster_type = speed::argparse::basic_priority_queue_caster<
-            T, string_type, allocator_type<T>>;
-
-    /** Type that represents the stack caster type. */
-    template<typename T>
-    using stack_caster_type = speed::argparse::basic_stack_caster<
-            T, string_type, allocator_type<T>>;
-
-    /** Type that represents the forward list type. */
-    template<typename T>
-    using forward_list_caster_type = speed::argparse::basic_forward_list_caster<
-            T, string_type, allocator_type<T>>;
-
-    /** Type that represents the list type. */
-    template<typename T>
-    using list_caster_type = speed::argparse::basic_list_caster<
-            T, string_type, allocator_type<T>>;
-
-    /** Type that represents the set type. */
-    template<typename T>
-    using set_caster_type = speed::argparse::basic_set_caster<
-            T, string_type, allocator_type<T>>;
-
-    /** Type that represents the unordered set type. */
-    template<typename T>
-    using unordered_set_caster_type = speed::argparse::basic_unordered_set_caster<
-            T, string_type, allocator_type<T>>;
-
-    /** Type that represents the unordered multiset type. */
-    template<typename T>
-    using unordered_multiset_caster_type = speed::argparse::basic_unordered_multiset_caster<
-            T, string_type, allocator_type<T>>;
-
-    /** Type that represents the tuple type. */
-    template<typename... Ts>
-    using tuple_caster_type = speed::argparse::basic_tuple_caster<
-            string_type, allocator_type<int>, Ts...>;
+    using type_caster_type = basic_type_caster<string_type, T>;
 
     /** Type that represents a value for an argument. */
     using arg_value_type = basic_arg_value<TpAllocator>;
@@ -206,7 +113,9 @@ public:
             : base_arg_type(arg_parsr)
             , minmax_vals_(1, 1)
             , max_vals_auto_update_(true)
+            , holdr_is_nested_contnr_(false)
     {
+        nr_vals_.emplace_back(0);
     }
     
     /**
@@ -245,6 +154,7 @@ public:
             base_arg_type::operator =(std::move(rhs));
             minmax_vals_ = std::move(rhs.minmax_vals_);
             vals_ = std::move(rhs.vals_);
+            nr_vals_ = std::move(rhs.nr_vals_);
             castrs_ = std::move(rhs.castrs_);
             assertns_ = std::move(rhs.assertns_);
             regxes_ = std::move(rhs.regxes_);
@@ -265,7 +175,7 @@ public:
         {
             vals_.emplace_back(std::forward<TpString_>(val), get_next_caster(),
                     get_next_assertion(), get_next_regex(), base_arg_type::get_arg_parser(), this);
-
+            ++nr_vals_.back();
             return true;
         }
 
@@ -290,6 +200,7 @@ public:
             if (!arg_val.has_errors())
             {
                 vals_.emplace_back(std::move(arg_val));
+                ++nr_vals_.back();
                 return true;
             }
         }
@@ -298,12 +209,35 @@ public:
     }
 
     /**
+     * @brief       Specifies whether the argument has been found in the program call.
+     * @param       fnd : The value that specifies whether the argument has been found in the
+     *              program call.
+     */
+    bool increase_occurrence() noexcept override
+    {
+        if (base_arg_type::was_found() &&
+            holdr_is_nested_contnr_ &&
+            !base_arg_type::max_occurrences_reached())
+        {
+            for (auto& castr : castrs_)
+            {
+                castr->request_addition();
+            }
+            nr_vals_.emplace_back(0);
+        }
+        
+        return base_arg_type::increase_occurrence();
+    }
+
+    /**
      * @brief       Clear values collection.
      */
-    inline void clear_values() noexcept
+    inline void reset() noexcept override
     {
         vals_.clear();
-        base_arg_type::clear_error_flags();
+        nr_vals_.clear();
+        nr_vals_.emplace_back(0);
+        base_arg_type::reset();
     }
 
     /**
@@ -311,41 +245,59 @@ public:
      */
     void update_error_flags() noexcept override
     {
-        bool in = false;
+        bool min_val_err = false;
+        bool val_err = false;
 
         base_arg_type::update_error_flags();
-
-        if (!min_values_reached() && base_arg_type::was_found())
+        
+        if (base_arg_type::was_found())
         {
-            base_arg_type::set_error_flag(arg_error_flags::MIN_VALUES_ERROR);
+            for (auto& nr_val : nr_vals_)
+            {
+                if (nr_val < minmax_vals_.first)
+                {
+                    base_arg_type::set_error_flag(arg_error_flags::MIN_VALUES_ERROR);
+                    min_val_err = true;
+                    break;
+                }
+            }
         }
-        else
+        if (!min_val_err)
         {
             base_arg_type::unset_error_flag(arg_error_flags::MIN_VALUES_ERROR);
-        }
-
-        if (vals_.size() > minmax_vals_.second)
-        {
-            base_arg_type::set_error_flag(arg_error_flags::MAX_VALUES_ERROR);
-            while (vals_.size() > minmax_vals_.second)
-            {
-                vals_.pop_back();
-            }
         }
 
         for (auto& val : vals_)
         {
             if (val.has_errors())
             {
-                in = true;
+                val_err = true;
                 base_arg_type::set_error_flag(arg_error_flags::VALUES_ERROR);
                 break;
             }
         }
-        if (!in)
+        if (!val_err)
         {
             base_arg_type::unset_error_flag(arg_error_flags::VALUES_ERROR);
         }
+    }
+    
+    /**
+     * @brief       Allows knowing whether the argument can't get more values.
+     * @return      If function was successfull true is returned, otherwise false is returned.
+     */
+    [[nodiscard]] inline bool max_values_reached() const noexcept
+    {
+        return nr_vals_.back() >= minmax_vals_.second;
+    }
+
+    /**
+     * @brief       Allows knowing whether the argument has rached the minimal number of values.
+     * @return      If function was successfull true is returned, otherwise false is returned.
+     */
+    [[nodiscard]] inline bool min_values_reached() const noexcept
+    {
+        return nr_vals_.back() >= minmax_vals_.first;
     }
 
     /**
@@ -509,6 +461,15 @@ public:
     }
 
     /**
+     * @brief       Get the actual number of values of the arguement.
+     * @return      The actual number of values of the argument.
+     */
+    [[nodiscard]] std::size_t get_actual_number_of_values() const noexcept
+    {
+        return vals_.size();
+    }
+
+    /**
      * @brief       Get maximum number of values for an option.
      * @return      The maximum number of values for an option.
      */
@@ -527,10 +488,30 @@ public:
     }
 
     /**
+     * @brief       Get the assertion associated with the current value.
+     * @return      The assertion associated with the current value.
+     */
+    [[nodiscard]] function_type* get_next_assertion()
+    {
+        if (nr_vals_.back() < assertns_.size())
+        {
+            auto it = assertns_.begin();
+            std::advance(it, nr_vals_.back());
+            return &*it;
+        }
+        else if (!assertns_.empty())
+        {
+            return &assertns_.back();
+        }
+
+        return nullptr;
+    }
+
+    /**
      * @brief       Get the caster associated witht the current value.
      * @return      The caster associated witht the current value.
      */
-    [[nodiscard]] caster_base_type* get_next_caster()
+    [[nodiscard]] type_caster_base_type* get_next_caster()
     {
         if (vals_.size() < castrs_.size())
         {
@@ -550,10 +531,10 @@ public:
      */
     [[nodiscard]] regex_type* get_next_regex()
     {
-        if (vals_.size() < regxes_.size())
+        if (nr_vals_.back() < regxes_.size())
         {
             auto it = regxes_.begin();
-            std::advance(it, vals_.size());
+            std::advance(it, nr_vals_.back());
             return &*it;
         }
         else if (!regxes_.empty())
@@ -565,32 +546,12 @@ public:
     }
 
     /**
-     * @brief       Get the assertion associated with the current value.
-     * @return      The assertion associated with the current value.
-     */
-    [[nodiscard]] function_type* get_next_assertion()
-    {
-        if (vals_.size() < assertns_.size())
-        {
-            auto it = assertns_.begin();
-            std::advance(it, vals_.size());
-            return &*it;
-        }
-        else if (!assertns_.empty())
-        {
-            return &assertns_.back();
-        }
-
-        return nullptr;
-    }
-
-    /**
-     * @brief       Get the number of values of the arguement.
-     * @return      The number of values of the argument.
+     * @brief       Get the current dimension number of values of the arguement.
+     * @return      The current dimension number of values of the argument.
      */
     [[nodiscard]] std::size_t get_number_of_values() const noexcept
     {
-        return vals_.size();
+        return nr_vals_.back();
     }
 
     /**
@@ -620,187 +581,6 @@ public:
     }
 
     /**
-     * @brief       Set the collection that will get the cast result of each value.
-     * @param       holdr : The collection that will get the cast result of each value.
-     */
-    template<typename TpValue_, std::size_t Nm>
-    void set_holders(array_type<TpValue_, Nm>* holdr)
-    {
-        castrs_.clear();
-        
-        castrs_.emplace_back(speed::memory::allocate_unique<array_caster_type<TpValue_, Nm>>(
-                allocator_type<array_caster_type<TpValue_, Nm>>(), holdr));
-        
-        update_minmax_values(1);
-    }
-
-    /**
-     * @brief       Set the collection that will get the cast result of each value.
-     * @param       holdr : The collection that will get the cast result of each value.
-     */
-    template<typename TpValue_>
-    void set_holders(vector_type<TpValue_>* holdr)
-    {
-        castrs_.clear();
-
-        castrs_.emplace_back(speed::memory::allocate_unique<vector_caster_type<TpValue_>>(
-                allocator_type<vector_caster_type<TpValue_>>(), holdr));
-        
-        update_minmax_values(1);
-    }
-
-    /**
-     * @brief       Set the collection that will get the cast result of each value.
-     * @param       holdr : The collection that will get the cast result of each value.
-     */
-    template<typename TpValue_>
-    void set_holders(deque_type<TpValue_>* holdr)
-    {
-        castrs_.clear();
-
-        castrs_.emplace_back(speed::memory::allocate_unique<deque_caster_type<TpValue_>>(
-                allocator_type<deque_caster_type<TpValue_>>(), holdr));
-        
-        update_minmax_values(1);
-    }
-
-    /**
-     * @brief       Set the collection that will get the cast result of each value.
-     * @param       holdr : The collection that will get the cast result of each value.
-     */
-    template<typename TpValue_>
-    void set_holders(queue_type<TpValue_>* holdr)
-    {
-        castrs_.clear();
-
-        castrs_.emplace_back(speed::memory::allocate_unique<queue_caster_type<TpValue_>>(
-                allocator_type<queue_caster_type<TpValue_>>(), holdr));
-        
-        update_minmax_values(1);
-    }
-
-    /**
-     * @brief       Set the collection that will get the cast result of each value.
-     * @param       holdr : The collection that will get the cast result of each value.
-     */
-    template<typename TpValue_>
-    void set_holders(priority_queue_type<TpValue_>* holdr)
-    {
-        castrs_.clear();
-
-        castrs_.emplace_back(speed::memory::allocate_unique<priority_queue_caster_type<TpValue_>>(
-                allocator_type<priority_queue_caster_type<TpValue_>>(), holdr));
-        
-        update_minmax_values(1);
-    }
-
-    /**
-     * @brief       Set the collection that will get the cast result of each value.
-     * @param       holdr : The collection that will get the cast result of each value.
-     */
-    template<typename TpValue_>
-    void set_holders(stack_type<TpValue_>* holdr)
-    {
-        castrs_.clear();
-
-        castrs_.emplace_back(speed::memory::allocate_unique<stack_caster_type<TpValue_>>(
-                allocator_type<stack_caster_type<TpValue_>>(), holdr));
-        
-        update_minmax_values(1);
-    }
-
-    /**
-     * @brief       Set the collection that will get the cast result of each value.
-     * @param       holdr : The collection that will get the cast result of each value.
-     */
-    template<typename TpValue_>
-    void set_holders(forward_list_type<TpValue_>* holdr)
-    {
-        castrs_.clear();
-
-        castrs_.emplace_back(speed::memory::allocate_unique<forward_list_caster_type<TpValue_>>(
-                allocator_type<forward_list_caster_type<TpValue_>>(), holdr));
-        
-        update_minmax_values(1);
-    }
-
-    /**
-     * @brief       Set the collection that will get the cast result of each value.
-     * @param       holdr : The collection that will get the cast result of each value.
-     */
-    template<typename TpValue_>
-    void set_holders(list_type<TpValue_>* holdr)
-    {
-        castrs_.clear();
-
-        castrs_.emplace_back(speed::memory::allocate_unique<list_caster_type<TpValue_>>(
-                allocator_type<list_caster_type<TpValue_>>(), holdr));
-        
-        update_minmax_values(1);
-    }
-
-    /**
-     * @brief       Set the collection that will get the cast result of each value.
-     * @param       holdr : The collection that will get the cast result of each value.
-     */
-    template<typename TpValue_>
-    void set_holders(set_type<TpValue_>* holdr)
-    {
-        castrs_.clear();
-
-        castrs_.emplace_back(speed::memory::allocate_unique<set_caster_type<TpValue_>>(
-                allocator_type<set_caster_type<TpValue_>>(), holdr));
-        
-        update_minmax_values(1);
-    }
-
-    /**
-     * @brief       Set the collection that will get the cast result of each value.
-     * @param       holdr : The collection that will get the cast result of each value.
-     */
-    template<typename TpValue_>
-    void set_holders(unordered_set_type<TpValue_>* holdr)
-    {
-        castrs_.clear();
-
-        castrs_.emplace_back(speed::memory::allocate_unique<unordered_set_caster_type<TpValue_>>(
-                allocator_type<unordered_set_caster_type<TpValue_>>(), holdr));
-        
-        update_minmax_values(1);
-    }
-
-    /**
-     * @brief       Set the collection that will get the cast result of each value.
-     * @param       holdr : The collection that will get the cast result of each value.
-     */
-    template<typename TpValue_>
-    void set_holders(unordered_multiset_type<TpValue_>* holdr)
-    {
-        castrs_.clear();
-
-        castrs_.emplace_back(
-                speed::memory::allocate_unique<unordered_multiset_caster_type<TpValue_>>(
-                        allocator_type<unordered_multiset_caster_type<TpValue_>>(), holdr));
-        
-        update_minmax_values(1);
-    }
-
-    /**
-     * @brief       Set the collection that will get the cast result of each value.
-     * @param       holdr : The collection that will get the cast result of each value.
-     */
-    template<typename... Ts_>
-    void set_holders(tuple_type<Ts_...>* holdr)
-    {
-        castrs_.clear();
-        castrs_.emplace_back(
-                speed::memory::allocate_unique<tuple_caster_type<Ts_...>>(
-                        allocator_type<tuple_caster_type<Ts_...>>(), holdr));
-        
-        update_minmax_values(std::tuple_size<tuple_type<Ts_...>>::value);
-    }
-
-    /**
      * @brief       Set the objects that will be holding the casted values.
      * @param       holdrs : The objects that will holding the casted values.
      */
@@ -808,10 +588,19 @@ public:
     void set_holders(Ts_*... holdrs)
     {
         castrs_.clear();
-        (castrs_.emplace_back(speed::memory::allocate_unique<caster_type<Ts_>>(
-                allocator_type<caster_type<Ts_>>(), holdrs)), ...);
+        (castrs_.emplace_back(speed::memory::allocate_unique<type_caster_type<Ts_>>(
+                allocator_type<type_caster_type<Ts_>>(), holdrs)), ...);
         
-        update_minmax_values(castrs_.size());
+        if constexpr (sizeof...(holdrs) == 1)
+        {
+            ((holdr_is_nested_contnr_ = is_nested_supported_container_v<Ts_>), ...);
+        }
+        else
+        {
+            holdr_is_nested_contnr_ = false;
+        }
+        
+        update_minmax_values(holdrs...);
     }
 
     /**
@@ -860,24 +649,6 @@ public:
         assertns_.clear();
         (assertns_.emplace_back(std::forward<Ts_>(callabls)), ...);
     }
-
-    /**
-     * @brief       Allows knowing whether the argument has rached the minimal number of values.
-     * @return      If function was successfull true is returned, otherwise false is returned.
-     */
-    [[nodiscard]] inline bool min_values_reached() const noexcept
-    {
-        return vals_.size() >= minmax_vals_.first;
-    }
-
-    /**
-     * @brief       Allows knowing whether the argument can't get more values.
-     * @return      If function was successfull true is returned, otherwise false is returned.
-     */
-    [[nodiscard]] inline bool max_values_reached() const noexcept
-    {
-        return vals_.size() >= minmax_vals_.second;
-    }
     
     /**
      * @brief       Print argument errors in standard output.
@@ -920,8 +691,8 @@ public:
 
 protected:
     /**
-     * @brief       Update the maximum amount of values.
-     * @param       new_max : The new maximum amount of values.
+     * @brief       Updates the minimum and maximum values if auto-update is enabled.
+     * @param       new_minmax : The new minimum and maximum amount of values.
      */
     void update_minmax_values(std::size_t new_minmax)
     {
@@ -932,13 +703,78 @@ protected:
 
         set_minmax_values(new_minmax, new_minmax);
     }
+    
+    /**
+     * @brief       Updates the minimum and maximum values if auto-update is enabled.
+     * @param       holdrs : Variadic number of arguments.
+     */
+    template<typename... Ts_>
+    void update_minmax_values(Ts_*... holdrs)
+    {
+        if (!max_vals_auto_update_)
+        {
+            return;
+        }
+
+        constexpr std::size_t N_PARAMETERS = sizeof...(Ts_);
+        set_minmax_values(N_PARAMETERS, N_PARAMETERS);
+    }
+    
+    /**
+     * @brief       Updates the minimum and maximum values if auto-update is enabled.
+     * @param       holdr : Pointer to an array.
+     */
+    template<typename Tp_, std::size_t N>
+    void update_minmax_values(array_type<Tp_, N>* holdr)
+    {
+        if (!max_vals_auto_update_)
+        {
+            return;
+        }
+        
+        set_minmax_values(N, N);
+    }
+    
+    /**
+     * @brief       Updates the minimum and maximum values if auto-update is enabled.
+     * @param       holdr : Pointer to a pair.
+     */
+    template<typename Tp1_, typename Tp2_>
+    void update_minmax_values(pair_type<Tp1_, Tp2_>* holdr)
+    {
+        if (!max_vals_auto_update_)
+        {
+            return;
+        }
+        
+        set_minmax_values(2, 2);
+    }
+    
+    /**
+     * @brief       Updates the minimum and maximum values if auto-update is enabled.
+     * @param       holdr : Pointer to a tuple.
+     */
+    template<typename... Ts_>
+    void update_minmax_values(tuple_type<Ts_...>* holdr)
+    {
+        if (!max_vals_auto_update_)
+        {
+            return;
+        }
+        
+        constexpr std::size_t TUPLE_SIZE = std::tuple_size<tuple_type<Ts_...>>::value;
+        set_minmax_values(TUPLE_SIZE, TUPLE_SIZE);
+    }
 
 private:
     /** Collection that has the values gotten through the program call for an argument. */
     vector_type<arg_value_type> vals_;
     
+    /** Virtual total number of values. */
+    vector_type<std::size_t> nr_vals_;
+    
     /** Type casters used to validate the values syntax. */
-    vector_type<unique_ptr_type<caster_base_type>> castrs_;
+    vector_type<unique_ptr_type<type_caster_base_type>> castrs_;
     
     /** Functions to execute in order to know if the values are valid. */
     list_type<function_type> assertns_;
@@ -951,6 +787,9 @@ private:
 
     /** Dictates whether the max values number will auto-update. */
     bool max_vals_auto_update_;
+    
+    /** Indicates if holder is a supported nested container. */
+    bool holdr_is_nested_contnr_;
 };
 
 }

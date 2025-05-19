@@ -159,15 +159,21 @@ public:
      */
     self_type& mandatory(bool enabl)
     {
-        if (enabl)
-        {
-            bse_arg_->set_flag(arg_flags::MANDATORY);
-        }
-        else
-        {
-            bse_arg_->unset_flag(arg_flags::MANDATORY);
-        }
+        bse_arg_->set_mandatory(enabl);
+        return dynamic_cast<self_type&>(*this);
+    }
 
+    /**
+     * @brief       Specifies the minimum and maximum number of times an argument can appear in the
+     *              program call. By default, all arguments have a minimum of 0 and a maximum of 1
+     *              occurrence, except for positional arguments, which have a default minimum of 1.
+     * @param       min : The minimum number of occurrences.
+     * @param       max : The maximum number of occurrences.
+     * @return      The object who call the method.
+     */
+    self_type& minmax_occurrences(std::size_t min, std::size_t max)
+    {
+        bse_arg_->set_minmax_occurrences(min, max);
         return dynamic_cast<self_type&>(*this);
     }
 
@@ -204,27 +210,6 @@ public:
 
         return dynamic_cast<self_type&>(*this);
     }
-
-    /**
-     * @brief       Allows to specify whether the argument can be found more than once during the
-     *              program call. This option is enable dy default for all the arguements.
-     * @param       enabl : Specify wheter the feature is enable.
-     * @return      The object who call the method.
-     */
-    self_type& unique_instance(bool enabl)
-    {
-        if (enabl)
-        {
-            bse_arg_->set_flag(arg_flags::UNIQUE_INSTANCE);
-        }
-        else
-        {
-            bse_arg_->unset_flag(arg_flags::UNIQUE_INSTANCE);
-        }
-
-        return dynamic_cast<self_type&>(*this);
-    }
-
 
 protected:
     /** Reference to the argument that this object configures. */

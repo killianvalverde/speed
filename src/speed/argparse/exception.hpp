@@ -260,6 +260,23 @@ public:
 };
 
 /**
+ * @brief       Class used to thrown exceptions when the maximum number of occurrences is
+ *              incoherent.
+ */
+class wrong_max_occurrences_exception : public exception
+{
+public:
+    /**
+     * @brief       Get the message of the exception.
+     * @return      The exception message.
+     */
+    [[nodiscard]] char const* what() const noexcept override
+    {
+        return "wrong max occurrences exception";
+    }
+};
+
+/**
  * @brief       Class used to thrown exceptions when the minimum and maximum number of values is
  *              incoherent.
  */

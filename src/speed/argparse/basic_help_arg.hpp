@@ -99,7 +99,6 @@ public:
             : base_arg_type(arg_parsr)
             , key_value_arg_type(arg_parsr, std::forward<Ts_>(kys)...)
     {
-        base_arg_type::clear_flags();
         base_arg_type::set_flags(arg_flags::DEFAULT_HELP_ARG_FLAGS);
         value_arg_type::set_minmax_values(0, 0);
     }

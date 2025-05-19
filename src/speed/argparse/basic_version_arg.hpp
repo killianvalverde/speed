@@ -75,7 +75,6 @@ public:
             , key_arg_type(arg_parsr, std::forward<Ts_>(kys)...)
             , vers_information_("v1.0.0")
     {
-        base_arg_type::clear_flags();
         base_arg_type::set_flags(arg_flags::DEFAULT_VERSION_ARG_FLAGS);
     }
     

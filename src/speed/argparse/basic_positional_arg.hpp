@@ -76,8 +76,8 @@ public:
             , value_arg_type(arg_parsr)
             , ky_(std::forward<TpString_>(usage_ky))
     {
-        base_arg_type::clear_flags();
-        base_arg_type::set_flags(arg_flags::DEFAULT_positional_ARG_FLAGS);
+        base_arg_type::set_flags(arg_flags::DEFAULT_POSITIONAL_ARG_FLAGS);
+        base_arg_type::set_minmax_occurrences(1, 1);
 
         if (ky_.empty())
         {
@@ -172,7 +172,7 @@ public:
      */
     void print_usage() override
     {
-        if (base_arg_type::is_flag_set(arg_flags::MANDATORY))
+        if (!base_arg_type::is_option())
         {
             std::cout << ky_;
         }

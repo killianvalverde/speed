@@ -178,14 +178,14 @@ public:
             return;
         }
         
-        if (bse_args_.size() <= 1)
+        if (bse_args_.size() < 2)
         {
             throw wrong_constraint_exception();
         }
         
         for (auto& bse_arg : bse_args_)
         {
-            if (bse_arg->is_flag_set(arg_flags::MANDATORY))
+            if (!bse_arg->is_option())
             {
                 throw wrong_constraint_exception();
             }
@@ -212,7 +212,7 @@ public:
 
         for (auto& bse_arg : bse_args_)
         {
-            if (bse_arg->is_flag_set(arg_flags::MANDATORY))
+            if (!bse_arg->is_option())
             {
                 throw wrong_constraint_exception();
             }
@@ -425,6 +425,7 @@ private:
     }
 
 private:
+    // TODO: Use a set here to avoid dups.
     /** The arguments in which apply the dependencies. */
     vector_type<base_arg_type*> bse_args_;
 

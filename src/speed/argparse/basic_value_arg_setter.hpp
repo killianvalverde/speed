@@ -162,6 +162,19 @@ public:
     basic_value_arg_setter& operator =(basic_value_arg_setter&& rhs) noexcept = default;
 
     /**
+     * @brief       Set the functions to execute in order to know if the values are valid.
+     * @param       callabls : Functions to execute in order to know if the values are valid.
+     * @return      The object who call the method.
+     */
+    template<typename... Ts_>
+    self_type& assertions(Ts_&&... callabls)
+    {
+        dynamic_cast<value_arg_type*>(base_arg_setter_type::bse_arg_)
+                ->set_assertions(std::forward<Ts_>(callabls)...);
+        return dynamic_cast<self_type&>(*this);
+    }
+
+    /**
      * @brief       Allows to specify whether keys can be used as values. By default this feature
      *              is disabled for all kind of arguements.
      * @param       enabl : Specify wheter the feature is enable.
@@ -243,19 +256,6 @@ public:
     {
         dynamic_cast<value_arg_type*>(base_arg_setter_type::bse_arg_)
                 ->set_holders(holdrs...);
-        return dynamic_cast<self_type&>(*this);
-    }
-
-    /**
-     * @brief       Set the functions to execute in order to know if the values are valid.
-     * @param       callabls : Functions to execute in order to know if the values are valid.
-     * @return      The object who call the method.
-     */
-    template<typename... Ts_>
-    self_type& assertions(Ts_&&... callabls)
-    {
-        dynamic_cast<value_arg_type*>(base_arg_setter_type::bse_arg_)
-                ->set_assertions(std::forward<Ts_>(callabls)...);
         return dynamic_cast<self_type&>(*this);
     }
 

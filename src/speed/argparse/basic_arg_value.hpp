@@ -36,10 +36,11 @@
 #include "../containers/containers.hpp"
 #include "../system/system.hpp"
 #include "../type_casting/type_casting.hpp"
+#include "forward_declarations.hpp"
 #include "arg_value_error_flags.hpp"
 #include "basic_arg_parser.hpp"
+#include "basic_type_caster.hpp"
 #include "basic_value_arg.hpp"
-#include "forward_declarations.hpp"
 
 namespace speed::argparse {
 
@@ -73,7 +74,7 @@ public:
     using flags_type = speed::containers::flags<T>;
 
     /** Caster base type used in the class. */
-    using caster_base_type = speed::type_casting::type_caster_base<string_type>;
+    using caster_base_type = type_caster_base<string_type>;
 
     /** Type that represents arguments that have values. */
     using value_arg_type = basic_value_arg<TpAllocator>;
@@ -86,9 +87,10 @@ public:
 
     /**
      * @brief       Constructor with parameters.
-     * @param       regx : Regex that the value has to match.
      * @param       val : The value.
      * @param       castr : Caster object used to parse the value.
+     * @param       assrt : Assetion that needs to be valid.
+     * @param       regx : Regex that the value has to match.
      * @param       arg_parsr : Argument parser that holds this object.
      * @param       val_arg : Value arg that holds this object.
      */

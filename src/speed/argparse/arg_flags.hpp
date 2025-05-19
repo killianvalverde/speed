@@ -39,61 +39,51 @@ enum class arg_flags : std::uint16_t
     /** Null flag. */
     NIL = 0x0,
     
-    /** The argument allways has to be present in the program call. */
-    MANDATORY = 0x1,
-    
-    /** The argument must appear not more than once in the program call. */
-    UNIQUE_INSTANCE = 0x2,
-    
     /** The argument can be grouped (-la == -l -a). */
-    GROUPING = 0x4,
+    GROUPING = 0x1,
 
     /** The values for the argument can have a prefix. */
-    VALUES_WITH_PREFIX = 0x8,
+    VALUES_WITH_PREFIX = 0x2,
 
     /** The values for the arugment can have other arguments keys as values. */
-    KEYS_AS_VALUES = 0x10,
+    KEYS_AS_VALUES = 0x4,
     
     /** Allows the usage of the equal operator (--tries=NUMBER). */
-    ASSIGNMENT_OPERATOR = 0x20,
+    ASSIGNMENT_OPERATOR = 0x8,
 
     /** Indicates that the argument will avoid the process of the rest of the arguments. */
-    TERMINAL = 0x40,
+    TERMINAL = 0x10,
 
     /** The argument will trigger the print of the help menu. Just used for help_args. */
-    TRIGGER_HELP_PRINTING = 0x80,
+    TRIGGER_HELP_PRINTING = 0x20,
 
     /** The argument will trigger the print of the version . Just used for version_args. */
-    TRIGGER_VERSION_PRINTING = 0x100,
+    TRIGGER_VERSION_PRINTING = 0x40,
 
     /** Pkill the program when help or version args are found and triggers a print. */
-    PKILL_AFTER_TRIGGERING = 0x200,
+    PKILL_AFTER_TRIGGERING = 0x80,
     
     /** All argument flags. */
-    ALL = 0x3FF,
+    ALL = 0xFF,
     
     /** The default flags used for the key arguments. */
     DEFAULT_KEY_ARG_FLAGS = (
-            UNIQUE_INSTANCE |
             GROUPING
     ),
     
     /** The default flags used for the key value arguments. */
     DEFAULT_KEY_VALUE_ARG_FLAGS = (
-            UNIQUE_INSTANCE |
             GROUPING |
             ASSIGNMENT_OPERATOR
     ),
     
     /** The default flags used for the positional arguments. */
-    DEFAULT_positional_ARG_FLAGS = (
-            UNIQUE_INSTANCE |
-            MANDATORY
+    DEFAULT_POSITIONAL_ARG_FLAGS = (
+            NIL
     ),
     
     /** The default flags used for the help arguments. */
     DEFAULT_HELP_ARG_FLAGS = (
-            UNIQUE_INSTANCE |
             TERMINAL |
             TRIGGER_HELP_PRINTING |
             PKILL_AFTER_TRIGGERING
@@ -101,7 +91,6 @@ enum class arg_flags : std::uint16_t
     
     /** The default flags used for the version arguments. */
     DEFAULT_VERSION_ARG_FLAGS = (
-            UNIQUE_INSTANCE |
             TERMINAL |
             TRIGGER_VERSION_PRINTING |
             PKILL_AFTER_TRIGGERING

@@ -92,7 +92,6 @@ public:
             , value_arg_type(arg_parsr)
             , usage_str_needs_refresh_(true)
     {
-        base_arg_type::clear_flags();
         base_arg_type::set_flags(arg_flags::DEFAULT_KEY_VALUE_ARG_FLAGS);
     }
     

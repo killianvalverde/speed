@@ -56,6 +56,10 @@ public:
     /** String type used in the class. */
     using string_type = std::basic_string<char, std::char_traits<char>, allocator_type<char>>;
 
+    /** Pair type used in the class. */
+    template<typename T1, typename T2>
+    using pair_type = std::pair<T1, T2>;
+
     /** Unordered set type used in the class. */
     template<typename TpKey_>
     using unordered_set_type = std::unordered_set<
@@ -76,10 +80,11 @@ public:
      */
     explicit basic_base_arg(arg_parser_type* arg_parsr)
             : arg_parsr_(arg_parsr)
+            , minmax_occurrencs_(0, 1)
             , presence_holdr_(nullptr)
             , flgs_(arg_flags::NIL)
             , err_flgs_(arg_error_flags::NIL)
-            , nr_fnd_(0)
+            , nr_occurrencs_(0)
     {
     }
     
@@ -126,18 +131,129 @@ public:
     }
 
     /**
+     * @brief       Increase the number of times the arguement has been found in the program call.
+     * @return      If function was successful true is returned, otherwise false is returned.
+     */
+    virtual bool increase_occurrence() noexcept
+    {
+        bool succss = true;
+        
+        if (max_occurrences_reached())
+        {
+            err_flgs_.set(arg_error_flags::MAX_OCCURRENCES_ERROR);
+            succss = false;
+        }
+        
+        if (presence_holdr_ != nullptr)
+        {
+            *presence_holdr_ = true;
+        }
+        
+        speed::safety::try_addm(&nr_occurrencs_, 1);
+        return succss;
+    }
+    
+    /**
+     * @brief       Resets the internal state of the object.
+     */
+    virtual inline void reset() noexcept
+    {
+        err_flgs_.clear();
+        nr_occurrencs_ = 0;
+        if (presence_holdr_ != nullptr)
+        {
+            *presence_holdr_ = false;
+        }
+    }
+
+    /**
      * @brief       Set errors flags if required.
      */
     virtual inline void update_error_flags() noexcept
     {
-        if (flgs_.is_set(arg_flags::MANDATORY) && nr_fnd_ == 0 && arg_parsr_->has_parsed())
+        if (nr_occurrencs_ < minmax_occurrencs_.first && arg_parsr_->has_parsed())
         {
-            err_flgs_.set(arg_error_flags::ALLWAYS_REQUIRED_ERROR);
+            err_flgs_.set(arg_error_flags::MIN_OCCURRENCES_ERROR);
         }
         else
         {
-            err_flgs_.unset(arg_error_flags::ALLWAYS_REQUIRED_ERROR);
+            err_flgs_.unset(arg_error_flags::MIN_OCCURRENCES_ERROR);
         }
+    }
+    
+    /**
+     * @brief       Allows knowing whether there are errors.
+     * @return      If function was successful true is returned, otherwise false is returned.
+     */
+    [[nodiscard]] inline bool has_errors() const noexcept
+    {
+        return err_flgs_.is_not_empty();
+    }
+
+    /**
+     * @brief       Allows knowing whether an argument error flag is set.
+     * @param       flg : The error flag to check.
+     * @return      If function was successful true is returned, otherwise false is returned.
+     */
+    [[nodiscard]] inline bool is_error_flag_set(arg_error_flags flg) const noexcept
+    {
+        return err_flgs_.is_set(flg);
+    }
+
+    /**
+     * @brief       Allows knowing whether the argument error name is empty.
+     * @return      If the function was successful true is returned, otherwise false is returned.
+     */
+    [[nodiscard]] inline bool is_error_name_empty() const noexcept
+    {
+        return err_name_.empty();
+    }
+
+    /**
+     * @brief       Allows knowing whether an argument flag is set.
+     * @param       flg : The flag to check.
+     * @return      If function was successful true is returned, otherwise false is returned.
+     */
+    [[nodiscard]] inline bool is_flag_set(arg_flags flg) const noexcept
+    {
+        return flgs_.is_set(flg);
+    }
+
+    /**
+     * @brief       Allows knowing whether the argument description is empty.
+     * @return      If the function was successful true is returned, otherwise false is returned.
+     */
+    [[nodiscard]] inline bool is_help_text_empty() const
+    {
+        return desc_.empty();
+    }
+
+    /**
+     * @brief       Allows knowing if the argument in an option.
+     * @return      If the function was successful true is returned, otherwise false is returned.
+     */
+    [[nodiscard]] inline bool is_option() const noexcept
+    {
+        return minmax_occurrencs_.first == 0;
+    }
+    
+    /**
+     * @brief       Allows knowing whether the argument can't get more values.
+     * @return      If function was successfull true is returned, otherwise false is returned.
+     */
+    [[nodiscard]] inline bool max_occurrences_reached() const noexcept
+    {
+        return nr_occurrencs_ >= minmax_occurrencs_.second;
+    }
+
+    /**
+     * @brief       Allows knowing whether the argument has been found in the program call.
+     * @return      The value that specifies whether the argument has been found in the program
+     *              call.
+     */
+    [[nodiscard]] inline bool was_found() const noexcept
+    {
+        return nr_occurrencs_ != 0;
     }
 
     /**
@@ -253,30 +369,6 @@ public:
     }
 
     /**
-     * @brief       Specifies whether the argument has been found in the program call.
-     * @param       fnd : The value that specifies whether the argument has been found in the
-     *              program call.
-     */
-    inline void set_found(bool fnd) noexcept
-    {
-        if (fnd && nr_fnd_ != 0 && flgs_.is_set(arg_flags::UNIQUE_INSTANCE))
-        {
-            err_flgs_.set(arg_error_flags::APPEAR_JUST_ONCE_ERROR);
-        }
-        else
-        {
-            fnd ? speed::safety::try_addm(&nr_fnd_, 1) : nr_fnd_ = 0;
-
-            if (presence_holdr_ != nullptr)
-            {
-                *presence_holdr_ = fnd;
-            }
-
-            err_flgs_.unset(arg_error_flags::APPEAR_JUST_ONCE_ERROR);
-        }
-    }
-
-    /**
      * @brief       Set the help menus assigned with the arguement.
      * @param       hlp_menus_ids : The help menus ids of the help menus assigned.
      */
@@ -290,16 +382,52 @@ public:
     }
 
     /**
+     * @brief       Sets whether the argument is mandatory.
+     * @param       enabl : `true` to make the argument mandatory, `false` to make it optional.
+     */
+    virtual void set_mandatory(bool enabl)
+    {
+        if (enabl && minmax_occurrencs_.first == 0)
+        {
+            minmax_occurrencs_.first = 1;
+        }
+        if (!enabl)
+        {
+            minmax_occurrencs_.first = 0;
+        }
+    }
+
+    /**
+     * @brief       Set the minimum and maximum number of time an argument can be find in the
+     *              program call.
+     * @param       min : The minimum number of occurrences.
+     * @param       max : The maxium number of occurrences.
+     */
+    virtual void set_minmax_occurrences(std::size_t min, std::size_t max)
+    {
+        if (max == 0)
+        {
+            throw wrong_max_occurrences_exception();
+        }
+        if (min > max)
+        {
+            throw wrong_min_max_interval_exception();
+        }
+
+        minmax_occurrencs_.first = min;
+        minmax_occurrencs_.second = max;
+    }
+
+    /**
      * @brief       Set the presence synchronizer.
      * @param       presence_holdr : The presence synchronizer.
      */
     inline void set_presence_holder(bool* presence_holdr) noexcept
     {
         presence_holdr_ = presence_holdr;
-
         if (presence_holdr_ != nullptr)
         {
-            *presence_holdr_ = nr_fnd_ == 0;
+            *presence_holdr_ = nr_occurrencs_ == 0;
         }
     }
 
@@ -320,103 +448,37 @@ public:
     {
         flgs_.unset(flg);
     }
-
-    /**
-     * @brief       Erase all argument error flags.
-     */
-    inline void clear_error_flags() noexcept
-    {
-        err_flgs_.clear();
-    }
-
-    /**
-     * @brief       Erase all argument flags.
-     */
-    inline void clear_flags() noexcept
-    {
-        flgs_.clear();
-    }
-    
-    /**
-     * @brief       Allows knowing whether there are errors.
-     * @return      If function was successful true is returned, otherwise false is returned.
-     */
-    [[nodiscard]] inline bool has_errors() const noexcept
-    {
-        return err_flgs_.is_not_empty();
-    }
-
-    /**
-     * @brief       Allows knowing whether an argument error flag is set.
-     * @param       flg : The error flag to check.
-     * @return      If function was successful true is returned, otherwise false is returned.
-     */
-    [[nodiscard]] inline bool is_error_flag_set(arg_error_flags flg) const noexcept
-    {
-        return err_flgs_.is_set(flg);
-    }
-
-    /**
-     * @brief       Allows knowing whether the argument error name is empty.
-     * @return      If the function was successful true is returned, otherwise false is returned.
-     */
-    [[nodiscard]] inline bool is_error_name_empty() const noexcept
-    {
-        return err_name_.empty();
-    }
-
-    /**
-     * @brief       Allows knowing whether an argument flag is set.
-     * @param       flg : The flag to check.
-     * @return      If function was successful true is returned, otherwise false is returned.
-     */
-    [[nodiscard]] inline bool is_flag_set(arg_flags flg) const noexcept
-    {
-        return flgs_.is_set(flg);
-    }
-
-    /**
-     * @brief       Allows knowing whether the argument description is empty.
-     * @return      If the function was successful true is returned, otherwise false is returned.
-     */
-    [[nodiscard]] inline bool is_help_text_empty() const
-    {
-        return desc_.empty();
-    }
-
-    /**
-     * @brief       Allows knowing if the argument in an option.
-     * @return      If the function was successful true is returned, otherwise false is returned.
-     */
-    [[nodiscard]] inline bool is_option() const noexcept
-    {
-        return flgs_.is_not_set(arg_flags::MANDATORY);
-    }
-
-    /**
-     * @brief       Allows knowing whether the argument has been found in the program call.
-     * @return      The value that specifies whether the argument has been found in the program
-     *              call.
-     */
-    [[nodiscard]] inline bool was_found() const noexcept
-    {
-        return nr_fnd_ != 0;
-    }
     
     /**
      * @brief       Print argument errors in standard output.
      */
     virtual void print_errors() const
     {
-        if (err_flgs_.is_set(arg_error_flags::ALLWAYS_REQUIRED_ERROR))
+        if (err_flgs_.is_set(arg_error_flags::MIN_OCCURRENCES_ERROR))
         {
             print_error_message();
-            std::cout << get_tittle() << " is allways required\n";
+            if (minmax_occurrencs_.first == 1)
+            {
+                std::cout << get_tittle() << " is allways required\n";
+            }
+            else
+            {
+                std::cout << get_tittle() << " must appear at least "
+                          << minmax_occurrencs_.first << " times\n";
+            }
         }
-        if (err_flgs_.is_set(arg_error_flags::APPEAR_JUST_ONCE_ERROR))
+        if (err_flgs_.is_set(arg_error_flags::MAX_OCCURRENCES_ERROR))
         {
             print_error_message();
-            std::cout << get_tittle() << " has appeared more than once\n";
+            if (minmax_occurrencs_.second == 1)
+            {
+                std::cout << get_tittle() << " has appeared more than once\n";
+            }
+            else
+            {
+                std::cout << get_tittle() << " must appear no more than "
+                          << minmax_occurrencs_.first << " times\n";
+            }
         }
     }
 
@@ -463,9 +525,9 @@ public:
         {
             return;
         }
-
+        
         speed::iostream::print_wrapped(std::cout, desc_, max_line_len, new_line_indent,
-                                       current_line_len);
+                current_line_len);
         std::cout << '\n';
     }
 
@@ -505,6 +567,9 @@ private:
     /** The name used to reference an arguments during the error display. */
     string_type err_name_;
 
+    /** Minimum and maximum number of times the argument has to be found. */
+    pair_type<std::size_t, std::size_t> minmax_occurrencs_;
+
     /** Function to execute if the arguement is found during the program call. */
     std::function<void()> actn_;
 
@@ -515,7 +580,7 @@ private:
     bool* presence_holdr_;
 
     /** Number of times the argument has been found. */
-    std::size_t nr_fnd_;
+    std::size_t nr_occurrencs_;
     
     /** Flags that dictates the argument behavior. */
     flags_type<arg_flags> flgs_;
