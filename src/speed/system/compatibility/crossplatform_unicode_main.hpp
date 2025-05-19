@@ -18,19 +18,19 @@
  */
 
 /**
- * @file        multiplatform_main_with_unicode_support.hpp
- * @brief       multiplatform_main_with_unicode_support header.
+ * @file        crossplatform_unicode_main.hpp
+ * @brief       crossplatform_unicode_main header.
  * @author      Killian Valverde
  * @date        2024/10/26
  */
 
-#ifndef SPEED_SYSTEM_COMPATIBILITY_MULTIPLATFORM_MAIN_WITH_UNICODE_SUPPORT_HPP
-#define SPEED_SYSTEM_COMPATIBILITY_MULTIPLATFORM_MAIN_WITH_UNICODE_SUPPORT_HPP
+#ifndef SPEED_SYSTEM_COMPATIBILITY_CROSSPLATFORM_UNICODE_MAIN_HPP
+#define SPEED_SYSTEM_COMPATIBILITY_CROSSPLATFORM_UNICODE_MAIN_HPP
 
 #include "platform.hpp"
 
 /** @cond */
-#ifdef SPEED_MULTIPLATFORM_MAIN_WITH_UNICODE_SUPPORT
+#ifdef SPEED_CROSSPLATFORM_UNICODE_MAIN
 #if defined(SPEED_WINAPI)
 #define main(c, v) \
     __secondary(c, v); \

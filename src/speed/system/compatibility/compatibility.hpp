@@ -27,7 +27,7 @@
 #ifndef SPEED_SYSTEM_COMPATIBILITY_COMPATIBILITY_HPP
 #define SPEED_SYSTEM_COMPATIBILITY_COMPATIBILITY_HPP
 
-#include "multiplatform_main_with_unicode_support.hpp"
+#include "crossplatform_unicode_main.hpp"
 #include "platform.hpp"
 #include "select_api.hpp"
 
