@@ -125,7 +125,7 @@ bool directory_iteration::const_iterator::open_directory()
         ino = speed::system::filesystem::get_file_inode(cur_dir_.c_str());
     }
 
-    if (current_recursivity_levl_ > composit_->recursivity_levl_ ||
+    if (current_recursivity_levl_ > composit_->max_recursivity_levl_ ||
         (composit_->inode_trackr_ && vistd_inos_.contains(ino)) ||
         (!composit_->follow_symbolic_lnks_ &&
                 speed::system::filesystem::is_symlink(cur_dir_.c_str())))
@@ -163,7 +163,7 @@ bool directory_iteration::const_iterator::read_directory()
         succss = speed::system::filesystem::readdir(&cur_dir_ent);
     }
     while (succss && (speed::stringutils::strcmp(cur_dir_ent.nme, ".") == 0 ||
-                      speed::stringutils::strcmp(cur_dir_ent.nme, "..") == 0));
+                    speed::stringutils::strcmp(cur_dir_ent.nme, "..") == 0));
 
     return succss;
 }

@@ -223,7 +223,7 @@ public:
             , regex_to_mtch_str_()
             , file_typs_(speed::system::filesystem::file_types::NIL)
             , access_mods_(speed::system::filesystem::access_modes::NIL)
-            , recursivity_levl_(~0ull)
+            , max_recursivity_levl_(~0ull)
             , follow_symbolic_lnks_(false)
             , case_sensitve_(false)
             , inode_trackr_(false)
@@ -338,7 +338,7 @@ public:
      */
     inline directory_iteration& recursivity_level(std::uint64_t recursivity_levl)
     {
-        recursivity_levl_ = recursivity_levl;
+        max_recursivity_levl_ = recursivity_levl;
         return *this;
     }
 
@@ -411,7 +411,7 @@ private:
     regex_type regex_to_mtch_;
 
     /** Maximum level of recursivity allowed. */
-    std::uint64_t recursivity_levl_;
+    std::uint64_t max_recursivity_levl_;
 
     /** List of file types that are allowed to be iterated. */
     system::filesystem::file_types file_typs_;
