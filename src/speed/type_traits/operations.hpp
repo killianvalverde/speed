@@ -27,10 +27,20 @@
 #ifndef SPEED_TYPE_TRAITS_OPERATIONS_HPP
 #define SPEED_TYPE_TRAITS_OPERATIONS_HPP
 
+#include <deque>
 #include <filesystem>
+#include <forward_list>
+#include <list>
+#include <map>
+#include <queue>
 #include <regex>
+#include <set>
+#include <stack>
 #include <string>
+#include <tuple>
 #include <type_traits>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 namespace speed::type_traits {
@@ -397,6 +407,78 @@ struct is_basic_string_vector
           >::type
 {
 };
+
+/** @cond */
+namespace __private {
+template<typename T>
+struct __is_std_container_helper : std::false_type {};
+
+template<typename T, std::size_t N>
+struct __is_std_container_helper<std::array<T, N>> : std::true_type {};
+
+template<typename... Args>
+struct __is_std_container_helper<std::vector<Args...>> : std::true_type {};
+
+template<typename... Args>
+struct __is_std_container_helper<std::deque<Args...>> : std::true_type {};
+
+template<typename... Args>
+struct __is_std_container_helper<std::queue<Args...>> : std::true_type {};
+
+template<typename... Args>
+struct __is_std_container_helper<std::priority_queue<Args...>> : std::true_type {};
+
+template<typename... Args>
+struct __is_std_container_helper<std::stack<Args...>> : std::true_type {};
+
+template<typename... Args>
+struct __is_std_container_helper<std::forward_list<Args...>> : std::true_type {};
+
+template<typename... Args>
+struct __is_std_container_helper<std::list<Args...>> : std::true_type {};
+
+template<typename... Args>
+struct __is_std_container_helper<std::set<Args...>> : std::true_type {};
+
+template<typename... Args>
+struct __is_std_container_helper<std::unordered_set<Args...>> : std::true_type {};
+
+template<typename... Args>
+struct __is_std_container_helper<std::unordered_multiset<Args...>> : std::true_type {};
+
+template<typename... Args>
+struct __is_std_container_helper<std::map<Args...>> : std::true_type {};
+
+template<typename... Args>
+struct __is_std_container_helper<std::unordered_map<Args...>> : std::true_type {};
+
+template<typename... Args>
+struct __is_std_container_helper<std::unordered_multimap<Args...>> : std::true_type {};
+
+template<typename... Args>
+struct __is_std_container_helper<std::pair<Args...>> : std::true_type {};
+
+template<typename... Args>
+struct __is_std_container_helper<std::tuple<Args...>> : std::true_type {};
+} /* __private */
+/** @endcond */
+
+/**
+ * @brief       Trait class that identifies whether T is a std container type.
+ */
+template<typename Tp>
+struct is_std_container
+        : public __private::__is_std_container_helper<
+                typename std::remove_cv<Tp>::type
+          >::type
+{
+};
+
+/**
+ * @brief       Trait class that identifies whether T is a std container type.
+ */
+template<typename... Args>
+constexpr bool is_std_container_v = is_std_container<Args...>::value;
 
 /** @cond */
 namespace __private {
