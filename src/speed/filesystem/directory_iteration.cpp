@@ -196,7 +196,7 @@ bool directory_iteration::const_iterator::is_file_valid()
     }
     
     if (!composit_->wildcard_to_mtch_.empty() &&
-        matches_wildcard(cur_fle_.filename().c_str(), composit_->wildcard_to_mtch_.c_str()))
+        !matches_wildcard(cur_fle_.filename().c_str(), composit_->wildcard_to_mtch_.c_str()))
     {
         return false;
     }
