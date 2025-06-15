@@ -37,7 +37,6 @@ indentation::indentation(std::size_t tab_size, std::size_t curr_size) noexcept
 indentation& indentation::operator ++() noexcept
 {
     curr_size_ += tab_size_;
-    
     return *this;
 }
 
