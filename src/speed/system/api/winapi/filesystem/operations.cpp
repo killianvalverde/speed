@@ -228,7 +228,7 @@ bool access(
 bool can_directory_be_created(const char* directory_pth, std::error_code* err_code) noexcept
 {
     char parent_pth[MAX_PATH] = {0};
-    std::size_t directory_path_len = stringutils::strlen(directory_pth);
+    std::size_t directory_path_len = stringutils::cstr_length(directory_pth);
     char* last_char_p;
 
     if (directory_path_len >= MAX_PATH ||
@@ -238,9 +238,9 @@ bool can_directory_be_created(const char* directory_pth, std::error_code* err_co
         return false;
     }
 
-    speed::stringutils::strcpy(parent_pth, directory_pth);
-    speed::stringutils::strrmlast(parent_pth, '\\');
-    last_char_p = speed::stringutils::strcut(parent_pth, '\\');
+    speed::stringutils::cstr_copy(parent_pth, directory_pth);
+    speed::stringutils::cstr_remove_trailing_if(parent_pth, [](char ch) { return ch == '\\'; });
+    last_char_p = speed::stringutils::cstr_cut(parent_pth, '\\');
     directory_path_len = last_char_p == nullptr ? 0 : parent_pth - last_char_p + 1;
 
     if (directory_path_len == 0)
@@ -256,7 +256,7 @@ bool can_directory_be_created(const char* directory_pth, std::error_code* err_co
 bool can_directory_be_created(const wchar_t* directory_pth, std::error_code* err_code) noexcept
 {
     wchar_t parent_pth[MAX_PATH] = {0};
-    std::size_t directory_path_len = stringutils::strlen(directory_pth);
+    std::size_t directory_path_len = stringutils::cstr_length(directory_pth);
     wchar_t* p_last_char;
 
     if (directory_path_len >= MAX_PATH ||
@@ -266,9 +266,9 @@ bool can_directory_be_created(const wchar_t* directory_pth, std::error_code* err
         return false;
     }
 
-    speed::stringutils::strcpy(parent_pth, directory_pth);
-    speed::stringutils::strrmlast(parent_pth, L'\\');
-    p_last_char = speed::stringutils::strcut(parent_pth, L'\\');
+    speed::stringutils::cstr_copy(parent_pth, directory_pth);
+    speed::stringutils::cstr_remove_trailing_if(parent_pth, [](char ch) { return ch == '\\'; });
+    p_last_char = speed::stringutils::cstr_cut(parent_pth, L'\\');
     directory_path_len = p_last_char == nullptr ? 0 : parent_pth - p_last_char + 1;
 
     if (directory_path_len == 0)
@@ -284,7 +284,7 @@ bool can_directory_be_created(const wchar_t* directory_pth, std::error_code* err
 bool can_regular_file_be_created(const char* regular_file_pth, std::error_code* err_code) noexcept
 {
     char parent_pth[MAX_PATH] = {0};
-    std::size_t path_len = stringutils::strlen(regular_file_pth);
+    std::size_t path_len = stringutils::cstr_length(regular_file_pth);
     char* p_last_char;
 
     if (path_len >= MAX_PATH || path_len == 0)
@@ -298,9 +298,9 @@ bool can_regular_file_be_created(const char* regular_file_pth, std::error_code* 
                       system::filesystem::file_types::REGULAR_FILE, err_code);
     }
 
-    speed::stringutils::strcpy(parent_pth, regular_file_pth);
-    speed::stringutils::strrmlast(parent_pth, '\\');
-    p_last_char = speed::stringutils::strcut(parent_pth, '\\');
+    speed::stringutils::cstr_copy(parent_pth, regular_file_pth);
+    speed::stringutils::cstr_remove_trailing_if(parent_pth, [](char ch) { return ch == '\\'; });
+    p_last_char = speed::stringutils::cstr_cut(parent_pth, '\\');
     path_len = p_last_char == nullptr ? 0 : parent_pth - p_last_char + 1;
 
     if (path_len == 0)
@@ -316,7 +316,7 @@ bool can_regular_file_be_created(const char* regular_file_pth, std::error_code* 
 bool can_regular_file_be_created(const wchar_t* regular_file_pth, std::error_code* err_code) noexcept
 {
     wchar_t parent_pth[MAX_PATH] = {0};
-    std::size_t path_len = stringutils::strlen(regular_file_pth);
+    std::size_t path_len = stringutils::cstr_length(regular_file_pth);
     wchar_t* p_last_char;
 
     if (path_len >= MAX_PATH || path_len == 0)
@@ -330,9 +330,9 @@ bool can_regular_file_be_created(const wchar_t* regular_file_pth, std::error_cod
                       system::filesystem::file_types::REGULAR_FILE, err_code);
     }
 
-    speed::stringutils::strcpy(parent_pth, regular_file_pth);
-    speed::stringutils::strrmlast(parent_pth, L'\\');
-    p_last_char = speed::stringutils::strcut(parent_pth, L'\\');
+    speed::stringutils::cstr_copy(parent_pth, regular_file_pth);
+    speed::stringutils::cstr_remove_trailing_if(parent_pth, [](char ch) { return ch == '\\'; });
+    p_last_char = speed::stringutils::cstr_cut(parent_pth, L'\\');
     path_len = p_last_char == nullptr ? 0 : parent_pth - p_last_char + 1;
 
     if (path_len == 0)
@@ -415,8 +415,7 @@ system::filesystem::inode_t get_file_inode(const char* file_pth, std::error_code
     BY_HANDLE_FILE_INFORMATION file_info;
 
     file_handl = ::CreateFileA(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
-                               nullptr);
+            OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, nullptr);
     
     if (file_handl == INVALID_HANDLE_VALUE)
     {
@@ -445,8 +444,7 @@ system::filesystem::inode_t get_file_inode(
     BY_HANDLE_FILE_INFORMATION file_info;
 
     file_handl = ::CreateFileW(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
-                               nullptr);
+            OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, nullptr);
 
     if (file_handl == INVALID_HANDLE_VALUE)
     {
@@ -512,7 +510,7 @@ system::process::uid_t get_file_uid(const char* file_pth, std::error_code* err_c
     system::process::uid_t uid;
 
     if (::GetNamedSecurityInfoA(file_pth, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &owner_sid,
-                                nullptr, nullptr, nullptr, &sec_desc) != ERROR_SUCCESS ||
+            nullptr, nullptr, nullptr, &sec_desc) != ERROR_SUCCESS ||
         !::ConvertSidToStringSidA(owner_sid, &sid_cstr))
     {
         system::errors::assign_system_error_code((int)GetLastError(), err_code);
@@ -539,7 +537,7 @@ system::process::uid_t get_file_uid(const wchar_t* file_pth, std::error_code* er
     system::process::uid_t uid;
 
     if (::GetNamedSecurityInfoW(file_pth, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &owner_sid,
-                                nullptr, nullptr, nullptr, &sec_desc) != ERROR_SUCCESS ||
+            nullptr, nullptr, nullptr, &sec_desc) != ERROR_SUCCESS ||
         !::ConvertSidToStringSidA(owner_sid, &sid_cstr))
     {
         system::errors::assign_system_error_code((int)GetLastError(), err_code);
@@ -582,7 +580,7 @@ system::process::gid_t get_file_gid(const char* file_pth, std::error_code* err_c
     }
 
     if (!::GetFileSecurityA(file_pth, GROUP_SECURITY_INFORMATION, security_desc, security_desc_sz,
-                            &security_desc_sz) ||
+            &security_desc_sz) ||
         !::GetSecurityDescriptorGroup(security_desc, &group_sid, &group_defaultd))
     {
         system::errors::assign_system_error_code((int)GetLastError(), err_code);
@@ -628,7 +626,7 @@ system::process::gid_t get_file_gid(const wchar_t* file_pth, std::error_code* er
     }
 
     if (!::GetFileSecurityW(file_pth, GROUP_SECURITY_INFORMATION, security_desc, security_desc_sz,
-                            &security_desc_sz) ||
+            &security_desc_sz) ||
         !::GetSecurityDescriptorGroup(security_desc, &group_sid, &group_defaultd))
     {
         system::errors::assign_system_error_code((int)GetLastError(), err_code);
@@ -656,7 +654,7 @@ std::size_t get_file_size(const char* file_pth, std::error_code* err_code) noexc
     DWORD file_sz;
     
     file_handl = ::CreateFileA(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+            OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
     
     if (file_handl == INVALID_HANDLE_VALUE)
     {
@@ -682,7 +680,7 @@ std::size_t get_file_size(const wchar_t* file_pth, std::error_code* err_code) no
     DWORD file_sz;
     
     file_handl = ::CreateFileW(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+            OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
     
     if (file_handl == INVALID_HANDLE_VALUE)
     {
@@ -714,8 +712,7 @@ bool get_modification_time(
     SYSTEMTIME local_system_tme;
     
     handl = ::CreateFileA(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                          OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
-                          nullptr);
+            OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, nullptr);
     
     if (handl == INVALID_HANDLE_VALUE ||
         ::GetFileTime(handl, nullptr, nullptr, &last_write_tme) == 0 ||
@@ -750,8 +747,7 @@ bool get_modification_time(
     SYSTEMTIME local_system_tme;
     
     handl = ::CreateFileW(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                          OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
-                          nullptr);
+            OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, nullptr);
 
     if (handl == INVALID_HANDLE_VALUE ||
         ::GetFileTime(handl, nullptr, nullptr, &last_write_tme) == 0 ||
@@ -793,7 +789,7 @@ bool is_block_device(const char* file_pth, std::error_code* err_code) noexcept
     DWORD file_typ;
 
     file_handl = ::CreateFileA(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+            OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
     if (file_handl == INVALID_HANDLE_VALUE)
     {
@@ -813,7 +809,7 @@ bool is_block_device(const wchar_t* file_pth, std::error_code* err_code) noexcep
     DWORD file_typ;
 
     file_handl = ::CreateFileW(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+            OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
     if (file_handl == INVALID_HANDLE_VALUE)
     {
@@ -833,7 +829,7 @@ bool is_character_device(const char* file_pth, std::error_code* err_code) noexce
     DWORD file_typ;
 
     file_handl = ::CreateFileA(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+            OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
     if (file_handl == INVALID_HANDLE_VALUE)
     {
@@ -853,7 +849,7 @@ bool is_character_device(const wchar_t* file_pth, std::error_code* err_code) noe
     DWORD file_typ;
 
     file_handl = ::CreateFileW(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+            OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
     if (file_handl == INVALID_HANDLE_VALUE)
     {
@@ -1005,7 +1001,7 @@ bool is_pipe(const char* file_pth, std::error_code* err_code) noexcept
     DWORD file_typ;
 
     file_handl = ::CreateFileA(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+            OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
     if (file_handl == INVALID_HANDLE_VALUE)
     {
@@ -1025,7 +1021,7 @@ bool is_pipe(const wchar_t* file_pth, std::error_code* err_code) noexcept
     DWORD file_typ;
 
     file_handl = ::CreateFileW(file_pth, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+            OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
     if (file_handl == INVALID_HANDLE_VALUE)
     {
@@ -1214,7 +1210,7 @@ bool mkdir_recursively(
     size_t slash_pos_sz = 0;
     char* last_chr;
 
-    pth_len = stringutils::strlen(directory_pth);
+    pth_len = stringutils::cstr_length(directory_pth);
 
     if (pth_len >= MAX_PATH ||
         pth_len == 0 ||
@@ -1223,12 +1219,12 @@ bool mkdir_recursively(
         return false;
     }
 
-    stringutils::strcpy(parnt_path, directory_pth);
-    stringutils::strrmlast(parnt_path, '\\');
+    stringutils::cstr_copy(parnt_path, directory_pth);
+    stringutils::cstr_remove_trailing_if(parnt_path, [](char ch) { return ch == '\\'; });
 
     do
     {
-        last_chr = stringutils::strcut(parnt_path, '\\', true);
+        last_chr = stringutils::cstr_cut(parnt_path, '\\', true);
 
         if (last_chr == nullptr)
         {
@@ -1275,7 +1271,7 @@ bool mkdir_recursively(
     size_t slash_pos_sz = 0;
     wchar_t* last_chr;
 
-    pth_len = stringutils::strlen(directory_pth);
+    pth_len = stringutils::cstr_length(directory_pth);
 
     if (pth_len >= MAX_PATH ||
         pth_len == 0 ||
@@ -1284,12 +1280,12 @@ bool mkdir_recursively(
         return false;
     }
 
-    stringutils::strcpy(parnt_path, directory_pth);
-    stringutils::strrmlast(parnt_path, L'\\');
+    stringutils::cstr_copy(parnt_path, directory_pth);
+    stringutils::cstr_remove_trailing_if(parnt_path, [](char ch) { return ch == '\\'; });
 
     do
     {
-        last_chr = stringutils::strcut(parnt_path, L'\\', true);
+        last_chr = stringutils::cstr_cut(parnt_path, L'\\', true);
 
         if (last_chr == nullptr)
         {
@@ -1335,22 +1331,22 @@ bool opendir(
     bool slash_insertd = false;
     auto* directory_ent_ext = &directory_ent->__priv;
     
-    directory_pth_len = speed::stringutils::strlen(directory_pth);
+    directory_pth_len = speed::stringutils::cstr_length(directory_pth);
     if (directory_pth_len >= MAX_PATH - 3)
     {
         system::errors::assign_system_error_code(ERANGE, err_code);
         return false;
     }
     
-    speed::stringutils::strcpy(directory_ent_ext->pth, directory_pth);
+    speed::stringutils::cstr_copy(directory_ent_ext->pth, directory_pth);
     if (directory_pth_len < 1 || directory_pth[directory_pth_len - 1] != '\\')
     {
-        speed::stringutils::strcat(directory_ent_ext->pth, "\\*");
+        speed::stringutils::cstr_concat(directory_ent_ext->pth, "\\*");
         slash_insertd = true;
     }
     else
     {
-        speed::stringutils::strcat(directory_ent_ext->pth, "*");
+        speed::stringutils::cstr_concat(directory_ent_ext->pth, "*");
     }
     
     directory_ent_ext->dir_handl = ::FindFirstFileA(
@@ -1386,22 +1382,22 @@ bool opendir(
     bool slash_insertd = false;
     auto* directory_ent_ext = &directory_ent->__priv;
     
-    directory_pth_len = speed::stringutils::strlen(directory_pth);
+    directory_pth_len = speed::stringutils::cstr_length(directory_pth);
     if (directory_pth_len >= MAX_PATH - 3)
     {
         system::errors::assign_system_error_code(ERANGE, err_code);
         return false;
     }
     
-    speed::stringutils::strcpy(directory_ent_ext->pth, directory_pth);
+    speed::stringutils::cstr_copy(directory_ent_ext->pth, directory_pth);
     if (directory_pth_len < 1 || directory_pth[directory_pth_len - 1] != '\\')
     {
-        speed::stringutils::strcat(directory_ent_ext->pth, "\\*");
+        speed::stringutils::cstr_concat(directory_ent_ext->pth, "\\*");
         slash_insertd = true;
     }
     else
     {
-        speed::stringutils::strcat(directory_ent_ext->pth, "*");
+        speed::stringutils::cstr_concat(directory_ent_ext->pth, "*");
     }
     
     directory_ent_ext->dir_handl = ::FindFirstFileW(
@@ -1525,7 +1521,7 @@ bool shortcut(
 
     ::CoInitialize(nullptr);
     res = ::CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink,
-                             (LPVOID*)&shell_lnk);
+            (LPVOID*)&shell_lnk);
 
     if (!SUCCEEDED(res))
     {
@@ -1554,7 +1550,7 @@ bool shortcut(
         goto exit;
     }
 
-    speed::stringutils::strcpy(wshortcut_pth + converted_chars - 1, L".lnk");
+    speed::stringutils::cstr_copy(wshortcut_pth + converted_chars - 1, L".lnk");
     res = persist_fle->Save(wshortcut_pth, true);
 
     goto exit;
@@ -1597,7 +1593,7 @@ bool shortcut(
 
     ::CoInitialize(nullptr);
     res = ::CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLinkW,
-                             (LPVOID*)&shell_lnk);
+            (LPVOID*)&shell_lnk);
 
     if (!SUCCEEDED(res))
     {
@@ -1614,15 +1610,15 @@ bool shortcut(
         goto exit_with_error;
     }
 
-    shortcut_pth_len = speed::stringutils::strlen(shortcut_pth);
+    shortcut_pth_len = speed::stringutils::cstr_length(shortcut_pth);
     if (shortcut_pth_len + 5 >= MAX_PATH)
     {
         system::errors::assign_system_error_code(ERROR_BAD_PATHNAME, err_code);
         goto exit;
     }
 
-    speed::stringutils::strcpy(wshortcut_pth, shortcut_pth);
-    speed::stringutils::strcpy(wshortcut_pth + shortcut_pth_len, L".lnk");
+    speed::stringutils::cstr_copy(wshortcut_pth, shortcut_pth);
+    speed::stringutils::cstr_copy(wshortcut_pth + shortcut_pth_len, L".lnk");
     res = persist_fle->Save(wshortcut_pth, true);
 
     goto exit;
@@ -1698,7 +1694,7 @@ bool symlink(const wchar_t* target_pth, const wchar_t* link_pth, std::error_code
 bool touch(const char* regular_file_pth, std::error_code* err_code) noexcept
 {
     HANDLE file_handle = ::CreateFileA(regular_file_pth, GENERIC_WRITE, 0, nullptr, CREATE_NEW,
-                                       FILE_ATTRIBUTE_NORMAL, nullptr);
+            FILE_ATTRIBUTE_NORMAL, nullptr);
 
     if (file_handle == INVALID_HANDLE_VALUE)
     {
@@ -1714,7 +1710,7 @@ bool touch(const char* regular_file_pth, std::error_code* err_code) noexcept
 bool touch(const wchar_t* regular_file_pth, std::error_code* err_code) noexcept
 {
     HANDLE file_handle = ::CreateFileW(regular_file_pth, GENERIC_WRITE, 0, nullptr, CREATE_NEW,
-                                       FILE_ATTRIBUTE_NORMAL, nullptr);
+            FILE_ATTRIBUTE_NORMAL, nullptr);
 
     if (file_handle == INVALID_HANDLE_VALUE)
     {

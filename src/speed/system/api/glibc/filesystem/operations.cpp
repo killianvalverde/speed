@@ -32,6 +32,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <cstdlib>
+#include <ctime>
 
 #include "../../../../stringutils/stringutils.hpp"
 #include "../../../codecs/codecs.hpp"
@@ -123,7 +124,7 @@ bool access(
 bool can_directory_be_created(const char* directory_pth, std::error_code* err_code) noexcept
 {
     char parent_pth[PATH_MAX] = {0};
-    std::size_t dir_path_len = stringutils::strlen(directory_pth);
+    std::size_t dir_path_len = stringutils::cstr_length(directory_pth);
     char* last_char_p;
 
     if (dir_path_len >= PATH_MAX ||
@@ -133,9 +134,9 @@ bool can_directory_be_created(const char* directory_pth, std::error_code* err_co
         return false;
     }
 
-    stringutils::strcpy(parent_pth, directory_pth);
-    stringutils::strrmlast(parent_pth, '/');
-    last_char_p = stringutils::strcut(parent_pth, '/');
+    stringutils::cstr_copy(parent_pth, directory_pth);
+    stringutils::cstr_remove_trailing_if(parent_pth, [](char ch) { return ch == '/'; });
+    last_char_p = stringutils::cstr_cut(parent_pth, '/');
     dir_path_len = last_char_p == nullptr ? 0 : parent_pth - last_char_p + 1;
 
     if (dir_path_len == 0)
@@ -161,7 +162,7 @@ bool can_directory_be_created(const wchar_t* directory_pth, std::error_code* err
 bool can_regular_file_be_created(const char* regular_file_pth, std::error_code* err_code) noexcept
 {
     char parent_pth[PATH_MAX] = {0};
-    std::size_t path_len = stringutils::strlen(regular_file_pth);
+    std::size_t path_len = stringutils::cstr_length(regular_file_pth);
     char* last_char_p;
 
     if (path_len >= PATH_MAX || path_len == 0)
@@ -175,9 +176,9 @@ bool can_regular_file_be_created(const char* regular_file_pth, std::error_code* 
                       system::filesystem::file_types::REGULAR_FILE, err_code);
     }
 
-    stringutils::strcpy(parent_pth, regular_file_pth);
-    stringutils::strrmlast(parent_pth, '/');
-    last_char_p = stringutils::strcut(parent_pth, '/');
+    stringutils::cstr_copy(parent_pth, regular_file_pth);
+    stringutils::cstr_remove_trailing_if(parent_pth, [](char ch) { return ch == '/'; });
+    last_char_p = stringutils::cstr_cut(parent_pth, '/');
     path_len = last_char_p == nullptr ? 0 : parent_pth - last_char_p + 1;
 
     if (path_len == 0)
@@ -545,38 +546,47 @@ bool is_file_type(
         std::error_code* err_code
 ) noexcept
 {
+    struct ::stat infos;
+    errno = 0;
+    
+    if (::stat(file_pth, &infos) == -1)
+    {
+        system::errors::assign_system_error_code(errno, err_code);
+        return false;
+    }
+    
     if ((file_typ & system::filesystem::file_types::BLOCK_DEVICE) !=
-                system::filesystem::file_types::NIL && is_block_device(file_pth, err_code))
+                system::filesystem::file_types::NIL && S_ISBLK(infos.st_mode))
     {
         return true;
     }
     if ((file_typ & system::filesystem::file_types::CHARACTER_DEVICE) !=
-                system::filesystem::file_types::NIL && is_character_device(file_pth, err_code))
+                system::filesystem::file_types::NIL && S_ISCHR(infos.st_mode))
     {
         return true;
     }
     if ((file_typ & system::filesystem::file_types::DIRECTORY) !=
-                system::filesystem::file_types::NIL && is_directory(file_pth, err_code))
+                system::filesystem::file_types::NIL && S_ISDIR(infos.st_mode))
     {
         return true;
     }
     if ((file_typ & system::filesystem::file_types::PIPE) !=
-                system::filesystem::file_types::NIL && is_pipe(file_pth, err_code))
+                system::filesystem::file_types::NIL && S_ISFIFO(infos.st_mode))
     {
         return true;
     }
     if ((file_typ & system::filesystem::file_types::REGULAR_FILE) !=
-                system::filesystem::file_types::NIL && is_regular_file(file_pth, err_code))
+                system::filesystem::file_types::NIL && S_ISREG(infos.st_mode))
     {
         return true;
     }
     if ((file_typ & system::filesystem::file_types::SOCKET) !=
-                system::filesystem::file_types::NIL && is_socket(file_pth, err_code))
+                system::filesystem::file_types::NIL && S_ISSOCK(infos.st_mode))
     {
         return true;
     }
     if ((file_typ & system::filesystem::file_types::SYMLINK) !=
-                system::filesystem::file_types::NIL && is_symlink(file_pth, err_code))
+                system::filesystem::file_types::NIL && S_ISLNK(infos.st_mode))
     {
         return true;
     }
@@ -722,7 +732,7 @@ bool mkdir_recursively(
     size_t slash_pos_sz = 0;
     char* lst_ch;
     
-    pth_len = stringutils::strlen(directory_pth);
+    pth_len = stringutils::cstr_length(directory_pth);
     
     if (pth_len >= PATH_MAX ||
         pth_len == 0 ||
@@ -732,12 +742,12 @@ bool mkdir_recursively(
         return false;
     }
     
-    stringutils::strcpy(parnt_path, directory_pth);
-    stringutils::strrmlast(parnt_path, '/');
+    stringutils::cstr_copy(parnt_path, directory_pth);
+    stringutils::cstr_remove_trailing_if(parnt_path, [](char ch) { return ch == '/'; });
     
     do
     {
-        lst_ch = stringutils::strcut(parnt_path, '/', true);
+        lst_ch = stringutils::cstr_cut(parnt_path, '/', true);
         
         if (lst_ch == nullptr)
         {
@@ -867,7 +877,7 @@ bool readdir(
 
     directory_ent_ext->ino = directory_ent_ext->entry->d_ino;
     if (!codecs::convert_c_str_to_wstring(directory_ent_ext->entry->d_name,
-                                          &directory_ent_ext->name_holdr))
+            &directory_ent_ext->name_holdr))
     {
         return false;
     }
