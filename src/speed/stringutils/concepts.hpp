@@ -18,32 +18,25 @@
  */
 
 /**
- * @file        stringutils.hpp
- * @brief       stringutils main header.
+ * @file        concepts.hpp
+ * @brief       stringutils concepts header.
  * @author      Killian Valverde
- * @date        2016/01/08
+ * @date        2025/06/11
  */
 
-#ifndef SPEED_STRINGUTILS_STRINGUTILS_HPP
-#define SPEED_STRINGUTILS_STRINGUTILS_HPP
+#ifndef SPEED_STRINGUTILS_CONCEPTS_HPP
+#define SPEED_STRINGUTILS_CONCEPTS_HPP
 
-#include "forward_declarations.hpp"
-#include "concepts.hpp"
-#include "operations.hpp"
+#include <string>
 
-namespace speed {
+namespace speed::stringutils {
 
-/**
- * @brief       Contains resources for common strings operations.
- */
-namespace stringutils {}
-
-#ifndef SPEED_DISABLE_ALIAS
-/**
- * @brief       Contains resources for common strings operations.
- */
-namespace str = stringutils;
-#endif
+template<typename T>
+concept StringLike = requires(T str) {
+    { str.data() } -> std::convertible_to<const typename T::value_type*>;
+    { str.size() } -> std::convertible_to<std::size_t>;
+    typename T::traits_type;
+};
 
 }
 
