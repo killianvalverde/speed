@@ -162,8 +162,8 @@ bool directory_iteration::const_iterator::read_directory()
     {
         succss = speed::system::filesystem::readdir(&cur_dir_ent);
     }
-    while (succss && (speed::stringutils::strcmp(cur_dir_ent.nme, ".") == 0 ||
-                    speed::stringutils::strcmp(cur_dir_ent.nme, "..") == 0));
+    while (succss && (speed::stringutils::cstr_compare(cur_dir_ent.nme, ".") == 0 ||
+                    speed::stringutils::cstr_compare(cur_dir_ent.nme, "..") == 0));
 
     return succss;
 }
@@ -187,20 +187,16 @@ void directory_iteration::const_iterator::exit_directory()
     }
 }
 
-bool directory_iteration::const_iterator::is_file_valid()
+[[nodiscard]] bool directory_iteration::const_iterator::is_file_valid()
 {
-    if (!composit_->substring_to_mtch_.empty() &&
-        !strstr(cur_fle_.filename().c_str(), composit_->substring_to_mtch_.c_str()))
+    if (!composit_->substring_to_mtch_.empty() && !find_substr())
     {
         return false;
     }
-    
-    if (!composit_->wildcard_to_mtch_.empty() &&
-        !matches_wildcard(cur_fle_.filename().c_str(), composit_->wildcard_to_mtch_.c_str()))
+    if (!composit_->wildcard_to_mtch_.empty() && !matches_wildcard())
     {
         return false;
     }
-    
     if (!composit_->regex_to_mtch_str_.empty() &&
         !std::regex_match(cur_fle_.filename().c_str(), composit_->regex_to_mtch_))
     {
@@ -212,7 +208,6 @@ bool directory_iteration::const_iterator::is_file_valid()
     {
         return false;
     }
-    
     if (composit_->access_mods_ != speed::system::filesystem::access_modes::NIL &&
         !speed::system::filesystem::access(cur_fle_.c_str(), composit_->access_mods_))
     {
@@ -222,158 +217,31 @@ bool directory_iteration::const_iterator::is_file_valid()
     return true;
 }
 
-int directory_iteration::const_iterator::strncmp(
-        const char_type* src,
-        const char_type* trg,
-        std::size_t nbr
-) const noexcept
+[[nodiscard]] bool directory_iteration::const_iterator::find_substr() const
 {
-    const char_type* const end_src = src + nbr;
-    char_type current_str_ch;
-    char_type current_pattrn_ch;
+    const auto& pth = cur_fle_.filename();
+    const char_type* substr = composit_->substring_to_mtch_.c_str();
 
-    if (src == nullptr)
-    {
-        return (trg == nullptr) ? 0 : -1;
-    }
-    if (trg == nullptr)
-    {
-        return 1;
-    }
-
-    for (; *src != '\0' && *trg != '\0' && src != end_src; ++src, ++trg)
-    {
-        current_str_ch = *src;
-        current_pattrn_ch = *trg;
-        
-        if (!composit_->case_sensitve_)
-        {
-            current_str_ch = speed::stringutils::strtolower(current_str_ch);
-            current_pattrn_ch = speed::stringutils::strtolower(current_pattrn_ch);
-        }
-
-        if (current_str_ch != current_pattrn_ch)
-        {
-            return current_str_ch < current_pattrn_ch ? -1 : 1;
-        }
-    }
-
-    if (src != end_src)
-    {
-        if (*src == '\0')
-        {
-            return (*trg == '\0') ? 0 : -1;
-        }
-        if (*trg == '\0')
-        {
-            return 1;
-        }
-    }
-
-    return 0;
+    return composit_->case_insensitve_
+            ? speed::stringutils::cstr_find_substr_icase(pth.c_str(), substr)
+            : speed::stringutils::cstr_find_substr(pth.c_str(), substr);
 }
 
-const directory_iteration::char_type* directory_iteration::const_iterator::strstr(
-        const char_type* str,
-        const char_type* substr
-) const noexcept
+[[nodiscard]] bool directory_iteration::const_iterator::matches_wildcard() const
 {
-    std::size_t str_len;
-    std::size_t substr_len;
+    const auto& pth = cur_fle_.filename();
+    const char_type* wildcrd = composit_->wildcard_to_mtch_.c_str();
 
-    substr_len = speed::stringutils::strlen(substr);
- 
-    if (substr_len == 0)
-    {
-        return str;
-    }
-    
-    str_len = speed::stringutils::strlen(str);
- 
-    while (str_len >= substr_len)
-    {
-        if (!strncmp(str, substr, substr_len))
-        {
-            return str;
-        }
-        
-        str++;
-        str_len--;
-    }
- 
-    return nullptr;
-}
-
-
-[[nodiscard]] bool directory_iteration::const_iterator::matches_wildcard(
-        const char_type* str,
-        const char_type* pattrn
-) noexcept
-{
-    const char_type* str_backup = nullptr;
-    const char_type* pattrn_backup = nullptr;
-    char_type current_str_ch;
-    char_type current_pattrn_ch;
-    
-    if (str == nullptr || pattrn == nullptr)
-    {
-        return false;
-    }
-
-    while (*str)
-    {
-        if (!composit_->case_sensitve_)
-        {
-            current_str_ch = speed::stringutils::strtolower(*str);
-            current_pattrn_ch = speed::stringutils::strtolower(*pattrn);
-        }
-        else
-        {
-            current_str_ch = *str;
-            current_pattrn_ch = *pattrn;
-        }
-        
-        if (current_pattrn_ch == '*')
-        {
-            pattrn++;
-            
-            if (*pattrn == '\0')
-            {
-                return true;
-            }
-            
-            pattrn_backup = pattrn;
-            str_backup = str;
-        }
-        else if (current_pattrn_ch == '?' || current_pattrn_ch == current_str_ch)
-        {
-            pattrn++;
-            str++;
-        }
-        else if (str_backup)
-        {
-            pattrn = pattrn_backup;
-            str = ++str_backup;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    while (*pattrn == '*')
-    {
-        pattrn++;
-    }
-
-    return *pattrn == '\0';
+    return composit_->case_insensitve_
+            ? speed::stringutils::match_wildcard_icase(pth.c_str(), wildcrd)
+            : speed::stringutils::match_wildcard(pth.c_str(), wildcrd);
 }
 
 void directory_iteration::update_regex()
 {
     typename regex_type::flag_type flg;
     
-    if (!case_sensitve_)
+    if (case_insensitve_)
     {
         flg = regex_type::ECMAScript | regex_type::icase;
     }

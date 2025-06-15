@@ -145,22 +145,7 @@ public:
          * @brief       Check if the current file is valid.
          * @return      If function was successful true is returned, otherwise false is returned.
          */
-        bool is_file_valid();
-
-        /**
-         * @brief       Compares two strings up to a specified number of characters.
-         * @param       src : Pointer to the source string to compare.
-         * @param       trg : Pointer to the target string to compare against.
-         * @param       nbr : The maximum number of characters to compare.
-         * @return      `0` if the strings are equal up to `nbr` characters. A negative value if
-         *              `src` is lexicographically less than `trg`. A positive value if `src` is
-         *              lexicographically greater than `trg`.
-         */
-        int strncmp(
-                const char_type* src,
-                const char_type* trg,
-                std::size_t nbr
-        ) const noexcept;
+        [[nodiscard]] bool is_file_valid();
         
         /**
          * @brief       Searches for the first occurrence of a substring in a string.
@@ -169,7 +154,7 @@ public:
          * @return      Pointer to the first occurrence of `substr` in `str` if found. `nullptr` if
          *              `substr` is not found. If `substr` is an empty string, returns `str`.
          */
-        const char_type* strstr(const char_type* str, const char_type* substr) const noexcept;
+        [[nodiscard]] bool find_substr() const;
 
         /**
          * @brief       Compares a string to a pattern with wildcard characters '*' and '?'.
@@ -177,10 +162,7 @@ public:
          * @param       pattrn : Pointer to the pattern containing wildcards.
          * @return      `true` if `str` matches the `pattrn` with wildcards; otherwise, `false`.
          */
-        [[nodiscard]] bool matches_wildcard(
-                const char_type* str,
-                const char_type* pattrn
-        ) noexcept;
+        [[nodiscard]] bool matches_wildcard() const;
 
     private:
         /** Current directory. */
@@ -225,7 +207,7 @@ public:
             , access_mods_(speed::system::filesystem::access_modes::NIL)
             , max_recursivity_levl_(~0ull)
             , follow_symbolic_lnks_(false)
-            , case_sensitve_(false)
+            , case_insensitve_(true)
             , inode_trackr_(false)
     {
     }
@@ -283,11 +265,11 @@ public:
      *              matching.
      * @return      The object who call the method.
      */
-    inline directory_iteration& case_sensitive(bool enabl)
+    inline directory_iteration& case_insensitive(bool enabl)
     {
-        if (case_sensitve_ != enabl)
+        if (case_insensitve_ != enabl)
         {
-            case_sensitve_ = enabl;
+            case_insensitve_ = enabl;
             
             if (!regex_to_mtch_str_.empty())
             {
@@ -423,7 +405,7 @@ private:
     bool follow_symbolic_lnks_;
     
     /** Specify wheter or not the regex will be case sensitive. */
-    bool case_sensitve_;
+    bool case_insensitve_;
     
     /** Specify wheter or not the inodes will be tracked. */
     bool inode_trackr_;
