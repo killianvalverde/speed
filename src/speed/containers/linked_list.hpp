@@ -248,8 +248,6 @@ public:
         friend class linked_list;
     };
     
-    // TODO: Implement reverce iterators.
-    
     /**
      * @brief       Default constructor.
      */

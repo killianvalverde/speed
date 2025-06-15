@@ -403,8 +403,6 @@ public:
         friend class static_cache;
     };
     
-    // TODO: Implement the reverce iterators.
-    
     /**
      * @brief       Default constructor.
      */
@@ -427,7 +425,6 @@ public:
         buffers_[i].flgs_.set(scbf_t::INSERTED_IN_AVAILABLE_LIST);
     }
     
-    // TODO: Implement copy and move operators.
     /** @cond */
     static_cache(const static_cache& rhs) = delete;
     

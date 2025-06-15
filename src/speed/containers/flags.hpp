@@ -47,11 +47,7 @@ public:
     using value_type = TpValue;
     
     /** Underlying value of the flags conteiner. */
-    using underlying_type = std::conditional_t<
-            std::is_enum<TpValue>::value,
-            speed::type_traits::try_underlying_type_t<TpValue>,
-            TpValue
-    >;
+    using underlying_type = speed::type_traits::try_underlying_type_t<TpValue>;
     
     /**
      * @brief       Class that represents const iterators.
@@ -163,7 +159,6 @@ public:
         const value_type& operator *() const override
         {
             aux_val_ = static_cast<value_type>(static_cast<underlying_type>(*val_) & (1u << cur_));
-            
             return aux_val_;
         }
     
@@ -234,7 +229,6 @@ public:
         self_type& operator ++() noexcept override
         {
             const_self_type::operator ++();
-            
             return *this;
         }
     
@@ -245,7 +239,6 @@ public:
         self_type& operator --() noexcept override
         {
             const_self_type::operator --();
-            
             return *this;
         }
     
@@ -299,11 +292,13 @@ public:
     
     /**
      * @brief       Constructor with parameters.
-     * @param       val : Default flags value.
+     * @param       vals : Default flag values.
      */
-    inline flags(const value_type& val) noexcept
-            : val_(val)
+    template<typename... Ts_>
+    inline flags(const Ts_&... vals) noexcept
+            : flags()
     {
+        set(vals...);
     }
     
     /**
@@ -364,7 +359,6 @@ public:
     flags& operator =(const value_type& flgs) noexcept
     {
         val_ = flgs;
-        
         return *this;
     }
     
@@ -442,46 +436,56 @@ public:
     
     /**
      * @brief       Set a frag in the conteiner.
-     * @param       flg : Flag to set in the conteiner.
+     * @param       flgs : Flags to set in the conteiner.
      */
-    inline flags& set(const value_type& flg) noexcept
+    template<typename... Ts_>
+    inline flags& set(const Ts_&... flgs) noexcept
     {
-        val_ = static_cast<value_type>(static_cast<underlying_type>(val_) |
-                                       static_cast<underlying_type>(flg));
+        ((val_ = static_cast<value_type>(
+                static_cast<underlying_type>(val_) |
+                static_cast<underlying_type>(flgs))), ...);
         
         return *this;
     }
     
     /**
      * @brief       Set a frag in the conteiner by index.
-     * @param       indx : Index in which set a flag in the conteiner.
+     * @param       indxs : Indexes in which set a flag in the conteiner.
      */
-    inline flags& set_by_index(std::uint8_t indx) noexcept
+    template<typename... Ts_>
+    inline flags& set_by_index(const Ts_&... indxs) noexcept
     {
-        val_ = static_cast<value_type>(static_cast<underlying_type>(val_) | (1u << indx));
+        ((val_ = static_cast<value_type>(
+                static_cast<underlying_type>(val_) |
+                (1u << indxs))), ...);
     
         return *this;
     }
     
     /**
      * @brief       Unset a flag in the conteiner.
-     * @param       flg : Flag to unset in the conteiner.
+     * @param       flgs : Flags to unset in the conteiner.
      */
-    inline flags& unset(const value_type& flg) noexcept
+    template<typename... Ts_>
+    inline flags& unset(const Ts_&... flgs) noexcept
     {
-        val_ = static_cast<value_type>(static_cast<underlying_type>(val_) &
-                                       ~static_cast<underlying_type>(flg));
+        ((val_ = static_cast<value_type>(
+                static_cast<underlying_type>(val_) &
+                ~static_cast<underlying_type>(flgs))), ...);
     
         return *this;
     }
     
     /**
      * @brief       Unset a flag in the conteiner.
-     * @param       indx : Index in which unset a flag in the conteiner.
+     * @param       indxs : Index in which unset a flag in the conteiner.
      */
-    inline flags& unset_by_index(std::uint8_t indx) noexcept
+    template<typename... Ts_>
+    inline flags& unset_by_index(const Ts_&... indxs) noexcept
     {
-        val_ = static_cast<value_type>(static_cast<underlying_type>(val_) & ~(1u << indx));
+        ((val_ = static_cast<value_type>(
+                static_cast<underlying_type>(val_) &
+                ~(1u << indxs))), ...);
     
         return *this;
     }
@@ -492,35 +496,59 @@ public:
     inline flags& clear() noexcept
     {
         val_ = static_cast<value_type>(0);
-        
         return *this;
     }
     
     /**
      * @brief       Allows knowing whether a flag is set in the conteiner.
-     * @param       flg : Flag to verify its presence in the conteiner.
+     * @param       flgs : Flags to verify its presence in the conteiner.
      */
-    inline bool is_set(const value_type& flg) const noexcept
+    template<typename... Ts_>
+    inline bool is_set(const Ts_&... flgs) const noexcept
     {
-        return ((static_cast<underlying_type>(val_) & static_cast<underlying_type>(flg)) != 0);
+        underlying_type concat = 0;
+        ((concat |= static_cast<underlying_type>(flgs)), ...);
+        
+        return ((concat & static_cast<underlying_type>(val_)) == concat);
     }
     
     /**
      * @brief       Allows knowing whether a flag is set in the conteiner.
-     * @param       flg : Flag to verify its presence in the conteiner.
+     * @param       flgs : Flags to verify its presence in the conteiner.
      */
-    inline bool is_not_set(const value_type& flg) const noexcept
+    template<typename... Ts_>
+    inline bool is_not_set(const Ts_&... flgs) const noexcept
     {
-        return ((static_cast<underlying_type>(val_) & static_cast<underlying_type>(flg)) == 0);
+        underlying_type concat = 0;
+        ((concat |= static_cast<underlying_type>(flgs)), ...);
+        
+        return ((concat & static_cast<underlying_type>(val_)) != concat);
     }
     
     /**
      * @brief       Allows knowing whether a flag is set in the conteiner by index.
-     * @param       indx : Index in which verify a flag presence in the conteiner.
+     * @param       indxs : Indexes in which verify a flag presence in the conteiner.
      */
-    inline bool is_set_by_index(std::uint8_t indx) const noexcept
+    template<typename... Ts_>
+    inline bool is_set_by_index(const Ts_&... indxs) noexcept
     {
-        return ((static_cast<underlying_type>(val_) & (1u << indx)) != 0);
+        underlying_type concat = 0;
+        ((concat |= (1u << indxs)), ...);
+        
+        return ((concat & static_cast<underlying_type>(val_)) == concat);
+    }
+    
+    /**
+     * @brief       Allows knowing whether a flag is not set in the conteiner by index.
+     * @param       indxs : Indexes in which verify a flag presence in the conteiner.
+     */
+    template<typename... Ts_>
+    inline bool is_not_set_by_index(const Ts_&... indxs) noexcept
+    {
+        underlying_type concat = 0;
+        ((concat |= (1u << indxs)), ...);
+        
+        return ((concat & static_cast<underlying_type>(val_)) != concat);
     }
     
     /**
