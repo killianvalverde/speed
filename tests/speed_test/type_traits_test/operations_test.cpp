@@ -29,18 +29,6 @@
 
 #include "speed/type_traits/type_traits.hpp"
 
-TEST(type_traits_operations, is_char)
-{
-    EXPECT_TRUE(speed::type_traits::is_char<char>::value);
-    EXPECT_TRUE(!speed::type_traits::is_char<wchar_t>::value);
-}
-
-TEST(type_traits_operations, is_wchar)
-{
-    EXPECT_TRUE(!speed::type_traits::is_wchar<char>::value);
-    EXPECT_TRUE(speed::type_traits::is_wchar<wchar_t>::value);
-}
-
 TEST(type_traits_operations, is_character)
 {
     EXPECT_TRUE(speed::type_traits::is_character<char>::value);
@@ -68,53 +56,6 @@ TEST(type_traits_operations, is_stdio_character)
     EXPECT_TRUE(!speed::type_traits::is_stdio_character<char32_t>::value);
 }
 
-TEST(type_traits_operations, is_float)
-{
-    EXPECT_TRUE(speed::type_traits::is_float<float>::value);
-    EXPECT_TRUE(!speed::type_traits::is_float<double>::value);
-}
-
-TEST(type_traits_operations, is_double)
-{
-    EXPECT_TRUE(!speed::type_traits::is_double<float>::value);
-    EXPECT_TRUE(speed::type_traits::is_double<double>::value);
-}
-
-TEST(type_traits_operations, is_long_double)
-{
-    EXPECT_TRUE(!speed::type_traits::is_long_double<float>::value);
-    EXPECT_TRUE(!speed::type_traits::is_long_double<double>::value);
-    EXPECT_TRUE(speed::type_traits::is_long_double<long double>::value);
-}
-
-TEST(type_traits_operations, is_basic_string)
-{
-    EXPECT_TRUE(speed::type_traits::is_basic_string<std::string>::value);
-    EXPECT_TRUE(speed::type_traits::is_basic_string<std::wstring>::value);
-    EXPECT_TRUE(!speed::type_traits::is_basic_string<int>::value);
-}
-
-TEST(type_traits_operations, is_basic_string_vector)
-{
-    EXPECT_TRUE(speed::type_traits::is_basic_string_vector<std::vector<std::string>>::value);
-    EXPECT_TRUE(speed::type_traits::is_basic_string_vector<std::vector<std::wstring>>::value);
-    EXPECT_TRUE(!speed::type_traits::is_basic_string_vector<std::vector<int>>::value);
-    EXPECT_TRUE(!speed::type_traits::is_basic_string_vector<int>::value);
-}
-
-TEST(type_traits_operations, is_basic_ostream)
-{
-    EXPECT_TRUE(speed::type_traits::is_basic_ostream<std::ostream>::value);
-    EXPECT_TRUE(speed::type_traits::is_basic_ostream<std::wostream>::value);
-    EXPECT_TRUE(!speed::type_traits::is_basic_ostream<int>::value);
-}
-
-TEST(type_traits_operations, is_path)
-{
-    EXPECT_TRUE(speed::type_traits::is_path<std::filesystem::path>::value);
-    EXPECT_TRUE(!speed::type_traits::is_path<int>::value);
-}
-
 TEST(type_traits_operations, try_underlying_type)
 {
     enum class item : char
@@ -122,10 +63,7 @@ TEST(type_traits_operations, try_underlying_type)
         POTION = 'P'
     };
     
-    EXPECT_TRUE(speed::type_traits::is_char<
-            speed::type_traits::try_underlying_type_t<item>>::value);
-    EXPECT_TRUE(speed::type_traits::is_char<
-            speed::type_traits::try_underlying_type_t<char>>::value);
-    EXPECT_TRUE(!speed::type_traits::is_char<
-            speed::type_traits::try_underlying_type_t<int>>::value);
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::try_underlying_type_t<item>, char>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::try_underlying_type_t<char>, char>));
+    EXPECT_TRUE(!(std::is_same_v<speed::type_traits::try_underlying_type_t<int>, char>));
 }

@@ -160,16 +160,16 @@ TEST(containers_flags, clear)
 
 TEST(containers_flags, is_set)
 {
-    speed::containers::flags<colors> clrs = colors::BLUE;
+    speed::containers::flags<colors> clrs(colors::BLUE, colors::RED);
     
-    EXPECT_TRUE(clrs.is_set(colors::BLUE));
+    EXPECT_TRUE(clrs.is_set(colors::BLUE, colors::RED));
 }
 
 TEST(containers_flags, is_set_by_index)
 {
-    speed::containers::flags<colors> clrs = colors::BLUE;
+    speed::containers::flags<colors> clrs(colors::BLUE, colors::RED);
     
-    EXPECT_TRUE(clrs.is_set_by_index(0));
+    EXPECT_TRUE(clrs.is_set_by_index(0, 1));
 }
 
 TEST(containers_flags, is_empty)

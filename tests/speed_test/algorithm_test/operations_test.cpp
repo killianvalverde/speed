@@ -24,22 +24,6 @@
  * @date        2018/08/07
  */
 
-#include <vector>
 #include <gtest/gtest.h>
 
 #include "speed/algorithm/algorithm.hpp"
-
-TEST(algorithm_operations, quicksort)
-{
-    std::vector<std::size_t> vec = {12, 34553, 1, 90, 124124};
-    
-    speed::algorithm::quicksort(vec, vec.size());
-    
-    std::size_t min = 0;
-    
-    for (auto& x : vec)
-    {
-        EXPECT_TRUE(min < x);
-        min = x;
-    }
-}
