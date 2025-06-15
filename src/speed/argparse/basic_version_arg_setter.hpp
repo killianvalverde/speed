@@ -139,7 +139,7 @@ public:
 
         vers_info.append(prog_name.empty() ? "???" : prog_name);
         vers_info.append(" ");
-        if (speed::stringutils::strlen(prog_vers) == 0)
+        if (speed::stringutils::cstr_length(prog_vers) == 0)
         {
             vers_info.append("v1.0.0");
         }
@@ -149,7 +149,7 @@ public:
         }
 
         vers_info.append("\nCopyright (C) ");
-        if (speed::stringutils::strlen(dte) == 0)
+        if (speed::stringutils::cstr_length(dte) == 0)
         {
             vers_info.append("20XX");
         }
@@ -165,7 +165,7 @@ public:
                 "This is free software: you are free to change and redistribute it.\n"
                 "There is NO WARRANTY, to the extent permitted by law.\n\n"
                 "Written by ");
-        if (speed::stringutils::strlen(authr) == 0)
+        if (speed::stringutils::cstr_length(authr) == 0)
         {
             vers_info.append("Unknown");
         }

@@ -268,7 +268,7 @@ public:
             {
                 std::cout << ", ";
                 bse_arg->print_name();
-                speed::safety::try_addml(&kys_len, bse_arg->get_name_length(), 2);
+                speed::safety::try_addm(&kys_len, bse_arg->get_name_length(), 2);
             }
             else
             {
@@ -292,7 +292,7 @@ public:
         }
         
         speed::safety::try_addm(&kys_len, args_indent);
-        speed::safety::try_addml(&new_line_indent, args_indent, total_id_len);
+        speed::safety::try_addm(&new_line_indent, args_indent, total_id_len);
         
         speed::iostream::print_wrapped(std::cout, desc, max_line_len, new_line_indent, kys_len);
         std::cout << '\n';

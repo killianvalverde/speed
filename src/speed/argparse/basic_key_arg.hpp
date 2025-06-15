@@ -97,11 +97,11 @@ public:
 
             if (ky.is_prefix_long())
             {
-                speed::safety::try_addml(&long_kys_len_, ky.get_string_length(), 2);
+                speed::safety::try_addm(&long_kys_len_, ky.get_string_length(), 2);
             }
             else
             {
-                speed::safety::try_addml(&short_kys_len_, ky.get_string_length(), 2);
+                speed::safety::try_addm(&short_kys_len_, ky.get_string_length(), 2);
             }
         }
 
@@ -187,11 +187,11 @@ public:
 
             if (ky.is_prefix_long())
             {
-                speed::safety::try_addml(&long_kys_len_, ky.get_string_length(), 2);
+                speed::safety::try_addm(&long_kys_len_, ky.get_string_length(), 2);
             }
             else
             {
-                speed::safety::try_addml(&short_kys_len_, ky.get_string_length(), 2);
+                speed::safety::try_addm(&short_kys_len_, ky.get_string_length(), 2);
             }
         }
     }
@@ -359,7 +359,7 @@ public:
             }
         }
     
-        speed::safety::try_addml(&args_indent, short_kys_len, long_kys_len);
+        speed::safety::try_addm(&args_indent, short_kys_len, long_kys_len);
         speed::safety::try_addm(&new_line_indent, args_indent);
         
         base_arg_type::print_help_text(args_indent, max_line_len, new_line_indent);
@@ -385,7 +385,7 @@ public:
                 if (*nr_args_printd > 0)
                 {
                     std::cout << ", " << ky.get_string();
-                    speed::safety::try_addml(cur_ky_len, ky.get_string_length(), 2);
+                    speed::safety::try_addm(cur_ky_len, ky.get_string_length(), 2);
                 }
                 else
                 {

@@ -349,7 +349,7 @@ public:
             }
         }
     
-        speed::safety::try_addml(&args_indent, short_kys_len, long_kys_len);
+        speed::safety::try_addm(&args_indent, short_kys_len, long_kys_len);
         speed::safety::try_addm(&new_line_indent, args_indent);
         
         base_arg_type::print_help_text(args_indent, max_line_len, new_line_indent);
