@@ -27,544 +27,81 @@
 #ifndef SPEED_TYPE_TRAITS_OPERATIONS_HPP
 #define SPEED_TYPE_TRAITS_OPERATIONS_HPP
 
-#include <deque>
-#include <filesystem>
-#include <forward_list>
-#include <list>
-#include <map>
-#include <queue>
-#include <regex>
-#include <set>
-#include <stack>
-#include <string>
-#include <tuple>
 #include <type_traits>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
 
 namespace speed::type_traits {
 
 /** @cond */
-namespace __private {
+namespace detail {
 template<typename...>
-struct __or;
+struct logical_or;
 
 template<>
-struct __or<> : public std::false_type {};
+struct logical_or<> : public std::false_type {};
 
 template<typename Tp>
-struct __or<Tp> : public Tp {};
+struct logical_or<Tp> : public Tp {};
 
 template<typename Tp1, typename Tp2>
-struct __or<Tp1, Tp2> : public std::conditional<Tp1::value, Tp1, Tp2>::type {};
+struct logical_or<Tp1, Tp2> : public std::conditional<Tp1::value, Tp1, Tp2>::type {};
 
 template<typename Tp1, typename Tp2, typename Tp3, typename... TpN>
-struct __or<Tp1, Tp2, Tp3, TpN...>
-        : public std::conditional<Tp1::value, Tp1, __or<Tp2, Tp3, TpN...>>::type {};
-} /* __private */
-/** @endcond */
+struct logical_or<Tp1, Tp2, Tp3, TpN...>
+        : public std::conditional<Tp1::value, Tp1, logical_or<Tp2, Tp3, TpN...>>::type {};
 
-/** @cond */
-namespace __private {
 template<typename...>
-struct __and;
+struct logical_and;
 
 template<>
-struct __and<> : public std::true_type {};
+struct logical_and<> : public std::true_type {};
 
 template<typename Tp>
-struct __and<Tp> : public Tp {};
+struct logical_and<Tp> : public Tp {};
 
 template<typename Tp1, typename Tp2>
-struct __and<Tp1, Tp2> : public std::conditional<Tp1::value, Tp2, Tp1>::type {};
+struct logical_and<Tp1, Tp2> : public std::conditional<Tp1::value, Tp2, Tp1>::type {};
 
 template<typename Tp1, typename Tp2, typename Tp3, typename... TpN>
-struct __and<Tp1, Tp2, Tp3, TpN...>
-        : public std::conditional<Tp1::value, __and<Tp2, Tp3, TpN...>, Tp1>::type {};
-} /* __private */
-/** @endcond */
+struct logical_and<Tp1, Tp2, Tp3, TpN...>
+        : public std::conditional<Tp1::value, logical_and<Tp2, Tp3, TpN...>, Tp1>::type {};
 
-/** @cond */
-namespace __private {
 template<typename>
-struct __is_char_helper : public std::false_type {};
+struct is_character_helper : public std::false_type {};
 
 template<>
-struct __is_char_helper<char> : public std::true_type {};
+struct is_character_helper<char> : public std::true_type {};
 
 template<>
-struct __is_char_helper<signed char> : public std::true_type {};
+struct is_character_helper<signed char> : public std::true_type {};
 
 template<>
-struct __is_char_helper<unsigned char> : public std::true_type {};
-} /* __private */
-/** @endcond */
-
-/**
- * @brief       Trait class that identifies whether T is a 'char' type.
- */
-template<typename Tp>
-struct is_char
-        : public __private::__is_char_helper<typename std::remove_cv<Tp>::type>::type
-{
-};
-
-/** @cond */
-namespace __private {
-template<typename>
-struct __is_wchar_helper : public std::false_type {};
+struct is_character_helper<unsigned char> : public std::true_type {};
 
 template<>
-struct __is_wchar_helper<wchar_t> : public std::true_type {};
-} /* __private */
-/** @endcond */
-
-/**
- * @brief       Trait class that identifies whether T is a 'wchat_t' type.
- */
-template<typename Tp>
-struct is_wchar
-        : public __private::__is_wchar_helper<typename std::remove_cv<Tp>::type>::type
-{
-};
-
-/** @cond */
-namespace __private {
-template<typename>
-struct __is_character_helper : public std::false_type {};
+struct is_character_helper<wchar_t> : public std::true_type {};
 
 template<>
-struct __is_character_helper<char> : public std::true_type {};
+struct is_character_helper<char8_t> : std::true_type {};
 
 template<>
-struct __is_character_helper<signed char> : public std::true_type {};
+struct is_character_helper<char16_t> : public std::true_type {};
 
 template<>
-struct __is_character_helper<unsigned char> : public std::true_type {};
+struct is_character_helper<char32_t> : public std::true_type {};
 
-template<>
-struct __is_character_helper<wchar_t> : public std::true_type {};
-
-template<>
-struct __is_character_helper<char16_t> : public std::true_type {};
-
-template<>
-struct __is_character_helper<char32_t> : public std::true_type {};
-} /* __private */
-/** @endcond */
-
-/**
- * @brief       Trait class that identifies whether T is a character type.
- */
-template<typename Tp>
-struct is_character
-        : public __private::__is_character_helper<
-                typename std::remove_cv<Tp>::type
-          >::type
+template<typename T, bool IsEnum>
+struct try_underlying_type_helper
 {
+    using type = T;
 };
 
-/**
- * @brief       Trait class that identifies whether T is a char pointer type.
- */
-template<typename Tp>
-struct is_char_pointer
-        : public __private::__and<
-                std::is_pointer<Tp>,
-                is_char<typename std::remove_pointer<Tp>::type>
-          >::type
-{
-};
-
-/**
- * @brief       Trait class that identifies whether T is a wchar pointer type.
- */
-template<typename Tp>
-struct is_wchar_pointer
-        : public __private::__and<
-                std::is_pointer<Tp>,
-                is_wchar<typename std::remove_pointer<Tp>::type>
-          >::type
-{
-};
-
-/**
- * @brief       Trait class that identifies whether T is a character pointer type.
- */
-template<typename Tp>
-struct is_character_pointer
-        : public __private::__and<
-                std::is_pointer<Tp>,
-                is_character<typename std::remove_pointer<Tp>::type>
-          >::type
-{
-};
-
-/**
- * @brief       Trait class that identifies whether T is a character that can be used in standard io
- *              operations.
- */
-template<typename Tp>
-struct is_stdio_character
-        : public __private::__or<is_char<Tp>, is_wchar<Tp>>::type
-{
-};
-
-/** @cond */
-namespace __private {
-template<typename>
-struct __is_float_helper : public std::false_type {};
-
-template<>
-struct __is_float_helper<float> : public std::true_type {};
-} /* __private */
-/** @endcond */
-
-/**
- * @brief       Trait class that identifies whether T is a 'float' type.
- */
-template<typename Tp>
-struct is_float
-        : public __private::__is_float_helper<typename std::remove_cv<Tp>::type>::type
-{
-};
-
-/** @cond */
-namespace __private {
-template<typename>
-struct __is_double_helper : public std::false_type {};
-
-template<>
-struct __is_double_helper<double> : public std::true_type {};
-} /* __private */
-/** @endcond */
-
-/**
- * @brief       Trait class that identifies whether T is a 'double' type.
- */
-template<typename Tp>
-struct is_double
-        : public __private::__is_double_helper<typename std::remove_cv<Tp>::type>::type
-{
-};
-
-/** @cond */
-namespace __private {
-template<typename>
-struct __is_long_double_helper : public std::false_type {};
-
-template<>
-struct __is_long_double_helper<long double> : public std::true_type {};
-} /* __private */
-/** @endcond */
-
-/**
- * @brief       Trait class that identifies whether T is a 'double' type.
- */
-template<typename Tp>
-struct is_long_double
-        : public __private::__is_long_double_helper<
-                typename std::remove_cv<Tp>::type
-          >::type
-{
-};
-
-/** @cond */
-namespace __private {
-template<typename>
-struct __is_basic_string_helper : public std::false_type {};
-
-template<
-        typename TpChar,
-        typename TpCharTraits,
-        typename TpCharAlloc
->
-struct __is_basic_string_helper<std::basic_string<TpChar, TpCharTraits, TpCharAlloc>>
-        : public is_character<TpChar>
-{
-};
-} /* __private */
-/** @endcond */
-
-/**
- * @brief       Trait class that identifies whether T is a 'std::basic_string' type.
- */
-template<typename Tp>
-struct is_basic_string
-        : public __private::__is_basic_string_helper<
-                typename std::remove_cv<Tp>::type
-          >::type
-{
-};
-
-/** @cond */
-namespace __private {
-template<typename>
-struct __is_string_helper : public std::false_type {};
-
-template<
-        typename TpChar,
-        typename TpCharTraits,
-        typename TpCharAlloc
->
-struct __is_string_helper<std::basic_string<TpChar, TpCharTraits, TpCharAlloc>>
-        : public is_char<TpChar>
-{
-};
-} /* __private */
-/** @endcond */
-
-/**
- * @brief       Trait class that identifies whether T is a 'std::string' type.
- */
-template<typename Tp>
-struct is_string
-        : public __private::__is_string_helper<
-                typename std::remove_cv<Tp>::type
-          >::type
-{
-};
-
-/** @cond */
-namespace __private {
-template<typename>
-struct __is_wstring_helper : public std::false_type {};
-
-template<
-        typename TpChar,
-        typename TpCharTraits,
-        typename TpCharAlloc
->
-struct __is_wstring_helper<std::basic_string<TpChar, TpCharTraits, TpCharAlloc>>
-        : public is_wchar<TpChar>
-{
-};
-} /* __private */
-/** @endcond */
-
-/**
- * @brief       Trait class that identifies whether T is a 'std::wstring' type.
- */
-template<typename Tp>
-struct is_wstring
-        : public __private::__is_wstring_helper<
-                typename std::remove_cv<Tp>::type
-          >::type
-{
-};
-
-/** @cond */
-namespace __private {
-template<typename>
-struct __is_basic_regex_helper : public std::false_type {};
-
-template<
-        typename TpChar,
-        typename TpRegexTraits
->
-struct __is_basic_regex_helper<std::basic_regex<TpChar, TpRegexTraits>>
-        : public is_character<TpChar>
-{
-};
-} /* __private */
-/** @endcond */
-
-/**
- * @brief       Trait class that identifies whether T is a 'std::basic_regex' type.
- */
-template<typename Tp>
-struct is_basic_regex
-        : public __private::__is_basic_regex_helper<
-                typename std::remove_cv<Tp>::type
-          >::type
-{
-};
-
-/** @cond */
-namespace __private {
-template<typename>
-struct __is_basic_string_vector_helper : public std::false_type {};
-
-template<
-        typename TpBasicString,
-        typename TpBasicStringAlloc
->
-struct __is_basic_string_vector_helper<std::vector<TpBasicString, TpBasicStringAlloc>>
-        : public is_basic_string<TpBasicString>
-{
-};
-} /* __private */
-/** @endcond */
-
-/**
- * @brief       Trait class that identifies whether T is a 'std::basic_string' type.
- */
-template<typename Tp>
-struct is_basic_string_vector
-        : public __private::__is_basic_string_vector_helper<
-                typename std::remove_cv<Tp>::type
-          >::type
-{
-};
-
-/** @cond */
-namespace __private {
 template<typename T>
-struct __is_std_container_helper : std::false_type {};
-
-template<typename T, std::size_t N>
-struct __is_std_container_helper<std::array<T, N>> : std::true_type {};
-
-template<typename... Args>
-struct __is_std_container_helper<std::vector<Args...>> : std::true_type {};
-
-template<typename... Args>
-struct __is_std_container_helper<std::deque<Args...>> : std::true_type {};
-
-template<typename... Args>
-struct __is_std_container_helper<std::queue<Args...>> : std::true_type {};
-
-template<typename... Args>
-struct __is_std_container_helper<std::priority_queue<Args...>> : std::true_type {};
-
-template<typename... Args>
-struct __is_std_container_helper<std::stack<Args...>> : std::true_type {};
-
-template<typename... Args>
-struct __is_std_container_helper<std::forward_list<Args...>> : std::true_type {};
-
-template<typename... Args>
-struct __is_std_container_helper<std::list<Args...>> : std::true_type {};
-
-template<typename... Args>
-struct __is_std_container_helper<std::set<Args...>> : std::true_type {};
-
-template<typename... Args>
-struct __is_std_container_helper<std::unordered_set<Args...>> : std::true_type {};
-
-template<typename... Args>
-struct __is_std_container_helper<std::unordered_multiset<Args...>> : std::true_type {};
-
-template<typename... Args>
-struct __is_std_container_helper<std::map<Args...>> : std::true_type {};
-
-template<typename... Args>
-struct __is_std_container_helper<std::unordered_map<Args...>> : std::true_type {};
-
-template<typename... Args>
-struct __is_std_container_helper<std::unordered_multimap<Args...>> : std::true_type {};
-
-template<typename... Args>
-struct __is_std_container_helper<std::pair<Args...>> : std::true_type {};
-
-template<typename... Args>
-struct __is_std_container_helper<std::tuple<Args...>> : std::true_type {};
-} /* __private */
+struct try_underlying_type_helper<T, true>
+{
+    using type = std::underlying_type_t<T>;
+};
+}
 /** @endcond */
-
-/**
- * @brief       Trait class that identifies whether T is a std container type.
- */
-template<typename Tp>
-struct is_std_container
-        : public __private::__is_std_container_helper<
-                typename std::remove_cv<Tp>::type
-          >::type
-{
-};
-
-/**
- * @brief       Trait class that identifies whether T is a std container type.
- */
-template<typename... Args>
-constexpr bool is_std_container_v = is_std_container<Args...>::value;
-
-/** @cond */
-namespace __private {
-template<typename>
-struct __is_basic_ostream_helper : public std::false_type {};
-
-template<
-        typename TpChar,
-        typename TpCharTraits
->
-struct __is_basic_ostream_helper<std::basic_ostream<TpChar, TpCharTraits>>
-        : public is_stdio_character<TpChar>
-{
-};
-} /* __private */
-/** @endcond */
-
-/**
- * @brief       Trait class that identifies whether T is a 'std::basic_ostream' type.
- */
-template<typename Tp>
-struct is_basic_ostream
-        : public __private::__is_basic_ostream_helper<
-                typename std::remove_cv<Tp>::type
-          >::type
-{
-};
-
-/** @cond */
-namespace __private {
-template<typename>
-struct __is_path_helper : public std::false_type {};
-
-template<>
-struct __is_path_helper<std::filesystem::path> : public std::true_type {};
-} /* __private */
-/** @endcond */
-
-/**
- * @brief       Trait class that identifies whether T is a 'std::filesystem::path' type.
- */
-template<typename Tp>
-struct is_path
-        : public __private::__is_path_helper<
-                typename std::remove_cv<Tp>::type
-          >::type
-{
-};
-
-/**
- * @brief       Trait class that tries to obtains the fundamental type of Tp.
- */
-template<typename Tp>
-struct fundamental_type
-{
-    /** The fundamental type of Tp. */
-    using type = std::remove_cv_t<
-            std::remove_pointer_t<
-                    std::remove_all_extents_t<
-                            std::remove_cvref_t<Tp>>>>;
-};
-
-/**
- * @brief       Trait class that tries to obtains the fundamental type of Tp.
- */
-template <typename Tp>
-using fundamental_type_t = typename fundamental_type<Tp>::type;
-
-/**
- * @brief       Trait class that try to obtains the underlying type of enum type T.
- */
-template<typename TpEnum>
-struct try_underlying_type
-{
-    /** The underlying type of enum type T. */
-    typedef std::conditional_t<
-            TpEnum(-1) < TpEnum(0),
-            std::make_signed_t<TpEnum>,
-            std::make_unsigned_t<TpEnum>
-    > type;
-};
-
-/** Trait class that try to obtains the underlying type of enum type T. Alias of
- *  'try_underlying_type<T>::type'. */
-template<typename TpEnum>
-using try_underlying_type_t = typename try_underlying_type<TpEnum>::type;
 
 /**
  * @brief       Alias that simplifies to inherit from the base class in the context of a CRTP
@@ -597,6 +134,76 @@ using basic_crtp_self = typename std::conditional<
         TpSelf<Ts...>,
         TpActual
 >::type;
+
+/**
+ * @brief       Trait class that identifies whether T is a character type.
+ */
+template<typename Tp>
+struct is_character
+        : public detail::is_character_helper<
+                typename std::remove_cv_t<Tp>
+          >::type
+{
+};
+
+/**
+ * @brief       Trait class that identifies whether T is a character type.
+ */
+template<typename Tp>
+inline constexpr bool is_character_v = is_character<Tp>::value;
+
+/**
+ * @brief       Trait class that identifies whether T is a character pointer type.
+ */
+template<typename Tp>
+struct is_character_pointer
+        : public detail::logical_and<
+                std::is_pointer<Tp>,
+                is_character<typename std::remove_pointer<Tp>::type>
+          >::type
+{
+};
+
+/**
+ * @brief       Trait class that identifies whether T is a character pointer type.
+ */
+template<typename Tp>
+inline constexpr bool is_character_pointer_v = is_character_pointer<Tp>::value;
+
+/**
+ * @brief       Trait class that identifies whether T is a character that can be used in standard io
+ *              operations.
+ */
+template<typename Tp>
+struct is_stdio_character
+        : public detail::logical_or<
+                std::is_same<std::remove_cv_t<Tp>, char>,
+                std::is_same<std::remove_cv_t<Tp>, wchar_t>
+          >::type
+{
+};
+
+/**
+ * @brief       Trait class that identifies whether T is a character that can be used in standard io
+ *              operations.
+ */
+template<typename Tp>
+inline constexpr bool is_stdio_character_v = is_stdio_character<Tp>::value;
+
+/**
+ * @brief       Trait class that try to obtains the underlying type of enum type T.
+ */
+template<typename Tp>
+struct try_underlying_type
+{
+    using type = typename detail::try_underlying_type_helper<Tp, std::is_enum_v<Tp>>::type;
+};
+
+/**
+ * @brief       Trait class that try to obtains the underlying type of enum type T.
+ */
+template<typename TpEnum>
+using try_underlying_type_t = typename try_underlying_type<TpEnum>::type;
 
 }
 
