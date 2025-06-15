@@ -42,7 +42,7 @@ set(SPEED_SCALARS_TEST_SOURCE_FILES
 )
 
 set(SPEED_STRINGUTILS_TEST_SOURCE_FILES
-        stringutils_test/operations.cpp
+        stringutils_test/test_operations.cpp
 )
 
 set(SPEED_SYSTEM_TEST_SOURCE_FILES
