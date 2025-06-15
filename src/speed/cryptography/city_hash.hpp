@@ -50,7 +50,7 @@ std::uint64_t city_hash_64(const void* ptr, std::size_t sz);
 template<typename TpChar>
 inline std::uint64_t city_hash_64(const TpChar* str)
 {
-    return city_hash_64(str, speed::stringutils::strlen(str) * sizeof(TpChar));
+    return city_hash_64(str, speed::stringutils::cstr_length(str) * sizeof(TpChar));
 }
 
 }
