@@ -27,8 +27,6 @@
 #ifndef SPEED_ERRORS_ERRORS_HPP
 #define SPEED_ERRORS_ERRORS_HPP
 
-#include "error_category_base.hpp"
-
 namespace speed {
 
 /**
