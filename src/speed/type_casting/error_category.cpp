@@ -88,7 +88,7 @@ std::string error_category::message(int val) const
 }
 
 /** @cond */
-namespace __private {
+namespace detail {
 error_category error_category_obj;
 }
 /** @endcond */

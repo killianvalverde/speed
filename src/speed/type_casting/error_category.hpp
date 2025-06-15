@@ -80,7 +80,7 @@ public:
 };
 
 /** @cond */
-namespace __private {
+namespace detail {
 extern error_category error_category_obj;
 } /* __private */
 /** @endcond */
@@ -94,7 +94,7 @@ inline void assign_type_casting_error_code(int value, std::error_code* err_code)
 {
     if (err_code != nullptr)
     {
-        err_code->assign(value, __private::error_category_obj);
+        err_code->assign(value, detail::error_category_obj);
     }
 }
 
@@ -105,7 +105,7 @@ inline void assign_type_casting_error_code(int value, std::error_code* err_code)
  */
 inline std::error_condition make_error_condition(speed::type_casting::error_conditions errc)
 {
-    return {static_cast<int>(errc), __private::error_category_obj};
+    return {static_cast<int>(errc), detail::error_category_obj};
 }
 
 }

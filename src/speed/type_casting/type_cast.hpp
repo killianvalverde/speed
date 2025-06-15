@@ -49,20 +49,20 @@ TpTarget type_cast(const TpSource& arg)
     {
         switch (static_cast<error_codes>(err_code.value()))
         {
-            case error_codes::ARITHMETIC_CONVERSION_FAILS:
-                throw conversion_fails_exception();
+        case error_codes::ARITHMETIC_CONVERSION_FAILS:
+            throw conversion_fails_exception();
 
-            case error_codes::ARITHMETIC_INVALID_SYNTAX:
-                throw invalid_syntax_exception();
+        case error_codes::ARITHMETIC_INVALID_SYNTAX:
+            throw invalid_syntax_exception();
 
-            case error_codes::ARITHMETIC_OVERFLOW_RANGE:
-                throw overflow_range_exception();
+        case error_codes::ARITHMETIC_OVERFLOW_RANGE:
+            throw overflow_range_exception();
 
-            case error_codes::ARITHMETIC_UNDERFLOW_RANGE:
-                throw underflow_range_exception();
+        case error_codes::ARITHMETIC_UNDERFLOW_RANGE:
+            throw underflow_range_exception();
 
-            default:
-                throw unknown_exception();
+        default:
+            throw unknown_exception();
         }
     }
 
