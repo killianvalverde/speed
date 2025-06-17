@@ -26,16 +26,10 @@
 
 #include "directory_iteration.hpp"
 
-#include "../stringutils/stringutils.hpp"
-
 namespace speed::filesystem {
 
 directory_iteration::const_iterator::const_iterator(const directory_iteration* composit)
-       : cur_dir_()
-       , cur_fle_()
-       , directory_entity_stck_()
-       , vistd_inos_()
-       , composit_(composit)
+       : composit_(composit)
        , end_(false)
        , current_recursivity_levl_(0)
 {
@@ -68,7 +62,7 @@ directory_iteration::const_iterator::~const_iterator() noexcept
 directory_iteration::const_iterator::self_type& directory_iteration::const_iterator::operator ++()
 {
 start:
-    directory_entity& cur_dir_ent = directory_entity_stck_.top();
+    directory_entity_type& cur_dir_ent = directory_entity_stck_.top();
 
     if (!read_directory())
     {
@@ -156,14 +150,14 @@ bool directory_iteration::const_iterator::open_directory()
 bool directory_iteration::const_iterator::read_directory()
 {
     bool succss;
-    directory_entity& cur_dir_ent = directory_entity_stck_.top();
+    directory_entity_type& cur_dir_ent = directory_entity_stck_.top();
 
     do
     {
         succss = speed::system::filesystem::readdir(&cur_dir_ent);
     }
     while (succss && (speed::stringutils::cstr_compare(cur_dir_ent.nme, ".") == 0 ||
-                    speed::stringutils::cstr_compare(cur_dir_ent.nme, "..") == 0));
+                speed::stringutils::cstr_compare(cur_dir_ent.nme, "..") == 0));
 
     return succss;
 }

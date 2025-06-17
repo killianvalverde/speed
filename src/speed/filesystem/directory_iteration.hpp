@@ -33,6 +33,7 @@
 #include <stack>
 
 #include "../containers/containers.hpp"
+#include "../stringutils/stringutils.hpp"
 #include "../system/system.hpp"
 #include "../type_casting/type_casting.hpp"
 #include "operations.hpp"
@@ -49,7 +50,7 @@ public:
     using char_type = std::filesystem::path::value_type;
 
     /** Directory entity type. */
-    using directory_entity = speed::system::filesystem::basic_directory_entity<char_type>;
+    using directory_entity_type = speed::system::filesystem::basic_directory_entity<char_type>;
 
     /** String type used in the class. */
     using string_type = std::basic_string<
@@ -172,7 +173,7 @@ public:
         std::filesystem::path cur_fle_;
 
         /** Stack of directories entities used to explore recursivelly the filesystem. */
-        std::stack<directory_entity> directory_entity_stck_;
+        std::stack<directory_entity_type> directory_entity_stck_;
 
         /** Set of visited inodes to avoid infinite recursions in case of fs corruptions. */
         std::set<speed::system::filesystem::inode_t> vistd_inos_;
@@ -198,18 +199,19 @@ public:
             >
     >
     explicit directory_iteration(TpPath_&& root_pth)
-            : root_pth_(get_normalized_path(std::forward<TpPath_>(root_pth)))
-            , substring_to_mtch_()
-            , wildcard_to_mtch_()
-            , regex_to_mtch_()
-            , regex_to_mtch_str_()
-            , file_typs_(speed::system::filesystem::file_types::NIL)
+            : root_pth_(std::forward<TpPath_>(root_pth))
             , access_mods_(speed::system::filesystem::access_modes::NIL)
+            , file_typs_(speed::system::filesystem::file_types::NIL)
             , max_recursivity_levl_(~0ull)
-            , follow_symbolic_lnks_(false)
             , case_insensitve_(true)
+            , follow_symbolic_lnks_(false)
             , inode_trackr_(false)
     {
+        if (speed::stringutils::cstr_find_first_char(root_pth_.c_str(),
+                SPEED_SYSTEM_FILESYSTEM_ALT_SLASH_CHAR))
+        {
+            root_pth_ = get_normalized_path(root_pth_);
+        }
     }
 
     /**
@@ -395,17 +397,17 @@ private:
     /** Maximum level of recursivity allowed. */
     std::uint64_t max_recursivity_levl_;
 
-    /** List of file types that are allowed to be iterated. */
-    system::filesystem::file_types file_typs_;
-
     /** Access mods that all the iterated files have to match. */
     system::filesystem::access_modes access_mods_;
 
-    /** Specify wheter or not follow symbolic links during the iteration. */
-    bool follow_symbolic_lnks_;
+    /** List of file types that are allowed to be iterated. */
+    system::filesystem::file_types file_typs_;
     
     /** Specify wheter or not the regex will be case sensitive. */
     bool case_insensitve_;
+
+    /** Specify wheter or not follow symbolic links during the iteration. */
+    bool follow_symbolic_lnks_;
     
     /** Specify wheter or not the inodes will be tracked. */
     bool inode_trackr_;
