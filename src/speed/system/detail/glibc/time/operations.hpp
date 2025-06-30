@@ -19,22 +19,21 @@
 
 /**
  * @file        operations.hpp
- * @brief       operations functions header.
+ * @brief       time operations header.
  * @author      Killian Valverde
  * @date        2017/10/18
  */
 
-#ifndef SPEED_SYSTEM_TIME_OPERATIONS_HPP
-#define SPEED_SYSTEM_TIME_OPERATIONS_HPP
+#ifndef SPEED_SYSTEM_DETAIL_GLIBC_TIME_OPERATIONS_HPP
+#define SPEED_SYSTEM_DETAIL_GLIBC_TIME_OPERATIONS_HPP
 
-#include <cstdint>
-#include <system_error>
+#include "../../../compatibility/compatibility.hpp"
+#ifdef SPEED_GLIBC
 
-#include "../detail/detail.hpp"
-#include "../compatibility/compatibility.hpp"
-#include "time_specification.hpp"
+#include "../../../errors/errors.hpp"
+#include "../../../time/time_specification.hpp"
 
-namespace speed::system::time {
+namespace speed::system::detail::glibc::time {
 
 /**
  * @brief       Get a monotonic time since some unspecified starting point.
@@ -42,13 +41,10 @@ namespace speed::system::time {
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool get_monotonic_time(
-        time_specification* time_spec,
+bool get_monotonic_time(
+        system::time::time_specification* time_spec,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(time::get_monotonic_time, false, time_spec, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Get a cpu time since some unspecified starting point.
@@ -56,14 +52,23 @@ inline bool get_monotonic_time(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool get_cpu_time(
-        time_specification* time_spec,
+bool get_cpu_time(
+        system::time::time_specification* time_spec,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(time::get_cpu_time, false, time_spec, err_code);
-}
+) noexcept;
+
+/**
+ * @brief       Get a child cpu time since some unspecified starting point.
+ * @param       time_spec : The value in which store the result.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+bool get_child_cpu_time(
+        system::time::time_specification* time_spec,
+        std::error_code* err_code = nullptr
+) noexcept;
 
 }
 
+#endif
 #endif

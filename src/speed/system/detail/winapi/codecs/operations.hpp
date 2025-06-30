@@ -24,15 +24,17 @@
  * @date        2024/10/16
  */
 
-#ifndef SPEED_SYSTEM_CODECS_OPERATIONS_HPP
-#define SPEED_SYSTEM_CODECS_OPERATIONS_HPP
+#ifndef SPEED_SYSTEM_DETAIL_WINAPI_CODECS_OPERATIONS_HPP
+#define SPEED_SYSTEM_DETAIL_WINAPI_CODECS_OPERATIONS_HPP
+
+#include "../../../compatibility/compatibility.hpp"
+#ifdef SPEED_WINAPI
 
 #include <string>
 
-#include "../compatibility/compatibility.hpp"
-#include "../detail/detail.hpp"
+#include "../../../errors/errors.hpp"
 
-namespace speed::system::codecs {
+namespace speed::system::detail::winapi::codecs {
 
 /**
  * @brief       Converts a specified c_string into a wstring.
@@ -48,7 +50,37 @@ bool convert_c_str_to_wstring(
         std::error_code* err_code = nullptr
 ) noexcept
 {
-    return SPEED_SELECT_API(codecs::convert_c_str_to_wstring, false, c_str, wstr, err_code);
+    try
+    {
+        int wstr_sz = ::MultiByteToWideChar(CP_UTF8, 0, c_str, -1, nullptr, 0);
+
+        if (wstr_sz == 0)
+        {
+            return true;
+        }
+
+        wstr->resize(wstr_sz);
+        wstr->at(wstr_sz - 1) = L'\0';
+
+        if (::MultiByteToWideChar(CP_UTF8, 0, c_str, -1, &(*wstr)[0], wstr_sz) == 0)
+        {
+            wstr->clear();
+            system::errors::assign_system_error_code((int)GetLastError(), err_code);
+            return false;
+        }
+        wstr->resize(wstr_sz - 1);
+        return true;
+    }
+    catch (const std::bad_alloc& ba)
+    {
+        system::errors::assign_system_error_code(ERROR_NOT_ENOUGH_MEMORY, err_code);
+    }
+    catch (...)
+    {
+        system::errors::assign_system_error_code(ERROR_BAD_ARGUMENTS, err_code);
+    }
+
+    return false;
 }
 
 /**
@@ -65,9 +97,42 @@ bool convert_w_str_to_string(
         std::error_code* err_code = nullptr
 ) noexcept
 {
-    return SPEED_SELECT_API(codecs::convert_w_str_to_string, false, w_str, str, err_code);
+    try
+    {
+        int str_sz = ::WideCharToMultiByte(CP_UTF8, 0, w_str, -1, nullptr, 0, nullptr, nullptr);
+
+        if (str_sz == 0)
+        {
+            return true;
+        }
+
+        str->resize(str_sz);
+        str->at(str_sz - 1) = '\0';
+
+        if (::WideCharToMultiByte(CP_UTF8, 0, w_str, -1, &(*str)[0], str_sz, nullptr,
+                                  nullptr) == 0)
+        {
+            str->clear();
+            system::errors::assign_system_error_code((int)GetLastError(), err_code);
+            return false;
+        }
+
+        str->resize(str_sz - 1);
+        return true;
+    }
+    catch (const std::bad_alloc& ba)
+    {
+        system::errors::assign_system_error_code(ERROR_NOT_ENOUGH_MEMORY, err_code);
+    }
+    catch (...)
+    {
+        system::errors::assign_system_error_code(ERROR_BAD_ARGUMENTS, err_code);
+    }
+
+    return false;
 }
 
 }
 
+#endif
 #endif

@@ -18,38 +18,24 @@
  */
 
 /**
- * @file        system.hpp
- * @brief       system functions header.
+ * @file        detail.hpp
+ * @brief       system api main header.
  * @author      Killian Valverde
- * @date        2017/01/08
+ * @date        2023/10/31
  */
 
-#ifndef SPEED_SYSTEM_SYSTEM_HPP
-#define SPEED_SYSTEM_SYSTEM_HPP
+#ifndef SPEED_SYSTEM_DETAIL_DETAIL_HPP
+#define SPEED_SYSTEM_DETAIL_DETAIL_HPP
 
-#include "codecs/codecs.hpp"
-#include "compatibility/compatibility.hpp"
-#include "detail/detail.hpp"
-#include "errors/errors.hpp"
-#include "exceptions/exceptions.hpp"
-#include "filesystem/filesystem.hpp"
-#include "process/process.hpp"
-#include "terminal/terminal.hpp"
-#include "time/time.hpp"
+#include "glibc/glibc.hpp"
+#include "winapi/winapi.hpp"
 
-namespace speed {
+namespace speed::system {
 
 /**
- * @brief       Contains resources for interact with the system.
+ * @brief       Contains all the implementation of the system functions using all supported APIs.
  */
-namespace system {}
-
-#ifndef SPEED_DISABLE_ALIAS
-/**
- * @brief       Contains resources for interact with the system.
- */
-namespace sys = system;
-#endif
+namespace detail {}
 
 }
 

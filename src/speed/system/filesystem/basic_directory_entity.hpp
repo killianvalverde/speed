@@ -27,8 +27,8 @@
 #ifndef SPEED_SYSTEM_FILESYSTEM_BASIC_DIRECTORY_ENTITY_HPP
 #define SPEED_SYSTEM_FILESYSTEM_BASIC_DIRECTORY_ENTITY_HPP
 
-#include "../api/glibc/filesystem/basic_directory_entity_extension.hpp"
-#include "../api/winapi/filesystem/basic_directory_entity_extension.hpp"
+#include "../detail/glibc/filesystem/basic_directory_entity_extension.hpp"
+#include "../detail/winapi/filesystem/basic_directory_entity_extension.hpp"
 #include "types.hpp"
 
 namespace speed::system::filesystem {

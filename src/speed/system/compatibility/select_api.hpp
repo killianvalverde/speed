@@ -31,9 +31,9 @@
 
 /** @cond */
 #ifdef SPEED_GLIBC
-#define SPEED_API_PREFIX 1, ::speed::system::api::glibc
+#define SPEED_API_PREFIX 1, ::speed::system::detail::glibc
 #elif defined(SPEED_WINAPI)
-#define SPEED_API_PREFIX 1, ::speed::system::api::winapi
+#define SPEED_API_PREFIX 1, ::speed::system::detail::winapi
 #else
 #define SPEED_API_PREFIX 0
 #endif

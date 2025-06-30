@@ -18,39 +18,29 @@
  */
 
 /**
- * @file        system.hpp
- * @brief       system functions header.
+ * @file        filesystem.hpp
+ * @brief       glibc filesystem main header.
  * @author      Killian Valverde
- * @date        2017/01/08
+ * @date        2023/10/31
  */
 
-#ifndef SPEED_SYSTEM_SYSTEM_HPP
-#define SPEED_SYSTEM_SYSTEM_HPP
+#ifndef SPEED_SYSTEM_DETAIL_GLIBC_FILESYSTEM_FILESYSTEM_HPP
+#define SPEED_SYSTEM_DETAIL_GLIBC_FILESYSTEM_FILESYSTEM_HPP
 
-#include "codecs/codecs.hpp"
-#include "compatibility/compatibility.hpp"
-#include "detail/detail.hpp"
-#include "errors/errors.hpp"
-#include "exceptions/exceptions.hpp"
-#include "filesystem/filesystem.hpp"
-#include "process/process.hpp"
-#include "terminal/terminal.hpp"
-#include "time/time.hpp"
+#include "../../../compatibility/compatibility.hpp"
+#ifdef SPEED_GLIBC
 
-namespace speed {
+#include "basic_directory_entity_extension.hpp"
+#include "operations.hpp"
+
+namespace speed::system::detail::glibc {
 
 /**
- * @brief       Contains resources for interact with the system.
+ * @brief       Contains filesystem interaction resources.
  */
-namespace system {}
-
-#ifndef SPEED_DISABLE_ALIAS
-/**
- * @brief       Contains resources for interact with the system.
- */
-namespace sys = system;
-#endif
+namespace filesystem {}
 
 }
 
+#endif
 #endif

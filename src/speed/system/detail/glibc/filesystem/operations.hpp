@@ -24,21 +24,23 @@
  * @date        2017/05/26
  */
 
-#ifndef SPEED_SYSTEM_FILESYSTEM_OPERATIONS_HPP
-#define SPEED_SYSTEM_FILESYSTEM_OPERATIONS_HPP
+#ifndef SPEED_SYSTEM_DETAIL_GLIBC_FILESYSTEM_OPERATIONS_HPP
+#define SPEED_SYSTEM_DETAIL_GLIBC_FILESYSTEM_OPERATIONS_HPP
 
-#include <cstdint>
+#include "../../../compatibility/compatibility.hpp"
+#ifdef SPEED_GLIBC
 
-#include "../compatibility/compatibility.hpp"
-#include "../detail/detail.hpp"
-#include "../process/process.hpp"
-#include "../time/time.hpp"
-#include "access_modes.hpp"
-#include "basic_directory_entity.hpp"
-#include "file_types.hpp"
-#include "types.hpp"
+#include <dirent.h>
 
-namespace speed::system::filesystem {
+#include "../../../errors/errors.hpp"
+#include "../../../filesystem/access_modes.hpp"
+#include "../../../filesystem/basic_directory_entity.hpp"
+#include "../../../filesystem/file_types.hpp"
+#include "../../../filesystem/types.hpp"
+#include "../../../process/types.hpp"
+#include "../../../time/system_time.hpp"
+
+namespace speed::system::detail::glibc::filesystem {
 
 /**
  * @brief       Checks whether the calling process can access the file path. If pathname is a
@@ -48,14 +50,11 @@ namespace speed::system::filesystem {
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      On success the true is returned, otherwise false is returned.
  */
-inline bool access(
+bool access(
         const char* file_pth,
-        access_modes access_mods,
+        system::filesystem::access_modes access_mods,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::access, false, file_pth, access_mods, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Checks whether the calling process can access the file path. If pathname is a
@@ -65,52 +64,43 @@ inline bool access(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      On success the true is returned, otherwise false is returned.
  */
-inline bool access(
+bool access(
         const wchar_t* file_pth,
-        access_modes access_mods,
+        system::filesystem::access_modes access_mods,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::access, false, file_pth, access_mods, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Checks whether the calling process can access the file path. If pathname is a
  *              symbolic link, it is dereferenced.
  * @param       file_pth : The file path.
  * @param       access_mods : Specifies the accessibility check(s) to be performed.
- * @param       file_typs : File types that the file must match with at least once.
+ * @param       file_typ : The file type.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      On success the true is returned, otherwise false is returned.
  */
-inline bool access(
+bool access(
         const char* file_pth,
-        access_modes access_mods,
-        file_types file_typs,
+        system::filesystem::access_modes access_mods,
+        system::filesystem::file_types file_typ,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::access, false, file_pth, access_mods, file_typs, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Checks whether the calling process can access the file path. If pathname is a
  *              symbolic link, it is dereferenced.
  * @param       file_pth : The file path.
  * @param       access_mods : Specifies the accessibility check(s) to be performed.
- * @param       file_typs : File types that the file must match with at least once.
+ * @param       file_typ : The file type.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      On success the true is returned, otherwise false is returned.
  */
-inline bool access(
+bool access(
         const wchar_t* file_pth,
-        access_modes access_mods,
-        file_types file_typs,
+        system::filesystem::access_modes access_mods,
+        system::filesystem::file_types file_typ,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::access, false, file_pth, access_mods, file_typs, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Check whether a specified directory can be created.
@@ -118,13 +108,10 @@ inline bool access(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      On success the true is returned, otherwise false is returned.
  */
-inline bool can_directory_be_created(
+bool can_directory_be_created(
         const char* directory_pth,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::can_directory_be_created, false, directory_pth, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Check whether a specified directory can be created.
@@ -132,13 +119,10 @@ inline bool can_directory_be_created(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      On success the true is returned, otherwise false is returned.
  */
-inline bool can_directory_be_created(
+bool can_directory_be_created(
         const wchar_t* directory_pth,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::can_directory_be_created, false, directory_pth, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Check whether a specified regular file can be created.
@@ -146,14 +130,10 @@ inline bool can_directory_be_created(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      On success the true is returned, otherwise false is returned.
  */
-inline bool can_regular_file_be_created(
+bool can_regular_file_be_created(
         const char* regular_file_pth,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::can_regular_file_be_created, false, regular_file_pth,
-                            err_code);
-}
+) noexcept;
 
 /**
  * @brief       Check whether a specified regular file can be created.
@@ -161,14 +141,10 @@ inline bool can_regular_file_be_created(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      On success the true is returned, otherwise false is returned.
  */
-inline bool can_regular_file_be_created(
+bool can_regular_file_be_created(
         const wchar_t* regular_file_pth,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::can_regular_file_be_created, false, regular_file_pth,
-                            err_code);
-}
+) noexcept;
 
 /**
  * @brief       Change the current execution directory.
@@ -176,10 +152,7 @@ inline bool can_regular_file_be_created(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool chdir(const char* directory_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::chdir, false, directory_pth, err_code);
-}
+bool chdir(const char* directory_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Change the current execution directory.
@@ -187,34 +160,29 @@ inline bool chdir(const char* directory_pth, std::error_code* err_code = nullptr
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool chdir(const wchar_t* directory_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::chdir, false, directory_pth, err_code);
-}
+bool chdir(const wchar_t* directory_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Closes the directory stream.
  * @param       directory_ent : The directory entity.
  * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful a pointer to the directory is returned, otherwise nullptr
- *              is returned.
+ * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool closedir(directory_entity* directory_ent, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::closedir, false, directory_ent, err_code);
-}
+bool closedir(
+        system::filesystem::directory_entity* directory_ent,
+        std::error_code* err_code = nullptr
+) noexcept;
 
 /**
  * @brief       Closes the directory stream.
  * @param       directory_ent : The directory entity.
  * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful a pointer to the directory is returned, otherwise nullptr
- *              is returned.
+ * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool closedir(wdirectory_entity* directory_ent, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::closedir, false, directory_ent, err_code);
-}
+bool closedir(
+        system::filesystem::wdirectory_entity* directory_ent,
+        std::error_code* err_code = nullptr
+) noexcept;
 
 /**
  * @brief       Check if a file exists.
@@ -222,10 +190,7 @@ inline bool closedir(wdirectory_entity* directory_ent, std::error_code* err_code
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool file_exists(const char* file_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::file_exists, false, file_pth, err_code);
-}
+bool file_exists(const char* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Check if a file exists.
@@ -233,10 +198,7 @@ inline bool file_exists(const char* file_pth, std::error_code* err_code = nullpt
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool file_exists(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::file_exists, false, file_pth, err_code);
-}
+bool file_exists(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Get the inode number of the specified file.
@@ -245,13 +207,10 @@ inline bool file_exists(const wchar_t* file_pth, std::error_code* err_code = nul
  * @return      On success the inode number of the sepcified file is returned, otherwise -1 is
  *              returned.
  */
-inline inode_t get_file_inode(
+system::filesystem::inode_t get_file_inode(
         const char* file_pth,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::get_file_inode, -1, file_pth, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Get the inode number of the specified file.
@@ -260,13 +219,10 @@ inline inode_t get_file_inode(
  * @return      On success the inode number of the sepcified file is returned, otherwise -1 is
  *              returned.
  */
-inline inode_t get_file_inode(
+system::filesystem::inode_t get_file_inode(
         const wchar_t* file_pth,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::get_file_inode, -1, file_pth, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Get the inode number of the specified file.
@@ -275,13 +231,10 @@ inline inode_t get_file_inode(
  * @return      On success the inode number of the sepcified file is returned, otherwise -1 is
  *              returned.
  */
-inline inode_t get_file_inode(
-        directory_entity* directory_ent,
+system::filesystem::inode_t get_file_inode(
+        system::filesystem::directory_entity* directory_ent,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::get_file_inode, -1, directory_ent, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Get the inode number of the specified file.
@@ -290,13 +243,10 @@ inline inode_t get_file_inode(
  * @return      On success the inode number of the sepcified file is returned, otherwise -1 is
  *              returned.
  */
-inline inode_t get_file_inode(
-        wdirectory_entity* directory_ent,
+system::filesystem::inode_t get_file_inode(
+        system::filesystem::wdirectory_entity* directory_ent,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::get_file_inode, -1, directory_ent, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Get the UID of the specified file.
@@ -304,13 +254,7 @@ inline inode_t get_file_inode(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      On success the UID of the sepcified file is returned, otherwise -1 is returned.
  */
-inline process::uid_t get_file_uid(
-        const char* file_pth,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::get_file_uid, -1, file_pth, err_code);
-}
+uid_t get_file_uid(const char* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Get the UID of the specified file.
@@ -318,41 +262,23 @@ inline process::uid_t get_file_uid(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      On success the UID of the sepcified file is returned, otherwise -1 is returned.
  */
-inline process::uid_t get_file_uid(
-        const wchar_t* file_pth,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::get_file_uid, -1, file_pth, err_code);
-}
+uid_t get_file_uid(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Get the GID of the specified file.
  * @param       file_pth : The file to get the GID.
  * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      On success the GID of the sepcified file is returned, otherwise -1 is returned..
+ * @return      On success the GID of the sepcified file is returned, otherwise -1 is returned.
  */
-inline process::gid_t get_file_gid(
-        const char* file_pth,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::get_file_gid, -1, file_pth, err_code);
-}
+gid_t get_file_gid(const char* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Get the GID of the specified file.
  * @param       file_pth : The file to get the GID.
  * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      On success the GID of the sepcified file is returned, otherwise -1 is returned..
+ * @return      On success the GID of the sepcified file is returned, otherwise -1 is returned.
  */
-inline process::gid_t get_file_gid(
-        const wchar_t* file_pth,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::get_file_gid, -1, file_pth, err_code);
-}
+gid_t get_file_gid(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Get the size in bytes of a specified file path.
@@ -360,13 +286,7 @@ inline process::gid_t get_file_gid(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      On success the file size in bytes in returned, otherwise -1 is returned.
  */
-inline std::size_t get_file_size(
-        const char* file_pth,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::get_file_size, ~0ull, file_pth, err_code);
-}
+std::size_t get_file_size(const char* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Get the size in bytes of a specified file path.
@@ -374,13 +294,7 @@ inline std::size_t get_file_size(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      On success the file size in bytes in returned, otherwise -1 is returned.
  */
-inline std::size_t get_file_size(
-        const wchar_t* file_pth,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::get_file_size, ~0ull, file_pth, err_code);
-}
+std::size_t get_file_size(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Get the modification time of the specified file.
@@ -389,15 +303,11 @@ inline std::size_t get_file_size(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool get_modification_time(
+bool get_modification_time(
         const char* file_pth,
-        time::system_time* system_tme,
+        system::time::system_time* system_tme,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::get_modification_time, false, file_pth, system_tme,
-                            err_code);
-}
+) noexcept;
 
 /**
  * @brief       Get the modification time of the specified time.
@@ -406,25 +316,17 @@ inline bool get_modification_time(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool get_modification_time(
+bool get_modification_time(
         const wchar_t* file_pth,
-        time::system_time* system_tme,
+        system::time::system_time* system_tme,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::get_modification_time, false, file_pth, system_tme,
-                            err_code);
-}
+) noexcept;
 
 /**
- * @brief       Get a temporal path.
- * @return      If function was successful a temporal path is returned otherwise a null pointer
- *              is returned.
+ * @brief       Get the tmp system path.
+ * @return      The tmp system path.
  */
-inline const char* get_temporal_path() noexcept
-{
-    return SPEED_SELECT_API(filesystem::get_temporal_path, nullptr);
-}
+const char* get_temporal_path() noexcept;
 
 /**
  * @brief       Checks if the given path corresponds to a block device.
@@ -432,10 +334,7 @@ inline const char* get_temporal_path() noexcept
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool is_block_device(const char* file_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_block_device, false, file_pth, err_code);
-}
+bool is_block_device(const char* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Checks if the given path corresponds to a block device.
@@ -443,10 +342,7 @@ inline bool is_block_device(const char* file_pth, std::error_code* err_code = nu
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool is_block_device(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_block_device, false, file_pth, err_code);
-}
+bool is_block_device(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Checks if the given path corresponds to a character device.
@@ -454,10 +350,7 @@ inline bool is_block_device(const wchar_t* file_pth, std::error_code* err_code =
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool is_character_device(const char* file_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_character_device, false, file_pth, err_code);
-}
+bool is_character_device(const char* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Checks if the given path corresponds to a character device.
@@ -465,13 +358,7 @@ inline bool is_character_device(const char* file_pth, std::error_code* err_code 
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool is_character_device(
-        const wchar_t* file_pth,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_character_device, false, file_pth, err_code);
-}
+bool is_character_device(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Checks if the given path corresponds to a directory.
@@ -479,10 +366,7 @@ inline bool is_character_device(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool is_directory(const char* file_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_directory, false, file_pth, err_code);
-}
+bool is_directory(const char* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Checks if the given path corresponds to a directory.
@@ -490,10 +374,7 @@ inline bool is_directory(const char* file_pth, std::error_code* err_code = nullp
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool is_directory(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_directory, false, file_pth, err_code);
-}
+bool is_directory(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Checks if the given path corresponds to a directory.
@@ -501,13 +382,10 @@ inline bool is_directory(const wchar_t* file_pth, std::error_code* err_code = nu
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool is_directory(
-        directory_entity* directory_ent,
+bool is_directory(
+        system::filesystem::directory_entity* directory_ent,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_directory, false, directory_ent, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Checks if the given path corresponds to a directory.
@@ -515,30 +393,10 @@ inline bool is_directory(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool is_directory(
-        wdirectory_entity* directory_ent,
+bool is_directory(
+        system::filesystem::wdirectory_entity* directory_ent,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_directory, false, directory_ent, err_code);
-}
-
-/**
- * @brief       Checks if the given path corresponds to a specified file type.
- * @param       file_pth : Path to check.
- * @param       file_typ : The specified file type. If more than one flag is set, the function will
- *              verify if at least one of the type is matching.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
- */
-inline bool is_file_type(
-        const char* file_pth,
-        file_types file_typ,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_file_type, false, file_pth, file_typ, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Checks if the given path corresponds to a specified file type.
@@ -547,14 +405,24 @@ inline bool is_file_type(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool is_file_type(
+bool is_file_type(
+        const char* file_pth,
+        system::filesystem::file_types file_typ,
+        std::error_code* err_code = nullptr
+) noexcept;
+
+/**
+ * @brief       Checks if the given path corresponds to a specified file type.
+ * @param       file_pth : Path to check.
+ * @param       file_typ : The specified file type.
+ * @param       err_code : If function fails it holds the platform-dependent error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+bool is_file_type(
         const wchar_t* file_pth,
-        file_types file_typ,
+        system::filesystem::file_types file_typ,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_file_type, false, file_pth, file_typ, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Checks if the given path corresponds to a named pipe.
@@ -562,10 +430,7 @@ inline bool is_file_type(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool is_pipe(const char* file_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_pipe, false, file_pth, err_code);
-}
+bool is_pipe(const char* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Checks if the given path corresponds to a named pipe.
@@ -573,10 +438,7 @@ inline bool is_pipe(const char* file_pth, std::error_code* err_code = nullptr) n
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool is_pipe(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_pipe, false, file_pth, err_code);
-}
+bool is_pipe(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Checks if the given path corresponds to a regular file.
@@ -584,10 +446,7 @@ inline bool is_pipe(const wchar_t* file_pth, std::error_code* err_code = nullptr
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool is_regular_file(const char* file_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_regular_file, false, file_pth, err_code);
-}
+bool is_regular_file(const char* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Checks if the given path corresponds to a regular file.
@@ -595,10 +454,7 @@ inline bool is_regular_file(const char* file_pth, std::error_code* err_code = nu
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool is_regular_file(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_regular_file, false, file_pth, err_code);
-}
+bool is_regular_file(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Checks if the given path corresponds to a socket.
@@ -606,10 +462,7 @@ inline bool is_regular_file(const wchar_t* file_pth, std::error_code* err_code =
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool is_socket(const char* file_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_socket, false, file_pth, err_code);
-}
+bool is_socket(const char* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Checks if the given path corresponds to a socket.
@@ -617,10 +470,7 @@ inline bool is_socket(const char* file_pth, std::error_code* err_code = nullptr)
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool is_socket(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_socket, false, file_pth, err_code);
-}
+bool is_socket(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Checks if the given path corresponds to a socket.
@@ -628,10 +478,7 @@ inline bool is_socket(const wchar_t* file_pth, std::error_code* err_code = nullp
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool is_symlink(const char* file_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_symlink, false, file_pth, err_code);
-}
+bool is_symlink(const char* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Checks if the given path corresponds to a socket.
@@ -639,66 +486,55 @@ inline bool is_symlink(const char* file_pth, std::error_code* err_code = nullptr
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool is_symlink(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_symlink, false, file_pth, err_code);
-}
+bool is_symlink(const wchar_t* file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Attempts to create a directory.
  * @param       directory_pth : The path of the new directory.
+ * @param       mods : Specifies the mode for the new directory.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool mkdir(
+bool mkdir(
         const char* directory_pth,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::mkdir, false, directory_pth, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Attempts to create a directory.
  * @param       directory_pth : The path of the new directory.
+ * @param       mods : Specifies the mode for the new directory.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool mkdir(
+bool mkdir(
         const wchar_t* directory_pth,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::mkdir, false, directory_pth, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Attemps to create a directory path.
  * @param       directory_pth : The path of directories to create.
+ * @param       mods : Specifies the mode for the new directories.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool mkdir_recursively(
+bool mkdir_recursively(
         const char* directory_pth,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::mkdir_recursively, false, directory_pth, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Attemps to create a directory path.
  * @param       directory_pth : The path of directories to create.
+ * @param       mods : Specifies the mode for the new directories.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool mkdir_recursively(
+bool mkdir_recursively(
         const wchar_t* directory_pth,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::mkdir_recursively, false, directory_pth, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Opens a directory stream corresponding to the directory name, and returns a pointer
@@ -708,14 +544,11 @@ inline bool mkdir_recursively(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool opendir(
-        directory_entity* directory_ent,
+bool opendir(
+        system::filesystem::directory_entity* directory_ent,
         const char* directory_pth,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::opendir, false, directory_ent, directory_pth, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Opens a directory stream corresponding to the directory name, and returns a pointer
@@ -725,14 +558,11 @@ inline bool opendir(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool opendir(
-        wdirectory_entity* directory_ent,
+bool opendir(
+        system::filesystem::wdirectory_entity* directory_ent,
         const wchar_t* directory_pth,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::opendir, false, directory_ent, directory_pth, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Read the next directory entry in the directory stream.
@@ -740,10 +570,10 @@ inline bool opendir(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool readdir(directory_entity* directory_ent, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::readdir, false, directory_ent, err_code);
-}
+bool readdir(
+        system::filesystem::directory_entity* directory_ent,
+        std::error_code* err_code = nullptr
+) noexcept;
 
 /**
  * @brief       Read the next directory entry in the directory stream.
@@ -751,10 +581,10 @@ inline bool readdir(directory_entity* directory_ent, std::error_code* err_code =
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool readdir(wdirectory_entity* directory_ent, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::readdir, false, directory_ent, err_code);
-}
+bool readdir(
+        system::filesystem::wdirectory_entity* directory_ent,
+        std::error_code* err_code = nullptr
+) noexcept;
 
 /**
  * @brief       Delete the specified directory.
@@ -762,10 +592,7 @@ inline bool readdir(wdirectory_entity* directory_ent, std::error_code* err_code 
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool rmdir(const char* directory_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::rmdir, false, directory_pth, err_code);
-}
+bool rmdir(const char* directory_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Delete the specified directory.
@@ -773,10 +600,7 @@ inline bool rmdir(const char* directory_pth, std::error_code* err_code = nullptr
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool rmdir(const wchar_t* directory_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::rmdir, false, directory_pth, err_code);
-}
+bool rmdir(const wchar_t* directory_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Creates a shortcut stored at shortcut_pth that points at target_pth.
@@ -785,14 +609,11 @@ inline bool rmdir(const wchar_t* directory_pth, std::error_code* err_code = null
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool shortcut(
+bool shortcut(
         const char* target_pth,
         const char* shortcut_pth,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::shortcut, false, target_pth, shortcut_pth, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Creates a shortcut stored at shortcut_pth that points at target_pth.
@@ -801,14 +622,11 @@ inline bool shortcut(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool shortcut(
+bool shortcut(
         const wchar_t* target_pth,
         const wchar_t* shortcut_pth,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::shortcut, false, target_pth, shortcut_pth, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Creates a symbolic link named lnk_pth which contains the string trg.
@@ -817,14 +635,11 @@ inline bool shortcut(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool symlink(
+bool symlink(
         const char* target_pth,
         const char* link_pth,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::symlink, false, target_pth, link_pth, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Creates a symbolic link named lnk_pth which contains the string trg.
@@ -833,42 +648,35 @@ inline bool symlink(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool symlink(
+bool symlink(
         const wchar_t* target_pth,
         const wchar_t* link_pth,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::symlink, false, target_pth, link_pth, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Attempts to create a regular file.
  * @param       regular_file_pth : The path of the new regular file.
+ * @param       mods : Specifies the mode for the new regular file.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool touch(
+bool touch(
         const char* regular_file_pth,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::touch, false, regular_file_pth, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Attempts to create a regular file.
  * @param       regular_file_pth : The path of the new regular file.
+ * @param       mods : Specifies the mode for the new regular file.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool touch(
+bool touch(
         const wchar_t* regular_file_pth,
         std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::touch, false, regular_file_pth, err_code);
-}
+) noexcept;
 
 /**
  * @brief       Delete the specified regular file.
@@ -876,10 +684,7 @@ inline bool touch(
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool unlink(const char* regular_file_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::unlink, false, regular_file_pth, err_code);
-}
+bool unlink(const char* regular_file_pth, std::error_code* err_code = nullptr) noexcept;
 
 /**
  * @brief       Delete the specified regular file.
@@ -887,11 +692,9 @@ inline bool unlink(const char* regular_file_pth, std::error_code* err_code = nul
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-inline bool unlink(const wchar_t* regular_file_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::unlink, false, regular_file_pth, err_code);
-}
+bool unlink(const wchar_t* regular_file_pth, std::error_code* err_code = nullptr) noexcept;
 
 }
 
+#endif
 #endif
