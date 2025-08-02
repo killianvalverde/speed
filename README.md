@@ -2,7 +2,7 @@
   <img height="90" src="docs/images/speed.png" alt="speed"/>
 
   [![license](https://img.shields.io/badge/license-GPLv3-red.svg)](https://github.com/killianvalverde/speed/blob/master/COPYING)
-  [![release](https://img.shields.io/badge/release-v0.4.1-blue.svg?cacheSeconds=2592000)](https://github.com/killianvalverde/speed/tree/v0.4.1)
+  [![release](https://img.shields.io/badge/release-v0.5.0-blue.svg?cacheSeconds=2592000)](https://github.com/killianvalverde/speed/tree/v0.4.1)
 </div>
 
 ## Table of Contents
