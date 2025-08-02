@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -30,8 +30,8 @@
 #include <cstdint>
 #include <system_error>
 
-#include "../api/api.hpp"
-#include "../compatibility/compatibility.hpp"
+#include "../detail/detail.hpp"
+#include "../platform/platform.hpp"
 #include "time_specification.hpp"
 
 namespace speed::system::time {
@@ -43,7 +43,7 @@ namespace speed::system::time {
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 inline bool get_monotonic_time(
-        time_specification* time_spec,
+        time_specification& time_spec,
         std::error_code* err_code = nullptr
 ) noexcept
 {
@@ -57,7 +57,7 @@ inline bool get_monotonic_time(
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 inline bool get_cpu_time(
-        time_specification* time_spec,
+        time_specification& time_spec,
         std::error_code* err_code = nullptr
 ) noexcept
 {

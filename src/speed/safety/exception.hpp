@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -34,7 +34,7 @@ namespace speed::safety {
 /**
  * @brief       Base class used to throw exceptions when a lowlevel operation fails.
  */
-class exception : public speed::exceptions::exception_base
+class exception : public exceptions::exception_base
 {
 public:
     /**

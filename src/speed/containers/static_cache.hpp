@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -61,26 +61,26 @@ using scbf_t = static_cache_buffer_flags;
  * @brief       Class that represents a generic static cache.
  */
 template<
-        typename TpKey,
-        typename TpValue,
+        typename KeyT,
+        typename ValueT,
         std::size_t SIZE,
-        typename TpHash = std::hash<TpKey>,
-        typename TpPred = std::equal_to<TpKey>
+        typename HashT = std::hash<KeyT>,
+        typename PredT = std::equal_to<KeyT>
 >
 class static_cache
 {
 public:
     /** The key type. */
-    using key_type = TpKey;
+    using key_type = KeyT;
     
     /** The value type. */
-    using value_type = TpValue;
+    using value_type = ValueT;
     
     /** The hash type. */
-    using hash_type = TpHash;
+    using hash_type = HashT;
     
     /** The predicate type. */
-    using pred_type = TpPred;
+    using pred_type = PredT;
     
     /** Class that represents flags container */
     template<typename T>
@@ -140,13 +140,7 @@ public:
         /**
          * @brief       Default constructor.
          */
-        const_iterator() noexcept
-                : hb_(nullptr)
-                , hb_size_(0)
-                , current_hb_idx_(0)
-                , current_hb_buf_(nullptr)
-        {
-        }
+        const_iterator() noexcept = default;
     
         /**
          * @brief       Constructor with parameters.
@@ -272,26 +266,26 @@ public:
         }
     
         template<
-                typename TpKey__,
-                typename TpValue__,
+                typename KeyT__,
+                typename ValueT__,
                 std::size_t SIZE__,
-                typename TpHash__,
-                typename TpPred__
+                typename HashT__,
+                typename PredT__
         >
         friend class static_cache;
 
     protected:
         /** The hash buffer. */
-        hash_buffer* hb_;
+        hash_buffer* hb_ = nullptr;
         
         /** The hash buffer size. */
-        std::size_t hb_size_;
+        std::size_t hb_size_ = 0;
         
         /** The current hash buffer index. */
-        std::size_t current_hb_idx_;
+        std::size_t current_hb_idx_ = 0;
     
         /** The current hash buffer buffer. */
-        buffer* current_hb_buf_;
+        buffer* current_hb_buf_ = nullptr;
     };
     
     /**
@@ -394,24 +388,20 @@ public:
         }
     
         template<
-                typename TpKey__,
-                typename TpValue__,
+                typename KeyT__,
+                typename ValueT__,
                 std::size_t SIZE__,
-                typename TpHash__,
-                typename TpPred__
+                typename HashT__,
+                typename PredT__
         >
         friend class static_cache;
     };
-    
-    // TODO: Implement the reverce iterators.
     
     /**
      * @brief       Default constructor.
      */
     static_cache() noexcept
-            : buffers_()
-            , av_list_(&buffers_[0])
-            , hbuf_()
+            : av_list_(&buffers_[0])
     {
         std::size_t i;
         
@@ -427,7 +417,6 @@ public:
         buffers_[i].flgs_.set(scbf_t::INSERTED_IN_AVAILABLE_LIST);
     }
     
-    // TODO: Implement copy and move operators.
     /** @cond */
     static_cache(const static_cache& rhs) = delete;
     
@@ -585,8 +574,8 @@ public:
      * @param       val : The value.
      * @return      An iterator to the inserted element.
      */
-    template<typename TpKey_, typename TpValue_>
-    iterator insert(TpKey_&& ky, TpValue_&& val)
+    template<typename KeyT_, typename ValueT_>
+    iterator insert(KeyT_&& ky, ValueT_&& val)
     {
         if (!find(ky).end())
         {
@@ -600,8 +589,8 @@ public:
             erase_from_hash_buffer(buf);
         }
         
-        buf->ky_ = std::forward<TpKey_>(ky);
-        buf->val_ = std::forward<TpValue_>(val);
+        buf->ky_ = std::forward<KeyT_>(ky);
+        buf->val_ = std::forward<ValueT_>(val);
         
         insert_in_hash_buffer_list(buf);
         set_most_recently_used_buffer(buf);
@@ -615,10 +604,10 @@ public:
      * @param       val : The value.
      * @return      An iterator to the inserted element.
      */
-    template<typename TpKey_, typename TpValue_>
-    iterator insert_and_lock(TpKey_&& ky, TpValue_&& val)
+    template<typename KeyT_, typename ValueT_>
+    iterator insert_and_lock(KeyT_&& ky, ValueT_&& val)
     {
-        iterator it = insert(std::forward<TpKey_>(ky), std::forward<TpValue_>(val));
+        iterator it = insert(std::forward<KeyT_>(ky), std::forward<ValueT_>(val));
         lock(it);
         
         return it;

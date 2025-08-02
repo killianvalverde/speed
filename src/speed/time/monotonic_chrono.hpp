@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -41,10 +41,10 @@ public:
      * @brief       Get the specific implementation time since some unspecified starting point.
      * @return      The specific implementation time since some unspecified starting point.
      */
-    [[nodiscard]] speed::system::time::time_specification get_time() const noexcept override
+    [[nodiscard]] system::time::time_specification get_time() const noexcept override
     {
-        speed::system::time::time_specification time_spec;
-        speed::system::time::get_monotonic_time(&time_spec);
+        system::time::time_specification time_spec;
+        system::time::get_monotonic_time(time_spec);
         return time_spec;
     }
 };

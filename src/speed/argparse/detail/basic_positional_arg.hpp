@@ -1,0 +1,255 @@
+/* speed - Generic C++ library.
+ * Copyright (C) 2015-2025 Killian Valverde.
+ *
+ * This file is part of speed.
+ *
+ * speed is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * speed is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with speed. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * @file        basic_positional_arg.hpp
+ * @brief       basic_positional_arg class header.
+ * @author      Killian Valverde
+ * @date        2016/03/11
+ */
+
+#ifndef SPEED_ARGPARSE_DETAIL_BASIC_POSITIONAL_ARG_HPP
+#define SPEED_ARGPARSE_DETAIL_BASIC_POSITIONAL_ARG_HPP
+
+#include <memory>
+#include <string>
+
+#include "forward_declarations.hpp"
+#include "../basic_arg_parser.hpp"
+#include "arg_flags.hpp"
+#include "basic_arg_value.hpp"
+#include "basic_base_arg.hpp"
+#include "basic_value_arg.hpp"
+
+namespace speed::argparse::detail {
+
+/**
+ * @brief       Class that represents arguments without keys.
+ */
+template<typename AllocatorT>
+class basic_positional_arg : public basic_value_arg<AllocatorT>
+{
+public:
+    /** Allocator type used in the class. */
+    template<typename T>
+    using allocator_type = typename std::allocator_traits<AllocatorT>::template rebind_alloc<T>;
+
+    /** String type used in the class. */
+    using string_type = std::basic_string<char, std::char_traits<char>, allocator_type<char>>;
+
+    /** String view type used in the class. */
+    using string_view_type = std::basic_string_view<char, std::char_traits<char>>;
+
+    /** Class that represents a value for an argument. */
+    using arg_value_type = basic_arg_value<AllocatorT>;
+    
+    /** Class that represents the base of the arguments hierarchy. */
+    using base_arg_type = basic_base_arg<AllocatorT>;
+    
+    /** Class that represents arguments that have values. */
+    using value_arg_type = basic_value_arg<AllocatorT>;
+    
+    /** Class that represents the argument parser. */
+    using arg_parser_type = basic_arg_parser<AllocatorT>;
+    
+    /**
+     * @brief       Constructor with parameters.
+     * @param       arg_parsr : Argument parser that holds this object.
+     * @param       usage_ky : Key used in the usage message.
+     */
+    template<typename StringT_>
+    basic_positional_arg(arg_parser_type* arg_parsr, StringT_&& usage_ky)
+            : base_arg_type(arg_parsr)
+            , value_arg_type(arg_parsr)
+            , ky_(std::forward<StringT_>(usage_ky))
+    {
+        base_arg_type::set_flags(arg_flags::DEFAULT_POSITIONAL_ARG_FLAGS);
+        base_arg_type::set_minmax_occurrences(1, 1);
+
+        if (ky_.empty())
+        {
+            throw no_key_specified_exception();
+        }
+
+        base_arg_type::set_error_name(ky_);
+    }
+    
+    /**
+     * @brief       Copy constructor.
+     * @param       rhs : Object to copy.
+     */
+    basic_positional_arg(const basic_positional_arg& rhs) = default;
+    
+    /**
+     * @brief       Move constructor.
+     * @param       rhs : Object to move.
+     */
+    basic_positional_arg(basic_positional_arg&& rhs) noexcept = default;
+    
+    /**
+     * @brief       Destructor.
+     */
+    ~basic_positional_arg() = default;
+    
+    /**
+     * @brief       Copy assignment operator.
+     * @param       rhs : Object to copy.
+     * @return      The object who call the method.
+     */
+    basic_positional_arg& operator =(const basic_positional_arg& rhs) = default;
+    
+    /**
+     * @brief       Move assignment operator.
+     * @param       rhs : Object to move.
+     * @return      The object who call the method.
+     */
+    basic_positional_arg& operator =(basic_positional_arg&& rhs) noexcept = default;
+
+    /**
+     * @brief       Returns the arguement key.
+     * @return      The arguement key.
+     */
+    [[nodiscard]] inline const string_type& get_key() const noexcept
+    {
+        return ky_;
+    }
+
+    /**
+     * @brief       Only used for polymorphic propose.
+     * @return      0 is returned always.
+     */
+    [[nodiscard]] inline std::size_t get_long_keys_length() noexcept override
+    {
+        return 0;
+    }
+
+    /**
+     * @brief       Get the necessary length to print the name of the argument.
+     * @return      The necessary length to print long argument name.
+     */
+    [[nodiscard]] virtual std::size_t get_name_length() const override
+    {
+        return ky_.size();
+    }
+
+    /**
+     * @brief       Get the necessary length to print the usage key.
+     * @return      The necessary length to print the usage key.
+     */
+    [[nodiscard]] inline std::size_t get_short_keys_length() noexcept override
+    {
+        if (base_arg_type::is_description_empty())
+        {
+            return 0;
+        }
+
+        return safety::addm(ky_.length(), 2);
+    }
+
+    /**
+     * @brief       Get a string that represents the kind of argument it is.
+     * @return      A string that represents the kind of argument it is.
+     */
+    [[nodiscard]] inline string_view_type get_tittle() const override
+    {
+        return "Value";
+    }
+
+    /**
+     * @brief       Prin the usage.
+     */
+    void print_name() override
+    {
+        std::cout << ky_;
+    }
+    
+    /**
+     * @brief       Print the argument usage ID in standard output for usage sentence.
+     */
+    void print_usage() override
+    {
+        if (!base_arg_type::is_option())
+        {
+            std::cout << ky_;
+        }
+        else
+        {
+            std::cout << "[" << ky_ << "]";
+        }
+        
+        if (value_arg_type::get_max_values() > 1)
+        {
+            std::cout << "...";
+        }
+    }
+    
+    /**
+     * @brief       Print the argument help text.
+     * @param       args_indent : Indentation used to print arguments help description.
+     * @param       max_line_len : The maximum line length that will be printed.
+     * @param       new_line_indent : The indentation used after a newline is printed.
+     * @param       short_kys_len : The maximum short keys length.
+     * @param       long_kys_len : The maximum long keys length.
+     */
+    void print_help_text(
+            std::size_t args_indent,
+            std::size_t max_line_len,
+            std::size_t new_line_indent,
+            std::size_t short_kys_len,
+            std::size_t long_kys_len
+    ) override
+    {
+        if (base_arg_type::is_description_empty())
+        {
+            return;
+        }
+        
+        std::size_t current_id_len = safety::addm(ky_.length(), 2);
+        std::size_t total_id_len = safety::addm(short_kys_len, long_kys_len);
+        std::size_t i;
+    
+        for (i = args_indent; i > 0; i--)
+        {
+            std::cout << ' ';
+        }
+    
+        std::cout << ky_ << "  ";
+        
+        if (current_id_len < total_id_len)
+        {
+            for (i = total_id_len - current_id_len; i > 0; i--)
+            {
+                std::cout << ' ';
+            }
+        }
+    
+        safety::try_addm(args_indent, total_id_len);
+        safety::try_addm(new_line_indent, args_indent);
+        
+        base_arg_type::print_help_text(args_indent, max_line_len, new_line_indent);
+    }
+
+private:
+    /** The id used to reference a value argument in the help menu. */
+    string_type ky_;
+};
+
+}
+
+#endif

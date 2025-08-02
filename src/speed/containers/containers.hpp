@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -27,8 +27,6 @@
 #ifndef SPEED_CONTAINERS_CONTAINERS_HPP
 #define SPEED_CONTAINERS_CONTAINERS_HPP
 
-#include "linked_list.hpp"
-#include "doubly_linked_node.hpp"
 #include "exception.hpp"
 #include "flags.hpp"
 #include "iterator_base.hpp"

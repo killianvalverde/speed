@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -37,7 +37,6 @@ indentation::indentation(std::size_t tab_size, std::size_t curr_size) noexcept
 indentation& indentation::operator ++() noexcept
 {
     curr_size_ += tab_size_;
-    
     return *this;
 }
 

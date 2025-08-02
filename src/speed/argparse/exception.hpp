@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -34,7 +34,7 @@ namespace speed::argparse {
 /**
  * @brief       The base class that the argparse classes will use to throw exceptions.
  */
-class exception : public speed::exceptions::exception_base
+class exception : public exceptions::exception_base
 {
 public:
     /**
@@ -221,7 +221,7 @@ public:
      */
     [[nodiscard]] char const* what() const noexcept override
     {
-        return "wrong dependency exception";
+        return "wrong constraint exception";
     }
 };
 
@@ -256,6 +256,23 @@ public:
     [[nodiscard]] char const* what() const noexcept override
     {
         return "wrong min max interval exception";
+    }
+};
+
+/**
+ * @brief       Class used to thrown exceptions when the maximum number of occurrences is
+ *              incoherent.
+ */
+class wrong_max_occurrences_exception : public exception
+{
+public:
+    /**
+     * @brief       Get the message of the exception.
+     * @return      The exception message.
+     */
+    [[nodiscard]] char const* what() const noexcept override
+    {
+        return "wrong max occurrences exception";
     }
 };
 

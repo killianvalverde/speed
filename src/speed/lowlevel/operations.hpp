@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -38,8 +38,8 @@ namespace speed::lowlevel {
  * @return      If function was successful the specified value converted to binary is returned,
  *              otherwise 0 is returned.
  */
-template<typename TpOnehot>
-constexpr std::uint8_t onehot_to_binary(const TpOnehot& val)
+template<typename IntegralT>
+constexpr std::uint8_t onehot_to_binary(IntegralT val)
 {
     constexpr std::uint8_t n_bits = sizeof(val) * 8;
     

@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -75,9 +75,9 @@ public:
      * @param       indent : The indent to print.
      * @return      The object who call the function.
      */
-    template<typename TpChar_, typename TpCharTraits_>
-    friend std::basic_ostream<TpChar_, TpCharTraits_>& operator <<(
-            std::basic_ostream<TpChar_, TpCharTraits_>& os,
+    template<typename CharT_, typename CharTraitsT_>
+    friend std::basic_ostream<CharT_, CharTraitsT_>& operator <<(
+            std::basic_ostream<CharT_, CharTraitsT_>& os,
             const indentation& indent
     );
 
@@ -96,9 +96,9 @@ private:
  * @param       indent : The indent to print.
  * @return      The object who call the function.
  */
-template<typename TpChar, typename TpCharTraits>
-std::basic_ostream<TpChar, TpCharTraits>& operator <<(
-        std::basic_ostream<TpChar, TpCharTraits>& os,
+template<typename CharT, typename CharTraitsT>
+std::basic_ostream<CharT, CharTraitsT>& operator <<(
+        std::basic_ostream<CharT, CharTraitsT>& os,
         const indentation& indent
 )
 {

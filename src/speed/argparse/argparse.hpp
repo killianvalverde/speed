@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -28,6 +28,7 @@
 #define SPEED_ARGPARSE_ARGPARSE_HPP
 
 #include "basic_arg_parser.hpp"
+#include "exception.hpp"
 
 namespace speed {
 

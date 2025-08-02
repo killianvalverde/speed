@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -28,7 +28,7 @@
 #define SPEED_SYSTEM_FILESYSTEM_FILESYSTEM_HPP
 
 #include "access_modes.hpp"
-#include "basic_directory_entity.hpp"
+#include "directory_entity.hpp"
 #include "file_types.hpp"
 #include "operations.hpp"
 #include "types.hpp"

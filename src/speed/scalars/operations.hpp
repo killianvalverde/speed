@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -36,11 +36,11 @@ namespace speed::scalars {
  * @param       val : The scalar to get the number of digits.
  * @return      The number of digits of the given scalar.
  */
-template<typename TpIntegral>
-TpIntegral count_digits(TpIntegral val) noexcept
+template<typename IntegralT>
+IntegralT count_digits(IntegralT val) noexcept
 {
-    TpIntegral n_digits = 1;
-    TpIntegral abs_val = speed::math::abs(val);
+    IntegralT n_digits = 1;
+    IntegralT abs_val = math::abs(val);
     
     while (abs_val > 9)
     {
@@ -49,6 +49,24 @@ TpIntegral count_digits(TpIntegral val) noexcept
     }
     
     return n_digits;
+}
+
+/**
+ * @brief       Swaps two integral values using the XOR swap algorithm.
+ * @param       lhs : Reference to the first variable to swap.
+ * @param       rhs : Reference to the second variable to swap.
+ */
+template<typename IntegralT>
+void xor_swap(IntegralT& lhs, IntegralT& rhs) noexcept
+{
+    if ((void*) &lhs == (void*) &rhs)
+    {
+        return;
+    }
+    
+    lhs ^= rhs;
+    rhs ^= lhs;
+    lhs ^= rhs;
 }
 
 }

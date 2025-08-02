@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -27,6 +27,7 @@
 #ifndef SPEED_TYPE_CASTING_EXCEPTION_HPP
 #define SPEED_TYPE_CASTING_EXCEPTION_HPP
 
+#include "detail/forward_declarations.hpp"
 #include "../exceptions/exceptions.hpp"
 
 namespace speed::type_casting {
@@ -34,7 +35,7 @@ namespace speed::type_casting {
 /**
  * @brief       Base class used to throw exceptions when a type casting fails.
  */
-class exception : public speed::exceptions::exception_base
+class exception : public exceptions::exception_base
 {
 public:
     /**

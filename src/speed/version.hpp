@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -31,12 +31,12 @@
 #define SPEED_VERSION_MAJOR 0
 
 /** The minor version number. */
-#define SPEED_VERSION_MINOR 4
+#define SPEED_VERSION_MINOR 5
 
 /** The patch version number */
-#define SPEED_VERSION_PATCH 1
+#define SPEED_VERSION_PATCH 0
 
 /** The hole version number in string type. */
-#define SPEED_VERSION ("0.4.1")
+#define SPEED_VERSION ("0.5.0")
 
 #endif

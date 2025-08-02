@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -36,12 +36,12 @@ namespace speed::math {
  * @param       val : The integral number to get the absolute number.
  * @return      The absolute number of the specified integral.
  */
-template<typename TpIntegral>
+template<typename IntegralT>
 inline std::enable_if_t<
-        std::is_signed_v<TpIntegral>,
-        TpIntegral
+        std::is_signed_v<IntegralT>,
+        IntegralT
 >
-abs(TpIntegral val) noexcept
+abs(IntegralT val) noexcept
 {
     if (val < 0)
     {
@@ -56,12 +56,12 @@ abs(TpIntegral val) noexcept
  * @param       val : The integral number to get the absolute number.
  * @return      The absolute number of the specified integral.
  */
-template<typename TpIntegral>
+template<typename IntegralT>
 inline std::enable_if_t<
-        std::is_unsigned_v<TpIntegral>,
-        TpIntegral
+        std::is_unsigned_v<IntegralT>,
+        IntegralT
 >
-abs(TpIntegral val) noexcept
+abs(IntegralT val) noexcept
 {
     return val;
 }

@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -29,10 +29,19 @@
 
 #include <cstdint>
 
+#include "../platform/platform.hpp"
+
 namespace speed::system::filesystem {
 
 /** Inode type. */
 using inode_t = std::uint64_t;
+
+/** Path character type. */
+#ifdef SPEED_WINAPI
+using path_char_t = wchar_t;
+#else
+using path_char_t = char;
+#endif
 
 }
 

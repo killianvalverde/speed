@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -28,6 +28,8 @@
 #define SPEED_SYSTEM_FILESYSTEM_FILE_TYPES_HPP
 
 #include <cstdint>
+
+#include "../../scalars/scalars.hpp"
 
 namespace speed::system::filesystem {
 
@@ -70,13 +72,9 @@ using ft_t = file_types;
 }
 
 /** @cond */
-namespace speed::lowlevel {
 template<>
-struct enable_bitwise_operators<speed::system::filesystem::file_types>
-{
-    static constexpr bool enable_with_same_type = true;
-};
-}
+struct speed::scalars::is_flag_enum<speed::system::filesystem::file_types>
+        : std::true_type {};
 /** @endcond */
 
 #endif

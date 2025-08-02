@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -29,43 +29,43 @@
 
 #include <string>
 
-#include "../api/api.hpp"
-#include "../compatibility/compatibility.hpp"
+#include "../platform/platform.hpp"
+#include "../detail/detail.hpp"
 
 namespace speed::system::codecs {
 
 /**
  * @brief       Converts a specified c_string into a wstring.
- * @param       c_str : The c_string to convert.
+ * @param       cstr : The c_string to convert.
  * @param       wstr : The wstring that will hold the result of the conversion.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 template<typename TpCharTraits, typename TpCharAlloc>
-bool convert_c_str_to_wstring(
-        const char* c_str,
-        std::basic_string<wchar_t, TpCharTraits, TpCharAlloc>* wstr,
+bool convert_cstr_to_wstring(
+        const char* cstr,
+        std::basic_string<wchar_t, TpCharTraits, TpCharAlloc>& wstr,
         std::error_code* err_code = nullptr
 ) noexcept
 {
-    return SPEED_SELECT_API(codecs::convert_c_str_to_wstring, false, c_str, wstr, err_code);
+    return SPEED_SELECT_API(codecs::convert_cstr_to_wstring, false, cstr, wstr, err_code);
 }
 
 /**
  * @brief       Converts a specified w_string into a string.
- * @param       w_str : The w_string to convert.
+ * @param       wcstr : The w_string to convert.
  * @param       str : The string that will hold the result of the conversion.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 template<typename TpCharTraits, typename TpCharAlloc>
-bool convert_w_str_to_string(
-        const wchar_t* w_str,
-        std::basic_string<char, TpCharTraits, TpCharAlloc>* str,
+bool convert_wcstr_to_string(
+        const wchar_t* wcstr,
+        std::basic_string<char, TpCharTraits, TpCharAlloc>& str,
         std::error_code* err_code = nullptr
 ) noexcept
 {
-    return SPEED_SELECT_API(codecs::convert_w_str_to_string, false, w_str, str, err_code);
+    return SPEED_SELECT_API(codecs::convert_wcstr_to_string, false, wcstr, str, err_code);
 }
 
 }

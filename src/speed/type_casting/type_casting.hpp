@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -27,15 +27,10 @@
 #ifndef SPEED_TYPE_CASTING_TYPE_CASTING_HPP
 #define SPEED_TYPE_CASTING_TYPE_CASTING_HPP
 
-#include "forward_declarations.hpp"
-#include "basic_type_caster.hpp"
 #include "error_category.hpp"
-#include "error_codes.hpp"
-#include "error_conditions.hpp"
 #include "exception.hpp"
 #include "try_type_cast.hpp"
 #include "type_cast.hpp"
-#include "type_caster_base.hpp"
 
 namespace speed {
 
