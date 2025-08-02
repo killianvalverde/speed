@@ -34,9 +34,9 @@ TEST(filesystem_directory_iteration, elementary)
 
     speed::filesystem::directory_iteration dir_iteration(".");
     dir_iteration.regex_to_match("^.*$")
-                 .file_types(speed::system::filesystem::file_types::ALL)
-                 .access_modes(speed::system::filesystem::access_modes::READ)
-                 .follow_symbolic_links(false)
+            .file_types(speed::system::filesystem::file_types::ALL)
+            .access_modes(speed::system::filesystem::access_modes::READ)
+            .resolve_directory_symlinks(false)
                  .recursivity_level(~0ull);
 
     for (auto dir_it = dir_iteration.begin(); dir_it != dir_iteration.end(); ++dir_it)

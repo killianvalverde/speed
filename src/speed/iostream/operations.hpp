@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -44,11 +44,11 @@ namespace speed::iostream {
 void fpurge(::FILE* fp) noexcept;
 
 /**
- * @brief       Get the current 'std::basic_ostream' object used to print TpChar in standard output.
- * @return      The current 'std::basic_ostream' object used to print TpChar in standard output.
+ * @brief       Get the current 'std::basic_ostream' object used to print CharT in standard output.
+ * @return      The current 'std::basic_ostream' object used to print CharT in standard output.
  */
-template<typename TpChar>
-inline std::basic_ostream<TpChar>& get_cout() noexcept;
+template<typename CharT>
+inline std::basic_ostream<CharT>& get_cout() noexcept;
 
 /**
  * @brief       Get the current 'std::ostream' object used to print in standard output.
@@ -75,18 +75,18 @@ inline std::wostream& get_cout<wchar_t>() noexcept
  * @param       os : Output stream object effected.
  * @return      Argument os.
  */
-template<typename TpChar, typename TpTraits>
-inline std::basic_ostream<TpChar, TpTraits>& newl(std::basic_ostream<TpChar, TpTraits>& os)
+template<typename CharT, typename TraitsT>
+inline std::basic_ostream<CharT, TraitsT>& newl(std::basic_ostream<CharT, TraitsT>& os)
 {
     return os.put(os.widen('\n'));
 }
 
 /**
- * @brief       Writes the C string pointed by format to the standard output (stdout). If format
+ * @brief       Writes the C string pointed by format to the standard output (os). If format
  *              includes format specifiers (subsequences beginning with %), the additional arguments
  *              following format are formatted and inserted in the resulting string replacing their
  *              respective specifiers.
- * @param       formt : C string that contains the text to be written to stdout. It can optionally
+ * @param       formt : C string that contains the text to be written to os. It can optionally
  *              contain embedded format specifiers that are replaced by the values specified in
  *              subsequent additional arguments and formatted as requested.
  * @return      On success, the total number of characters written is returned. If a writing error
@@ -97,11 +97,11 @@ inline std::basic_ostream<TpChar, TpTraits>& newl(std::basic_ostream<TpChar, TpT
 int printf(const char* formt, ...) noexcept;
 
 /**
- * @brief       Writes the C string pointed by format to the standard output (stdout). If format
+ * @brief       Writes the C string pointed by format to the standard output (os). If format
  *              includes format specifiers (subsequences beginning with %), the additional arguments
  *              following format are formatted and inserted in the resulting string replacing their
  *              respective specifiers.
- * @param       formt : C string that contains the text to be written to stdout. It can optionally
+ * @param       formt : C string that contains the text to be written to os. It can optionally
  *              contain embedded format specifiers that are replaced by the values specified in
  *              subsequent additional arguments and formatted as requested.
  * @return      On success, the total number of characters written is returned. If a writing error
@@ -114,28 +114,30 @@ int printf(const wchar_t* formt, ...) noexcept;
 /**
  * @brief       Print a string wrapping if necessary.
  * @param       os : Ostrem used to print.
- * @param       txt : Text to print.
+ * @param       str : Text to print.
  * @param       max_line_len : The maximum line length that will be printed.
  * @param       new_line_indent : The indentation used after a newline is printed.
  * @param       current_line_len : The current length of the current line.
  * @return
  */
-template<typename TpChar, typename TpCharTraits, typename TpCharAlloc>
-std::basic_ostream<TpChar, TpCharTraits>& print_wrapped(
-        std::basic_ostream<TpChar, TpCharTraits>& os,
-        const std::basic_string<TpChar, TpCharTraits, TpCharAlloc>& txt,
+template<typename CharT, typename CharTraitsT, typename StringT>
+std::basic_ostream<CharT, CharTraitsT>& print_wrapped(
+        std::basic_ostream<CharT, CharTraitsT>& os,
+        const StringT& str,
         std::size_t max_line_len,
         std::size_t new_line_indent,
         std::size_t current_line_len = 0
 )
 {
-    using string_type = std::basic_string<TpChar, TpCharTraits, TpCharAlloc>;
-
-    typename string_type::const_iterator str_it;
-    typename string_type::const_iterator aux_str_it;
+    using string_view_type = type_traits::string_view_of_t<StringT>;
+    using string_view_it_type = typename string_view_type::const_iterator;
+    
+    string_view_type strv = str;
+    string_view_it_type str_it;
+    string_view_it_type aux_str_it;
     std::size_t len_to_next;
 
-    for (str_it = txt.cbegin(); str_it != txt.cend(); ++str_it)
+    for (str_it = strv.cbegin(); str_it != strv.cend(); ++str_it)
     {
         if (*str_it == '\n')
         {
@@ -155,9 +157,9 @@ std::basic_ostream<TpChar, TpCharTraits>& print_wrapped(
             {
                 ++aux_str_it;
                 ++len_to_next;
-            } while (aux_str_it != txt.cend() && *aux_str_it != ' ');
+            } while (aux_str_it != strv.cend() && *aux_str_it != ' ');
 
-            speed::safety::try_addm(&len_to_next, current_line_len);
+            safety::try_addm(len_to_next, current_line_len);
             if (len_to_next > max_line_len)
             {
                 os << '\n';
@@ -188,13 +190,13 @@ std::basic_ostream<TpChar, TpCharTraits>& print_wrapped(
  * @param       os : Ostream in which set the attribute.
  * @return      os is returned.
  */
-template<typename TpChar, typename TpTraits>
-inline std::basic_ostream<TpChar, TpTraits>& set_default_text(
-        std::basic_ostream<TpChar, TpTraits>& os
+template<typename CharT, typename TraitsT>
+inline std::basic_ostream<CharT, TraitsT>& set_default_text(
+        std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    speed::system::terminal::set_foreground_text_attribute(
-            stdout, speed::system::terminal::text_attribute::DEFAULT);
+    system::terminal::set_foreground_text_attribute(
+            os, system::terminal::text_attribute::DEFAULT);
     return os;
 }
 
@@ -203,13 +205,13 @@ inline std::basic_ostream<TpChar, TpTraits>& set_default_text(
  * @param       os : Ostream in which set the attribute.
  * @return      os is returned.
  */
-template<typename TpChar, typename TpTraits>
-inline std::basic_ostream<TpChar, TpTraits>& set_black_text(
-        std::basic_ostream<TpChar, TpTraits>& os
+template<typename CharT, typename TraitsT>
+inline std::basic_ostream<CharT, TraitsT>& set_black_text(
+        std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    speed::system::terminal::set_foreground_text_attribute(
-            stdout, speed::system::terminal::text_attribute::BLACK);
+    system::terminal::set_foreground_text_attribute(
+            os, system::terminal::text_attribute::BLACK);
     return os;
 }
 
@@ -218,13 +220,13 @@ inline std::basic_ostream<TpChar, TpTraits>& set_black_text(
  * @param       os : Ostream in which set the attribute.
  * @return      os is returned.
  */
-template<typename TpChar, typename TpTraits>
-inline std::basic_ostream<TpChar, TpTraits>& set_red_text(
-        std::basic_ostream<TpChar, TpTraits>& os
+template<typename CharT, typename TraitsT>
+inline std::basic_ostream<CharT, TraitsT>& set_red_text(
+        std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    speed::system::terminal::set_foreground_text_attribute(
-            stdout, speed::system::terminal::text_attribute::RED);
+    system::terminal::set_foreground_text_attribute(
+            os, system::terminal::text_attribute::RED);
     return os;
 }
 
@@ -233,13 +235,13 @@ inline std::basic_ostream<TpChar, TpTraits>& set_red_text(
  * @param       os : Ostream in which set the attribute.
  * @return      os is returned.
  */
-template<typename TpChar, typename TpTraits>
-inline std::basic_ostream<TpChar, TpTraits>& set_green_text(
-        std::basic_ostream<TpChar, TpTraits>& os
+template<typename CharT, typename TraitsT>
+inline std::basic_ostream<CharT, TraitsT>& set_green_text(
+        std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    speed::system::terminal::set_foreground_text_attribute(
-            stdout, speed::system::terminal::text_attribute::GREEN);
+    system::terminal::set_foreground_text_attribute(
+            os, system::terminal::text_attribute::GREEN);
     return os;
 }
 
@@ -248,13 +250,13 @@ inline std::basic_ostream<TpChar, TpTraits>& set_green_text(
  * @param       os : Ostream in which set the attribute.
  * @return      os is returned.
  */
-template<typename TpChar, typename TpTraits>
-inline std::basic_ostream<TpChar, TpTraits>& set_brown_text(
-        std::basic_ostream<TpChar, TpTraits>& os
+template<typename CharT, typename TraitsT>
+inline std::basic_ostream<CharT, TraitsT>& set_brown_text(
+        std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    speed::system::terminal::set_foreground_text_attribute(
-            stdout, speed::system::terminal::text_attribute::BROWN);
+    system::terminal::set_foreground_text_attribute(
+            os, system::terminal::text_attribute::BROWN);
     return os;
 }
 
@@ -263,13 +265,13 @@ inline std::basic_ostream<TpChar, TpTraits>& set_brown_text(
  * @param       os : Ostream in which set the attribute.
  * @return      os is returned.
  */
-template<typename TpChar, typename TpTraits>
-inline std::basic_ostream<TpChar, TpTraits>& set_blue_text(
-        std::basic_ostream<TpChar, TpTraits>& os
+template<typename CharT, typename TraitsT>
+inline std::basic_ostream<CharT, TraitsT>& set_blue_text(
+        std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    speed::system::terminal::set_foreground_text_attribute(
-            stdout, speed::system::terminal::text_attribute::BLUE);
+    system::terminal::set_foreground_text_attribute(
+            os, system::terminal::text_attribute::BLUE);
     return os;
 }
 
@@ -278,13 +280,13 @@ inline std::basic_ostream<TpChar, TpTraits>& set_blue_text(
  * @param       os : Ostream in which set the attribute.
  * @return      os is returned.
  */
-template<typename TpChar, typename TpTraits>
-inline std::basic_ostream<TpChar, TpTraits>& set_purple_text(
-        std::basic_ostream<TpChar, TpTraits>& os
+template<typename CharT, typename TraitsT>
+inline std::basic_ostream<CharT, TraitsT>& set_purple_text(
+        std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    speed::system::terminal::set_foreground_text_attribute(
-            stdout, speed::system::terminal::text_attribute::PURPLE);
+    system::terminal::set_foreground_text_attribute(
+            os, system::terminal::text_attribute::PURPLE);
     return os;
 }
 
@@ -293,13 +295,13 @@ inline std::basic_ostream<TpChar, TpTraits>& set_purple_text(
  * @param       os : Ostream in which set the attribute.
  * @return      os is returned.
  */
-template<typename TpChar, typename TpTraits>
-inline std::basic_ostream<TpChar, TpTraits>& set_cyan_text(
-        std::basic_ostream<TpChar, TpTraits>& os
+template<typename CharT, typename TraitsT>
+inline std::basic_ostream<CharT, TraitsT>& set_cyan_text(
+        std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    speed::system::terminal::set_foreground_text_attribute(
-            stdout, speed::system::terminal::text_attribute::CYAN);
+    system::terminal::set_foreground_text_attribute(
+            os, system::terminal::text_attribute::CYAN);
     return os;
 }
 
@@ -308,13 +310,13 @@ inline std::basic_ostream<TpChar, TpTraits>& set_cyan_text(
  * @param       os : Ostream in which set the attribute.
  * @return      os is returned.
  */
-template<typename TpChar, typename TpTraits>
-inline std::basic_ostream<TpChar, TpTraits>& set_light_gray_text(
-        std::basic_ostream<TpChar, TpTraits>& os
+template<typename CharT, typename TraitsT>
+inline std::basic_ostream<CharT, TraitsT>& set_light_gray_text(
+        std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    speed::system::terminal::set_foreground_text_attribute(
-            stdout, speed::system::terminal::text_attribute::LIGHT_GRAY);
+    system::terminal::set_foreground_text_attribute(
+            os, system::terminal::text_attribute::LIGHT_GRAY);
     return os;
 }
 
@@ -323,13 +325,13 @@ inline std::basic_ostream<TpChar, TpTraits>& set_light_gray_text(
  * @param       os : Ostream in which set the attribute.
  * @return      os is returned.
  */
-template<typename TpChar, typename TpTraits>
-inline std::basic_ostream<TpChar, TpTraits>& set_dark_gray_text(
-        std::basic_ostream<TpChar, TpTraits>& os
+template<typename CharT, typename TraitsT>
+inline std::basic_ostream<CharT, TraitsT>& set_dark_gray_text(
+        std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    speed::system::terminal::set_foreground_text_attribute(
-            stdout, speed::system::terminal::text_attribute::GRAY);
+    system::terminal::set_foreground_text_attribute(
+            os, system::terminal::text_attribute::GRAY);
     return os;
 }
 
@@ -338,13 +340,13 @@ inline std::basic_ostream<TpChar, TpTraits>& set_dark_gray_text(
  * @param       os : Ostream in which set the attribute.
  * @return      os is returned.
  */
-template<typename TpChar, typename TpTraits>
-inline std::basic_ostream<TpChar, TpTraits>& set_light_red_text(
-        std::basic_ostream<TpChar, TpTraits>& os
+template<typename CharT, typename TraitsT>
+inline std::basic_ostream<CharT, TraitsT>& set_light_red_text(
+        std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    speed::system::terminal::set_foreground_text_attribute(
-            stdout, speed::system::terminal::text_attribute::LIGHT_RED);
+    system::terminal::set_foreground_text_attribute(
+            os, system::terminal::text_attribute::LIGHT_RED);
     return os;
 }
 
@@ -353,13 +355,13 @@ inline std::basic_ostream<TpChar, TpTraits>& set_light_red_text(
  * @param       os : Ostream in which set the attribute.
  * @return      os is returned.
  */
-template<typename TpChar, typename TpTraits>
-inline std::basic_ostream<TpChar, TpTraits>& set_light_green_text(
-        std::basic_ostream<TpChar, TpTraits>& os
+template<typename CharT, typename TraitsT>
+inline std::basic_ostream<CharT, TraitsT>& set_light_green_text(
+        std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    speed::system::terminal::set_foreground_text_attribute(
-            stdout, speed::system::terminal::text_attribute::LIGHT_GREEN);
+    system::terminal::set_foreground_text_attribute(
+            os, system::terminal::text_attribute::LIGHT_GREEN);
     return os;
 }
 
@@ -368,13 +370,13 @@ inline std::basic_ostream<TpChar, TpTraits>& set_light_green_text(
  * @param       os : Ostream in which set the attribute.
  * @return      os is returned.
  */
-template<typename TpChar, typename TpTraits>
-inline std::basic_ostream<TpChar, TpTraits>& set_yellow_text(
-        std::basic_ostream<TpChar, TpTraits>& os
+template<typename CharT, typename TraitsT>
+inline std::basic_ostream<CharT, TraitsT>& set_yellow_text(
+        std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    speed::system::terminal::set_foreground_text_attribute(
-            stdout, speed::system::terminal::text_attribute::YELLOW);
+    system::terminal::set_foreground_text_attribute(
+            os, system::terminal::text_attribute::YELLOW);
     return os;
 }
 
@@ -383,13 +385,13 @@ inline std::basic_ostream<TpChar, TpTraits>& set_yellow_text(
  * @param       os : Ostream in which set the attribute.
  * @return      os is returned.
  */
-template<typename TpChar, typename TpTraits>
-inline std::basic_ostream<TpChar, TpTraits>& set_light_blue_text(
-        std::basic_ostream<TpChar, TpTraits>& os
+template<typename CharT, typename TraitsT>
+inline std::basic_ostream<CharT, TraitsT>& set_light_blue_text(
+        std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    speed::system::terminal::set_foreground_text_attribute(
-            stdout, speed::system::terminal::text_attribute::LIGHT_BLUE);
+    system::terminal::set_foreground_text_attribute(
+            os, system::terminal::text_attribute::LIGHT_BLUE);
     return os;
 }
 
@@ -398,13 +400,13 @@ inline std::basic_ostream<TpChar, TpTraits>& set_light_blue_text(
  * @param       os : Ostream in which set the attribute.
  * @return      os is returned.
  */
-template<typename TpChar, typename TpTraits>
-inline std::basic_ostream<TpChar, TpTraits>& set_light_purple_text(
-        std::basic_ostream<TpChar, TpTraits>& os
+template<typename CharT, typename TraitsT>
+inline std::basic_ostream<CharT, TraitsT>& set_light_purple_text(
+        std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    speed::system::terminal::set_foreground_text_attribute(
-            stdout, speed::system::terminal::text_attribute::LIGHT_PURPLE);
+    system::terminal::set_foreground_text_attribute(
+            os, system::terminal::text_attribute::LIGHT_PURPLE);
     return os;
 }
 
@@ -413,13 +415,13 @@ inline std::basic_ostream<TpChar, TpTraits>& set_light_purple_text(
  * @param       os : Ostream in which set the attribute.
  * @return      os is returned.
  */
-template<typename TpChar, typename TpTraits>
-inline std::basic_ostream<TpChar, TpTraits>& set_light_cyan_text(
-        std::basic_ostream<TpChar, TpTraits>& os
+template<typename CharT, typename TraitsT>
+inline std::basic_ostream<CharT, TraitsT>& set_light_cyan_text(
+        std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    speed::system::terminal::set_foreground_text_attribute(
-            stdout, speed::system::terminal::text_attribute::LIGHT_CYAN);
+    system::terminal::set_foreground_text_attribute(
+            os, system::terminal::text_attribute::LIGHT_CYAN);
     return os;
 }
 
@@ -428,13 +430,13 @@ inline std::basic_ostream<TpChar, TpTraits>& set_light_cyan_text(
  * @param       os : Ostream in which set the attribute.
  * @return      os is returned.
  */
-template<typename TpChar, typename TpTraits>
-inline std::basic_ostream<TpChar, TpTraits>& set_white_text(
-        std::basic_ostream<TpChar, TpTraits>& os
+template<typename CharT, typename TraitsT>
+inline std::basic_ostream<CharT, TraitsT>& set_white_text(
+        std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    speed::system::terminal::set_foreground_text_attribute(
-            stdout, speed::system::terminal::text_attribute::WHITE);
+    system::terminal::set_foreground_text_attribute(
+            os, system::terminal::text_attribute::WHITE);
     return os;
 }
 

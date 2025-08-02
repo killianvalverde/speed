@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -27,7 +27,7 @@
 #ifndef SPEED_SYSTEM_DETAIL_WINAPI_CODECS_OPERATIONS_HPP
 #define SPEED_SYSTEM_DETAIL_WINAPI_CODECS_OPERATIONS_HPP
 
-#include "../../../compatibility/compatibility.hpp"
+#include "../../../platform/platform.hpp"
 #ifdef SPEED_WINAPI
 
 #include <string>
@@ -38,37 +38,37 @@ namespace speed::system::detail::winapi::codecs {
 
 /**
  * @brief       Converts a specified c_string into a wstring.
- * @param       c_str : The c_string to convert.
+ * @param       cstr : The c_string to convert.
  * @param       wstr : The wstring that will hold the result of the conversion.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 template<typename TpCharTraits, typename TpCharAlloc>
-bool convert_c_str_to_wstring(
-        const char* c_str,
-        std::basic_string<wchar_t, TpCharTraits, TpCharAlloc>* wstr,
+bool convert_cstr_to_wstring(
+        const char* cstr,
+        std::basic_string<wchar_t, TpCharTraits, TpCharAlloc>& wstr,
         std::error_code* err_code = nullptr
 ) noexcept
 {
     try
     {
-        int wstr_sz = ::MultiByteToWideChar(CP_UTF8, 0, c_str, -1, nullptr, 0);
+        int wstr_sz = ::MultiByteToWideChar(CP_UTF8, 0, cstr, -1, nullptr, 0);
 
         if (wstr_sz == 0)
         {
             return true;
         }
 
-        wstr->resize(wstr_sz);
-        wstr->at(wstr_sz - 1) = L'\0';
+        wstr.resize(wstr_sz);
+        wstr.at(wstr_sz - 1) = L'\0';
 
-        if (::MultiByteToWideChar(CP_UTF8, 0, c_str, -1, &(*wstr)[0], wstr_sz) == 0)
+        if (::MultiByteToWideChar(CP_UTF8, 0, cstr, -1, &wstr[0], wstr_sz) == 0)
         {
-            wstr->clear();
+            wstr.clear();
             system::errors::assign_system_error_code((int)GetLastError(), err_code);
             return false;
         }
-        wstr->resize(wstr_sz - 1);
+        wstr.resize(wstr_sz - 1);
         return true;
     }
     catch (const std::bad_alloc& ba)
@@ -85,39 +85,38 @@ bool convert_c_str_to_wstring(
 
 /**
  * @brief       Converts a specified w_string into a string.
- * @param       w_str : The w_string to convert.
+ * @param       wcstr : The w_string to convert.
  * @param       str : The string that will hold the result of the conversion.
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 template<typename TpCharTraits, typename TpCharAlloc>
-bool convert_w_str_to_string(
-        const wchar_t* w_str,
-        std::basic_string<char, TpCharTraits, TpCharAlloc>* str,
+bool convert_wcstr_to_string(
+        const wchar_t* wcstr,
+        std::basic_string<char, TpCharTraits, TpCharAlloc>& str,
         std::error_code* err_code = nullptr
 ) noexcept
 {
     try
     {
-        int str_sz = ::WideCharToMultiByte(CP_UTF8, 0, w_str, -1, nullptr, 0, nullptr, nullptr);
+        int str_sz = ::WideCharToMultiByte(CP_UTF8, 0, wcstr, -1, nullptr, 0, nullptr, nullptr);
 
         if (str_sz == 0)
         {
             return true;
         }
 
-        str->resize(str_sz);
-        str->at(str_sz - 1) = '\0';
+        str.resize(str_sz);
+        str.at(str_sz - 1) = '\0';
 
-        if (::WideCharToMultiByte(CP_UTF8, 0, w_str, -1, &(*str)[0], str_sz, nullptr,
-                                  nullptr) == 0)
+        if (::WideCharToMultiByte(CP_UTF8, 0, wcstr, -1, &str[0], str_sz, nullptr, nullptr) == 0)
         {
-            str->clear();
+            str.clear();
             system::errors::assign_system_error_code((int)GetLastError(), err_code);
             return false;
         }
 
-        str->resize(str_sz - 1);
+        str.resize(str_sz - 1);
         return true;
     }
     catch (const std::bad_alloc& ba)

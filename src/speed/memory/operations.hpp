@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -39,11 +39,11 @@ namespace speed::memory {
  * @param       args : Arguments to forward to the constructor.
  * @return      The address of the allocated memory.
  */
-template<typename TpValue, typename TpAllocator, typename... Ts>
-TpValue* allocate_and_construct(const TpAllocator& alloc, TpValue*& ptr, Ts&&... args)
+template<typename ValueT, typename AllocatorT, typename... Ts>
+ValueT* allocate_and_construct(const AllocatorT& alloc, ValueT*& ptr, Ts&&... args)
 {
-    using allocator_traits_type = std::allocator_traits<TpAllocator>;
-    using value_allocator_type = typename allocator_traits_type::template rebind_alloc<TpValue>;
+    using allocator_traits_type = std::allocator_traits<AllocatorT>;
+    using value_allocator_type = typename allocator_traits_type::template rebind_alloc<ValueT>;
     
     value_allocator_type value_alloc(alloc);
     ptr = allocator_traits_type::allocate(value_alloc, 1);
@@ -68,26 +68,26 @@ TpValue* allocate_and_construct(const TpAllocator& alloc, TpValue*& ptr, Ts&&...
  * @return      A `std::unique_ptr<T, std::function<void(T*)>>` that owns the allocated and
  *              constructed object,
  */
-template <typename TpValue, typename TpAllocator, typename... Ts>
-std::unique_ptr<TpValue> allocate_unique(
-        const TpAllocator& alloc,
+template <typename ValueT, typename AllocatorT, typename... Ts>
+std::unique_ptr<ValueT> allocate_unique(
+        const AllocatorT& alloc,
         Ts&&... args
 )
 {
-    using allocator_traits_type = std::allocator_traits<TpAllocator>;
-    using value_allocator_type = typename allocator_traits_type::template rebind_alloc<TpValue>;
+    using allocator_traits_type = std::allocator_traits<AllocatorT>;
+    using value_allocator_type = typename allocator_traits_type::template rebind_alloc<ValueT>;
     
-    TpValue* ptr;
+    ValueT* ptr;
     value_allocator_type value_alloc(alloc);
     
     allocate_and_construct(alloc, ptr, std::forward<Ts>(args)...);
 
-    // auto deleter = [value_alloc](TpValue* p) mutable {
+    // auto deleter = [value_alloc](ValueT* p) mutable {
     //     std::allocator_traits<value_allocator_type>::destroy(value_alloc, p);
     //     std::allocator_traits<value_allocator_type>::deallocate(value_alloc, p, 1);
     // };
 
-    return std::unique_ptr<TpValue>(ptr);
+    return std::unique_ptr<ValueT>(ptr);
 }
 
 /**
@@ -96,22 +96,22 @@ std::unique_ptr<TpValue> allocate_unique(
  * @param       args : Arguments to forward to the object constructor.
  * @return      Same pointer as the passed argument, but points to the newly constructed object.
  */
-template<typename Tp, typename... Ts>
-Tp* construct_at(Tp* ptr, Ts&&... args)
+template<typename ValueT, typename... Ts>
+ValueT* construct_at(ValueT* ptr, Ts&&... args)
 {
-    return ::new (static_cast<void*>(ptr)) Tp(std::forward<Ts>(args)...);
+    return ::new (static_cast<void*>(ptr)) ValueT(std::forward<Ts>(args)...);
 }
 
 /**
  * @brief       Destroy the object pointer by the pointer.
  * @param       ptr : Pointer to the object to destroy.
  */
-template<typename Tp>
-void destroy_at(Tp* ptr)
+template<typename ValueT>
+void destroy_at(ValueT* ptr)
 {
     if (ptr)
     {
-        ptr->~Tp();
+        ptr->~ValueT();
     }
 }
 
@@ -120,11 +120,11 @@ void destroy_at(Tp* ptr)
  * @param       alloc : Allocator used to deallocate.
  * @param       ptr : Pointer to object to destruct and deallocate.
  */
-template<typename TpValue, typename TpAllocator>
-void destroy_and_deallocate(const TpAllocator& alloc, TpValue* ptr)
+template<typename ValueT, typename AllocatorT>
+void destroy_and_deallocate(const AllocatorT& alloc, ValueT* ptr)
 {
-    using allocator_traits_type = std::allocator_traits<TpAllocator>;
-    using value_allocator_type = typename allocator_traits_type::template rebind_alloc<TpValue>;
+    using allocator_traits_type = std::allocator_traits<AllocatorT>;
+    using value_allocator_type = typename allocator_traits_type::template rebind_alloc<ValueT>;
     
     value_allocator_type value_alloc(alloc);
     

@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -24,7 +24,7 @@
  * @date        2017/01/08
  */
 
-#include "../../../compatibility/compatibility.hpp"
+#include "../../../platform/platform.hpp"
 #ifdef SPEED_WINAPI
 
 #include "operations.hpp"

@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -29,8 +29,60 @@
 
 #include <system_error>
 
-#include "../errors/errors.hpp"
-#include "error_conditions.hpp"
+namespace speed::type_casting {
+
+/** @cond */
+namespace detail {
+
+enum class error_code_enum : std::uint8_t
+{
+    NIL = 0x0,
+    ARITHMETIC_CODES_BEGINS = 0x1,
+    ARITHMETIC_CONVERSION_FAILS = 0x1,
+    ARITHMETIC_INVALID_SYNTAX = 0x2,
+    ARITHMETIC_OVERFLOW_RANGE = 0x3,
+    ARITHMETIC_UNDERFLOW_RANGE = 0x4,
+    ARITHMETIC_CODES_ENDS = 0x4,
+    SYSTEM_CODES_BEGINS = 0x5,
+    FILESYSTEM_CODES_BEGINS = 0x5,
+    FILESYSTEM_INVALID_PATH = 0x6,
+    FILESYSTEM_CODES_ENDS = 0x6,
+    SYSTEM_CODES_ENDS = 0x6,
+    OTHERS_BEGINS = 0x7,
+    RANGE_ERROR = 0x7,
+    OTHER = 0x8,
+    OTHERS_ENDS = 0x8
+};
+
+}
+/** @endcond */
+
+/**
+ * @brief       The type casting error condition enum.
+ */
+enum class errc : std::uint8_t
+{
+    /** Null condition. */
+    NIL = 0x0,
+    
+    /** Arithmetic error. */
+    ARITHMETIC_ERROR = 0x1,
+    
+    /** System error. */
+    SYSTEM_ERROR = 0x2,
+    
+    /** Other error. */
+    OTHER = 0x3
+};
+
+}
+
+namespace std {
+template<> struct is_error_condition_enum<speed::type_casting::errc>
+        : public std::true_type
+{
+};
+}
 
 namespace speed::type_casting {
 
@@ -44,7 +96,7 @@ public:
      * @brief       Allows gettin the name of the category.
      * @return      The name of the category.
      */
-    [[nodiscard]] inline const char* name() const noexcept override
+    [[nodiscard]] constexpr const char* name() const noexcept override
     {
         return "type casting error category";
     }
@@ -64,7 +116,8 @@ public:
      * @return      If function is successful true is returned, otherwise false is returned.
      */
     [[nodiscard]] inline bool equivalent(
-            const std::error_code& err_code, int cond
+            const std::error_code& err_code,
+            int cond
     ) const noexcept override
     {
         return *this == err_code.category() && 
@@ -81,29 +134,26 @@ public:
 
 /** @cond */
 namespace detail {
-extern error_category error_category_obj;
-} /* __private */
-/** @endcond */
 
-/**
- * @brief       Assign the value to the error_code if it is not null using a system category.
- * @param       value : The value to assign.
- * @param       err_code : The object that will contain the error.
- */
-inline void assign_type_casting_error_code(int value, std::error_code* err_code)
+extern error_category error_category_obj;
+
+inline void assign_error_code(error_code_enum ec, std::error_code* err_code)
 {
     if (err_code != nullptr)
     {
-        err_code->assign(value, detail::error_category_obj);
+        err_code->assign(static_cast<int>(ec), detail::error_category_obj);
     }
 }
+
+}
+/** @endcond */
 
 /**
  * @brief       Allows getting an error condition from the error condition enum.
  * @param       errc : Error condition enul object.
  * @return      The error condition.
  */
-inline std::error_condition make_error_condition(speed::type_casting::error_conditions errc)
+inline std::error_condition make_error_condition(type_casting::errc errc)
 {
     return {static_cast<int>(errc), detail::error_category_obj};
 }

@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -40,14 +40,14 @@ namespace speed::safety {
  * @param       trg : Integral to increment.
  * @param       vals : Values to add to the integral.
  */
-template<typename TpTarget, typename... TpValues>
-inline TpTarget add(TpTarget trg, const TpValues&... vals)
+template<typename TargetT, typename... ValueTs>
+inline TargetT add(TargetT trg, ValueTs... vals)
 {
-    constexpr TpTarget max_trg = std::numeric_limits<TpTarget>::max();
+    constexpr TargetT max_trg = std::numeric_limits<TargetT>::max();
     
-    ((trg > max_trg - static_cast<TpTarget>(vals)
+    ((trg > max_trg - static_cast<TargetT>(vals)
             ? throw overflow_exception()
-            : trg += static_cast<TpTarget>(vals)), ...);
+            : trg += static_cast<TargetT>(vals)), ...);
     
     return trg;
 }
@@ -58,19 +58,19 @@ inline TpTarget add(TpTarget trg, const TpValues&... vals)
  * @param       vals : Values to add to the integral.
  * @return      If the function was successful true is returned, otherwise false is returned.
  */
-template<typename TpTarget, typename... TpValues>
-inline bool try_add(TpTarget* trg, const TpValues& ... vals) noexcept
+template<typename TargetT, typename... ValueTs>
+inline bool try_add(TargetT& trg, ValueTs... vals) noexcept
 {
-    constexpr TpTarget max_trg = std::numeric_limits<TpTarget>::max();
-    bool scs = true;
+    constexpr TargetT max_trg = std::numeric_limits<TargetT>::max();
+    bool succss = true;
     
-    ((scs
-            ? (*trg > max_trg - static_cast<TpTarget>(vals)
-                    ? scs = false
-                    : *trg += static_cast<TpTarget>(vals))
+    ((succss
+            ? (trg > max_trg - static_cast<TargetT>(vals)
+                    ? succss = false
+                    : trg += static_cast<TargetT>(vals))
             : 0), ...);
     
-    return scs;
+    return succss;
 }
 
 /**
@@ -79,15 +79,15 @@ inline bool try_add(TpTarget* trg, const TpValues& ... vals) noexcept
  * @param       trg : Integral to increment.
  * @param       vals : Values to add to the integral.
  */
-template<typename TpTarget, typename... TpValues>
-inline TpTarget addm(TpTarget trg, const TpValues&... vals) noexcept
+template<typename TargetT, typename... ValueTs>
+inline TargetT addm(TargetT trg, ValueTs... vals) noexcept
 {
-    constexpr TpTarget max_trg = std::numeric_limits<TpTarget>::max();
+    constexpr TargetT max_trg = std::numeric_limits<TargetT>::max();
     bool saturatd = false;
 
-    ((saturatd || trg > max_trg - static_cast<TpTarget>(vals)
+    ((saturatd || trg > max_trg - static_cast<TargetT>(vals)
             ? (trg = max_trg, saturatd = true)
-            : trg += static_cast<TpTarget>(vals)), ...);
+            : trg += static_cast<TargetT>(vals)), ...);
     
     return trg;
 }
@@ -99,22 +99,22 @@ inline TpTarget addm(TpTarget trg, const TpValues&... vals) noexcept
  * @param       vals : Values to add to the integral.
  * @return      If the function was successful true is returned, otherwise false is returned.
  */
-template<typename TpTarget, typename... TpValues>
+template<typename TargetT, typename... ValueTs>
 inline bool try_addm(
-        TpTarget* trg,
-        const TpValues& ... vals
+        TargetT& trg,
+        ValueTs... vals
 ) noexcept
 {
-    constexpr TpTarget max_trg = std::numeric_limits<TpTarget>::max();
-    bool scs = true;
+    constexpr TargetT max_trg = std::numeric_limits<TargetT>::max();
+    bool succss = true;
     
-    ((scs
-            ? (*trg > max_trg - static_cast<TpTarget>(vals)
-                    ? (*trg = max_trg, scs = false)
-                    : *trg += static_cast<TpTarget>(vals))
+    ((succss
+            ? (trg > max_trg - static_cast<TargetT>(vals)
+                    ? (trg = max_trg, succss = false)
+                    : trg += static_cast<TargetT>(vals))
             : 0), ...);
     
-    return scs;
+    return succss;
 }
 
 }

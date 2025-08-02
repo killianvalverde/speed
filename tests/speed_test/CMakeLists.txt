@@ -1,8 +1,6 @@
-project(speed_gtest)
-
 find_package(GTest REQUIRED)
 
-include_directories(${PROJECT_SOURCE_DIR}/../../src)
+include_directories(${CMAKE_CURRENT_LIST_DIR}/../../src)
 
 set(SPEED_ALGORITHM_TEST_SOURCE_FILES
         algorithm_test/operations_test.cpp
@@ -13,7 +11,6 @@ set(SPEED_ARGPARSE_TEST_SOURCE_FILES
 )
 
 set(SPEED_CONTAINERS_TEST_SOURCE_FILES
-        containers_test/linked_lists_test.cpp
         containers_test/flags_test.cpp
         containers_test/static_cache_test.cpp
 )
@@ -37,7 +34,6 @@ set(SPEED_SAFETY_TEST_SOURCE_FILES
 )
 
 set(SPEED_SCALARS_TEST_SOURCE_FILES
-        scalars_test/scalar_test.cpp
         scalars_test/operations_test.cpp
 )
 

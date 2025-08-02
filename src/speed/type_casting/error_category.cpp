@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -26,60 +26,58 @@
 
 #include "error_category.hpp"
 
-#include "error_codes.hpp"
-
 namespace speed::type_casting {
 
 std::error_condition error_category::default_error_condition(int val) const noexcept
 {
-    if (val == static_cast<int>(error_codes::NIL))
+    if (val == static_cast<int>(detail::error_code_enum::NIL))
     {
-        return {error_conditions::NIL};
+        return {errc::NIL};
     }
-    else if (val >= static_cast<int>(error_codes::ARITHMETIC_CODES_BEGINS) &&
-             val <= static_cast<int>(error_codes::ARITHMETIC_CODES_ENDS))
+    else if (val >= static_cast<int>(detail::error_code_enum::ARITHMETIC_CODES_BEGINS) &&
+             val <= static_cast<int>(detail::error_code_enum::ARITHMETIC_CODES_ENDS))
     {
-        return {error_conditions::ARITHMETIC_ERROR};
+        return {errc::ARITHMETIC_ERROR};
     }
-    else if (val >= static_cast<int>(error_codes::SYSTEM_CODES_BEGINS) &&
-             val <= static_cast<int>(error_codes::SYSTEM_CODES_ENDS))
+    else if (val >= static_cast<int>(detail::error_code_enum::SYSTEM_CODES_BEGINS) &&
+             val <= static_cast<int>(detail::error_code_enum::SYSTEM_CODES_ENDS))
     {
-        return {error_conditions::SYSTEM_ERROR};
+        return {errc::SYSTEM_ERROR};
     }
-    else if (val >= static_cast<int>(error_codes::OTHERS_BEGINS))
+    else if (val >= static_cast<int>(detail::error_code_enum::OTHERS_BEGINS))
     {
-        return {error_conditions::OTHER};
+        return {errc::OTHER};
     }
     
-    return {error_conditions::NIL};
+    return {errc::NIL};
 }
 
 std::string error_category::message(int val) const
 {
-    switch (static_cast<error_codes>(val))
+    switch (static_cast<detail::error_code_enum>(val))
     {
-        case error_codes::NIL:
+        case detail::error_code_enum::NIL:
             return "No error";
 
-        case error_codes::ARITHMETIC_CONVERSION_FAILS:
+        case detail::error_code_enum::ARITHMETIC_CONVERSION_FAILS:
             return "Conversion fails";
 
-        case error_codes::ARITHMETIC_INVALID_SYNTAX:
+        case detail::error_code_enum::ARITHMETIC_INVALID_SYNTAX:
             return "Invalid syntax";
 
-        case error_codes::ARITHMETIC_OVERFLOW_RANGE:
+        case detail::error_code_enum::ARITHMETIC_OVERFLOW_RANGE:
             return "Overflow range";
 
-        case error_codes::ARITHMETIC_UNDERFLOW_RANGE:
+        case detail::error_code_enum::ARITHMETIC_UNDERFLOW_RANGE:
             return "Underflow range";
 
-        case error_codes::FILESYSTEM_INVALID_PATH:
+        case detail::error_code_enum::FILESYSTEM_INVALID_PATH:
             return "Invalid path";
 
-        case error_codes::RANGE_ERROR:
+        case detail::error_code_enum::RANGE_ERROR:
             return "Invalid syntax";
 
-        case error_codes::OTHER:
+        case detail::error_code_enum::OTHER:
             return "Invalid syntax";
 
         default:

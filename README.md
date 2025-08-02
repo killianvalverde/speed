@@ -45,7 +45,7 @@ The following compilers are currently known to be compatible:
 | Compiler                                                   | Standard Library | Test Environment   |
 |:-----------------------------------------------------------| :--------------- | :----------------- |
 | [GCC](https://gcc.gnu.org/) >= 11.4.0                      | libstdc++        | Ubuntu 22.04       |
-| [MSVC](https://visualstudio.microsoft.com/) >= 19.41.34123 | Microsoft STL    | Visual Studio 2022 |
+| [MSVC](https://visualstudio.microsoft.com/) >= 19.44.35213 | Microsoft STL    | Visual Studio 2022 |
 
 ## Requirements
 

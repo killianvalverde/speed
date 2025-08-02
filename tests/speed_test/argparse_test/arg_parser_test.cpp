@@ -74,7 +74,7 @@ TEST_F(argparse_arg_parser, add_key_arg)
             .help_menus_assigned("help1", "help2")
             .mandatory(false)
             .minmax_occurrences(0, 1)
-            .store_presence(&presnc)
+            .store_presence(presnc)
             .terminal(false)
             .terminal(false);
 
@@ -101,10 +101,10 @@ TEST_F(argparse_arg_parser, add_key_value_arg)
             .mandatory(false)
             .minmax_occurrences(0, 1)
             .minmax_values(1, 1)
-            .store_into(&vals)
+            .store_into(vals)
             .regexes("^.*$")
-            .store_into(&holdr1, &holdr2)
-            .store_presence(&presnc)
+            .store_into(holdr1, holdr2)
+            .store_presence(presnc)
             .terminal(false)
             .values_names("VALUE")
             .values_with_prefix(false)
@@ -131,10 +131,10 @@ TEST_F(argparse_arg_parser, add_positional_arg)
             .mandatory(true)
             .minmax_occurrences(0, 1)
             .minmax_values(1, 1)
-            .store_into(&vals)
+            .store_into(vals)
             .regexes("^.*$")
-            .store_into(&holdr1, &holdr2)
-            .store_presence(&presnc)
+            .store_into(holdr1, holdr2)
+            .store_presence(presnc)
             .terminal(false)
             .values_with_prefix(false)
             .values_with_prefix(false);
@@ -153,25 +153,17 @@ TEST_F(argparse_arg_parser, add_help_arg)
 
     ap.add_help_arg("-h", "--help")
             .action([&]() {})
-            .assignment_operator(false)
             .description("Display this help and exit.")
             .error_name("error")
             .grouping(false)
             .help_menus_assigned("help1", "help2")
-            .help_menus_triggered("^.*$", "help1")
+            .help_menu_triggered("help1")
             .mandatory(false)
-            .minmax_occurrences(0, 1)
-            .minmax_values(0, 0)
             .pkill_after_triggering(true)
-            .store_into(&vals)
-            .regexes("^.*$")
-            .store_into(&holdr1, &holdr2)
-            .store_presence(&presnc)
+            .store_presence(presnc)
             .terminal(false)
             .trigger_help_printing(false)
-            .values_names("VALUE")
-            .values_with_prefix(false)
-            .values_with_prefix(false);
+            .trigger_help_printing(false);
 
     EXPECT_THROW(ap.add_help_arg(), speed::argparse::exception);
     EXPECT_THROW(ap.add_help_arg("-h"), speed::argparse::exception);
@@ -193,7 +185,7 @@ TEST_F(argparse_arg_parser, add_version_arg)
             .mandatory(false)
             .minmax_occurrences(0, 1)
             .pkill_after_triggering(false)
-            .store_presence(&presnc)
+            .store_presence(presnc)
             .terminal(false)
             .trigger_version_printing(false)
             .version_information("v1.0.0")
@@ -233,15 +225,15 @@ TEST_F(argparse_arg_parser, parse_key_args)
 
     ap.add_key_arg("-a", "--all")
             .description("Display all the information.")
-            .store_presence(&flg_all);
+            .store_presence(flg_all);
 
     ap.add_key_arg("-l", "--long")
             .description("Display the list in a not compacted mode.")
-            .store_presence(&flg_long);
+            .store_presence(flg_long);
 
     ap.add_key_arg("-r", "--recursive")
             .description("Execute the process in a recursive way.")
-            .store_presence(&flg_recursive)
+            .store_presence(flg_recursive)
             .action([&]() { ++dee; });
 
     EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
@@ -271,18 +263,18 @@ TEST_F(argparse_arg_parser, parse_key_value_args)
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .store_into(&secs);
+            .store_into(secs);
 
     ap.add_key_value_arg("--minutes", "-m")
             .description("Set minutes.")
             .values_names("INTEGER")
             .minmax_values(1, 2)
-            .store_into(&mins_vec);
+            .store_into(mins_vec);
 
     ap.add_key_value_arg("--hours", "-h")
             .description("Set hours.")
             .values_names("INTEGER")
-            .store_into(&hrs);
+            .store_into(hrs);
 
     EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
     EXPECT_TRUE(ap.count_values_found("-s") == 1);
@@ -327,29 +319,29 @@ TEST_F(argparse_arg_parser, parse_positional_args)
             .description("Set seconds.")
             .values_names("INTEGER")
             .minmax_values(1, ~0ull)
-            .store_into(&secs);
+            .store_into(secs);
 
     ap.add_positional_arg("DESTINATION1")
             .description("Destination directory.")
-            .store_into(&pths1);
+            .store_into(pths1);
 
     ap.add_positional_arg("DESTINATION2")
             .description("Destination directory.")
-            .store_into(&pths2);
+            .store_into(pths2);
 
     ap.add_positional_arg("DESTINATION3")
             .description("Destination directory.")
-            .store_into(&pths3)
+            .store_into(pths3)
             .minmax_values(1, 2);
 
     ap.add_positional_arg("NUMBER1")
             .description("Some number.")
-            .store_into(&numbr1)
+            .store_into(numbr1)
             .minmax_values(1, 2);
 
     ap.add_positional_arg("NUMBER2")
             .description("Some number.")
-            .store_into(&numbr2)
+            .store_into(numbr2)
             .minmax_values(1, 2);
 
     EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
@@ -388,17 +380,11 @@ TEST_F(argparse_arg_parser, parse_help_args)
 
     ap.add_help_arg("--help", "-h")
             .description("Display this help and exit.")
-            .values_names("CATEGORY")
-            .store_into(&help_cat)
-            .store_presence(&presnc)
+            .store_presence(presnc)
             .trigger_help_printing(false);
 
     EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
     EXPECT_TRUE(presnc);
-    EXPECT_TRUE(ap.count_values_found("-h") == 1);
-    EXPECT_TRUE(help_cat == "information");
-    EXPECT_TRUE(ap.get_front_as<std::string>("-h") == "information");
-    EXPECT_THROW(dm = ap.get_at_as<std::string>("-h", 1), speed::argparse::exception);
 }
 
 TEST_F(argparse_arg_parser, parse_version_args)
@@ -413,7 +399,7 @@ TEST_F(argparse_arg_parser, parse_version_args)
 
     ap.add_version_arg("--version", "-v")
             .description("Display version information.")
-            .store_presence(&presnc)
+            .store_presence(presnc)
             .trigger_version_printing(false);
 
     EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
@@ -439,18 +425,18 @@ TEST_F(argparse_arg_parser, parse_eq_operator)
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .store_into(&secs);
+            .store_into(secs);
 
     ap.add_key_value_arg("--minutes", "-m")
             .description("Set minutes.")
             .values_names("INTEGER")
             .minmax_values(2, 2)
-            .store_into(&mins_vec);
+            .store_into(mins_vec);
 
     ap.add_key_value_arg("--hours", "-h")
             .description("Set hours.")
             .values_names("INTEGER")
-            .store_into(&hrs);
+            .store_into(hrs);
 
     EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
     EXPECT_TRUE(ap.count_values_found("-s") == 1);
@@ -485,18 +471,18 @@ TEST_F(argparse_arg_parser, parse_grouping)
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .store_into(&secs);
+            .store_into(secs);
 
     ap.add_key_value_arg("--minutes", "-m")
             .description("Set minutes.")
             .values_names("INTEGER")
-            .store_into(&mins_vec)
+            .store_into(mins_vec)
             .minmax_values(2, 2);
 
     ap.add_key_value_arg("--hours", "-h")
             .description("Set hours.")
             .values_names("INTEGER")
-            .store_into(&hrs);
+            .store_into(hrs);
 
     EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
     EXPECT_TRUE(ap.count_values_found("-s") == 1);
@@ -661,13 +647,13 @@ TEST_F(argparse_arg_parser, parse_sub_parser)
     bool interactv = false;
 
     add_parsr.add_positional_arg("FILE")
-            .store_into(&pth);
+            .store_into(pth);
 
     commit_parsr.add_key_value_arg("-m")
-            .store_into(&messag);
+            .store_into(messag);
 
     rebase_parsr.add_key_arg("-i", "--interactive")
-            .store_presence(&interactv);
+            .store_presence(interactv);
 
     ap.add_key_arg("add")
             .sub_parser(&add_parsr);
@@ -700,12 +686,12 @@ TEST_F(argparse_arg_parser, parse_with_assertions)
     std::vector<std::uint64_t> b_vals;
     
     ap.add_key_value_arg("-a")
-            .store_into(&a_vals)
+            .store_into(a_vals)
             .minmax_values(2, 2)
             .assertions([&](const std::string& val) { return val != "21"; });
     
     ap.add_key_value_arg("-b")
-            .store_into(&b_vals)
+            .store_into(b_vals)
             .minmax_values(2, 2)
             .assertions([&](const std::string& val) { return val != "21"; });
 
@@ -727,7 +713,7 @@ TEST_F(argparse_arg_parser, parse_nested_container_as_holder)
     
     ap.add_key_value_arg("-n")
             .minmax_occurrences(0, ~0ull)
-            .store_into(&containr)
+            .store_into(containr)
             .minmax_values(1, 2);
 
     EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
@@ -751,7 +737,7 @@ TEST_F(argparse_arg_parser, parse_nested_container_as_holder_with_too_few_occurr
     
     ap.add_key_value_arg("-n")
             .minmax_occurrences(3, ~0ull)
-            .store_into(&containr)
+            .store_into(containr)
             .minmax_values(1, 2);
 
     EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
@@ -775,7 +761,7 @@ TEST_F(argparse_arg_parser, parse_nested_container_as_holder_with_too_many_occur
     
     ap.add_key_value_arg("-n")
             .minmax_occurrences(1, 1)
-            .store_into(&containr)
+            .store_into(containr)
             .minmax_values(1, 2);
 
     EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
@@ -784,6 +770,32 @@ TEST_F(argparse_arg_parser, parse_nested_container_as_holder_with_too_many_occur
     EXPECT_TRUE(containr.at(0).at(0) == "hello");
     EXPECT_TRUE(containr.at(0).at(1) == "world");
     EXPECT_TRUE(containr.size() == 1);
+}
+
+TEST_F(argparse_arg_parser, parse_nested_container_as_holder_array_type)
+{
+    std::vector<const char*> argv = {
+        "speed",
+        "-n", "hello", "world",
+        "-n", "bye", "planet",
+        "-n", "hello", "world"
+    };
+    
+    std::array<std::array<std::string, 2>, 3> containr;
+    
+    ap.add_key_value_arg("-n")
+            .store_into(containr);
+
+    EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
+    EXPECT_TRUE(!ap.has_errors());
+    EXPECT_TRUE(!ap.arg_has_errors("-n"));
+    EXPECT_TRUE(containr.at(0).at(0) == "hello");
+    EXPECT_TRUE(containr.at(0).at(1) == "world");
+    EXPECT_TRUE(containr.at(1).at(0) == "bye");
+    EXPECT_TRUE(containr.at(1).at(1) == "planet");
+    EXPECT_TRUE(containr.at(2).at(0) == "hello");
+    EXPECT_TRUE(containr.at(2).at(1) == "world");
+    EXPECT_TRUE(containr.size() == 3);
 }
 
 TEST_F(argparse_arg_parser, strore_into_tuple)
@@ -799,12 +811,12 @@ TEST_F(argparse_arg_parser, strore_into_tuple)
     
     ap.add_key_value_arg("-a")
             .description("...")
-            .store_into(&a_vals)
+            .store_into(a_vals)
             .minmax_values(1, 4);
     
     ap.add_key_value_arg("-b")
             .description("...")
-            .store_into(&b_vals);
+            .store_into(b_vals);
 
     EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
     EXPECT_TRUE(!ap.has_errors());
@@ -830,15 +842,15 @@ TEST_F(argparse_arg_parser, check_errors)
 
     ap.add_key_arg("-a", "--all")
             .description("Display all the information.")
-            .store_presence(&flg_all);
+            .store_presence(flg_all);
 
     ap.add_key_arg("-l", "--long")
             .description("Display the list in a not compacted mode.")
-            .store_presence(&flg_long);
+            .store_presence(flg_long);
 
     ap.add_key_arg("-r", "--recursive")
             .description("Execute the process in a recursive way.")
-            .store_presence(&flg_recursive);
+            .store_presence(flg_recursive);
 
     EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
     EXPECT_TRUE(flg_all);
@@ -1256,7 +1268,7 @@ TEST_F(argparse_arg_parser, print_number_errors)
     ap.add_key_value_arg("--seconds", "-s")
             .description("Set seconds.")
             .values_names("INTEGER")
-            .store_into(&val);
+            .store_into(val);
 
     ap.parse_args(argv.size(), argv);
     ap.print_errors();

@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -30,7 +30,7 @@
 #include <cstdio>
 #include <iostream>
 
-#include "../compatibility/compatibility.hpp"
+#include "../platform/platform.hpp"
 #include "text_attribute.hpp"
 
 namespace speed::system::terminal {
@@ -76,18 +76,31 @@ inline bool kbhit(
 }
 
 /**
- * @brief       Set a terminal text attribute.
- * @param       terminal_strm : Terminal stream in which set the attribute.
- * @param       text_attr : Attribute to set.
- * @return      If function was successful 0 is returned, otherwise -1 is returned.
+ * @brief       Sets the foreground text attribute for a narrow-character output stream.
+ * @param       os : The output stream (e.g., `std::cout`) to modify.
+ * @param       text_attr : The text attribute to set.
+ * @return      `true` if the attribute was successfully set, otherwise `false`.
  */
 inline bool set_foreground_text_attribute(
-        ::FILE* terminal_strm,
+        std::ostream& os,
         text_attribute text_attr
 ) noexcept
 {
-    return SPEED_SELECT_API(terminal::set_foreground_text_attribute, false, terminal_strm,
-                            text_attr);
+    return SPEED_SELECT_API(terminal::set_foreground_text_attribute, false, os, text_attr);
+}
+
+/**
+ * @brief       Sets the foreground text attribute for a wide-character output stream.
+ * @param       wos The wide-character output stream to modify.
+ * @param       text_attr The text attribute to set.
+ * @return      `true` if the attribute was successfully set, otherwise `false`.
+ */
+inline bool set_foreground_text_attribute(
+        std::wostream& wos,
+        text_attribute text_attr
+) noexcept
+{
+    return SPEED_SELECT_API(terminal::set_foreground_text_attribute, false, wos, text_attr);
 }
 
 }

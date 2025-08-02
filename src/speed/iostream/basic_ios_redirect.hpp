@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -37,22 +37,22 @@ namespace speed::iostream {
  * @brief       Class used to redirect a input/output stream buffer to another one.
  */
 template<
-        typename TpChar,
-        typename TpCharTraits = std::char_traits<TpChar>,
-        typename TpAllocator = std::allocator<TpChar>
+        typename CharT,
+        typename CharTraitsT = std::char_traits<CharT>,
+        typename AllocatorT = std::allocator<CharT>
 >
 class basic_ios_redirect
 {
 public:
     /** Character type. */
-    using char_type = TpChar;
+    using char_type = CharT;
     
     /** Character traits type, */
-    using char_traits_type = TpCharTraits;
+    using char_traits_type = CharTraitsT;
     
     /** Allocator type. */
     template<typename T>
-    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
+    using allocator_type = typename std::allocator_traits<AllocatorT>::template rebind_alloc<T>;
     
     /** Input/output stream type. */
     using ios_type = std::basic_ios<char_type, char_traits_type>;
@@ -125,7 +125,7 @@ public:
             stringstream_ = stringstream_alloc_.allocate(1);
         }
 
-        speed::memory::construct_at(stringstream_);
+        memory::construct_at(stringstream_);
         stringstream_constructed_ = true;
         
         old_streambuf_ = ios_->rdbuf(stringstream_->rdbuf());
@@ -144,7 +144,7 @@ public:
         
         if (stringstream_constructed_)
         {
-            speed::memory::destroy_at(stringstream_);
+            memory::destroy_at(stringstream_);
             stringstream_constructed_ = false;
         }
     }
@@ -170,8 +170,8 @@ public:
     {
         if (stringstream_constructed_)
         {
-            speed::memory::destroy_at(stringstream_);
-            speed::memory::construct_at(stringstream_);
+            memory::destroy_at(stringstream_);
+            memory::construct_at(stringstream_);
         }
     }
 

@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -30,6 +30,7 @@
 #include <cstdint>
 
 #include "../stringutils/stringutils.hpp"
+#include "../type_traits/type_traits.hpp"
 
 namespace speed::cryptography {
 
@@ -41,16 +42,18 @@ namespace speed::cryptography {
  */
 std::uint64_t city_hash_64(const void* ptr, std::size_t sz);
 
-
 /**
  * @brief       Compute the city-hash of a specific cstr.
  * @param       str : Cstr to hash.
  * @return      The hash value.
  */
-template<typename TpChar>
-inline std::uint64_t city_hash_64(const TpChar* str)
+template<typename StringT>
+inline std::uint64_t city_hash_64(const StringT& str)
 {
-    return city_hash_64(str, speed::stringutils::cstr_length(str) * sizeof(TpChar));
+    using string_view_type = type_traits::string_view_of_t<StringT>;
+    string_view_type strv = str;
+    
+    return city_hash_64(strv.data(), strv.size() * sizeof(string_view_type::value_type));
 }
 
 }

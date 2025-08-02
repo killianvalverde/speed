@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -27,7 +27,7 @@
 #ifndef SPEED_SYSTEM_DETAIL_WINAPI_TIME_OPERATIONS_HPP
 #define SPEED_SYSTEM_DETAIL_WINAPI_TIME_OPERATIONS_HPP
 
-#include "../../../compatibility/compatibility.hpp"
+#include "../../../platform/platform.hpp"
 #ifdef SPEED_WINAPI
 
 #include "../../../errors/errors.hpp"
@@ -42,7 +42,7 @@ namespace speed::system::detail::winapi::time {
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 bool get_monotonic_time(
-        system::time::time_specification* time_spec,
+        system::time::time_specification& time_spec,
         std::error_code* err_code = nullptr
 ) noexcept;
 
@@ -53,7 +53,7 @@ bool get_monotonic_time(
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 bool get_cpu_time(
-        system::time::time_specification* time_spec,
+        system::time::time_specification& time_spec,
         std::error_code* err_code = nullptr
 ) noexcept;
 

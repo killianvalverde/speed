@@ -51,8 +51,8 @@ TEST(safety_operations, try_add)
     std::uint32_t val1 = 4294967294;
     std::uint32_t val2 = 4294967295;
     
-    EXPECT_TRUE(speed::safety::try_add(&val1, 1));
-    EXPECT_TRUE(!speed::safety::try_add(&val2, 1));
+    EXPECT_TRUE(speed::safety::try_add(val1, 1));
+    EXPECT_TRUE(!speed::safety::try_add(val2, 1));
 }
 
 TEST(safety_operations, try_addl)
@@ -60,8 +60,8 @@ TEST(safety_operations, try_addl)
     std::uint32_t val1 = 4294967293;
     std::uint32_t val2 = 4294967294;
     
-    EXPECT_TRUE(speed::safety::try_add(&val1, 1, 1));
-    EXPECT_TRUE(!speed::safety::try_add(&val2, 1, 1));
+    EXPECT_TRUE(speed::safety::try_add(val1, 1, 1));
+    EXPECT_TRUE(!speed::safety::try_add(val2, 1, 1));
 }
 
 TEST(safety_operations, addm)
@@ -87,8 +87,8 @@ TEST(safety_operations, try_addm)
     std::uint32_t val1 = 4294967294;
     std::uint32_t val2 = 4294967295;
     
-    EXPECT_TRUE(speed::safety::try_addm(&val1, 1) && val1 == 4294967295);
-    EXPECT_TRUE(!speed::safety::try_addm(&val2, 1) && val2 == 4294967295);
+    EXPECT_TRUE(speed::safety::try_addm(val1, 1) && val1 == 4294967295);
+    EXPECT_TRUE(!speed::safety::try_addm(val2, 1) && val2 == 4294967295);
 }
 
 TEST(safety_operations, try_addml)
@@ -96,6 +96,6 @@ TEST(safety_operations, try_addml)
     std::uint32_t val1 = 4294967293;
     std::uint32_t val2 = 4294967294;
     
-    EXPECT_TRUE(speed::safety::try_addm(&val1, 1, 1) && val1 == 4294967295);
-    EXPECT_TRUE(!speed::safety::try_addm(&val2, 1, 1) && val2 == 4294967295);
+    EXPECT_TRUE(speed::safety::try_addm(val1, 1, 1) && val1 == 4294967295);
+    EXPECT_TRUE(!speed::safety::try_addm(val2, 1, 1) && val2 == 4294967295);
 }

@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -30,47 +30,52 @@
 #include <list>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <unordered_set>
+#include <span>
 #include <vector>
 
+#include "detail/forward_declarations.hpp"
 #include "../containers/containers.hpp"
 #include "../memory/memory.hpp"
 #include "../stringutils/stringutils.hpp"
-#include "forward_declarations.hpp"
-#include "arg_error_flags.hpp"
-#include "arg_flags.hpp"
-#include "arg_parser_error_flags.hpp"
-#include "arg_parser_flags.hpp"
-#include "arg_value_error_flags.hpp"
-#include "basic_arg_constraint.hpp"
-#include "basic_arg_constraint_setter.hpp"
-#include "basic_arg_parser_setter.hpp"
-#include "basic_help_arg.hpp"
-#include "basic_help_arg_setter.hpp"
-#include "basic_help_menu.hpp"
-#include "basic_help_menu_setter.hpp"
-#include "basic_key_arg.hpp"
-#include "basic_key_arg_setter.hpp"
-#include "basic_key_value_arg.hpp"
-#include "basic_key_value_arg_setter.hpp"
-#include "basic_positional_arg.hpp"
-#include "basic_positional_arg_setter.hpp"
-#include "basic_version_arg.hpp"
-#include "basic_version_arg_setter.hpp"
+#include "detail/arg_error_flags.hpp"
+#include "detail/arg_flags.hpp"
+#include "detail/arg_parser_error_flags.hpp"
+#include "detail/arg_parser_flags.hpp"
+#include "detail/arg_value_error_flags.hpp"
+#include "detail/basic_arg_constraint.hpp"
+#include "detail/basic_arg_constraint_setter.hpp"
+#include "detail/basic_arg_parser_setter.hpp"
+#include "detail/basic_help_arg.hpp"
+#include "detail/basic_help_arg_setter.hpp"
+#include "detail/basic_help_menu.hpp"
+#include "detail/basic_help_menu_setter.hpp"
+#include "detail/basic_key_arg.hpp"
+#include "detail/basic_key_arg_setter.hpp"
+#include "detail/basic_key_value_arg.hpp"
+#include "detail/basic_key_value_arg_setter.hpp"
+#include "detail/basic_positional_arg.hpp"
+#include "detail/basic_positional_arg_setter.hpp"
+#include "detail/basic_version_arg.hpp"
+#include "detail/basic_version_arg_setter.hpp"
 
 namespace speed::argparse {
 
 /**
  * @brief       Class used to parse arguments.
  */
-template<typename TpAllocator>
+template<typename AllocatorT>
 class basic_arg_parser
 {
 public:
+    /** The character type used in the argument parser. */
+    using char_type = char;
+    
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
+    using allocator_type = typename std::allocator_traits<AllocatorT>::template rebind_alloc<T>;
     
     /** Shared pointer type used in the class. */
     template<typename T>
@@ -78,6 +83,9 @@ public:
 
     /** String type used in the class. */
     using string_type = std::basic_string<char, std::char_traits<char>, allocator_type<char>>;
+
+    /** String view type used in the class. */
+    using string_view_type = std::basic_string_view<char, std::char_traits<char>>;
 
     /** Vector type used in the class. */
     template<typename T>
@@ -88,105 +96,167 @@ public:
     using list_type = std::list<T, allocator_type<T>>;
 
     /** Unordered map type used in the class. */
-    template<typename TpKey_, typename TpValue_>
+    template<typename KeyT_, typename ValueT_>
     using unordered_map_type = std::unordered_map<
-            TpKey_, TpValue_, std::hash<TpKey_>,
-            std::equal_to<TpKey_>,
-            allocator_type<std::pair<const TpKey_, TpValue_>>>;
+            KeyT_, ValueT_, std::hash<KeyT_>,
+            std::equal_to<KeyT_>,
+            allocator_type<std::pair<const KeyT_, ValueT_>>>;
 
     /** Unordered set type used in the class. */
-    template<typename TpKey_>
+    template<typename KeyT_>
     using unordered_set_type = std::unordered_set<
-            TpKey_, std::hash<TpKey_>,
-            std::equal_to<TpKey_>,
-            allocator_type<TpKey_>>;
+            KeyT_, std::hash<KeyT_>,
+            std::equal_to<KeyT_>,
+            allocator_type<KeyT_>>;
+    
+    /** Span type used in the class. */
+    template<typename ValueT>
+    using span_type = std::span<ValueT>;
 
     /** Class that represents a bit field */
     template<typename T>
-    using flags_type = speed::containers::flags<T>;
-
+    using flags_type = containers::flags<T>;
+    
+private:
     /** Type that represents a key for an argument. */
-    using arg_key_type = basic_arg_key<TpAllocator>;
+    using arg_key_type = detail::basic_arg_key<AllocatorT>;
 
     /** Type that represents a value for an argument. */
-    using arg_value_type = basic_arg_value<TpAllocator>;
+    using arg_value_type = detail::basic_arg_value<AllocatorT>;
     
     /** Type that represents the base of the arguments hierarchy. */
-    using base_arg_type = basic_base_arg<TpAllocator>;
+    using base_arg_type = detail::basic_base_arg<AllocatorT>;
     
     /** Type that represents arguments that have keys. */
-    using key_arg_type = basic_key_arg<TpAllocator>;
+    using key_arg_type = detail::basic_key_arg<AllocatorT>;
     
     /** Type that represents arguments that have values. */
-    using value_arg_type = basic_value_arg<TpAllocator>;
+    using value_arg_type = detail::basic_value_arg<AllocatorT>;
     
     /** Type that represents arguments that have keys and values. */
-    using key_value_arg_type = basic_key_value_arg<TpAllocator>;
+    using key_value_arg_type = detail::basic_key_value_arg<AllocatorT>;
 
     /** Type that represents arguments without keys. */
-    using positional_arg_type = basic_positional_arg<TpAllocator>;
+    using positional_arg_type = detail::basic_positional_arg<AllocatorT>;
 
     /** Type that represents the option to get the help information. */
-    using help_arg_type = basic_help_arg<TpAllocator>;
+    using help_arg_type = detail::basic_help_arg<AllocatorT>;
     
     /** Type that represents the argument to get the version information. */
-    using version_arg_type = basic_version_arg<TpAllocator>;
+    using version_arg_type = detail::basic_version_arg<AllocatorT>;
 
     /** Type that represents a constraint for a set of arguments. */
-    using arg_constraint_type = basic_arg_constraint<TpAllocator>;
+    using arg_constraint_type = detail::basic_arg_constraint<AllocatorT>;
 
     /** Type that represents a help menu. */
-    using help_menu_type = basic_help_menu<TpAllocator>;
+    using help_menu_type = detail::basic_help_menu<AllocatorT>;
 
     /** Type used to configure an added key argument. */
-    using key_arg_setter_type = basic_key_arg_setter<TpAllocator>;
+    using key_arg_setter_type = detail::basic_key_arg_setter<AllocatorT>;
 
     /** Type used to configure an added key value argument. */
-    using key_value_arg_setter_type = basic_key_value_arg_setter<TpAllocator>;
+    using key_value_arg_setter_type = detail::basic_key_value_arg_setter<AllocatorT>;
 
     /** Type used to configure an added positional argument. */
-    using positional_arg_setter_type = basic_positional_arg_setter<TpAllocator>;
+    using positional_arg_setter_type = detail::basic_positional_arg_setter<AllocatorT>;
 
     /** Type used to configure an added help argument. */
-    using help_arg_setter_type = basic_help_arg_setter<TpAllocator>;
+    using help_arg_setter_type = detail::basic_help_arg_setter<AllocatorT>;
 
     /** Type used to configure an added version argument. */
-    using version_arg_setter_type = basic_version_arg_setter<TpAllocator>;
+    using version_arg_setter_type = detail::basic_version_arg_setter<AllocatorT>;
 
     /** Type used to configure an added argument constraint. */
-    using arg_constraint_setter_type = basic_arg_constraint_setter<TpAllocator>;
+    using arg_constraint_setter_type = detail::basic_arg_constraint_setter<AllocatorT>;
 
     /** Type used to configure an added help menu. */
-    using help_menu_setter_type = basic_help_menu_setter<TpAllocator>;
+    using help_menu_setter_type = detail::basic_help_menu_setter<AllocatorT>;
 
     /** Type used to configure the argument parser. */
-    using arg_parser_setter_type = basic_arg_parser_setter<TpAllocator>;
+    using arg_parser_setter_type = detail::basic_arg_parser_setter<AllocatorT>;
+    
+    /**
+    * @brief        Represents the possible states of the parsing DFA (Deterministic Finite
+     *              Automaton).
+    */
+    enum class parsing_dfa_state : std::uint8_t
+    {
+        /** Initial state before parsing begins. */
+        START,
+    
+        /** Reading the next argument from input. */
+        READ_ARG,
+    
+        /** Parsing a string. */
+        PARSE_STRING,
+    
+        /** Parsing a key argument. */
+        PARSE_KEY_ARG,
+    
+        /** Parsing an equal sign (`=`) used to assign a value to a key. */
+        PARSE_EQ_OPERATOR,
+    
+        /** Parsing grouped short arguments (e.g., `-abc`). */
+        PARSE_GROUPING_ARGS,
+    
+        /** Parsing a positional (non-key) argument. */
+        PARSE_POSITIONAL_ARG,
+    
+        /** Handling an unrecognized or invalid argument. */
+        PARSE_UNRECOGNIZED_ARG,
+    
+        /** State indicating parsing should be terminated. */
+        QUIT,
+    
+        /** Final state after successful parsing. */
+        FINISH
+    };
+    
+    /**
+     * @brief       Holds the context and state information for the parsing DFA.
+     */
+    template<typename ArgcT_, typename ArgvT_>
+    struct parsing_dfa_context
+    {
+        /** Number of command-line arguments. */
+        ArgcT_ argc = 0;
+    
+        /** Reference to the array or container of argument values. */
+        const ArgvT_& argv;
+    
+        /** Current DFA state. */
+        parsing_dfa_state stte = parsing_dfa_state::START;
+    
+        /** Current index of the argument being processed. */
+        std::size_t idx = 0;
+    
+        /** Pointer to the current key argument being parsed. */
+        key_arg_type* ky_arg = nullptr;
+    
+        /** Pointer to the previously parsed argument. */
+        base_arg_type* prev_arg = nullptr;
+    
+        /** Iterator to the current positional argument. */
+        vector_type<unique_ptr_type<base_arg_type>>::iterator pos_arg_it;
+    };
 
+public:
     /**
      * @brief       Constructor with parameters.
      * @param       prog_name : The program name. If you don't specify any, the program name will
      *              be obtained from argv.
      */
     template<
-            typename TpString_ = string_type,
+            typename StringT_ = string_type,
             typename = std::enable_if_t<
-                    !std::is_base_of<basic_arg_parser, std::decay_t<TpString_>>::value
+                    !std::is_base_of<basic_arg_parser, std::decay_t<StringT_>>::value
             >
     >
-    explicit basic_arg_parser(TpString_&& prog_name = string_type())
-            : short_prefxs_({"-"})
-            , long_prefxs_({"--"})
-            , prog_name_(std::forward<TpString_>(prog_name))
-            , err_id_("error")
-            , default_hlp_arg_(nullptr)
-            , current_vers_arg_(nullptr)
-            , max_unrecog_args_(1)
-            , flgs_(arg_parser_flags::DEFAULT_ARG_PARSER_FLAGS)
-            , err_flgs_(arg_parser_error_flags::NIL)
-            , parsd_(false)
+    explicit basic_arg_parser(StringT_&& prog_name = string_type())
+            : prog_name_(std::forward<StringT_>(prog_name))
     {
-        bse_arg_list_.reserve(6);
-        bse_arg_map_.reserve(12);
+        bse_arg_list_.reserve(10);
+        bse_arg_map_.reserve(20);
     }
     
     /**
@@ -228,7 +298,7 @@ public:
      */
     arg_parser_setter_type configure() noexcept
     {
-        return arg_parser_setter_type(this);
+        return {this};
     }
     
     /**
@@ -236,18 +306,18 @@ public:
      * @param       kys : Variadic number of strings to speficy every key that the arguement will
      *              have.
      */
-    template<typename... Ts_>
-    key_arg_setter_type add_key_arg(Ts_&&... kys)
+    template<typename... StringTs_>
+    key_arg_setter_type add_key_arg(StringTs_&&... kys)
     {
         (assert_valid_key(kys), ...);
         
-        unique_ptr_type<key_arg_type> ky_arg = speed::memory::allocate_unique<key_arg_type>(
-                allocator_type<key_arg_type>(), this, kys...);
+        unique_ptr_type<key_arg_type> ky_arg = memory::allocate_unique<key_arg_type>(
+                allocator_type<key_arg_type>(), this, std::forward<StringTs_>(kys)...);
         
-        key_arg_setter_type key_arg_settr(ky_arg.get());
-        register_key_arg(std::move(ky_arg), std::forward<Ts_>(kys)...);
+        key_arg_type* ky_arg_ref = ky_arg.get();
+        register_key_arg(std::move(ky_arg));
         
-        return key_arg_settr;
+        return {ky_arg_ref};
     }
     
     /**
@@ -255,19 +325,20 @@ public:
      * @param       kys : Variadic number of strings to speficy every key that the arguement will
      *              have.
      */
-    template<typename... Ts_>
-    key_value_arg_setter_type add_key_value_arg(Ts_&&... kys)
+    template<typename... StringTs_>
+    key_value_arg_setter_type add_key_value_arg(StringTs_&&... kys)
     {
         (assert_valid_key(kys), ...);
         
         unique_ptr_type<key_value_arg_type> ky_val_arg =
-                speed::memory::allocate_unique<key_value_arg_type>(
-                        allocator_type<key_value_arg_type>(), this, kys...);
+                memory::allocate_unique<key_value_arg_type>(
+                        allocator_type<key_value_arg_type>(), this,
+                        std::forward<StringTs_>(kys)...);
         
-        key_value_arg_setter_type key_val_arg_settr(ky_val_arg.get());
-        register_key_value_arg(std::move(ky_val_arg), std::forward<Ts_>(kys)...);
+        key_value_arg_type* ky_val_arg_ref = ky_val_arg.get();
+        register_key_value_arg(std::move(ky_val_arg));
         
-        return key_val_arg_settr;
+        return {ky_val_arg_ref};
     }
 
     /**
@@ -275,19 +346,19 @@ public:
      * @param       ky : The ID that will be used to make refence to this argument in the
      *              parser as well as being used during the printing of the usage message.
      */
-    template<typename TpString_>
-    positional_arg_setter_type add_positional_arg(TpString_&& ky)
+    template<typename StringTs_>
+    positional_arg_setter_type add_positional_arg(StringTs_&& ky)
     {
         assert_valid_key(ky);
         
         unique_ptr_type<positional_arg_type> positionl_arg =
-                speed::memory::allocate_unique<positional_arg_type>(
-                        allocator_type<positional_arg_type>(), this, ky);
+                memory::allocate_unique<positional_arg_type>(
+                        allocator_type<positional_arg_type>(), this, std::forward<StringTs_>(ky));
         
-        positional_arg_setter_type positionl_arg_settr(positionl_arg.get());
-        register_positional_arg(std::move(positionl_arg), std::forward<TpString_>(ky));
+        positional_arg_type* positionl_arg_ref = positionl_arg.get();
+        register_positional_arg(std::move(positionl_arg));
         
-        return positionl_arg_settr;
+        return {positionl_arg_ref};
     }
     
     /**
@@ -295,18 +366,18 @@ public:
      * @param       kys : Variadic number of strings to speficy every key that the arguement will
      *              have.
      */
-    template<typename... Ts_>
-    help_arg_setter_type add_help_arg(Ts_&&... kys)
+    template<typename... StringTs_>
+    help_arg_setter_type add_help_arg(StringTs_&&... kys)
     {
         (assert_valid_key(kys), ...);
         
-        unique_ptr_type<help_arg_type> hlp_arg = speed::memory::allocate_unique<help_arg_type>(
-                allocator_type<help_arg_type>(), this, kys...);
+        unique_ptr_type<help_arg_type> hlp_arg = memory::allocate_unique<help_arg_type>(
+                allocator_type<help_arg_type>(), this, std::forward<StringTs_>(kys)...);
         
-        help_arg_setter_type hlp_arg_settr(hlp_arg.get());
-        register_help_arg(std::move(hlp_arg), std::forward<Ts_>(kys)...);
+        help_arg_type* hlp_arg_ref = hlp_arg.get();
+        register_help_arg(std::move(hlp_arg));
         
-        return hlp_arg_settr;
+        return {hlp_arg_ref};
     }
     
     /**
@@ -314,20 +385,20 @@ public:
      * @param       kys : Variadic number of strings to speficy every key that the arguement will
      *              have.
      */
-    template<typename... Ts_>
-    version_arg_setter_type add_version_arg(Ts_&&... kys)
+    template<typename... StringTs_>
+    version_arg_setter_type add_version_arg(StringTs_&&... kys)
     {
         (assert_valid_key(kys), ...);
-        assert_valid_version_addition();
+        assert_valid_version();
         
         unique_ptr_type<version_arg_type> vers_arg =
-                speed::memory::allocate_unique<version_arg_type>(
-                        allocator_type<version_arg_type>(), this, kys...);
+                memory::allocate_unique<version_arg_type>(
+                        allocator_type<version_arg_type>(), this, std::forward<StringTs_>(kys)...);
         
-        version_arg_setter_type vers_arg_settr(vers_arg.get());
-        register_version_arg(std::move(vers_arg), std::forward<Ts_>(kys)...);
+        version_arg_type* vers_arg_ref = vers_arg.get();
+        register_version_arg(std::move(vers_arg));
         
-        return vers_arg_settr;
+        return {vers_arg_ref};
     }
     
     /**
@@ -336,10 +407,10 @@ public:
      * @param       kys : Variadic number of strings to speficy every argument in which the
      *              constraint applies.
      */
-    template<typename... Ts_>
-    arg_constraint_setter_type add_constraint(const Ts_&... kys)
+    template<typename... StringTs_>
+    arg_constraint_setter_type add_constraint(const StringTs_&... kys)
     {
-        return arg_constraint_setter_type(&constrnts_.emplace_back(this, kys...));
+        return {&constrnts_.emplace_back(this, kys...)};
     }
 
     /**
@@ -349,10 +420,10 @@ public:
      *              ID is empty the default help menu will be refered.
      * @return      Object that allows configurint the help menu added.
      */
-    template<typename TpString_ = string_type>
-    help_menu_setter_type add_help_menu(TpString_&& hlp_menu_id = string_type())
+    template<typename StringT_ = string_type>
+    help_menu_setter_type add_help_menu(StringT_&& hlp_menu_id = string_type())
     {
-        return help_menu_setter_type(&get_help_menu(std::forward<TpString_>(hlp_menu_id)));
+        return {&get_help_menu(std::forward<StringT_>(hlp_menu_id))};
     }
     
     /**
@@ -360,195 +431,79 @@ public:
      * @param       argc : Contains the number of arguments gotten through the program call.
      * @param       argv : Contains the arguments gotten through the program call.
      */
-    template<typename TpArgc_, typename TpArgv_>
-    void parse_args(const TpArgc_& argc, const TpArgv_& argv)
+    template<typename ArgcT_, typename ArgvT_>
+    void parse_args(ArgcT_ argc, const ArgvT_& argv)
     {
-        enum class dfa_t : std::uint8_t
+        parsing_dfa_context<ArgcT_, ArgvT_> parsing_dfa_contxt{ .argc = argc, .argv = argv };
+        
+        while (parsing_dfa_contxt.stte != parsing_dfa_state::FINISH)
         {
-            START, READ_ARG, PARSE_KEY, PARSE_KEY_ARG, PARSE_EQ_OPERATOR, PARSE_GROUPING_ARGS,
-            PARSE_POSITIONAL_ARG, PARSE_UNRECOGNIZED_ARG, QUIT, FINISH
-        };
-
-        dfa_t cur_state;
-        string_type cur_argv;
-        string_type ky_builder;
-        string_type eq_val;
-        std::size_t cur_idx;
-        std::size_t pos_increment;
-        std::size_t eq_pos;
-        key_arg_type *ky_arg = nullptr;
-        key_value_arg_type *ky_val_arg = nullptr;
-        positional_arg_type *positionl_arg = nullptr;
-        base_arg_type *prev_arg = nullptr;
-        vector_type<key_arg_type*> chaind_args;
-        bool insertd;
-        bool prefix_err;
-        auto cur_bse_arg_it = get_first_positional_arg(bse_arg_list_.begin());
-
-        for (cur_state = dfa_t::START; cur_state != dfa_t::FINISH; )
-        {
-            switch (cur_state)
+            switch (parsing_dfa_contxt.stte)
             {
-            case dfa_t::START:
-                reset_args_parse();
-                if (argc > 0 && prog_name_.empty())
-                {
-                    prog_name_ = argv[0];
-                }
-                cur_idx = 1;
-                cur_state = dfa_t::READ_ARG;
+            case parsing_dfa_state::START:
+                parse_start_state(parsing_dfa_contxt);
                 continue;
 
-            case dfa_t::READ_ARG:
-                if (cur_idx >= argc)
-                {
-                    cur_state = dfa_t::QUIT;
-                    continue;
-                }
-                cur_argv = argv[cur_idx];
-                cur_state = dfa_t::PARSE_KEY;
+            case parsing_dfa_state::READ_ARG:
+                parse_read_state(parsing_dfa_contxt);
                 continue;
 
-            case dfa_t::PARSE_KEY:
-                if ((ky_arg = get_key_arg(cur_argv)) != nullptr)
-                {
-                    cur_state = dfa_t::PARSE_KEY_ARG;
-                    continue;
-                }
-                cur_state = dfa_t::PARSE_EQ_OPERATOR;
+            case parsing_dfa_state::PARSE_STRING:
+                parse_string_state(parsing_dfa_contxt);
                 continue;
 
-            case dfa_t::PARSE_KEY_ARG:
-                parse_key_arg(argc, argv, ky_arg, cur_idx, &pos_increment);
-                cur_idx += pos_increment + 1;
-                prev_arg = ky_arg;
-                cur_state = dfa_t::READ_ARG;
+            case parsing_dfa_state::PARSE_KEY_ARG:
+                parse_key_arg_state(parsing_dfa_contxt);
                 continue;
 
-            case dfa_t::PARSE_EQ_OPERATOR:
-                if (cur_argv.size() > 2 &&
-                    (eq_pos = cur_argv.find('=', 1)) != string_type::npos)
-                {
-                    ky_builder = cur_argv.substr(0, eq_pos);
-                    eq_val = cur_argv.substr(eq_pos + 1);
-
-                    if (!ky_builder.empty() && 
-                        !eq_val.empty() && 
-                        (ky_val_arg = get_key_value_arg(ky_builder)) != nullptr &&
-                            ky_val_arg->is_flag_set(arg_flags::ASSIGNMENT_OPERATOR))
-                    {
-                        ky_val_arg->add_value(std::move(eq_val));
-                        ky_arg = ky_val_arg;
-                        cur_state = dfa_t::PARSE_KEY_ARG;
-                        continue;
-                    }
-                }
-                cur_state = dfa_t::PARSE_GROUPING_ARGS;
+            case parsing_dfa_state::PARSE_EQ_OPERATOR:
+                parse_eq_operator_state(parsing_dfa_contxt);
                 continue;
 
-            case dfa_t::PARSE_GROUPING_ARGS:
-                chaind_args.clear();
-                ky_builder = get_key_prefix(cur_argv);
-                ky_builder += ' ';
-                for (auto i = ky_builder.size() - 1; i < cur_argv.size(); ++i)
-                {
-                    ky_builder[ky_builder.size() - 1] = cur_argv[i];
-                    ky_arg = get_key_arg(ky_builder);
-                    if (ky_arg != nullptr && ky_arg->is_flag_set(arg_flags::GROUPING))
-                    {
-                        chaind_args.push_back(ky_arg);
-                    }
-                    else
-                    {
-                        chaind_args.clear();
-                        break;
-                    }
-                }
-                if (!chaind_args.empty())
-                {
-                    for (auto& chaind_arg : chaind_args)
-                    {
-                        parse_key_arg(argc, argv, chaind_arg, cur_idx, &pos_increment);
-                        cur_idx += pos_increment;
-                    }
-                    ++cur_idx;
-                    cur_state = dfa_t::READ_ARG;
-                    prev_arg = static_cast<base_arg_type*>(chaind_args.back());
-                    continue;
-                }
-                cur_state = dfa_t::PARSE_POSITIONAL_ARG;
+            case parsing_dfa_state::PARSE_GROUPING_ARGS:
+                parse_grouping_args_state(parsing_dfa_contxt);
                 continue;
 
-            case dfa_t::PARSE_POSITIONAL_ARG:
-                insertd = false;
-                while (cur_bse_arg_it != bse_arg_list_.end() &&
-                       dynamic_cast<positional_arg_type*>(cur_bse_arg_it->get())
-                            ->max_values_reached())
-                {
-                    cur_bse_arg_it = get_next_positional_arg(cur_bse_arg_it);
-                }
-                while (cur_bse_arg_it != bse_arg_list_.end())
-                {
-                    positionl_arg = dynamic_cast<positional_arg_type*>(cur_bse_arg_it->get());
-                    prefix_err = has_value_with_prefix_error(positionl_arg, cur_argv);
-                    if (prefix_err || !positionl_arg->try_add_value(cur_argv))
-                    {
-                        if (positionl_arg->min_values_reached() ||
-                            (positionl_arg->get_number_of_values() > 0 && prefix_err))
-                        {
-                            cur_bse_arg_it = get_next_positional_arg(cur_bse_arg_it);
-                            continue;
-                        }
-                        else if (!prefix_err)
-                        {
-                            positionl_arg->add_value(std::move(cur_argv));
-                            insertd = true;
-                        }
-                        break;
-                    }
-                    insertd = true;
-                    break;
-                }
-                if (insertd)
-                {
-                    if (static_cast<base_arg_type*>(positionl_arg) != prev_arg)
-                    {
-                        positionl_arg->execute_action();
-                        positionl_arg->increase_occurrence();
-                    }
-                    ++cur_idx;
-                    cur_state = dfa_t::READ_ARG;
-                    prev_arg = positionl_arg;
-                    continue;
-                }
-                cur_state = dfa_t::PARSE_UNRECOGNIZED_ARG;
+            case parsing_dfa_state::PARSE_POSITIONAL_ARG:
+                parse_positional_arg_state(parsing_dfa_contxt);
                 continue;
 
-            case dfa_t::PARSE_UNRECOGNIZED_ARG:
-                if (unrecog_args_.size() < max_unrecog_args_)
-                {
-                    unrecog_args_.push_back(std::move(cur_argv));
-                }
-                ++cur_idx;
-                cur_state = dfa_t::READ_ARG;
-                prev_arg = nullptr;
+            case parsing_dfa_state::PARSE_UNRECOGNIZED_ARG:
+                parse_unrecognized_args_state(parsing_dfa_contxt);
                 continue;
 
-            case dfa_t::QUIT:
-                parsd_ = true;
-                update_error_flags();
-                trigger_prints();
-                if (flgs_.is_set(arg_parser_flags::PRINT_ERRORS))
-                {
-                    print_errors();
-                }
-                cur_state = dfa_t::FINISH;
+            case parsing_dfa_state::QUIT:
+                parse_quit_state(parsing_dfa_contxt);
                 continue;
-
-            case dfa_t::FINISH:
-                break;
             }
         }
+    }
+    
+    /**
+     * @brief       Allows knowing whether there are errors associated with a specific argument in
+     *              the argument parser.
+     * @return      If function was successful true is returned, otherwise false is returned.
+     */
+    template<typename StringT_>
+    [[nodiscard]] inline bool arg_has_errors(const StringT_& ky) const
+    {
+        base_arg_type* bse_arg = get_base_arg(ky);
+        
+        if (bse_arg == nullptr)
+        {
+            throw key_not_found_exception();
+        }
+        
+        return bse_arg->has_errors();
+    }
+    
+    /**
+     * @brief       Allows knowing whether there are errors in the argument parser.
+     * @return      If function was successful true is returned, otherwise false is returned.
+     */
+    [[nodiscard]] inline bool has_errors() const noexcept
+    {
+        return err_flgs_.is_not_empty();
     }
     
     /**
@@ -556,7 +511,8 @@ public:
      * @param       ky : Argument key to check.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] bool was_found(const string_type& ky) const
+    template<typename StringT_>
+    [[nodiscard]] bool was_found(const StringT_& ky) const
     {
         base_arg_type* bse_arg = get_base_arg(ky);
 
@@ -575,7 +531,8 @@ public:
      * @return      The number of values that has been found for a specified argument that have
      *              values associated.
      */
-    [[nodiscard]] std::size_t count_values_found(const string_type& ky) const
+    template<typename StringT_>
+    [[nodiscard]] std::size_t count_values_found(const StringT_& ky) const
     {
         value_arg_type* val_arg = get_value_arg(ky);
 
@@ -584,7 +541,7 @@ public:
             throw key_not_found_exception();
         }
 
-        return val_arg->get_actual_number_of_values();
+        return val_arg->get_total_values_count();
     }
     
     /**
@@ -592,8 +549,8 @@ public:
      * @param       ky : Key of the argument to get the front value.
      * @return      The key argument front value converted to target
      */
-    template<typename TpTarget_>
-    [[nodiscard]] TpTarget_ get_front_as(const string_type& ky) const
+    template<typename TargetT_, typename StringT_>
+    [[nodiscard]] TargetT_ get_front_as(const StringT_& ky) const
     {
         value_arg_type* val_arg = get_value_arg(ky);
         
@@ -602,7 +559,7 @@ public:
             throw key_not_found_exception();
         }
         
-        return val_arg->template get_front_value_as<TpTarget_>();
+        return val_arg->template get_front_value_as<TargetT_>();
     }
     
     /**
@@ -612,10 +569,10 @@ public:
      * @return      If function was successful the key argument front value converted to target 
      *              is returned, otherwise the default value is returned.
      */
-    template<typename TpTarget_, typename TpDefaultValue_>
-    [[nodiscard]] TpTarget_ get_front_as(
-            const string_type& ky,
-            TpDefaultValue_&& default_val
+    template<typename TargetT_, typename StringT_, typename DefaultValueT_>
+    [[nodiscard]] TargetT_ get_front_as(
+            const StringT_& ky,
+            DefaultValueT_&& default_val
     ) const
     {
         value_arg_type* val_arg = get_value_arg(ky);
@@ -625,8 +582,8 @@ public:
             throw key_not_found_exception();
         }
         
-        return val_arg->template get_front_value_as<TpTarget_>(
-                std::forward<TpDefaultValue_>(default_val));
+        return val_arg->template get_front_value_as<TargetT_>(
+                std::forward<DefaultValueT_>(default_val));
     }
     
     /**
@@ -635,10 +592,10 @@ public:
      * @param       res : The object that will contain the result of the conversion.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    template<typename TpTarget_, typename TpDefaultValue_>
-    [[nodiscard]] TpTarget_ try_get_front_as(
-            const string_type& ky,
-            TpTarget_* res
+    template<typename TargetT_, typename StringT_, typename DefaultValueT_>
+    [[nodiscard]] bool try_get_front_as(
+            const StringT_& ky,
+            TargetT_& res
     ) const
     {
         value_arg_type* val_arg = get_value_arg(ky);
@@ -648,7 +605,7 @@ public:
             throw key_not_found_exception();
         }
         
-        return val_arg->template try_get_front_value_as<TpTarget_>(res);
+        return val_arg->template try_get_front_value_as<TargetT_>(res);
     }
     
     /**
@@ -657,8 +614,8 @@ public:
      * @param       indx : Index of the value to get.
      * @return      The key argument index value converted to target.
      */
-    template<typename TpTarget_>
-    [[nodiscard]] TpTarget_ get_at_as(const string_type& ky, std::size_t indx) const
+    template<typename TargetT_, typename StringT_>
+    [[nodiscard]] TargetT_ get_at_as(const StringT_& ky, std::size_t indx) const
     {
         value_arg_type* val_arg = get_value_arg(ky);
         
@@ -667,7 +624,7 @@ public:
             throw key_not_found_exception();
         }
         
-        return val_arg->template get_value_at_as<TpTarget_>(indx);
+        return val_arg->template get_value_at_as<TargetT_>(indx);
     }
     
     /**
@@ -678,11 +635,11 @@ public:
      * @return      If function was successful the key argument index value converted to target is
      *              returned, otherwise the default value is returned.
      */
-    template<typename TpTarget_, typename TpDefaultValue_>
-    [[nodiscard]] TpTarget_ get_at_as(
-            const string_type& ky,
+    template<typename TargetT_, typename StringT_, typename DefaultValueT_>
+    [[nodiscard]] TargetT_ get_at_as(
+            const StringT_& ky,
             std::size_t indx,
-            TpDefaultValue_&& default_val
+            DefaultValueT_&& default_val
     ) const
     {
         value_arg_type* val_arg = get_value_arg(ky);
@@ -692,8 +649,8 @@ public:
             throw key_not_found_exception();
         }
         
-        return val_arg->template get_value_at_as<TpTarget_>(
-                indx, std::forward<TpDefaultValue_>(default_val));
+        return val_arg->template get_value_at_as<TargetT_>(
+                indx, std::forward<DefaultValueT_>(default_val));
     }
     
     /**
@@ -703,11 +660,11 @@ public:
      * @param       res : The object that will contain the result of the conversion.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    template<typename TpTarget_, typename TpDefaultValue_>
-    [[nodiscard]] TpTarget_ try_get_at_as(
-            const string_type& ky,
+    template<typename TargetT_, typename StringT_>
+    [[nodiscard]] bool try_get_at_as(
+            const StringT_& ky,
             std::size_t indx,
-            TpTarget_* res
+            TargetT_& res
     ) const
     {
         value_arg_type* val_arg = get_value_arg(ky);
@@ -717,7 +674,7 @@ public:
             throw key_not_found_exception();
         }
         
-        return val_arg->template try_get_value_at_as<TpTarget_>(indx, res);
+        return val_arg->template try_get_value_at_as<TargetT_>(indx, res);
     }
     
     /**
@@ -725,8 +682,8 @@ public:
      * @param       ky : Key of the argument to get the values.
      * @return      The key argument values converted to target.
      */
-    template<typename TpTarget_>
-    [[nodiscard]] vector_type<TpTarget_> get_all_as(const string_type& ky) const
+    template<typename TargetT_, typename StringT_>
+    [[nodiscard]] vector_type<TargetT_> get_all_as(const StringT_& ky) const
     {
         value_arg_type* val_arg = get_value_arg(ky);
         
@@ -735,7 +692,7 @@ public:
             throw key_not_found_exception();
         }
 
-        return val_arg->template get_values_as<TpTarget_>();
+        return val_arg->template get_values_as<TargetT_>();
     }
     
     /**
@@ -745,10 +702,14 @@ public:
      * @return      If function was successful the key argument values converted to target are 
      *              returned, otherwise the default value is returned.
      */
-    template<typename TpTarget_, typename TpDefaultValue_ = vector_type<TpTarget_>>
-    [[nodiscard]] vector_type<TpTarget_> get_all_as(
-            const string_type& ky,
-            TpDefaultValue_&& default_val
+    template<
+            typename TargetT_,
+            typename StringT_,
+            typename DefaultValueT_ = vector_type<TargetT_>
+    >
+    [[nodiscard]] vector_type<TargetT_> get_all_as(
+            const StringT_& ky,
+            DefaultValueT_&& default_val
     ) const
     {
         value_arg_type* val_arg = get_value_arg(ky);
@@ -758,8 +719,8 @@ public:
             throw key_not_found_exception();
         }
 
-        return val_arg->template get_values_as<TpTarget_>(
-                std::forward<TpDefaultValue_>(default_val));
+        return val_arg->template get_values_as<TargetT_>(
+                std::forward<DefaultValueT_>(default_val));
     }
     
     /**
@@ -768,10 +729,10 @@ public:
      * @param       res : The object that will contain the result of the conversion.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    template<typename TpTarget_>
+    template<typename TargetT_, typename StringT_>
     [[nodiscard]] bool try_get_all_as(
-            const string_type& ky,
-            vector_type<TpTarget_>* res
+            const StringT_& ky,
+            vector_type<TargetT_>& res
     ) const
     {
         value_arg_type* val_arg = get_value_arg(ky);
@@ -781,33 +742,7 @@ public:
             throw key_not_found_exception();
         }
 
-        return val_arg->template try_get_values_as<TpTarget_>(res);
-    }
-    
-    /**
-     * @brief       Allows knowing whether there are errors in the argument parser.
-     * @return      If function was successful true is returned, otherwise false is returned.
-     */
-    [[nodiscard]] inline bool has_errors() const noexcept
-    {
-        return err_flgs_.is_not_empty();
-    }
-    
-    /**
-     * @brief       Allows knowing whether there are errors associated with a specific argument in
-     *              the argument parser.
-     * @return      If function was successful true is returned, otherwise false is returned.
-     */
-    [[nodiscard]] inline bool arg_has_errors(const string_type& ky) const
-    {
-        base_arg_type* bse_arg = get_base_arg(ky);
-
-        if (bse_arg == nullptr)
-        {
-            throw key_not_found_exception();
-        }
-
-        return bse_arg->has_errors();
+        return val_arg->template try_get_values_as<TargetT_>(res);
     }
     
     /**
@@ -815,7 +750,8 @@ public:
      * @param       hlp_menu_id : The ID of the help menu to print. If nothing is pecified the
      *              default help menu will be printed.
      */
-    void print_help(const string_type& hlp_menu_id = string_type())
+    template<typename StringT_ = string_type>
+    void print_help(const StringT_& hlp_menu_id = string_type())
     {
         get_help_menu(hlp_menu_id).print();
     }
@@ -843,7 +779,7 @@ public:
             return;
         }
         
-        if (err_flgs_.is_set(arg_parser_error_flags::ARGS_ERROR))
+        if (err_flgs_.is_set(detail::arg_parser_error_flags::ARGS_ERROR))
         {
             for (auto& bse_arg : bse_arg_list_)
             {
@@ -851,7 +787,7 @@ public:
             }
         }
         
-        if (err_flgs_.is_set(arg_parser_error_flags::ARGS_CONSTRAINTS_ERROR))
+        if (err_flgs_.is_set(detail::arg_parser_error_flags::ARGS_CONSTRAINTS_ERROR))
         {
             for (auto& constrnt : constrnts_)
             {
@@ -859,18 +795,18 @@ public:
             }
         }
         
-        if (err_flgs_.is_set(arg_parser_error_flags::UNRECOGNIZED_ARGS_ERROR))
+        if (err_flgs_.is_set(detail::arg_parser_error_flags::UNRECOGNIZED_ARGS_ERROR))
         {
             for (auto& unrecog_arg : unrecog_args_)
             {
                 std::cout << prog_name_ << ": ";
                 if (!err_id_.empty())
                 {
-                    if (flgs_.is_set(arg_parser_flags::USE_COLORS))
+                    if (flgs_.is_set(detail::arg_parser_flags::USE_COLORS))
                     {
-                        std::cout << speed::iostream::set_light_red_text
+                        std::cout << iostream::set_light_red_text
                                   << err_id_ << ": "
-                                  << speed::iostream::set_default_text;
+                                  << iostream::set_default_text;
                     }
                     else
                     {
@@ -888,12 +824,12 @@ public:
                       << "' for more information.\n";
         }
         
-        if (flgs_.is_set(arg_parser_flags::PRINT_HELP_AFTER_PRINTING_ERRORS))
+        if (flgs_.is_set(detail::arg_parser_flags::PRINT_HELP_AFTER_PRINTING_ERRORS))
         {
             print_help();
         }
         
-        if (flgs_.is_set(arg_parser_flags::PKILL_AFTER_PRINTING_ERRORS))
+        if (flgs_.is_set(detail::arg_parser_flags::PKILL_AFTER_PRINTING_ERRORS))
         {
             exit_program(-1);
         }
@@ -904,8 +840,8 @@ private:
      * @brief       Assert the validity of the specified key.
      * @param       ky : Key to check.
      */
-    template<typename TpString_>
-    inline void assert_valid_key(const TpString_& ky) const
+    template<typename StringT_>
+    inline void assert_valid_key(const StringT_& ky) const
     {
         if (arg_key_exists(ky))
         {
@@ -916,7 +852,7 @@ private:
     /**
      * @brief       Assert the validity of adding a version argument.
      */
-    inline void assert_valid_version_addition() const
+    inline void assert_valid_version() const
     {
         if (current_vers_arg_ != nullptr)
         {
@@ -927,12 +863,14 @@ private:
     /**
      * @brief       Register in the data stuctures a specified key argument and its keys.
      * @param       ky_arg : Key argument to register.
-     * @param       kys : Keys of the key argument.
      */
-    template<typename... Ts_>
-    void register_key_arg(unique_ptr_type<key_arg_type> ky_arg, Ts_&&... kys)
+    void register_key_arg(unique_ptr_type<key_arg_type> ky_arg)
     {
-        (bse_arg_map_.emplace(std::forward<Ts_>(kys), ky_arg.get()), ...);
+        for (auto& ky : ky_arg->get_keys())
+        {
+            bse_arg_map_.emplace(ky.get_string(), ky_arg.get());
+        }
+        
         register_into_help_menus(ky_arg.get());
         bse_arg_list_.emplace_back(std::move(ky_arg));
     }
@@ -940,26 +878,19 @@ private:
     /**
      * @brief       Register in the data stuctures a specified key value argument and its keys.
      * @param       ky_val_arg : Key value argument to register.
-     * @param       kys : Keys of the key value argument.
      */
-    template<typename... Ts_>
-    inline void register_key_value_arg(unique_ptr_type<key_value_arg_type> ky_val_arg, Ts_&&... kys)
+    inline void register_key_value_arg(unique_ptr_type<key_value_arg_type> ky_val_arg)
     {
-        register_key_arg(std::move(ky_val_arg), std::forward<Ts_>(kys)...);
+        register_key_arg(std::move(ky_val_arg));
     }
 
     /**
      * @brief       Register in the data stuctures a specified positional argument and its key.
      * @param       positionl_arg : positional argument to register.
-     * @param       ky : Key of the positional argument.
      */
-    template<typename TpString_>
-    inline void register_positional_arg(
-            unique_ptr_type<positional_arg_type> positionl_arg,
-            TpString_&& ky
-    )
+    inline void register_positional_arg(unique_ptr_type<positional_arg_type> positionl_arg)
     {
-        bse_arg_map_.emplace(std::forward<TpString_>(ky), positionl_arg.get());
+        bse_arg_map_.emplace(positionl_arg->get_key(), positionl_arg.get());
         register_into_help_menus(positionl_arg.get());
         bse_arg_list_.emplace_back(std::move(positionl_arg));
     }
@@ -967,31 +898,27 @@ private:
     /**
      * @brief       Register in the data stuctures a specified help argument and its keys.
      * @param       hlp_arg : Help argument to register.
-     * @param       kys : Keys of the help argument.
      */
-    template<typename... Ts_>
-    inline void register_help_arg(unique_ptr_type<help_arg_type> hlp_arg, Ts_&&... kys)
+    inline void register_help_arg(unique_ptr_type<help_arg_type> hlp_arg)
     {
         if (default_hlp_arg_ == nullptr)
         {
             default_hlp_arg_ = hlp_arg.get();
         }
-        register_key_arg(std::move(hlp_arg), std::forward<Ts_>(kys)...);
+        register_key_arg(std::move(hlp_arg));
     }
 
     /**
      * @brief       Register in the data stuctures a specified version argument and its keys.
      * @param       vers_arg : Version argument to register.
-     * @param       kys : Keys of the version argument.
      */
-    template<typename... Ts_>
-    inline void register_version_arg(unique_ptr_type<version_arg_type> vers_arg, Ts_&&... kys)
+    inline void register_version_arg(unique_ptr_type<version_arg_type> vers_arg)
     {
         if (current_vers_arg_ == nullptr)
         {
             current_vers_arg_ = vers_arg.get();
         }
-        register_key_arg(std::move(vers_arg), std::forward<Ts_>(kys)...);
+        register_key_arg(std::move(vers_arg));
     }
 
     /**
@@ -1008,32 +935,21 @@ private:
      * @param       bse_arg : Argument to register.
      * @param       hlp_menus_ids : IDs of the help menu in which register the argument.
      */
-    template<typename... Ts_>
-    void register_into_help_menus(base_arg_type* bse_arg, Ts_&&... hlp_menus_ids)
+    template<typename... StringTs_>
+    void register_into_help_menus(base_arg_type* bse_arg, StringTs_&&... hlp_menus_ids)
     {
-        (get_help_menu(std::forward<Ts_>(hlp_menus_ids)).add_entry(bse_arg), ...);
+        (get_help_menu(std::forward<StringTs_>(hlp_menus_ids)).add_entry(bse_arg), ...);
     }
 
     /**
      * @brief       Remove an arguement to every help menu specified by their IDs.
      * @param       bse_arg : Argument to remove.
-     * @param       hlp_menus_ids : IDs of the help menus in which remove.
      */
-    void remove_from_help_menus(
-            base_arg_type* bse_arg,
-            const unordered_set_type<string_type>& hlp_menus_ids
-    )
+    void remove_from_help_menus(base_arg_type* bse_arg)
     {
-        if (hlp_menus_ids.empty())
+        for (auto& x : hlp_menu_map_)
         {
-            get_help_menu().remove_entry(bse_arg);
-        }
-        else
-        {
-            for (auto& hlp_menu_id: hlp_menus_ids)
-            {
-                get_help_menu(hlp_menu_id).remove_entry(bse_arg);
-            }
+            x.second->remove_entry(bse_arg);
         }
     }
 
@@ -1046,58 +962,294 @@ private:
         this->~basic_arg_parser();
         exit(val);
     }
-
+    
     /**
-     * @brief       Parse the specified key argument.
-     * @param       argc : Reference to the number of arguments found in the program call.
-     * @param       argv : Arguments found in the program call.
-     * @param       ky_arg : The key argument to parse.
-     * @param       cur_idx : The current index checked in argv.
-     * @param       pos_increment : How much the index will be increased afther the parsing.
+     * @brief       Initializes the parsing DFA to its starting state.
+     * @param       contxt : Reference to the parsing DFA context that will be initialized.
      */
-    template<typename TpArgc_, typename TpArgv_>
-    void parse_key_arg(
-            const TpArgc_& argc,
-            const TpArgv_& argv,
-            key_arg_type *ky_arg,
-            std::size_t cur_idx,
-            std::size_t* pos_increment
-    )
+    template<typename ArgcT_, typename ArgvT_>
+    void parse_start_state(parsing_dfa_context<ArgcT_, ArgvT_>& contxt)
     {
-        *pos_increment = 0;
-        auto* ky_val_arg = dynamic_cast<key_value_arg_type*>(ky_arg);
+        reset_args_parse();
         
-        if (!ky_arg->increase_occurrence())
+        if (contxt.argc > 0 && prog_name_.empty())
+        {
+            prog_name_ = contxt.argv[0];
+        }
+        
+        contxt.idx = 1;
+        contxt.stte = parsing_dfa_state::READ_ARG;
+        contxt.pos_arg_it = get_first_positional_arg(bse_arg_list_.begin());
+    }
+    
+    /**
+     * @brief       Handles the DFA state for reading the next argument.
+     * @param       contxt : Reference to the parsing DFA context that holds the current state.
+     */
+    template<typename ArgcT_, typename ArgvT_>
+    void parse_read_state(parsing_dfa_context<ArgcT_, ArgvT_>& contxt)
+    {
+        if (contxt.idx >= contxt.argc)
+        {
+            contxt.stte = parsing_dfa_state::QUIT;
+            return;
+        }
+        
+        contxt.stte = parsing_dfa_state::PARSE_STRING;
+    }
+    
+    /**
+     * @brief       Handles the DFA state for parsing a string.
+     * @param       contxt : Reference to the parsing DFA context containing the current state.
+     */
+    template<typename ArgcT_, typename ArgvT_>
+    void parse_string_state(parsing_dfa_context<ArgcT_, ArgvT_>& contxt)
+    {
+        contxt.ky_arg = get_key_arg(contxt.argv[contxt.idx]);
+        
+        if (contxt.ky_arg == nullptr)
+        {
+            contxt.stte = parsing_dfa_state::PARSE_EQ_OPERATOR;
+            return;
+        }
+        
+        contxt.stte = parsing_dfa_state::PARSE_KEY_ARG;
+    }
+    
+    /**
+     * @brief       Handles the DFA state for processing a key argument.
+     * @param       contxt : Reference to the parsing DFA context containing the current state.
+     */
+    template<typename ArgcT_, typename ArgvT_>
+    void parse_key_arg_state(parsing_dfa_context<ArgcT_, ArgvT_>& contxt)
+    {
+        parse_key_arg(contxt);
+        ++contxt.idx;
+        contxt.prev_arg = contxt.ky_arg;
+        contxt.stte = parsing_dfa_state::READ_ARG;
+    }
+    
+    /**
+     * @brief       Handles the DFA state for parsing arguments with an equal-sign assignment.
+     * @param       contxt : Reference to the parsing DFA context containing the current state.
+     */
+    template<typename ArgcT_, typename ArgvT_>
+    void parse_eq_operator_state(parsing_dfa_context<ArgcT_, ArgvT_>& contxt)
+    {
+        string_view_type cur_argv = contxt.argv[contxt.idx];
+        string_view_type ky_strv;
+        string_view_type val_strv;
+        std::size_t eq_pos;
+        key_value_arg_type* ky_val_arg;
+        
+        if (cur_argv.size() > 2 &&
+            (eq_pos = cur_argv.find('=', 1)) != string_type::npos)
+        {
+            ky_strv = cur_argv.substr(0, eq_pos);
+            val_strv = cur_argv.substr(eq_pos + 1);
+    
+            if (!ky_strv.empty() &&
+                !val_strv.empty() &&
+                (ky_val_arg = get_key_value_arg(ky_strv)) != nullptr &&
+                        ky_val_arg->is_flag_set(detail::arg_flags::ASSIGNMENT_OPERATOR))
+            {
+                ky_val_arg->add_value(val_strv);
+                contxt.ky_arg = ky_val_arg;
+                contxt.stte = parsing_dfa_state::PARSE_KEY_ARG;
+                return;
+            }
+        }
+        
+        contxt.stte = parsing_dfa_state::PARSE_GROUPING_ARGS;
+    }
+    
+    /**
+     * @brief       Handles the DFA state for parsing grouped single-character arguments.
+     * @param       contxt : Reference to the parsing DFA context containing the current state.
+     */
+    template<typename ArgcT_, typename ArgvT_>
+    void parse_grouping_args_state(parsing_dfa_context<ArgcT_, ArgvT_>& contxt)
+    {
+        string_view_type cur_argv = contxt.argv[contxt.idx];
+        string_view_type ky_prefix = get_key_prefix(cur_argv);
+        string_type ky_builder;
+        bool valid_groupng;
+        
+        ky_builder.reserve(ky_prefix.size() + 1);
+        ky_builder = ky_prefix;
+        ky_builder += ' ';
+        
+        auto for_each_grouping_key = [&](auto&& actn) -> bool
+        {
+            for (auto i = ky_prefix.size(); i < cur_argv.size(); ++i)
+            {
+                ky_builder[ky_prefix.size()] = cur_argv[i];
+                key_arg_type* ky_arg = get_key_arg(ky_builder);
+                if (!actn(ky_arg))
+                {
+                    return false;
+                }
+            }
+            return true;
+        };
+        
+        valid_groupng = for_each_grouping_key([&](key_arg_type* ky_arg) -> bool
+        {
+            return ky_arg && ky_arg->is_flag_set(detail::arg_flags::GROUPING);
+        });
+        
+        if (!valid_groupng)
+        {
+            contxt.stte = parsing_dfa_state::PARSE_POSITIONAL_ARG;
+            return;
+        }
+        
+        for_each_grouping_key([&](key_arg_type* ky_arg) -> bool
+        {
+            contxt.ky_arg = ky_arg;
+            parse_key_arg(contxt);
+            return true;
+        });
+        
+        ++contxt.idx;
+        contxt.stte = parsing_dfa_state::READ_ARG;
+        contxt.prev_arg = static_cast<base_arg_type*>(contxt.ky_arg);
+    }
+    
+    /**
+     * @brief       Handles the DFA state for parsing positional arguments.
+     * @param       contxt : Reference to the parsing DFA context containing the current state.
+     */
+    template<typename ArgcT_, typename ArgvT_>
+    void parse_positional_arg_state(parsing_dfa_context<ArgcT_, ArgvT_>& contxt)
+    {
+        string_view_type cur_argv = contxt.argv[contxt.idx];
+        positional_arg_type* pos_arg;
+        bool insertd = false;
+        
+        while (contxt.pos_arg_it != bse_arg_list_.end() &&
+               dynamic_cast<positional_arg_type*>(contxt.pos_arg_it->get())
+                        ->max_values_reached())
+        {
+            contxt.pos_arg_it = get_next_positional_arg(contxt.pos_arg_it);
+        }
+        
+        while (contxt.pos_arg_it != bse_arg_list_.end())
+        {
+            pos_arg = dynamic_cast<positional_arg_type*>(contxt.pos_arg_it->get());
+            bool prefix_err = is_value_prefix_invalid(pos_arg, cur_argv);
+            
+            if (prefix_err || !pos_arg->try_add_value(cur_argv))
+            {
+                if (pos_arg->min_values_reached() ||
+                    (pos_arg->get_current_dimension_values_count() > 0 && prefix_err))
+                {
+                    contxt.pos_arg_it = get_next_positional_arg(contxt.pos_arg_it);
+                    continue;
+                }
+                else if (!prefix_err)
+                {
+                    pos_arg->add_value(cur_argv);
+                    insertd = true;
+                }
+                
+                break;
+            }
+            
+            insertd = true;
+            break;
+        }
+        
+        if (!insertd)
+        {
+            contxt.stte = parsing_dfa_state::PARSE_UNRECOGNIZED_ARG;
+            return;
+        }
+        
+        if (static_cast<base_arg_type*>(pos_arg) != contxt.prev_arg)
+        {
+            pos_arg->execute_action();
+            pos_arg->increase_occurrence();
+        }
+        
+        ++contxt.idx;
+        contxt.stte = parsing_dfa_state::READ_ARG;
+        contxt.prev_arg = pos_arg;
+    }
+    
+    /**
+     * @brief       Handles the DFA state for parsing unrecognized arguments.
+     * @param       contxt : Reference to the parsing DFA context containing the current state.
+     */
+    template<typename ArgcT_, typename ArgvT_>
+    void parse_unrecognized_args_state(parsing_dfa_context<ArgcT_, ArgvT_>& contxt)
+    {
+        if (unrecog_args_.size() < max_unrecog_args_)
+        {
+            unrecog_args_.emplace_back(contxt.argv[contxt.idx]);
+        }
+        
+        ++contxt.idx;
+        contxt.stte = parsing_dfa_state::READ_ARG;
+        contxt.prev_arg = nullptr;
+    }
+    
+    /**
+     * @brief       Handles the DFA state to terminate parsing.
+     * @param       contxt : Reference to the parsing DFA context containing the current state.
+     */
+    template<typename ArgcT_, typename ArgvT_>
+    void parse_quit_state(parsing_dfa_context<ArgcT_, ArgvT_>& contxt)
+    {
+        parsd_ = true;
+        update_error_flags();
+        trigger_prints();
+        contxt.stte = parsing_dfa_state::FINISH;
+    }
+    
+    /**
+     * @brief       Parses a key argument and processes its associated values.
+     * @param       contxt : Reference to the parsing DFA context containing the current state.
+     */
+    template<typename ArgcT_, typename ArgvT_>
+    void parse_key_arg(parsing_dfa_context<ArgcT_, ArgvT_>& contxt)
+    {
+        std::size_t pos_inc = 0;
+        
+        if (!contxt.ky_arg->increase_occurrence())
         {
             return;
         }
-        ky_arg->execute_action();
+        
+        contxt.ky_arg->execute_action();
 
-        if (ky_val_arg != nullptr)
+        if (auto* ky_val_arg = dynamic_cast<key_value_arg_type*>(contxt.ky_arg);
+            ky_val_arg != nullptr)
         {
-            for (*pos_increment = 1;
+            for (pos_inc = 1;
                  !ky_val_arg->max_values_reached() &&
-                         cur_idx + *pos_increment < argc &&
-                         string_can_be_value(ky_val_arg, argv[cur_idx + *pos_increment]);
-                 ++*pos_increment)
+                         contxt.idx + pos_inc < contxt.argc &&
+                         string_can_be_value(ky_val_arg, contxt.argv[contxt.idx + pos_inc]);
+                 ++pos_inc)
             {
                 if (ky_val_arg->min_values_reached())
                 {
-                    if (!ky_val_arg->try_add_value(argv[cur_idx + *pos_increment]))
+                    if (!ky_val_arg->try_add_value(contxt.argv[contxt.idx + pos_inc]))
                     {
                         break;
                     }
                 }
                 else
                 {
-                    ky_val_arg->add_value(argv[cur_idx + *pos_increment]);
+                    ky_val_arg->add_value(contxt.argv[contxt.idx + pos_inc]);
                 }
             }
 
-            --*pos_increment;
+            --pos_inc;
         }
         
-        ky_arg->parse_sub_arg_parser(argc, argv, cur_idx, pos_increment);
+        contxt.ky_arg->parse_sub_arg_parser(contxt.argc, contxt.argv, contxt.idx, pos_inc);
+        contxt.idx += pos_inc;
     }
 
     /**
@@ -1105,8 +1257,6 @@ private:
      */
     void reset_args_parse() noexcept
     {
-        value_arg_type* value_arg;
-        
         parsd_ = false;
         
         for (auto& bse_arg : bse_arg_list_)
@@ -1131,21 +1281,21 @@ private:
             if (bse_arg->has_errors() && !err_fnd)
             {
                 err_fnd = true;
-                err_flgs_.set(arg_parser_error_flags::ARGS_ERROR);
+                err_flgs_.set(detail::arg_parser_error_flags::ARGS_ERROR);
             }
         }
         if (!err_fnd)
         {
-            err_flgs_.unset(arg_parser_error_flags::ARGS_ERROR);
+            err_flgs_.unset(detail::arg_parser_error_flags::ARGS_ERROR);
         }
 
         if (!unrecog_args_.empty())
         {
-            err_flgs_.set(arg_parser_error_flags::UNRECOGNIZED_ARGS_ERROR);
+            err_flgs_.set(detail::arg_parser_error_flags::UNRECOGNIZED_ARGS_ERROR);
         }
         else
         {
-            err_flgs_.unset(arg_parser_error_flags::UNRECOGNIZED_ARGS_ERROR);
+            err_flgs_.unset(detail::arg_parser_error_flags::UNRECOGNIZED_ARGS_ERROR);
         }
 
         err_fnd = false;
@@ -1154,20 +1304,20 @@ private:
             if (constrnt.is_violed())
             {
                 err_fnd = true;
-                err_flgs_.set(arg_parser_error_flags::ARGS_CONSTRAINTS_ERROR);
+                err_flgs_.set(detail::arg_parser_error_flags::ARGS_CONSTRAINTS_ERROR);
                 break;
             }
         }
         if (!err_fnd)
         {
-            err_flgs_.unset(arg_parser_error_flags::ARGS_CONSTRAINTS_ERROR);
+            err_flgs_.unset(detail::arg_parser_error_flags::ARGS_CONSTRAINTS_ERROR);
         }
     }
 
     /**
      * @brief       Update the key arguments after the prifixes changed.
      */
-    void update_arg_keys_prefixes()
+    void update_key_args_prefixes()
     {
         key_arg_type* ky_arg;
 
@@ -1175,7 +1325,7 @@ private:
         {
             if ((ky_arg = dynamic_cast<key_arg_type*>(bse_arg.get())) != nullptr)
             {
-                ky_arg->update_prefixes_length();
+                ky_arg->update_prefixes();
             }
         }
     }
@@ -1185,7 +1335,7 @@ private:
      * @param       str : The string to check.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] bool arg_has_eq_operator(const string_type& str) const
+    [[nodiscard]] bool arg_has_eq_operator(string_view_type str) const
     {
         key_arg_type* ky_arg;
         std::size_t eq_pos;
@@ -1196,7 +1346,8 @@ private:
             if (eq_pos != string_type::npos)
             {
                 ky_arg = get_key_arg(str.substr(0, eq_pos));
-                return ky_arg != nullptr && ky_arg->is_flag_set(arg_flags::ASSIGNMENT_OPERATOR);
+                return ky_arg != nullptr &&
+                        ky_arg->is_flag_set(detail::arg_flags::ASSIGNMENT_OPERATOR);
             }
         }
 
@@ -1208,9 +1359,10 @@ private:
      * @param       ky : Argument key to check.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool arg_key_exists(const string_type& ky) const noexcept
+    template<typename StringT_>
+    [[nodiscard]] inline bool arg_key_exists(const StringT_& ky) const noexcept
     {
-        return bse_arg_map_.count(ky) > 0;
+        return bse_arg_map_.contains(ky);
     }
 
     /**
@@ -1218,9 +1370,9 @@ private:
      * @param       str : The string to check.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] bool chained_args_exists(const string_type& str) const
+    [[nodiscard]] bool args_are_chained(string_view_type str) const
     {
-        string_type ky_builder = get_key_prefix(str);
+        string_type ky_builder(get_key_prefix(str));
         key_arg_type* ky_arg = nullptr;
 
         ky_builder += ' ';
@@ -1228,7 +1380,7 @@ private:
         {
             ky_builder[ky_builder.size() - 1] = str[i];
             ky_arg = get_key_arg(ky_builder);
-            if (ky_arg == nullptr || !ky_arg->is_flag_set(arg_flags::GROUPING))
+            if (ky_arg == nullptr || !ky_arg->is_flag_set(detail::arg_flags::GROUPING))
             {
                 return false;
             }
@@ -1243,22 +1395,7 @@ private:
      */
     [[nodiscard]] inline bool colors_enabled() const noexcept
     {
-        return flgs_.is_set(arg_parser_flags::USE_COLORS);
-    }
-
-    /**
-     * @brief       Allows knowing whether a string can't be an argument value due to the
-     *              presece of a prefix while the value argument doesn't allow it.
-     * @param       val_arg : The value argument to consider for the checking.
-     * @param       str : The string to check.
-     * @return      If function was successful true is returned, otherwise false is returned.
-     */
-    [[nodiscard]] bool has_value_with_prefix_error(
-            value_arg_type* val_arg,
-            const string_type& str
-    ) const
-    {
-        return value_has_prefix(str) && !val_arg->is_flag_set(arg_flags::VALUES_WITH_PREFIX);
+        return flgs_.is_set(detail::arg_parser_flags::USE_COLORS);
     }
 
     /**
@@ -1275,7 +1412,7 @@ private:
      * @param       flg : Flag to check.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool is_error_flag_set(arg_parser_error_flags flg) const noexcept
+    [[nodiscard]] inline bool is_error_flag_set(detail::arg_parser_error_flags flg) const noexcept
     {
         return err_flgs_.is_set(flg);
     }
@@ -1285,7 +1422,7 @@ private:
      * @param       flg : Flag to check.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool is_flag_set(arg_parser_flags flg) const noexcept
+    [[nodiscard]] inline bool is_flag_set(detail::arg_parser_flags flg) const noexcept
     {
         return flgs_.is_set(flg);
     }
@@ -1295,7 +1432,7 @@ private:
      * @param       ky : String that contains the prefix
      * @return      If function was successful true is returned, if not false is returned.
      */
-    [[nodiscard]] bool is_key_prefix_long(const string_type& ky) const
+    [[nodiscard]] bool is_key_prefix_long(string_view_type ky) const
     {
         std::size_t long_prefx_len = 0;
         std::size_t short_prefx_len = 0;
@@ -1336,16 +1473,34 @@ private:
     }
 
     /**
+     * @brief       Allows knowing whether a string can't be an argument value due to the
+     *              presece of a prefix while the value argument doesn't allow it.
+     * @param       val_arg : The value argument to consider for the checking.
+     * @param       str : The string to check.
+     * @return      If function was successful true is returned, otherwise false is returned.
+     */
+    template<typename StringT_>
+    [[nodiscard]] bool is_value_prefix_invalid(
+            value_arg_type* val_arg,
+            const StringT_& str
+    ) const
+    {
+        return value_has_prefix(str) &&
+                !val_arg->is_flag_set(detail::arg_flags::VALUES_WITH_PREFIX);
+    }
+
+    /**
      * @brief       Allows knowing whether a string can be interpreted as an argument value.
      * @param       val_arg : The value argument that the value is currecntly related.
      * @param       str : The string to check.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] bool string_can_be_value(value_arg_type* val_arg, const string_type& str) const
+    template<typename StringT_>
+    [[nodiscard]] bool string_can_be_value(value_arg_type* val_arg, const StringT_& str) const
     {
-        return !has_value_with_prefix_error(val_arg, str) &&
-               (!arg_key_exists(str) || val_arg->is_flag_set(arg_flags::KEYS_AS_VALUES)) &&
-               !arg_has_eq_operator(str) && !chained_args_exists(str);
+        return !is_value_prefix_invalid(val_arg, str) &&
+               (!arg_key_exists(str) || val_arg->is_flag_set(detail::arg_flags::KEYS_AS_VALUES)) &&
+               !arg_has_eq_operator(str) && !args_are_chained(str);
     }
     
     /**
@@ -1353,7 +1508,7 @@ private:
      * @param       val : Value to check.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] bool value_has_prefix(const string_type& val) const
+    [[nodiscard]] bool value_has_prefix(string_view_type val) const
     {
         for (auto& long_prefx : long_prefxs_)
         {
@@ -1380,7 +1535,8 @@ private:
      * @return      If function was successful a reference to the argument found is returned,
      *              otherwise a null pointer is returned.
      */
-    [[nodiscard]] base_arg_type* get_base_arg(const string_type& ky) const noexcept
+    template<typename StringT_>
+    [[nodiscard]] base_arg_type* get_base_arg(const StringT_& ky) const noexcept
     {
         auto it = bse_arg_map_.find(ky);
         
@@ -1398,7 +1554,8 @@ private:
      * @return      If function was successful a reference to the argument found is returned, if not
      *              a null pointer is returned.
      */
-    [[nodiscard]] key_arg_type* get_key_arg(const string_type& ky) const noexcept
+    template<typename StringT_>
+    [[nodiscard]] key_arg_type* get_key_arg(const StringT_& ky) const noexcept
     {
         auto it = bse_arg_map_.find(ky);
         
@@ -1416,7 +1573,8 @@ private:
      * @return      If function was successful a reference to the argument found is returned, if not
      *              a null pointer is returned.
      */
-    [[nodiscard]] value_arg_type* get_value_arg(const string_type& ky) const noexcept
+    template<typename StringT_>
+    [[nodiscard]] value_arg_type* get_value_arg(const StringT_& ky) const noexcept
     {
         auto it = bse_arg_map_.find(ky);
         
@@ -1434,7 +1592,8 @@ private:
      * @return      If function was successful a reference to the argument found is returned, if not
      *              a null pointer is returned.
      */
-    [[nodiscard]] key_value_arg_type* get_key_value_arg(const string_type& ky) const noexcept
+    template<typename StringT_>
+    [[nodiscard]] key_value_arg_type* get_key_value_arg(const StringT_& ky) const noexcept
     {
         auto it = bse_arg_map_.find(ky);
         
@@ -1452,9 +1611,8 @@ private:
      * @return      If function was successful a reference to the argument found is returned, if not
      *              a null pointer is returned.
      */
-    [[nodiscard]] positional_arg_type* get_positional_arg(
-            const string_type& ky
-    ) const noexcept
+    template<typename StringT_>
+    [[nodiscard]] positional_arg_type* get_positional_arg(const StringT_& ky) const noexcept
     {
         auto it = bse_arg_map_.find(ky);
         
@@ -1472,7 +1630,8 @@ private:
      * @return      If function was successful a reference to the argument found is returned, if not
      *              a null pointer is returned.
      */
-    [[nodiscard]] help_arg_type* get_help_arg(const string_type& ky) const noexcept
+    template<typename StringT_>
+    [[nodiscard]] help_arg_type* get_help_arg(const StringT_& ky) const noexcept
     {
         auto it = bse_arg_map_.find(ky);
         
@@ -1498,18 +1657,20 @@ private:
      * @param       hlp_menu_id : ID of the help menu to get.
      * @return      The help menu related witht he specified ID.
      */
-    template<typename TpString_ = string_type>
-    [[nodiscard]] help_menu_type& get_help_menu(TpString_&& hlp_menu_id = string_type()) noexcept
+    template<typename StringT_ = string_type>
+    [[nodiscard]] help_menu_type& get_help_menu(StringT_&& hlp_menu_id = string_type()) noexcept
     {
         auto it = hlp_menu_map_.find(hlp_menu_id);
         
         if (it == hlp_menu_map_.end())
         {
-            it = hlp_menu_map_.emplace(std::forward<TpString_>(hlp_menu_id),
-                    help_menu_type(this)).first;
+            it = hlp_menu_map_.emplace(
+                    std::forward<StringT_>(hlp_menu_id),
+                    memory::allocate_unique<help_menu_type>(
+                            allocator_type<help_menu_type>(), this)).first;
         }
 
-        return it->second;
+        return *(it->second);
     }
     
     /**
@@ -1525,7 +1686,7 @@ private:
     ) const noexcept
     {
         while (it != bse_arg_list_.end() &&
-                dynamic_cast<positional_arg_type*>(it->get()) == nullptr)
+               dynamic_cast<positional_arg_type*>(it->get()) == nullptr)
         {
             ++it;
         }
@@ -1539,49 +1700,36 @@ private:
      * @return      If function was successful the prefix is returned, if not an empty string is
      *              returned.
      */
-    [[nodiscard]] string_type get_key_prefix(const string_type& ky) const
+    [[nodiscard]] string_view_type get_key_prefix(string_view_type ky) const
     {
-        auto long_prefx_it = long_prefxs_.begin();
-        auto short_prefx_it = short_prefxs_.begin();
         auto res_long_prefx_it = long_prefxs_.end();
         auto res_short_prefx_it = short_prefxs_.end();
-        std::size_t cur_len;
         
-        for (; long_prefx_it != long_prefxs_.end(); ++long_prefx_it)
+        auto find_prefix = [&](const auto& prefixs, auto& res_it)
         {
-            cur_len = long_prefx_it->length();
-            if (ky.compare(0, cur_len, *long_prefx_it) == 0)
+            for (auto prefx_it = prefixs.begin(); prefx_it != prefixs.end(); ++prefx_it)
             {
-                if (res_long_prefx_it == long_prefxs_.end() ||
-                        res_long_prefx_it->length() < cur_len)
+                std::size_t prefx_len = prefx_it->length();
+                if (ky.compare(0, prefx_len, *prefx_it) == 0 &&
+                    (res_it == prefixs.end() || res_it->length() < prefx_len))
                 {
-                    res_long_prefx_it = long_prefx_it;
+                    res_it = prefx_it;
                 }
             }
-        }
+        };
         
-        for (; short_prefx_it != short_prefxs_.end(); ++short_prefx_it)
-        {
-            cur_len = short_prefx_it->length();
-            if (ky.compare(0, cur_len, *short_prefx_it) == 0)
-            {
-                if (res_short_prefx_it == short_prefxs_.end() ||
-                        res_short_prefx_it->length() < cur_len)
-                {
-                    res_short_prefx_it = short_prefx_it;
-                }
-            }
-        }
+        find_prefix(long_prefxs_, res_long_prefx_it);
+        find_prefix(short_prefxs_, res_short_prefx_it);
         
         if (res_long_prefx_it != long_prefxs_.end() && res_short_prefx_it != short_prefxs_.end())
         {
-            return (res_long_prefx_it->length() >= res_short_prefx_it->length()) ?
-                   *res_long_prefx_it : *res_short_prefx_it;
+            return res_long_prefx_it->length() >= res_short_prefx_it->length() ?
+                    *res_long_prefx_it : *res_short_prefx_it;
         }
         
         return res_long_prefx_it != long_prefxs_.end() ? *res_long_prefx_it :
-               res_short_prefx_it != short_prefxs_.end() ? *res_short_prefx_it :
-               string_type();
+                res_short_prefx_it != short_prefxs_.end() ? *res_short_prefx_it :
+                string_view_type();
     }
     
     /**
@@ -1606,7 +1754,7 @@ private:
      * @brief       Get the number of arguments that are options.
      * @return      The number of arguments that are options.
      */
-    [[nodiscard]] inline std::size_t get_nr_options() const noexcept
+    [[nodiscard]] inline std::size_t get_options_count() const noexcept
     {
         key_arg_type* ky_arg;
         std::size_t nr_options_bldr = 0;
@@ -1615,19 +1763,16 @@ private:
         for (auto& bse_arg : bse_arg_list_)
         {
             ky_arg = dynamic_cast<key_arg_type*>(bse_arg.get());
-            if (ky_arg != nullptr)
+            if (ky_arg != nullptr && ky_arg->is_option())
             {
-                if (ky_arg->is_option())
+                if (!ky_arg->is_flag_set(detail::arg_flags::TERMINAL) &&
+                    !ky_arg->is_flag_set(detail::arg_flags::PKILL_AFTER_TRIGGERING))
                 {
-                    if (!ky_arg->is_flag_set(arg_flags::TERMINAL) &&
-                        !ky_arg->is_flag_set(arg_flags::PKILL_AFTER_TRIGGERING))
-                    {
-                        speed::safety::try_addm(&nr_options_bldr, 1);
-                    }
-                    else
-                    {
-                        speed::safety::try_addm(&nr_term_not_always_requird, 1);
-                    }
+                    safety::try_addm(nr_options_bldr, 1);
+                }
+                else
+                {
+                    safety::try_addm(nr_term_not_always_requird, 1);
                 }
             }
         }
@@ -1648,17 +1793,17 @@ private:
      * @brief       Set the error id used by the parser for generic errors.
      * @param       err_id : Error id used by the parser for generic errors.
      */
-    template<typename TpString_>
-    inline void set_error_id(TpString_&& err_id) noexcept
+    template<typename StringT_>
+    inline void set_error_id(StringT_&& err_id) noexcept
     {
-        err_id_ = std::forward<TpString_>(err_id);
+        err_id_ = std::forward<StringT_>(err_id);
     }
 
     /**
      * @brief       Set an argument parser flag.
      * @param       flg : Flag to set.
      */
-    inline void set_flag(arg_parser_flags flg) noexcept
+    inline void set_flag(detail::arg_parser_flags flg) noexcept
     {
         flgs_.set(flg);
     }
@@ -1667,12 +1812,12 @@ private:
      * @brief       Set the long prefixes.
      * @param       prefxs : The long prefixes.
      */
-    template<typename... Ts_>
-    void set_long_prefixes(Ts_&&... prefxs)
+    template<typename... StringTs_>
+    void set_long_prefixes(StringTs_&&... prefxs)
     {
         long_prefxs_.clear();
-        (long_prefxs_.emplace(prefxs), ...);
-        update_arg_keys_prefixes();
+        (long_prefxs_.emplace(std::forward<StringTs_>(prefxs)), ...);
+        update_key_args_prefixes();
     }
 
     /**
@@ -1688,29 +1833,29 @@ private:
      * @brief       Set the short prefixes.
      * @param       prefxs : The short prefixes.
      */
-    template<typename... Ts_>
-    void set_short_prefixes(Ts_&&... prefxs)
+    template<typename... StringTs_>
+    void set_short_prefixes(StringTs_&&... prefxs)
     {
         short_prefxs_.clear();
-        (short_prefxs_.emplace(prefxs), ...);
-        update_arg_keys_prefixes();
+        (short_prefxs_.emplace(std::forward<StringTs_>(prefxs)), ...);
+        update_key_args_prefixes();
     }
 
     /**
      * @brief       Set the program name.
      * @param       prog_name : The program name.
      */
-    template<typename TpString_>
-    inline void set_program_name(TpString_&& prog_name)
+    template<typename StringT_>
+    inline void set_program_name(StringT_&& prog_name)
     {
-        prog_name_ = std::forward<TpString_>(prog_name);
+        prog_name_ = std::forward<StringT_>(prog_name);
     }
 
     /**
      * @brief       Unset an argument parser flag.
      * @param       flg : Flag to unset.
      */
-    inline void unset_flag(arg_parser_flags flg) noexcept
+    inline void unset_flag(detail::arg_parser_flags flg) noexcept
     {
         flgs_.unset(flg);
     }
@@ -1720,7 +1865,7 @@ private:
      */
     void print_usage()
     {
-        std::size_t nr_options = get_nr_options();
+        std::size_t nr_options = get_options_count();
 
         std::cout << "Usage: ";
 
@@ -1820,10 +1965,10 @@ private:
             hlp_arg = dynamic_cast<help_arg_type*>(bse_arg.get());
             if (hlp_arg != nullptr &&
                 hlp_arg->was_found() &&
-                hlp_arg->is_flag_set(arg_flags::TRIGGER_HELP_PRINTING))
+                hlp_arg->is_flag_set(detail::arg_flags::TRIGGER_HELP_PRINTING))
             {
-                print_help(hlp_arg->get_help_menu_id_assigned());
-                if (hlp_arg->is_flag_set(arg_flags::PKILL_AFTER_TRIGGERING))
+                hlp_arg->print_help_menu_assigned();
+                if (hlp_arg->is_flag_set(detail::arg_flags::PKILL_AFTER_TRIGGERING))
                 {
                     exit_program(0);
                 }
@@ -1832,34 +1977,39 @@ private:
 
         if (current_vers_arg_ != nullptr &&
             current_vers_arg_->was_found() &&
-                current_vers_arg_->is_flag_set(arg_flags::TRIGGER_VERSION_PRINTING))
+            current_vers_arg_->is_flag_set(detail::arg_flags::TRIGGER_VERSION_PRINTING))
         {
             print_version();
-            if (current_vers_arg_->is_flag_set(arg_flags::PKILL_AFTER_TRIGGERING))
+            if (current_vers_arg_->is_flag_set(detail::arg_flags::PKILL_AFTER_TRIGGERING))
             {
                 exit_program(0);
             }
+        }
+        
+        if (flgs_.is_set(detail::arg_parser_flags::PRINT_ERRORS))
+        {
+            print_errors();
         }
     }
 
 private:
     /** Map allowing access to a base argument from one of its keys. */
-    unordered_map_type<string_type, base_arg_type*> bse_arg_map_;
+    unordered_map_type<string_view_type, base_arg_type*> bse_arg_map_;
 
     /** Map allowing access to a help menu from its key. */
-    unordered_map_type<string_type, help_menu_type> hlp_menu_map_;
+    unordered_map_type<string_type, unique_ptr_type<help_menu_type>> hlp_menu_map_;
 
     /** Contains the short prefixes for arguments. */
-    unordered_set_type<string_type> short_prefxs_;
+    unordered_set_type<string_type> short_prefxs_ = {"-"};
 
     /** Contains the long prefixes for arguments. */
-    unordered_set_type<string_type> long_prefxs_;
+    unordered_set_type<string_type> long_prefxs_ = {"--"};
 
     /** Contains the program name. */
     string_type prog_name_;
 
     /** Error id that will be used for global errors. */
-    string_type err_id_;
+    string_type err_id_ = "error";
 
     /** Contains all the arguments. */
     vector_type<unique_ptr_type<base_arg_type>> bse_arg_list_;
@@ -1871,35 +2021,35 @@ private:
     list_type<arg_constraint_type> constrnts_;
 
     /** Reference to the first added help argument. */
-    help_arg_type* default_hlp_arg_;
+    help_arg_type* default_hlp_arg_ = nullptr;
 
     /** Contains the current version argument. */
-    version_arg_type* current_vers_arg_;
+    version_arg_type* current_vers_arg_ = nullptr;
     
     /** Contains the maximum number of unrecognized args to be catched. */
-    std::size_t max_unrecog_args_;
+    std::size_t max_unrecog_args_ = 1;
     
     /** Flags that dictates the argument parser behavior. */
-    flags_type<arg_parser_flags> flgs_;
+    flags_type<detail::arg_parser_flags> flgs_ = detail::arg_parser_flags::DEFAULT_ARG_PARSER_FLAGS;
     
     /** Argument parser error flags. */
-    flags_type<arg_parser_error_flags> err_flgs_;
+    flags_type<detail::arg_parser_error_flags> err_flgs_ = detail::arg_parser_error_flags::NIL;
 
     /** Indicates whether the parsing has been done. */
-    bool parsd_;
+    bool parsd_ = false;
     
-    friend class basic_arg_key<TpAllocator>;
-    friend class basic_arg_value<TpAllocator>;
-    friend class basic_base_arg<TpAllocator>;
-    friend class basic_key_arg<TpAllocator>;
-    friend class basic_value_arg<TpAllocator>;
-    friend class basic_key_value_arg<TpAllocator>;
-    friend class basic_positional_arg<TpAllocator>;
-    friend class basic_help_arg<TpAllocator>;
-    friend class basic_version_arg<TpAllocator>;
-    friend class basic_arg_constraint<TpAllocator>;
-    friend class basic_help_menu<TpAllocator>;
-    friend class basic_arg_parser_setter<TpAllocator>;
+    friend class detail::basic_arg_key<AllocatorT>;
+    friend class detail::basic_arg_value<AllocatorT>;
+    friend class detail::basic_base_arg<AllocatorT>;
+    friend class detail::basic_key_arg<AllocatorT>;
+    friend class detail::basic_value_arg<AllocatorT>;
+    friend class detail::basic_key_value_arg<AllocatorT>;
+    friend class detail::basic_positional_arg<AllocatorT>;
+    friend class detail::basic_help_arg<AllocatorT>;
+    friend class detail::basic_version_arg<AllocatorT>;
+    friend class detail::basic_arg_constraint<AllocatorT>;
+    friend class detail::basic_help_menu<AllocatorT>;
+    friend class detail::basic_arg_parser_setter<AllocatorT>;
 };
 
 /** Class used to parse arguments. */

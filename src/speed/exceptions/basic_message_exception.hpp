@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -36,29 +36,36 @@ namespace speed::exceptions {
 /**
  * @brief       Base for any speed exception class that needs to have a customizable message.
  */
-template<typename TpAllocator>
+template<typename CharT, typename CharTraitsT, typename AllocatorT>
 class basic_message_exception : public exception_base
 {
 public:
+    /** The character tupe. */
+    using char_type = CharT;
+    
+    /** The character traits type. */
+    using char_traits_type = CharTraitsT;
+    
     /** Allocator type used in the class. */
     template<typename T>
-    using allocator_type = typename std::allocator_traits<TpAllocator>::template rebind_alloc<T>;
+    using allocator_type = typename std::allocator_traits<AllocatorT>::template rebind_alloc<T>;
 
     /** String type used in the class. */
-    using string_type = std::basic_string<char, std::char_traits<char>, allocator_type<char>>;
+    using string_type = std::basic_string<CharT, std::char_traits<CharTraitsT>,
+            allocator_type<CharT>>;
 
     /**
      * @brief       Constructor with parameters.
      * @param       mess : Message to return by the exception object.
      */
     template<
-            typename TpString_,
+            typename StringT_,
             typename = std::enable_if_t<
-                    !std::is_base_of<basic_message_exception, std::decay_t<TpString_>>::value
+                    !std::is_base_of<basic_message_exception, std::decay_t<StringT_>>::value
             >
     >
-    explicit inline basic_message_exception(TpString_&& mess) noexcept
-            : mess_(std::forward<TpString_>(mess))
+    explicit inline basic_message_exception(StringT_&& mess) noexcept
+            : mess_(std::forward<StringT_>(mess))
     {
     }
     
@@ -97,7 +104,7 @@ public:
      * @brief       Get the message of the exception.
      * @return      The exception message.
      */
-    [[nodiscard]] inline const char* what() const noexcept override
+    [[nodiscard]] inline const char_type* what() const noexcept override
     {
         return mess_.c_str();
     }
@@ -108,7 +115,8 @@ protected:
 };
 
 /** Class used to parse arguments. */
-using message_exception = basic_message_exception<std::allocator<char>>;
+using message_exception = basic_message_exception<char, std::char_traits<char>,
+        std::allocator<char>>;
 
 }
 

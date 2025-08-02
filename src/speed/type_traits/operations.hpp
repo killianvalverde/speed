@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -27,121 +27,102 @@
 #ifndef SPEED_TYPE_TRAITS_OPERATIONS_HPP
 #define SPEED_TYPE_TRAITS_OPERATIONS_HPP
 
+#include <string>
+#include <string_view>
 #include <type_traits>
+
+#include "detail/forward_declarations.hpp"
+#include "detail/operations.hpp"
 
 namespace speed::type_traits {
 
-/** @cond */
-namespace detail {
-template<typename...>
-struct logical_or;
-
-template<>
-struct logical_or<> : public std::false_type {};
-
-template<typename Tp>
-struct logical_or<Tp> : public Tp {};
-
-template<typename Tp1, typename Tp2>
-struct logical_or<Tp1, Tp2> : public std::conditional<Tp1::value, Tp1, Tp2>::type {};
-
-template<typename Tp1, typename Tp2, typename Tp3, typename... TpN>
-struct logical_or<Tp1, Tp2, Tp3, TpN...>
-        : public std::conditional<Tp1::value, Tp1, logical_or<Tp2, Tp3, TpN...>>::type {};
-
-template<typename...>
-struct logical_and;
-
-template<>
-struct logical_and<> : public std::true_type {};
-
-template<typename Tp>
-struct logical_and<Tp> : public Tp {};
-
-template<typename Tp1, typename Tp2>
-struct logical_and<Tp1, Tp2> : public std::conditional<Tp1::value, Tp2, Tp1>::type {};
-
-template<typename Tp1, typename Tp2, typename Tp3, typename... TpN>
-struct logical_and<Tp1, Tp2, Tp3, TpN...>
-        : public std::conditional<Tp1::value, logical_and<Tp2, Tp3, TpN...>, Tp1>::type {};
-
-template<typename>
-struct is_character_helper : public std::false_type {};
-
-template<>
-struct is_character_helper<char> : public std::true_type {};
-
-template<>
-struct is_character_helper<signed char> : public std::true_type {};
-
-template<>
-struct is_character_helper<unsigned char> : public std::true_type {};
-
-template<>
-struct is_character_helper<wchar_t> : public std::true_type {};
-
-template<>
-struct is_character_helper<char8_t> : std::true_type {};
-
-template<>
-struct is_character_helper<char16_t> : public std::true_type {};
-
-template<>
-struct is_character_helper<char32_t> : public std::true_type {};
-
-template<typename T, bool IsEnum>
-struct try_underlying_type_helper
-{
-    using type = T;
-};
-
+/**
+ * @brief       Type trait to deduce the allocator type used by a given type.
+ */
 template<typename T>
-struct try_underlying_type_helper<T, true>
+struct allocator_of
 {
-    using type = std::underlying_type_t<T>;
+    /** The allocator type associated with `T`. */
+    using type = typename detail::allocator_of_helper<std::decay_t<T>>::type;
 };
-}
-/** @endcond */
+
+/**
+ * @brief       Helper alias to extract the allocator type of a given type.
+ */
+template<typename T>
+using allocator_of_t = typename allocator_of<T>::type;
 
 /**
  * @brief       Alias that simplifies to inherit from the base class in the context of a CRTP
  *              pattern.
  */
 template<
-        template<typename...> class TpBase,
-        template<typename...> class TpDerived,
-        typename TpActual,
-        typename TpCondition,
-        typename... Ts
+        template<typename...> class BaseT,
+        template<typename...> class DerivedT,
+        typename ActualT,
+        typename ConditionT,
+        typename... ParameterTs
 >
 using basic_crtp_base = typename std::conditional<
-        std::is_same_v<TpActual, TpCondition>,
-        TpBase<Ts..., TpDerived<Ts..., TpActual>>,
-        TpBase<Ts..., TpActual>
+        std::is_same_v<ActualT, ConditionT>,
+        BaseT<ParameterTs..., DerivedT<ParameterTs..., ActualT>>,
+        BaseT<ParameterTs..., ActualT>
 >::type;
 
 /**
  * @brief       Alias that simplifies getting access to the self type in a CRTP context.
  */
 template<
-        template<typename...> class TpSelf,
-        typename TpActual,
-        typename TpCondition,
-        typename... Ts
+        template<typename...> class SelfT,
+        typename ActualT,
+        typename ConditionT,
+        typename... ParameterTs
 >
 using basic_crtp_self = typename std::conditional<
-        std::is_same_v<TpActual, TpCondition>,
-        TpSelf<Ts...>,
-        TpActual
+        std::is_same_v<ActualT, ConditionT>,
+        SelfT<ParameterTs...>,
+        ActualT
 >::type;
 
 /**
+ * @brief       Trait class that try to obtains the character traits of any kind of String.
+ */
+template<typename T>
+struct character_traits_of
+{
+    /** The character traits type associated with `T`. */
+    using type = typename detail::character_traits_of_helper<std::decay_t<T>>::type;
+};
+
+/**
+ * @brief       Trait class that try to obtains the character traits of any kind of String.
+ */
+template<typename T>
+using character_traits_of_t = typename character_traits_of<T>::type;
+
+/**
+ * @brief       Trait class that try to obtains the character type of any kind of String.
+ */
+template<typename T>
+struct character_type_of
+{
+    /** The character type associated with `T`. */
+    using type = typename detail::character_type_of_helper<std::decay_t<T>>::type;
+};
+
+/**
+ * @brief       Trait class that try to obtains the character type of any kind of String.
+ */
+template<typename T>
+using character_type_of_t = typename character_type_of<T>::type;
+
+/**
  * @brief       Trait class that identifies whether T is a character type.
  */
-template<typename Tp>
+template<typename T>
 struct is_character
         : public detail::is_character_helper<
-                typename std::remove_cv_t<Tp>
+                typename std::remove_cv_t<T>
           >::type
 {
 };
@@ -149,17 +130,17 @@ struct is_character
 /**
  * @brief       Trait class that identifies whether T is a character type.
  */
-template<typename Tp>
-inline constexpr bool is_character_v = is_character<Tp>::value;
+template<typename T>
+inline constexpr bool is_character_v = is_character<T>::value;
 
 /**
  * @brief       Trait class that identifies whether T is a character pointer type.
  */
-template<typename Tp>
+template<typename T>
 struct is_character_pointer
         : public detail::logical_and<
-                std::is_pointer<Tp>,
-                is_character<typename std::remove_pointer<Tp>::type>
+                std::is_pointer<T>,
+                is_character<typename std::remove_pointer<T>::type>
           >::type
 {
 };
@@ -167,18 +148,18 @@ struct is_character_pointer
 /**
  * @brief       Trait class that identifies whether T is a character pointer type.
  */
-template<typename Tp>
-inline constexpr bool is_character_pointer_v = is_character_pointer<Tp>::value;
+template<typename T>
+inline constexpr bool is_character_pointer_v = is_character_pointer<T>::value;
 
 /**
  * @brief       Trait class that identifies whether T is a character that can be used in standard io
  *              operations.
  */
-template<typename Tp>
+template<typename T>
 struct is_stdio_character
         : public detail::logical_or<
-                std::is_same<std::remove_cv_t<Tp>, char>,
-                std::is_same<std::remove_cv_t<Tp>, wchar_t>
+                std::is_same<std::remove_cv_t<T>, char>,
+                std::is_same<std::remove_cv_t<T>, wchar_t>
           >::type
 {
 };
@@ -187,23 +168,40 @@ struct is_stdio_character
  * @brief       Trait class that identifies whether T is a character that can be used in standard io
  *              operations.
  */
-template<typename Tp>
-inline constexpr bool is_stdio_character_v = is_stdio_character<Tp>::value;
+template<typename T>
+inline constexpr bool is_stdio_character_v = is_stdio_character<T>::value;
+
+/**
+ * @brief       Trait class that try to obtains the string_view that will suit the given type.
+ */
+template<typename T>
+struct string_view_of
+{
+    /** The string view type associated with `T`. */
+    using type = std::basic_string_view<character_type_of_t<T>, character_traits_of_t<T>>;
+};
+
+/**
+ * @brief       Trait class that try to obtains the string_view that will suit the given type.
+ */
+template<typename T>
+using string_view_of_t = typename string_view_of<T>::type;
 
 /**
  * @brief       Trait class that try to obtains the underlying type of enum type T.
  */
-template<typename Tp>
-struct try_underlying_type
+template<typename T>
+struct underlying_type_of
 {
-    using type = typename detail::try_underlying_type_helper<Tp, std::is_enum_v<Tp>>::type;
+    /** The underlying type associated with `T`. */
+    using type = typename detail::underlying_type_of_helper<T, std::is_enum_v<T>>::type;
 };
 
 /**
  * @brief       Trait class that try to obtains the underlying type of enum type T.
  */
-template<typename TpEnum>
-using try_underlying_type_t = typename try_underlying_type<TpEnum>::type;
+template<typename EnumT>
+using underlying_type_of_t = typename underlying_type_of<EnumT>::type;
 
 }
 

@@ -8,48 +8,46 @@ set(SPEED_ALGORITHM_SOURCE_FILES
 )
 
 set(SPEED_ARGPARSE_SOURCE_FILES
-        argparse/arg_constraint_flags.hpp
-        argparse/arg_error_flags.hpp
-        argparse/arg_flags.hpp
-        argparse/arg_parser_error_flags.hpp
-        argparse/arg_parser_flags.hpp
-        argparse/arg_value_error_flags.hpp
+        argparse/detail/arg_constraint_flags.hpp
+        argparse/detail/arg_error_flags.hpp
+        argparse/detail/arg_flags.hpp
+        argparse/detail/arg_parser_error_flags.hpp
+        argparse/detail/arg_parser_flags.hpp
+        argparse/detail/arg_value_error_flags.hpp
+        argparse/detail/basic_arg_constraint.hpp
+        argparse/detail/basic_arg_constraint_setter.hpp
+        argparse/detail/basic_arg_key.hpp
+        argparse/detail/basic_arg_parser_setter.hpp
+        argparse/detail/basic_arg_value.hpp
+        argparse/detail/basic_base_arg.hpp
+        argparse/detail/basic_base_arg_setter.hpp
+        argparse/detail/basic_help_arg.hpp
+        argparse/detail/basic_help_arg_setter.hpp
+        argparse/detail/basic_help_menu.hpp
+        argparse/detail/basic_help_menu_setter.hpp
+        argparse/detail/basic_key_arg.hpp
+        argparse/detail/basic_key_arg_setter.hpp
+        argparse/detail/basic_key_value_arg.hpp
+        argparse/detail/basic_key_value_arg_setter.hpp
+        argparse/detail/basic_positional_arg.hpp
+        argparse/detail/basic_positional_arg_setter.hpp
+        argparse/detail/basic_type_caster.hpp
+        argparse/detail/basic_value_arg.hpp
+        argparse/detail/basic_value_arg_setter.hpp
+        argparse/detail/basic_version_arg.hpp
+        argparse/detail/basic_version_arg_setter.hpp
+        argparse/detail/forward_declarations.hpp
+        argparse/detail/help_menu_flags.hpp
+        argparse/detail/type_traits.hpp
         argparse/argparse.cpp
         argparse/argparse.hpp
-        argparse/basic_arg_constraint.hpp
-        argparse/basic_arg_constraint_setter.hpp
-        argparse/basic_arg_key.hpp
         argparse/basic_arg_parser.hpp
-        argparse/basic_arg_parser_setter.hpp
-        argparse/basic_arg_value.hpp
-        argparse/basic_base_arg.hpp
-        argparse/basic_base_arg_setter.hpp
-        argparse/basic_help_arg.hpp
-        argparse/basic_help_arg_setter.hpp
-        argparse/basic_help_menu.hpp
-        argparse/basic_help_menu_setter.hpp
-        argparse/basic_key_arg.hpp
-        argparse/basic_key_arg_setter.hpp
-        argparse/basic_key_value_arg.hpp
-        argparse/basic_key_value_arg_setter.hpp
-        argparse/basic_positional_arg.hpp
-        argparse/basic_positional_arg_setter.hpp
-        argparse/basic_type_caster.hpp
-        argparse/basic_value_arg.hpp
-        argparse/basic_value_arg_setter.hpp
-        argparse/basic_version_arg.hpp
-        argparse/basic_version_arg_setter.hpp
         argparse/exception.hpp
-        argparse/forward_declarations.hpp
-        argparse/help_menu_flags.hpp
-        argparse/type_traits.hpp
 )
 
 set(SPEED_CONTAINERS_SOURCE_FILES
-        containers/linked_list.hpp
         containers/containers.cpp
         containers/containers.hpp
-        containers/doubly_linked_node.hpp
         containers/exception.hpp
         containers/flags.hpp
         containers/iterator_base.hpp
@@ -76,11 +74,11 @@ set(SPEED_EXCEPTIONS_SOURCE_FILES
 )
 
 set(SPEED_FILESYSTEM_SOURCE_FILES
+        filesystem/detail/forward_declarations.hpp
         filesystem/directory_iteration.cpp
         filesystem/directory_iteration.hpp
         filesystem/filesystem.cpp
         filesystem/filesystem.hpp
-        filesystem/forward_declarations.hpp
         filesystem/operations.hpp
         filesystem/valid_path.hpp
 )
@@ -96,7 +94,6 @@ set(SPEED_IOSTREAM_SOURCE_FILES
 )
 
 set(SPEED_LOWLEVEL_SOURCE_FILES
-        lowlevel/enable_bitwise_operators.hpp
         lowlevel/lowlevel.cpp
         lowlevel/lowlevel.hpp
         lowlevel/operations.hpp
@@ -122,29 +119,30 @@ set(SPEED_SAFETY_SOURCE_FILES
 )
 
 set(SPEED_SCALARS_SOURCE_FILES
+        scalars/is_flag_enum.hpp
         scalars/operations.hpp
-        scalars/scalar.hpp
         scalars/scalars.cpp
         scalars/scalars.hpp
 )
 
 set(SPEED_STRINGUTILS_SOURCE_FILES
-        stringutils/concepts.hpp
-        stringutils/forward_declarations.hpp
+        stringutils/detail/forward_declarations.hpp
         stringutils/operations.hpp
         stringutils/stringutils.cpp
         stringutils/stringutils.hpp
 )
 
 set(SPEED_SYSTEM_SOURCE_FILES
+        system/codecs/codecs.hpp
+        system/codecs/operations.hpp
         system/detail/detail.hpp
         system/detail/glibc/codecs/codecs.hpp
         system/detail/glibc/codecs/operations.cpp
         system/detail/glibc/codecs/operations.hpp
-        system/detail/glibc/filesystem/basic_directory_entity_extension.hpp
         system/detail/glibc/filesystem/filesystem.hpp
         system/detail/glibc/filesystem/operations.cpp
         system/detail/glibc/filesystem/operations.hpp
+        system/detail/glibc/filesystem/types.hpp
         system/detail/glibc/glibc.hpp
         system/detail/glibc/process/operations.cpp
         system/detail/glibc/process/operations.hpp
@@ -158,10 +156,10 @@ set(SPEED_SYSTEM_SOURCE_FILES
         system/detail/winapi/codecs/codecs.hpp
         system/detail/winapi/codecs/operations.cpp
         system/detail/winapi/codecs/operations.hpp
-        system/detail/winapi/filesystem/basic_directory_entity_extension.hpp
         system/detail/winapi/filesystem/filesystem.hpp
         system/detail/winapi/filesystem/operations.cpp
         system/detail/winapi/filesystem/operations.hpp
+        system/detail/winapi/filesystem/types.hpp
         system/detail/winapi/process/operations.cpp
         system/detail/winapi/process/operations.hpp
         system/detail/winapi/process/process.hpp
@@ -172,22 +170,20 @@ set(SPEED_SYSTEM_SOURCE_FILES
         system/detail/winapi/time/operations.hpp
         system/detail/winapi/time/time.hpp
         system/detail/winapi/winapi.hpp
-        system/codecs/codecs.hpp
-        system/codecs/operations.hpp
-        system/compatibility/compatibility.hpp
-        system/compatibility/crossplatform_unicode_main.hpp
-        system/compatibility/platform.hpp
-        system/compatibility/select_api.hpp
         system/errors/errors.hpp
         system/errors/operations.hpp
         system/exceptions/exception.hpp
         system/exceptions/exceptions.hpp
         system/filesystem/access_modes.hpp
-        system/filesystem/basic_directory_entity.hpp
+        system/filesystem/directory_entity.hpp
         system/filesystem/file_types.hpp
         system/filesystem/filesystem.hpp
         system/filesystem/operations.hpp
         system/filesystem/types.hpp
+        system/platform/compatibility.hpp
+        system/platform/crossplatform_unicode_main.hpp
+        system/platform/platform.hpp
+        system/platform/select_api.hpp
         system/process/operations.hpp
         system/process/process.hpp
         system/process/types.hpp
@@ -214,12 +210,10 @@ set(SPEED_TIME_SOURCE_FILES
 )
 
 set(SPEED_TYPE_CASTING_SOURCE_FILES
+        type_casting/detail/forward_declarations.hpp
         type_casting/error_category.cpp
         type_casting/error_category.hpp
-        type_casting/error_codes.hpp
-        type_casting/error_conditions.hpp
         type_casting/exception.hpp
-        type_casting/forward_declarations.hpp
         type_casting/try_type_cast.hpp
         type_casting/type_cast.hpp
         type_casting/type_casting.cpp
@@ -227,6 +221,8 @@ set(SPEED_TYPE_CASTING_SOURCE_FILES
 )
 
 set(SPEED_TYPE_TRAITS_SOURCE_FILES
+        type_traits/detail/forward_declarations.hpp
+        type_traits/detail/operations.hpp
         type_traits/operations.hpp
         type_traits/type_traits.cpp
         type_traits/type_traits.hpp
@@ -253,7 +249,6 @@ set(SPEED_SOURCE_FILES
         ${SPEED_TYPE_TRAITS_SOURCE_FILES}
         speed.hpp
         version.hpp
-        argparse/type_traits.hpp
 )
 
 add_library(speed_algorithm STATIC ${SPEED_ALGORITHM_SOURCE_FILES})

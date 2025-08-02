@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -27,7 +27,6 @@
 #ifndef SPEED_LOWLEVEL_LOWLEVEL_HPP
 #define SPEED_LOWLEVEL_LOWLEVEL_HPP
 
-#include "enable_bitwise_operators.hpp"
 #include "operations.hpp"
 
 namespace speed {

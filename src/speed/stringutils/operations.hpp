@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -30,13 +30,13 @@
 #include <algorithm>
 #include <array>
 #include <cwctype>
+#include <locale>
 #include <string>
 #include <type_traits>
 #include <vector>
 
-#include "forward_declarations.hpp"
+#include "detail/forward_declarations.hpp"
 #include "../type_traits/type_traits.hpp"
-#include "concepts.hpp"
 
 namespace speed::stringutils {
 
@@ -48,15 +48,15 @@ namespace speed::stringutils {
  * @param       src : Pointer to the null-terminated source string to copy from.
  * @return      Pointer to the beginning of the destination buffer (`dest`).
  */
-template<typename TpDestinationChar, typename TpSourceChar>
-TpDestinationChar* cstr_copy(TpDestinationChar* dest, const TpSourceChar* src) noexcept
+template<typename DestinationCharT, typename SourceCharT>
+DestinationCharT* cstr_copy(DestinationCharT* dest, const SourceCharT* src) noexcept
 {
     if (dest == nullptr || src == nullptr)
     {
         return dest;
     }
 
-    TpDestinationChar* orig_dest = dest;
+    DestinationCharT* orig_dest = dest;
 
     while (*src != '\0')
     {
@@ -76,10 +76,10 @@ TpDestinationChar* cstr_copy(TpDestinationChar* dest, const TpSourceChar* src) n
  * @param       cnt : Maximum number of characters to copy (not counting the null terminator).
  * @return      Pointer to the beginning of the destination buffer (`dest`).
  */
-template<typename TpDestinationChar, typename TpSourceChar>
-TpDestinationChar* cstr_copy(
-        TpDestinationChar* dest,
-        const TpSourceChar* src,
+template<typename DestinationCharT, typename SourceCharT>
+DestinationCharT* cstr_copy(
+        DestinationCharT* dest,
+        const SourceCharT* src,
         std::size_t cnt
 ) noexcept
 {
@@ -88,8 +88,8 @@ TpDestinationChar* cstr_copy(
         return dest;
     }
     
-    TpDestinationChar* orig_dest = dest;
-    const TpDestinationChar* const end_dest = dest + cnt;
+    DestinationCharT* orig_dest = dest;
+    const DestinationCharT* const end_dest = dest + cnt;
     
     while (*src != '\0' && dest < end_dest)
     {
@@ -107,15 +107,15 @@ TpDestinationChar* cstr_copy(
  * @param       src : Pointer to the null-terminated source string to append.
  * @return      Pointer to the beginning of the destination buffer (`dest`).
  */
-template<typename TpDestinationChar, typename TpSourceChar>
-TpDestinationChar* cstr_concat(TpDestinationChar* dest, const TpSourceChar* src) noexcept
+template<typename DestinationCharT, typename SourceCharT>
+DestinationCharT* cstr_concat(DestinationCharT* dest, const SourceCharT* src) noexcept
 {
     if (dest == nullptr || src == nullptr)
     {
         return dest;
     }
     
-    TpDestinationChar* orig_dest = dest;
+    DestinationCharT* orig_dest = dest;
     
     while (*dest != '\0')
     {
@@ -139,10 +139,10 @@ TpDestinationChar* cstr_concat(TpDestinationChar* dest, const TpSourceChar* src)
  * @param       cnt : Maximum number of characters to append from `src`.
  * @return      Pointer to the beginning of the destination buffer (`dest`).
  */
-template<typename TpDestinationChar, typename TpSourceChar>
-TpDestinationChar* cstr_concat(
-        TpDestinationChar* dest,
-        const TpSourceChar* src,
+template<typename DestinationCharT, typename SourceCharT>
+DestinationCharT* cstr_concat(
+        DestinationCharT* dest,
+        const SourceCharT* src,
         std::size_t cnt
 ) noexcept
 {
@@ -151,7 +151,7 @@ TpDestinationChar* cstr_concat(
         return dest;
     }
     
-    TpDestinationChar* orig_dest = dest;
+    DestinationCharT* orig_dest = dest;
 
     while (*dest != '\0')
     {
@@ -171,15 +171,15 @@ TpDestinationChar* cstr_concat(
  * @param       str : Pointer to a null-terminated string.
  * @return      The number of characters in the string (excluding the null terminator).
  */
-template<typename TpChar>
-[[nodiscard]] std::size_t cstr_length(const TpChar* str) noexcept
+template<typename CharT>
+[[nodiscard]] std::size_t cstr_length(const CharT* str) noexcept
 {
     if (str == nullptr)
     {
         return 0;
     }
     
-    const TpChar* it = str;
+    const CharT* it = str;
     
     while (*it != '\0')
     {
@@ -198,10 +198,10 @@ template<typename TpChar>
  *              - `-1` if `src` < `trg`,
  *              - `1` if `src` > `trg`.
  */
-template<typename TpSourceChar, typename TpTargetChar>
-[[nodiscard]] int cstr_compare(const TpSourceChar* src, const TpTargetChar* trg) noexcept
+template<typename SourceCharT, typename TargetCharT>
+[[nodiscard]] int cstr_compare(const SourceCharT* src, const TargetCharT* trg) noexcept
 {
-    if (src == (const TpSourceChar*)trg)
+    if (src == (const SourceCharT*)trg)
     {
         return 0;
     }
@@ -242,14 +242,14 @@ template<typename TpSourceChar, typename TpTargetChar>
  *              - `-1` if `src` < `trg`,
  *              - `1` if `src` > `trg`.
  */
-template<typename TpSourceChar, typename TpTargetChar>
+template<typename SourceCharT, typename TargetCharT>
 [[nodiscard]] int cstr_compare(
-        const TpSourceChar* src,
-        const TpTargetChar* trg,
+        const SourceCharT* src,
+        const TargetCharT* trg,
         std::size_t cnt
 ) noexcept
 {
-    if (src == (const TpSourceChar*)trg || cnt == 0)
+    if (src == (const SourceCharT*)trg || cnt == 0)
     {
         return 0;
     }
@@ -262,7 +262,7 @@ template<typename TpSourceChar, typename TpTargetChar>
         return 1;
     }
     
-    const TpSourceChar* const src_end = src + cnt;
+    const SourceCharT* const src_end = src + cnt;
     
     while (src < src_end && *src != '\0' && *trg != '\0')
     {
@@ -301,13 +301,13 @@ template<typename TpSourceChar, typename TpTargetChar>
  *              - `-1` if `src` < `trg`,
  *              - `1` if `src` > `trg`.
  */
-template<typename TpSourceChar, typename TpTargetChar>
+template<typename SourceCharT, typename TargetCharT>
 [[nodiscard]] int cstr_compare_icase(
-        const TpSourceChar* src,
-        const TpTargetChar* trg
+        const SourceCharT* src,
+        const TargetCharT* trg
 ) noexcept
 {
-    if (src == (const TpSourceChar*)trg)
+    if (src == (const SourceCharT*)trg)
     {
         return 0;
     }
@@ -322,8 +322,8 @@ template<typename TpSourceChar, typename TpTargetChar>
 
     while (*src != '\0' && *trg != '\0')
     {
-        auto ch1 = speed::stringutils::to_lower(*src);
-        auto ch2 = speed::stringutils::to_lower(*trg);
+        auto ch1 = stringutils::to_lower(*src);
+        auto ch2 = stringutils::to_lower(*trg);
 
         if (ch1 != ch2)
         {
@@ -353,14 +353,14 @@ template<typename TpSourceChar, typename TpTargetChar>
  *              - `-1` if `src` < `trg`,
  *              - `1` if `src` > `trg`.
  */
-template<typename TpSourceChar, typename TpTargetChar>
+template<typename SourceCharT, typename TargetCharT>
 [[nodiscard]] int cstr_compare_icase(
-        const TpSourceChar* src,
-        const TpTargetChar* trg,
+        const SourceCharT* src,
+        const TargetCharT* trg,
         std::size_t cnt
 ) noexcept
 {
-    if (src == (const TpSourceChar*)trg || cnt == 0)
+    if (src == (const SourceCharT*)trg || cnt == 0)
     {
         return 0;
     }
@@ -373,12 +373,12 @@ template<typename TpSourceChar, typename TpTargetChar>
         return 1;
     }
 
-    const TpSourceChar* const src_end = src + cnt;
+    const SourceCharT* const src_end = src + cnt;
 
     while (src < src_end && *src != '\0' && *trg != '\0')
     {
-        auto ch1 = speed::stringutils::to_lower(*src);
-        auto ch2 = speed::stringutils::to_lower(*trg);
+        auto ch1 = stringutils::to_lower(*src);
+        auto ch2 = stringutils::to_lower(*trg);
 
         if (ch1 != ch2)
         {
@@ -411,8 +411,8 @@ template<typename TpSourceChar, typename TpTargetChar>
  * @return      A pointer to the first occurrence of `val` in `str`, or `nullptr` if `val` is not
  *              found or if `str` is `nullptr`.
  */
-template<typename TpChar, typename TpIntegral>
-[[nodiscard]] TpChar* cstr_find_first_char(TpChar* str, TpIntegral val) noexcept
+template<typename CharT, typename IntegralT>
+[[nodiscard]] CharT* cstr_find_first_char(CharT* str, IntegralT val) noexcept
 {
     if (str == nullptr)
     {
@@ -437,15 +437,15 @@ template<typename TpChar, typename TpIntegral>
  * @return      A pointer to the last occurrence of `val` in `str`, or `nullptr` if `val` is not
  *              found or if `str` is `nullptr`.
  */
-template<typename TpChar, typename TpIntegral>
-[[nodiscard]] TpChar* cstr_find_last_char(TpChar* str, TpIntegral val) noexcept
+template<typename CharT, typename IntegralT>
+[[nodiscard]] CharT* cstr_find_last_char(CharT* str, IntegralT val) noexcept
 {
     if (str == nullptr)
     {
         return nullptr;
     }
 
-    TpChar* last = nullptr;
+    CharT* last = nullptr;
 
     for (; *str != '\0'; ++str)
     {
@@ -467,10 +467,10 @@ template<typename TpChar, typename TpIntegral>
  * @return      The number of leading characters in `str` that are present in `prefxs`.
  *              Returns `0` if `str` or `prefxs` is `nullptr`.
  */
-template<typename TpSourceChar, typename TpPrefixChar>
+template<typename SourceCharT, typename PrefixCharT>
 [[nodiscard]] std::size_t cstr_count_prefix_in(
-        const TpSourceChar* str,
-        const TpPrefixChar* prefxs
+        const SourceCharT* str,
+        const PrefixCharT* prefxs
 ) noexcept
 {
     if (str == nullptr || prefxs == nullptr)
@@ -481,7 +481,7 @@ template<typename TpSourceChar, typename TpPrefixChar>
     std::size_t pos = 0;
     for (; *str != '\0'; ++str)
     {
-        const TpPrefixChar* cur_prefx = prefxs;
+        const PrefixCharT* cur_prefx = prefxs;
         bool fnd = false;
         
         while (*cur_prefx != '\0')
@@ -513,10 +513,10 @@ template<typename TpSourceChar, typename TpPrefixChar>
  * @return      The number of leading characters in `str` that are **not** present in `prefxs`.
  *              Returns `0` if `str` or `prefxs` is `nullptr`.
  */
-template<typename TpSourceChar, typename TpPrefixChar>
+template<typename SourceCharT, typename PrefixCharT>
 [[nodiscard]] std::size_t cstr_count_prefix_not_in(
-        const TpSourceChar* str,
-        const TpPrefixChar* prefxs
+        const SourceCharT* str,
+        const PrefixCharT* prefxs
 ) noexcept
 {
     if (str == nullptr || prefxs == nullptr)
@@ -527,7 +527,7 @@ template<typename TpSourceChar, typename TpPrefixChar>
     std::size_t pos = 0;
     for (; *str != '\0'; ++str)
     {
-        for (const TpPrefixChar* cur_prefx = prefxs; *cur_prefx != '\0'; ++cur_prefx)
+        for (const PrefixCharT* cur_prefx = prefxs; *cur_prefx != '\0'; ++cur_prefx)
         {
             if (*str == *cur_prefx)
             {
@@ -548,10 +548,10 @@ template<typename TpSourceChar, typename TpPrefixChar>
  * @return      Pointer to the first occurrence in `str` of any character in `accpt`, or `nullptr`
  *              if none of the characters are found or if `str` or `accpt` is `nullptr`.
  */
-template<typename TpSourceChar, typename TpAcceptedChar>
-[[nodiscard]] TpSourceChar* cstr_find_any_of(
-        TpSourceChar* str,
-        const TpAcceptedChar* accpt
+template<typename SourceCharT, typename AcceptedCharT>
+[[nodiscard]] SourceCharT* cstr_find_any_of(
+        SourceCharT* str,
+        const AcceptedCharT* accpt
 ) noexcept
 {
     if (str == nullptr || accpt == nullptr)
@@ -561,7 +561,7 @@ template<typename TpSourceChar, typename TpAcceptedChar>
 
     for (; *str != '\0'; ++str)
     {
-        for (const TpAcceptedChar* cur_accpt = accpt; *cur_accpt != '\0'; ++cur_accpt)
+        for (const AcceptedCharT* cur_accpt = accpt; *cur_accpt != '\0'; ++cur_accpt)
         {
             if (*str == *cur_accpt)
             {
@@ -580,10 +580,10 @@ template<typename TpSourceChar, typename TpAcceptedChar>
  * @return      Pointer to the first occurrence of `substr` in `str`, or `nullptr` if `substr`
  *              is not found or if either pointer is `nullptr`.
  */
-template<typename TpSourceChar, typename TpSubstringChar>
-[[nodiscard]] TpSourceChar* cstr_find_substr(
-        TpSourceChar* str,
-        const TpSubstringChar* substr
+template<typename SourceCharT, typename SubstringCharT>
+[[nodiscard]] SourceCharT* cstr_find_substr(
+        SourceCharT* str,
+        const SubstringCharT* substr
 ) noexcept
 {
     if (str == nullptr || substr == nullptr)
@@ -591,18 +591,18 @@ template<typename TpSourceChar, typename TpSubstringChar>
         return nullptr;
     }
 
-    const std::size_t substr_len = speed::stringutils::cstr_length(substr);
+    const std::size_t substr_len = cstr_length(substr);
     if (substr_len == 0)
     {
         return str;
     }
 
-    const std::size_t str_len = speed::stringutils::cstr_length(str);
+    const std::size_t str_len = cstr_length(str);
     const std::size_t max_start = (str_len < substr_len) ? 0 : (str_len - substr_len + 1);
 
     for (std::size_t i = 0; i < max_start; ++i, ++str)
     {
-        if (speed::stringutils::cstr_compare(str, substr, substr_len) == 0)
+        if (cstr_compare(str, substr, substr_len) == 0)
         {
             return str;
         }
@@ -618,10 +618,10 @@ template<typename TpSourceChar, typename TpSubstringChar>
  * @return      Pointer to the first occurrence of `substr` in `str`, ignoring case; `nullptr`
  *              if `substr` is not found or if either pointer is `nullptr`.
  */
-template<typename TpSourceChar, typename TpSubstringChar>
-[[nodiscard]] TpSourceChar* cstr_find_substr_icase(
-        TpSourceChar* str,
-        const TpSubstringChar* substr
+template<typename SourceCharT, typename SubstringCharT>
+[[nodiscard]] SourceCharT* cstr_find_substr_icase(
+        SourceCharT* str,
+        const SubstringCharT* substr
 ) noexcept
 {
     if (str == nullptr || substr == nullptr)
@@ -629,18 +629,18 @@ template<typename TpSourceChar, typename TpSubstringChar>
         return nullptr;
     }
 
-    const std::size_t substr_len = speed::stringutils::cstr_length(substr);
+    const std::size_t substr_len = cstr_length(substr);
     if (substr_len == 0)
     {
         return str;
     }
 
-    const std::size_t str_len = speed::stringutils::cstr_length(str);
+    const std::size_t str_len = cstr_length(str);
     const std::size_t max_start = (str_len < substr_len) ? 0 : (str_len - substr_len + 1);
 
     for (std::size_t i = 0; i < max_start; ++i, ++str)
     {
-        if (speed::stringutils::cstr_compare_icase(str, substr, substr_len) == 0)
+        if (cstr_compare_icase(str, substr, substr_len) == 0)
         {
             return str;
         }
@@ -657,10 +657,10 @@ template<typename TpSourceChar, typename TpSubstringChar>
  * @param       delimitrs : Pointer to a null-terminated string containing delimiter characters.
  * @return      Pointer to the start of the next token, or `nullptr` if there are no more tokens.
  */
-template<typename TpSourceChar, typename TpDelimiterChar>
-[[nodiscard]] TpSourceChar* cstr_tokenize_any_of(
-        TpSourceChar*& str,
-        const TpDelimiterChar* delimitrs
+template<typename SourceCharT, typename DelimiterCharT>
+[[nodiscard]] SourceCharT* cstr_tokenize_any_of(
+        SourceCharT*& str,
+        const DelimiterCharT* delimitrs
 ) noexcept
 {
     if (str == nullptr || delimitrs == nullptr)
@@ -668,7 +668,7 @@ template<typename TpSourceChar, typename TpDelimiterChar>
         return nullptr;
     }
 
-    while (*str != '\0' && speed::stringutils::cstr_find_any_of(delimitrs, *str) != nullptr)
+    while (*str != '\0' && cstr_find_any_of(delimitrs, *str) != nullptr)
     {
         ++str;
     }
@@ -679,11 +679,11 @@ template<typename TpSourceChar, typename TpDelimiterChar>
         return nullptr;
     }
 
-    TpSourceChar* token_strt = str;
+    SourceCharT* token_strt = str;
 
     while (*str != '\0')
     {
-        if (speed::stringutils::cstr_find_any_of(delimitrs, *str) != nullptr)
+        if (cstr_find_any_of(delimitrs, *str) != nullptr)
         {
             *str = '\0';
             ++str;
@@ -705,15 +705,15 @@ template<typename TpSourceChar, typename TpDelimiterChar>
  * @return      Pointer to the modified string, or `nullptr` if `str` is `nullptr` or `val` is not
  *              found.
  */
-template<typename TpChar, typename TpIntegral>
-TpChar* cstr_cut(TpChar* str, TpIntegral val, bool erase_val) noexcept
+template<typename CharT, typename IntegralT>
+CharT* cstr_cut(CharT* str, IntegralT val, bool erase_val) noexcept
 {
     if (str == nullptr)
     {
         return nullptr;
     }
 
-    TpChar* lst = speed::stringutils::cstr_find_last_char(str, val);
+    CharT* lst = cstr_find_last_char(str, val);
     if (lst == nullptr)
     {
         return nullptr;
@@ -735,15 +735,15 @@ TpChar* cstr_cut(TpChar* str, TpIntegral val, bool erase_val) noexcept
  * @return      Pointer to the modified string, or `nullptr` if `str` is `nullptr`, `cnt` is 0,
  *              or the character is not found.
  */
-template<typename TpChar, typename TpIntegral>
-TpChar* cstr_cut(TpChar* str, TpIntegral val, bool erase_val, std::size_t cnt) noexcept
+template<typename CharT, typename IntegralT>
+CharT* cstr_cut(CharT* str, IntegralT val, bool erase_val, std::size_t cnt) noexcept
 {
     if (str == nullptr || cnt == 0)
     {
         return nullptr;
     }
 
-    TpChar* lst = speed::stringutils::cstr_find_last_char(str, val, cnt);
+    CharT* lst = cstr_find_last_char(str, val, cnt);
     if (lst == nullptr)
     {
         return nullptr;
@@ -760,17 +760,17 @@ TpChar* cstr_cut(TpChar* str, TpIntegral val, bool erase_val, std::size_t cnt) n
  * @return      Pointer to the modified string if `str` is not `nullptr`, or `nullptr` if `str` is
  *              `nullptr`.
  */
-template<typename TpChar, typename TpPredicate>
-TpChar* cstr_remove_if(TpChar* str, TpPredicate pred) noexcept
+template<typename CharT, typename PredicateT>
+CharT* cstr_remove_if(CharT* str, PredicateT pred) noexcept
 {
     if (str == nullptr)
     {
         return nullptr;
     }
 
-    TpChar* write_it = str;
+    CharT* write_it = str;
 
-    for (TpChar* read_it = str; *read_it != '\0'; ++read_it)
+    for (CharT* read_it = str; *read_it != '\0'; ++read_it)
     {
         if (!pred(*read_it))
         {
@@ -792,18 +792,18 @@ TpChar* cstr_remove_if(TpChar* str, TpPredicate pred) noexcept
  * @return      Pointer to the modified string if `str` is not `nullptr`, or `nullptr` if `str`
  *              is `nullptr` or `cnt == 0`.
  */
-template<typename TpChar, typename TpPredicate>
-TpChar* cstr_remove_if(TpChar* str, TpPredicate pred, std::size_t cnt) noexcept
+template<typename CharT, typename PredicateT>
+CharT* cstr_remove_if(CharT* str, PredicateT pred, std::size_t cnt) noexcept
 {
     if (str == nullptr || cnt == 0)
     {
         return nullptr;
     }
 
-    TpChar* write_it = str;
+    CharT* write_it = str;
     std::size_t i = 0;
 
-    for (TpChar* read_it = str; *read_it != '\0' && i < cnt; ++read_it, ++i)
+    for (CharT* read_it = str; *read_it != '\0' && i < cnt; ++read_it, ++i)
     {
         if (!pred(*read_it))
         {
@@ -827,15 +827,15 @@ TpChar* cstr_remove_if(TpChar* str, TpPredicate pred, std::size_t cnt) noexcept
  * @return      Pointer to the modified string if `str` is not `nullptr`, or `nullptr` if `str`
  *              is `nullptr`.
  */
-template<typename TpChar, typename TpPredicate>
-TpChar* cstr_remove_trailing_if(TpChar* str, TpPredicate pred) noexcept
+template<typename CharT, typename PredicateT>
+CharT* cstr_remove_trailing_if(CharT* str, PredicateT pred) noexcept
 {
     if (str == nullptr)
     {
         return nullptr;
     }
 
-    std::size_t str_sz = speed::stringutils::cstr_length(str);
+    std::size_t str_sz = cstr_length(str);
 
     if (str_sz > 0 && pred(str[str_sz - 1]))
     {
@@ -854,15 +854,15 @@ TpChar* cstr_remove_trailing_if(TpChar* str, TpPredicate pred) noexcept
  * @return      Pointer to the modified string if `str` is not `nullptr`, or `nullptr` if `str`
  *              is `nullptr` or `cnt` is 0.
  */
-template<typename TpChar, typename TpPredicate>
-TpChar* cstr_remove_trailing_if(TpChar* str, TpPredicate pred, std::size_t cnt) noexcept
+template<typename CharT, typename PredicateT>
+CharT* cstr_remove_trailing_if(CharT* str, PredicateT pred, std::size_t cnt) noexcept
 {
     if (str == nullptr || cnt == 0)
     {
         return nullptr;
     }
 
-    std::size_t str_len = speed::stringutils::cstr_length(str);
+    std::size_t str_len = cstr_length(str);
     if (str_len > cnt)
     {
         str_len = cnt;
@@ -877,63 +877,69 @@ TpChar* cstr_remove_trailing_if(TpChar* str, TpPredicate pred, std::size_t cnt) 
 }
 
 /**
- * @brief       Escapes all regex-special characters in a null-terminated C-style string.
- * @param       str : Null-terminated input string to escape. If `nullptr`, returns an empty string.
- * @return      A `std::basic_string<TpChar, TpCharTraits, TpAllocator>` with all regex-special
- *              characters escaped.
+ * @brief       Escapes all regular expression special characters in a given string.
+ * @param       str : The input string to escape. Can be null or empty.
+ * @return      A new string of the same type's allocator and traits, with all regex
+ *              special characters escaped.
+ *              - If `str` is null, returns an empty string.
+ *              - If `str` contains no special characters, returns a copy of the input string.
  */
-template<typename TpChar, typename TpCharTraits, typename TpAllocator>
-[[nodiscard]] auto escape_regex(const TpChar* str) noexcept
+template<typename StringT>
+[[nodiscard]] auto escape_regex(const StringT& str)
 {
-    using string_type = std::basic_string<TpChar, TpCharTraits, TpAllocator>;
+    using character_type = type_traits::character_type_of_t<StringT>;
+    using character_traits_type = type_traits::character_traits_of_t<StringT>;
+    using allocator_type = type_traits::allocator_of_t<StringT>;
+    using string_view_type = type_traits::string_view_of_t<StringT>;
+    using string_type = std::basic_string<character_type, character_traits_type, allocator_type>;
+    using size_type = typename string_type::size_type;
     
-    const std::array<TpChar, 14> special_chars =
+    if (is_null(str))
+    {
+        return string_type();
+    }
+
+    const std::array<character_type, 14> special_chars =
         {'[', '\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '{', '}', ']'};
-
-    if (str == nullptr)
+    
+    string_view_type strv = str;
+    size_type original_str_sz = strv.size();
+    string_type res_str;
+    size_type extra_chars = 0;
+    
+    auto is_special = [&](character_type ch)
     {
-        return string_type{};
+        return std::find(special_chars.begin(), special_chars.end(), ch) != special_chars.end();
+    };
+
+    for (auto ch : strv)
+    {
+        if (is_special(ch))
+        {
+            ++extra_chars;
+        }
+    }
+    if (extra_chars == 0)
+    {
+        res_str = strv;
+        return res_str;
     }
     
-    string_type res;
-    const TpChar* str_it;
-    std::size_t original_len = 0;
-    std::size_t extr = 0;
+    res_str.resize(original_str_sz + extra_chars);
 
-    for (str_it = str; *str_it != '\0'; ++str_it)
+    for (size_type i = original_str_sz, j = res_str.size(); i > 0;)
     {
-        ++original_len;
-        if (std::find(special_chars.begin(), special_chars.end(), *str_it) != special_chars.end())
+        --i;
+        --j;
+        res_str[j] = strv[i];
+        if (is_special(strv[i]))
         {
-            ++extr;
+            --j;
+            res_str[j] = '\\';
         }
     }
 
-    res.reserve(original_len + extr);
-    for (str_it = str; *str_it != '\0'; ++str_it)
-    {
-        if (std::find(special_chars.begin(), special_chars.end(), *str_it) != special_chars.end())
-        {
-            res += '\\';
-        }
-        res += *str_it;
-    }
-
-    return res;
-}
-
-/**
- * @brief       Escapes all regex-special characters in a `std::basic_string`.
- * @param       str : The input string to escape.
- * @return      A `std::basic_string<TpChar, TpCharTraits, TpAllocator>` with all regex-special
- *              characters escaped.
- */
-template<typename TpChar, typename TpCharTraits, typename TpAllocator>
-[[nodiscard]] auto escape_regex(
-        const std::basic_string<TpChar, TpCharTraits, TpAllocator>& str
-) noexcept
-{
-    return escape_regex<TpChar, TpCharTraits, TpAllocator>(str.c_str());
+    return res_str;
 }
 
 /**
@@ -942,22 +948,22 @@ template<typename TpChar, typename TpCharTraits, typename TpAllocator>
  * @return      `true` if the string was modified (i.e., any special characters were escaped),
  *              `false` otherwise.
  */
-template<typename TpChar, typename TpCharTraits, typename TpCharAlloc>
-bool escape_regex_implace(std::basic_string<TpChar, TpCharTraits, TpCharAlloc>& str) noexcept
+template<typename CharT, typename CharTraitsT, typename AllocatorT>
+bool escape_regex_inplace(std::basic_string<CharT, CharTraitsT, AllocatorT>& str)
 {
-    using string_type = std::basic_string<TpChar, TpCharTraits, TpCharAlloc>;
+    using string_type = std::basic_string<CharT, CharTraitsT, AllocatorT>;
     using size_type = typename string_type::size_type;
 
-    const std::array<TpChar, 14> special_chars =
+    const std::array<CharT, 14> special_chars =
         {'[', '\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '{', '}', ']'};
     
-    auto is_special = [&](TpChar ch)
+    auto is_special = [&](CharT ch)
     {
         return std::find(special_chars.begin(), special_chars.end(), ch) != special_chars.end();
     };
 
     size_type extra_chars = 0;
-    for (TpChar ch : str)
+    for (CharT ch : str)
     {
         if (is_special(ch))
         {
@@ -989,78 +995,113 @@ bool escape_regex_implace(std::basic_string<TpChar, TpCharTraits, TpCharAlloc>& 
 }
 
 /**
- * @brief       Returns the length of a null-terminated string.
- * @param       str : Pointer to the null-terminated string.
- * @return      The number of characters in the string, excluding the null terminator.
+ * @brief       Returns the length of a string-like object.
+ * @param       str : The string-like object to measure.
+ * @return      The number of characters in the string.
  */
-template<typename TpChar>
-[[nodiscard]] inline std::size_t get_length(const TpChar* str) noexcept
+template<typename StringT>
+[[nodiscard]] inline std::size_t get_length(const StringT& str) noexcept
 {
-    return speed::stringutils::cstr_length(str);
+    if (is_null(str))
+    {
+        return 0;
+    }
+    
+    type_traits::string_view_of_t<StringT> strv = str;
+    return strv.size();
 }
 
 /**
- * @brief       Returns the length of a std::basic_string.
- * @param       str : Reference to the string whose length is to be computed.
- * @return      The number of characters in the string.
+ * @brief       Checks whether a given string is empty.
+ * @param       str : The string to check.
+ * @return      `true` if the string is empty, otherwise `false`.
  */
-template<StringLike TpString>
-[[nodiscard]] inline auto get_length(const TpString& str) noexcept
+template<typename StringT>
+[[nodiscard]] constexpr bool is_empty(const StringT& str) noexcept
 {
-    return str.size();
+    return get_length(str) == 0;
+}
+
+/**
+ * @brief       Checks whether a given string pointer is null.
+ * @param       str : The string object or pointer to check.
+ * @return      `true` if `str` is `nullptr` (only for character pointers), otherwise `false`.
+ */
+template<typename StringT>
+[[nodiscard]] constexpr bool is_null(const StringT& str) noexcept
+{
+    if constexpr (type_traits::is_character_pointer_v<StringT>)
+    {
+        return str == nullptr;
+    }
+    
+    return false;
 }
 
 /**
  * @brief       Matches a string against a wildcard pattern.
  *
- * Supports wildcard characters:
- * - `*` matches any sequence of characters (including an empty sequence),
+ * This function checks whether the given source string matches the provided
+ * pattern string. The pattern supports the following wildcards:
+ * - `*` matches zero or more characters.
  * - `?` matches exactly one character.
  *
- * @param       str : Pointer to the null-terminated string to be matched.
- * @param       pattrn : Pointer to the null-terminated wildcard pattern string.
- * @return      `true` if the string matches the pattern; otherwise, `false`.
+ * @param       str : The input string to be matched.
+ * @param       pattrn : The pattern string that may include `*` and `?` wildcards.
+ * @return      `true` if the string matches the pattern, `false` otherwise.
  */
-template<typename TpSourceChar, typename TpPatternChar>
+template<typename SourceStringT, typename PatternStringT>
 [[nodiscard]] bool match_wildcard(
-        const TpSourceChar* str,
-        const TpPatternChar* pattrn
+        const SourceStringT& str,
+        const PatternStringT& pattrn
 ) noexcept
 {
-    if (str == nullptr || pattrn == nullptr)
+    using source_string_type = type_traits::string_view_of_t<SourceStringT>;
+    using pattern_string_type = type_traits::string_view_of_t<PatternStringT>;
+    using source_string_it_type = source_string_type::const_iterator;
+    using pattern_string_it_type = pattern_string_type::const_iterator;
+    
+    if (is_null(str) || is_null(pattrn))
     {
         return false;
     }
+    
+    source_string_type strv = str;
+    pattern_string_type pattrnv = pattrn;
+    source_string_it_type strv_it = strv.begin();
+    pattern_string_it_type pattrnv_it = pattrnv.begin();
+    source_string_it_type strv_backup;
+    pattern_string_it_type pattrnv_backup;
+    bool has_backp = false;
 
-    const TpSourceChar* str_backup = nullptr;
-    const TpPatternChar* pattrn_backup = nullptr;
-
-    while (*str)
+    while (strv_it != strv.end())
     {
-        if (*pattrn == '*')
+        if (pattrnv_it != pattrnv.end() && *pattrnv_it == '*')
         {
-            while (*pattrn == '*')
+            while (pattrnv_it != pattrnv.end() && *pattrnv_it == '*')
             {
-                ++pattrn;
+                ++pattrnv_it;
             }
 
-            if (*pattrn == '\0')
+            if (pattrnv_it == pattrnv.end())
             {
                 return true;
             }
 
-            pattrn_backup = pattrn;
-            str_backup = str;
+            pattrnv_backup = pattrnv_it;
+            strv_backup = strv_it;
+            has_backp = true;
         }
-        else if (*pattrn == '?' || *pattrn == *str)
+        else if (pattrnv_it != pattrnv.end() && (*pattrnv_it == '?' || *pattrnv_it == *strv_it))
         {
-            ++pattrn;
-            ++str;
+            ++pattrnv_it;
+            ++strv_it;
         }
-        else if (pattrn_backup)
+        else if (has_backp)
         {
-            pattrn = pattrn_backup;
-            str = ++str_backup;
+            ++strv_backup;
+            pattrnv_it = pattrnv_backup;
+            strv_it = strv_backup;
         }
         else
         {
@@ -1068,107 +1109,80 @@ template<typename TpSourceChar, typename TpPatternChar>
         }
     }
 
-    while (*pattrn == '*')
+    while (pattrnv_it != pattrnv.end() && *pattrnv_it == '*')
     {
-        ++pattrn;
+        ++pattrnv_it;
     }
 
-    return *pattrn == '\0';
+    return pattrnv_it == pattrnv.end();
 }
 
 /**
- * @brief       Matches a std::basic_string against a wildcard pattern.
+ * @brief       Matches a string against a wildcard pattern, case-insensitively.
  *
- * Supports wildcard characters:
- * - `*` matches any sequence of characters (including empty),
+ * This function checks whether the given source string matches the provided
+ * pattern string, ignoring case differences. The pattern supports the following wildcards:
+ * - `*` matches zero or more characters.
  * - `?` matches exactly one character.
  *
- * @param       str : The string to match.
- * @param       pattrn : Null-terminated wildcard pattern string.
- * @return      `true` if the string matches the pattern; otherwise, `false`.
+ * @param       str : The input string to be matched.
+ * @param       pattrn : The pattern string that may include `*` and `?` wildcards.
+ * @return      `true` if the string matches the pattern (case-insensitively), `false` otherwise.
  */
-template<StringLike TpSourceString, typename TpPatternChar>
-[[nodiscard]] bool match_wildcard(
-        const TpSourceString& str,
-        const TpPatternChar* pattrn
-) noexcept
-{
-    return speed::stringutils::match_wildcard(str.data(), pattrn);
-}
-
-/**
- * @brief       Matches a string against a wildcard pattern, both provided as std::basic_string.
- *
- * Supports wildcard characters:
- * - `*` matches any sequence of characters (including empty),
- * - `?` matches exactly one character.
- *
- * @param       str : The string to be matched.
- * @param       pattrn : The wildcard pattern string.
- * @return      `true` if `str` matches `pattrn`; otherwise, `false`.
- */
-template<StringLike TpSourceString, StringLike TpPatternString>
-[[nodiscard]] bool match_wildcard(
-        const TpSourceString& str,
-        const TpPatternString& pattrn
-) noexcept
-{
-    return speed::stringutils::match_wildcard(str.data(), pattrn.data());
-}
-
-/**
- * @brief       Case-insensitive wildcard pattern matching between C-style strings.
- *
- * Supports wildcard characters:
- * - `*` matches any sequence of characters (including empty),
- * - `?` matches exactly one character,
- *
- * @param       str : Pointer to the null-terminated input string to match.
- * @param       pattrn : Pointer to the null-terminated wildcard pattern string.
- * @return      `true` if the input string matches the wildcard pattern ignoring case;
- *              otherwise, `false`.
- */
-template<typename TpSourceChar, typename TpPatternChar>
+template<typename SourceStringT, typename PatternStringT>
 [[nodiscard]] bool match_wildcard_icase(
-        const TpSourceChar* str,
-        const TpPatternChar* pattrn
+        const SourceStringT& str,
+        const PatternStringT& pattrn
 ) noexcept
 {
-    if (str == nullptr || pattrn == nullptr)
+    using source_string_type = type_traits::string_view_of_t<SourceStringT>;
+    using pattern_string_type = type_traits::string_view_of_t<PatternStringT>;
+    using source_string_it_type = source_string_type::const_iterator;
+    using pattern_string_it_type = pattern_string_type::const_iterator;
+    
+    if (is_null(str) || is_null(pattrn))
     {
         return false;
     }
+    
+    source_string_type strv = str;
+    pattern_string_type pattrnv = pattrn;
+    source_string_it_type strv_it = strv.begin();
+    pattern_string_it_type pattrnv_it = pattrnv.begin();
+    source_string_it_type strv_backup;
+    pattern_string_it_type pattrnv_backup;
+    bool has_backp = false;
 
-    const TpSourceChar* str_backup = nullptr;
-    const TpPatternChar* pattrn_backup = nullptr;
-
-    while (*str)
+    while (strv_it != strv.end())
     {
-        if (*pattrn == '*')
+        if (pattrnv_it != pattrnv.end() && *pattrnv_it == '*')
         {
-            while (*pattrn == '*')
+            while (pattrnv_it != pattrnv.end() && *pattrnv_it == '*')
             {
-                ++pattrn;
+                ++pattrnv_it;
             }
 
-            if (*pattrn == '\0')
+            if (pattrnv_it == pattrnv.end())
             {
                 return true;
             }
 
-            pattrn_backup = pattrn;
-            str_backup = str;
+            pattrnv_backup = pattrnv_it;
+            strv_backup = strv_it;
+            has_backp = true;
         }
-        else if (*pattrn == '?' ||
-                 speed::stringutils::to_lower(*pattrn) == speed::stringutils::to_lower(*str))
+        else if (pattrnv_it != pattrnv.end() &&
+                 (*pattrnv_it == '?' ||
+                  stringutils::to_lower(*pattrnv_it) == stringutils::to_lower(*strv_it)))
         {
-            ++pattrn;
-            ++str;
+            ++pattrnv_it;
+            ++strv_it;
         }
-        else if (pattrn_backup)
+        else if (has_backp)
         {
-            pattrn = pattrn_backup;
-            str = ++str_backup;
+            ++strv_backup;
+            pattrnv_it = pattrnv_backup;
+            strv_it = strv_backup;
         }
         else
         {
@@ -1176,221 +1190,90 @@ template<typename TpSourceChar, typename TpPatternChar>
         }
     }
 
-    while (*pattrn == '*')
+    while (pattrnv_it != pattrnv.end() && *pattrnv_it == '*')
     {
-        ++pattrn;
+        ++pattrnv_it;
     }
 
-    return *pattrn == '\0';
+    return pattrnv_it == pattrnv.end();
 }
 
 /**
- * @brief       Case-insensitive wildcard pattern matching between a std::basic_string and a
- *              C-style pattern string.
- *
- * It supports wildcard characters:
- * - `*` matches any sequence of characters (including empty),
- * - `?` matches exactly one character.
- *
- * @param       str : The string to be matched.
- * @param       pattrn : The wildcard pattern as a null-terminated C-style string.
- * @return      `true` if `str` matches the wildcard pattern ignoring case; otherwise, `false`.
+ * @brief       Selects the first string when its character type matches a specified type.
+ * @param       str1 : The first string (returned if it matches the specified character type).
+ * @param       str2 : The second string (ignored in this overload).
+ * @return      A reference to `str1`.
  */
-template<StringLike TpSourceString, typename TpPatternChar>
-[[nodiscard]] bool match_wildcard_icase(
-        const TpSourceString& str,
-        const TpPatternChar* pattrn
-) noexcept
+template<typename TpChar, typename TpString1, typename TpString2>
+requires std::is_same_v<TpChar, type_traits::character_type_of_t<TpString1>>
+constexpr TpString1& pick_by_char(TpString1& str1, TpString2& str2)
 {
-    return speed::stringutils::match_wildcard_icase(str.data(), pattrn);
+    return str1;
 }
 
 /**
- * @brief       Case-insensitive wildcard pattern matching between two std::basic_strings.
- *
- * It supports wildcard characters:
- * - `*` matches any sequence of characters (including empty),
- * - `?` matches exactly one character.
- *
- * @param       str : The string to be matched.
- * @param       pattrn : The wildcard pattern string.
- * @return      `true` if `str` matches the wildcard pattern ignoring case; otherwise, `false`.
+ * @brief       Selects the second string when the first string's character type
+ *              does not match a specified type.
+ * @param       str1 : The first string (ignored if character type doesn't match).
+ * @param       str2 : The second string (returned if `str1` doesn't match).
+ * @return      A reference to `str2`.
  */
-template<StringLike TpSourceString, StringLike TpPatternString>
-[[nodiscard]] bool match_wildcard_icase(
-        const TpSourceString& str,
-        const TpPatternString& pattrn
-) noexcept
+template<typename TpChar, typename TpString1, typename TpString2>
+constexpr TpString2& pick_by_char(TpString1& str1, TpString2& str2)
 {
-    return speed::stringutils::match_wildcard_icase(str.data(), pattrn.data());
+    return str2;
 }
 
 /**
- * @brief       Splits a string into a vector of substrings based on separator characters,
- *              supporting escape characters.
- * @param       str : Null-terminated input string to split.
- * @param       seps : Null-terminated string of separator characters.
- * @param       escape_ch : Character used to escape separators.
- * @return      A vector of substrings of type
- *              `std::basic_string<TpSourceChar, TpCharTraits, TpAllocator>`. Empty input or
- *              separators result in an empty vector.
+ * @brief       Splits a string into substrings based on a set of separator characters.
+ * @param       str : The string to be split.
+ * @param       seps : The string containing one or more separator characters.
+ * @return      A vector of substrings resulting from the split operation.
  */
-template<
-        typename TpSourceChar,
-        typename TpSeparatorChar,
-        typename TpCharTraits,
-        typename TpAllocator,
-        typename TpIntegral
->
-[[nodiscard]] auto split(
-        const TpSourceChar* str,
-        const TpSeparatorChar* seps,
-        TpIntegral escape_ch
-)
+template<typename StringT1, typename StringT2>
+[[nodiscard]] auto split(const StringT1& str, const StringT2& seps)
 {
-    using char_allocator_type =
-        typename std::allocator_traits<TpAllocator>::template rebind_alloc<TpSourceChar>;
-    using string_type =
-        std::basic_string<TpSourceChar, TpCharTraits, char_allocator_type>;
+    using character_type = type_traits::character_type_of_t<StringT1>;
+    using character_traits_type = type_traits::character_traits_of_t<StringT1>;
+    using allocator_type = type_traits::allocator_of_t<StringT1>;
+    using string_type = std::basic_string<character_type, character_traits_type, allocator_type>;
+    using source_string_view_type = type_traits::string_view_of_t<StringT1>;
+    using separators_string_view_type = type_traits::string_view_of_t<StringT2>;
     using string_allocator_type =
-        typename std::allocator_traits<TpAllocator>::template rebind_alloc<string_type>;
-
+        typename std::allocator_traits<allocator_type>::template rebind_alloc<string_type>;
+    
     std::vector<string_type, string_allocator_type> vals;
-    const TpSourceChar* cur_substr = str;
-    std::size_t vals_sz = 0;
-    std::size_t cnt;
-
-    if (str == nullptr || seps == nullptr || *str == '\0' || *seps == '\0')
+    std::size_t start = 0;
+    
+    if (is_empty(str) || is_empty(seps))
     {
         return vals;
     }
-
-    auto is_separator = [seps](TpSourceChar ch)
+    
+    source_string_view_type strv = str;
+    separators_string_view_type sepsv = seps;
+    
+    vals.reserve(4);
+    
+    for (std::size_t i = 0; i < strv.size(); ++i)
     {
-        for (const TpSeparatorChar* sep_it = seps; *sep_it != '\0'; ++sep_it)
+        if (sepsv.find(strv[i]) != separators_string_view_type::npos)
         {
-            if (ch == *sep_it)
-            {
-                return true;
-            }
-        }
-        return false;
-    };
-    
-    auto get_current_substring_size = [seps, escape_ch](const TpSourceChar* cur_substr)
-    {
-        while (*cur_substr != '\0')
-        {
-            std::size_t cnt = cstr_count_prefix_not_in(cur_substr, seps);
-    
-            if (cnt == 0)
-            {
-                return (std::size_t)0;
-            }
-            else if (cur_substr[cnt - 1] != escape_ch)
-            {
-                return cnt;
-            }
-
-            cur_substr += cnt + 1;
-        }
-    
-        return (std::size_t)0;
-    };
-    
-    auto get_substring = [](const TpSourceChar* str, std::size_t cnt)
-    {
-        string_type res;
-        res.reserve(cnt);
-        res.append(str, cnt);
-        return res;
-    };
-    
-    while (*cur_substr != '\0')
-    {
-        cnt = get_current_substring_size(cur_substr);
-        
-        if (cnt != 0)
-        {
-            cur_substr += cnt;
-            ++vals_sz;
-        }
-        
-        while (is_separator(*cur_substr))
-        {
-            ++cur_substr;
+            vals.emplace_back(strv.substr(start, i - start));
+            start = i + 1;
         }
     }
-    vals.reserve(vals_sz);
 
-    cur_substr = str;
-    while (*cur_substr != '\0')
+    if (start < strv.size())
     {
-        cnt = get_current_substring_size(cur_substr);
-        
-        if (cnt != 0)
-        {
-            vals.emplace_back(get_substring(cur_substr, cnt));
-            cur_substr += cnt;
-        }
-        
-        if (is_separator(*cur_substr))
-        {
-            ++cur_substr;
-        }
+        vals.emplace_back(strv.substr(start));
+    }
+    else
+    {
+        vals.emplace_back(string_type());
     }
 
     return vals;
-}
-
-/**
- * @brief       Splits a std::basic_string into substrings based on separator characters with
- *              escape support.
- * @param       str : Input string to split.
- * @param       seps : Null-terminated string of separator characters.
- * @param       escape_ch : Character used to escape separators.
- * @return      A vector of substrings split from `str`.
- */
-template<
-        StringLike TpSourceString,
-        typename TpSeparatorChar,
-        typename TpCharTraits,
-        typename TpAllocator,
-        typename TpIntegral
->
-[[nodiscard]] auto split(
-        const TpSourceString& str,
-        const TpSeparatorChar* seps,
-        TpIntegral escape_ch
-)
-{
-    return speed::stringutils::split<typename TpSourceString::value_type, TpSeparatorChar,
-            TpCharTraits, TpAllocator, TpIntegral>(str.data(), seps, escape_ch);
-}
-
-/**
- * @brief       Splits a string into substrings based on separator characters with escape support.
- * @param       str : The input string to be split.
- * @param       seps : The separator characters as a string.
- * @param       escape_ch : Character used to escape separator characters.
- * @return      A vector of substrings resulting from splitting the input string.
- */
-template<
-        StringLike TpSourceString,
-        StringLike TpSeparatorString,
-        typename TpCharTraits,
-        typename TpAllocator,
-        typename TpIntegral
->
-[[nodiscard]] auto split(
-        const TpSourceString& str,
-        const TpSeparatorString& seps,
-        TpIntegral escape_ch
-)
-{
-    return speed::stringutils::split<typename TpSourceString::value_type,
-            typename TpSeparatorString::value_type, TpCharTraits, TpAllocator, TpIntegral>(
-                    str.data(), seps.data(), escape_ch);
 }
 
 /**
@@ -1398,15 +1281,16 @@ template<
  * @param       ch : The character to convert.
  * @return      The lowercase equivalent of `ch` if supported; otherwise, returns `ch` unchanged.
  */
-template<typename TpChar>
-[[nodiscard]] TpChar to_lower(TpChar ch)
+template<typename CharT>
+/** @cond */requires std::is_integral_v<CharT>/** @endcond */
+[[nodiscard]] CharT to_lower(CharT ch)
 {
-    if constexpr (std::is_same_v<TpChar, char>)
+    if constexpr (std::is_same_v<CharT, char>)
     {
         const std::locale loc;
         return std::tolower(ch, loc);
     }
-    else if constexpr (std::is_same_v<TpChar, wchar_t>)
+    else if constexpr (std::is_same_v<CharT, wchar_t>)
     {
         return std::towlower(ch);
     }
@@ -1415,39 +1299,35 @@ template<typename TpChar>
 }
 
 /**
- * @brief       Converts a null-terminated string to lowercase.
- * @param       str : Pointer to the null-terminated input string.
- * @return      A `std::basic_string` containing the lowercase version of the input string.
- */
-template<typename TpChar, typename TpCharTraits, typename TpAllocator>
-[[nodiscard]] auto to_lower(const TpChar* str)
-{
-    using string_type = std::basic_string<TpChar, TpCharTraits, TpAllocator>;
-    string_type res;
-
-    if (str == nullptr)
-    {
-        return res;
-    }
-
-    for (const TpChar* str_it = str; *str_it != '\0'; ++str_it)
-    {
-        res += speed::stringutils::to_lower(*str_it);
-    }
-
-    return res;
-}
-
-/**
  * @brief       Converts a string to lowercase.
  * @param       str : The input string to convert to lowercase.
  * @return      A new string containing the lowercase version of the input.
  */
-template<StringLike TpString, typename TpCharTraits, typename TpAllocator>
-[[nodiscard]] auto to_lower(const TpString& str)
+template<typename StringT>
+/** @cond */requires (!std::is_integral_v<StringT>)/** @endcond */
+[[nodiscard]] auto to_lower(const StringT& str)
 {
-    return speed::stringutils::to_lower<
-            typename TpString::value_type, TpCharTraits, TpAllocator>(str.data());
+    using character_type = type_traits::character_type_of_t<StringT>;
+    using character_traits_type = type_traits::character_traits_of_t<StringT>;
+    using string_view_type = type_traits::string_view_of_t<StringT>;
+    using string_type = std::basic_string<character_type, character_traits_type>;
+    
+    if (is_null(str))
+    {
+        return string_type();
+    }
+    
+    string_view_type strv = str;
+    string_type res;
+    
+    res.reserve(strv.size());
+
+    for (auto ch : strv)
+    {
+        res += stringutils::to_lower(ch);
+    }
+
+    return res;
 }
 
 /**
@@ -1455,22 +1335,22 @@ template<StringLike TpString, typename TpCharTraits, typename TpAllocator>
  * @param       str : The string to convert to lowercase in place.
  * @return      true if the string was modified (at least one character changed), false otherwise.
  */
-template<typename TpChar, typename TpCharTraits, typename TpAllocator>
-bool to_lower_inplace(std::basic_string<TpChar, TpCharTraits, TpAllocator>& str)
+template<typename CharT, typename CharTraitsT, typename AllocatorT>
+bool to_lower_inplace(std::basic_string<CharT, CharTraitsT, AllocatorT>& str)
 {
-    bool modified = false;
+    bool modif = false;
 
     for (auto& ch : str)
     {
-        TpChar lower_ch = speed::stringutils::to_lower(ch);
+        CharT lower_ch = stringutils::to_lower(ch);
         if (lower_ch != ch)
         {
             ch = lower_ch;
-            modified = true;
+            modif = true;
         }
     }
 
-    return modified;
+    return modif;
 }
 
 /**
@@ -1478,15 +1358,16 @@ bool to_lower_inplace(std::basic_string<TpChar, TpCharTraits, TpAllocator>& str)
  * @param       ch : The character to convert.
  * @return      The uppercase equivalent of the character.
  */
-template<typename TpChar>
-[[nodiscard]] TpChar to_upper(TpChar ch)
+template<typename CharT>
+/** @cond */requires std::is_integral_v<CharT>/** @endcond */
+[[nodiscard]] CharT to_upper(CharT ch)
 {
-    if constexpr (std::is_same_v<TpChar, char>)
+    if constexpr (std::is_same_v<CharT, char>)
     {
         const std::locale loc;
         return std::toupper(ch, loc);
     }
-    else if constexpr (std::is_same_v<TpChar, wchar_t>)
+    else if constexpr (std::is_same_v<CharT, wchar_t>)
     {
         return std::towupper(ch);
     }
@@ -1495,39 +1376,35 @@ template<typename TpChar>
 }
 
 /**
- * @brief       Converts a null-terminated string to uppercase.
- * @param       str : Pointer to a null-terminated input string.
- * @return      A new `std::basic_string` with uppercase characters.
- */
-template<typename TpChar, typename TpCharTraits, typename TpAllocator>
-[[nodiscard]] auto to_upper(const TpChar* str)
-{
-    using string_type = std::basic_string<TpChar, TpCharTraits, TpAllocator>;
-    string_type res;
-
-    if (str == nullptr)
-    {
-        return res;
-    }
-
-    for (const TpChar* str_it = str; *str_it != '\0'; ++str_it)
-    {
-        res += speed::stringutils::to_upper(*str_it);
-    }
-
-    return res;
-}
-
-/**
  * @brief       Converts a string to uppercase.
  * @param       str : Input string to convert.
  * @return      A new `std::basic_string` with uppercase characters.
  */
-template<StringLike TpString, typename TpCharTraits, typename TpAllocator>
-[[nodiscard]] auto to_upper(const TpString& str)
+template<typename StringT>
+/** @cond */requires (!std::is_integral_v<StringT>)/** @endcond */
+[[nodiscard]] auto to_upper(const StringT& str)
 {
-    return speed::stringutils::to_upper<
-            typename TpString::value_type, TpCharTraits, TpAllocator>(str.data());
+    using character_type = type_traits::character_type_of_t<StringT>;
+    using character_traits_type = type_traits::character_traits_of_t<StringT>;
+    using string_view_type = type_traits::string_view_of_t<StringT>;
+    using string_type = std::basic_string<character_type, character_traits_type>;
+    
+    if (is_null(str))
+    {
+        return string_type();
+    }
+    
+    string_view_type strv = str;
+    string_type res;
+    
+    res.reserve(strv.size());
+
+    for (auto ch : strv)
+    {
+        res += stringutils::to_upper(ch);
+    }
+
+    return res;
 }
 
 /**
@@ -1535,22 +1412,22 @@ template<StringLike TpString, typename TpCharTraits, typename TpAllocator>
  * @param       str : The string to modify in-place.
  * @return      true if the string was modified; false if no characters changed.
  */
-template<typename TpChar, typename TpCharTraits, typename TpAllocator>
-bool to_upper_inplace(std::basic_string<TpChar, TpCharTraits, TpAllocator>& str)
+template<typename CharT, typename CharTraitsT, typename AllocatorT>
+bool to_upper_inplace(std::basic_string<CharT, CharTraitsT, AllocatorT>& str)
 {
-    bool modifid = false;
+    bool modif = false;
 
     for (auto& ch : str)
     {
-        TpChar upper_ch = speed::stringutils::to_upper(ch);
+        CharT upper_ch = stringutils::to_upper(ch);
         if (upper_ch != ch)
         {
             ch = upper_ch;
-            modifid = true;
+            modif = true;
         }
     }
 
-    return modifid;
+    return modif;
 }
 
 }

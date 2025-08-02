@@ -29,6 +29,26 @@
 
 #include "speed/type_traits/type_traits.hpp"
 
+TEST(type_traits_operations, character_type_of)
+{
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::character_type_of_t<
+            std::string>, char>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::character_type_of_t<
+            std::wstring>, wchar_t>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::character_type_of_t<
+            std::string_view>, char>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::character_type_of_t<
+            std::wstring_view>, wchar_t>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::character_type_of_t<
+            const char*>, char>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::character_type_of_t<
+            wchar_t*>, wchar_t>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::character_type_of_t<
+            char[5]>, char>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::character_type_of_t
+            <const wchar_t[42]>, wchar_t>));
+}
+
 TEST(type_traits_operations, is_character)
 {
     EXPECT_TRUE(speed::type_traits::is_character<char>::value);
@@ -46,6 +66,7 @@ TEST(type_traits_operations, is_character_pointer)
     EXPECT_TRUE(speed::type_traits::is_character_pointer<char32_t*>::value);
     EXPECT_TRUE(!speed::type_traits::is_character_pointer<char>::value);
     EXPECT_TRUE(!speed::type_traits::is_character_pointer<char []>::value);
+    EXPECT_TRUE(!speed::type_traits::is_character_pointer<char*&>::value);
 }
 
 TEST(type_traits_operations, is_stdio_character)
@@ -56,6 +77,32 @@ TEST(type_traits_operations, is_stdio_character)
     EXPECT_TRUE(!speed::type_traits::is_stdio_character<char32_t>::value);
 }
 
+TEST(type_traits_operations, string_view_of)
+{
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::string_view_of_t<
+            std::string>, std::string_view>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::string_view_of_t<
+            std::wstring>, std::wstring_view>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::string_view_of_t<
+            std::string&>, std::string_view>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::string_view_of_t<
+            const std::wstring&>, std::wstring_view>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::string_view_of_t<
+            std::string&&>, std::string_view>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::string_view_of_t<
+            std::string_view>, std::string_view>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::string_view_of_t<
+            std::wstring_view>, std::wstring_view>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::string_view_of_t<
+            const char*>, std::string_view>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::string_view_of_t<
+            wchar_t*>, std::wstring_view>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::string_view_of_t<
+            char[5]>, std::string_view>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::string_view_of_t
+            <const wchar_t[42]>, std::wstring_view>));
+}
+
 TEST(type_traits_operations, try_underlying_type)
 {
     enum class item : char
@@ -63,7 +110,7 @@ TEST(type_traits_operations, try_underlying_type)
         POTION = 'P'
     };
     
-    EXPECT_TRUE((std::is_same_v<speed::type_traits::try_underlying_type_t<item>, char>));
-    EXPECT_TRUE((std::is_same_v<speed::type_traits::try_underlying_type_t<char>, char>));
-    EXPECT_TRUE(!(std::is_same_v<speed::type_traits::try_underlying_type_t<int>, char>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::underlying_type_of_t<item>, char>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::underlying_type_of_t<char>, char>));
+    EXPECT_TRUE(!(std::is_same_v<speed::type_traits::underlying_type_of_t<int>, char>));
 }

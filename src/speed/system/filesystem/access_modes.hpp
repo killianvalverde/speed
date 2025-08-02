@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -29,7 +29,7 @@
 
 #include <cstdint>
 
-#include "../../lowlevel/lowlevel.hpp"
+#include "../../scalars/scalars.hpp"
 
 namespace speed::system::filesystem {
 
@@ -63,13 +63,9 @@ using am_t = access_modes;
 }
 
 /** @cond */
-namespace speed::lowlevel {
 template<>
-struct enable_bitwise_operators<speed::system::filesystem::access_modes>
-{
-    static constexpr bool enable_with_same_type = true;
-};
-}
+struct speed::scalars::is_flag_enum<speed::system::filesystem::access_modes>
+        : std::true_type {};
 /** @endcond */
 
 #endif

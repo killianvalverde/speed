@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -30,6 +30,7 @@
 #include <filesystem>
 #include <system_error>
 
+#include "detail/forward_declarations.hpp"
 #include "../containers/containers.hpp"
 
 namespace speed::filesystem {
@@ -52,22 +53,23 @@ public:
     {
         if (access_mods_.is_not_empty() && file_typs_.is_not_empty())
         {
-            return speed::system::filesystem::access(c_str(), access_mods_.get_value(),
-                    file_typs_.get_value(), err_code);
+            return system::filesystem::check_file(c_str(), resolve_symlnk,
+                    access_mods_.get_value(), file_typs_.get_value(), err_code);
         }
         else if (access_mods_.is_not_empty())
         {
-            return speed::system::filesystem::access(c_str(), access_mods_.get_value(), err_code);
+            return system::filesystem::access(c_str(), resolve_symlnk,
+                    access_mods_.get_value(), err_code);
         }
         else if (file_typs_.is_not_empty())
         {
-            return speed::system::filesystem::is_file_type(c_str(), file_typs_.get_value(),
-                    err_code);
+            return system::filesystem::is_file_type(c_str(), resolve_symlnk,
+                    file_typs_.get_value(), err_code);
         }
         else
         {
-            return speed::system::filesystem::access(c_str(),
-                    speed::system::filesystem::access_modes::EXISTS, err_code);
+            return system::filesystem::access(c_str(), resolve_symlnk,
+                    system::filesystem::access_modes::EXISTS, err_code);
         }
     }
     
@@ -77,7 +79,7 @@ protected:
      * @param       access_mods : A bitmask or enumeration value representing the desired access
      *              modes.
      */
-    inline void set_access_modes(speed::system::filesystem::access_modes access_mods) noexcept
+    inline void set_access_modes(system::filesystem::access_modes access_mods) noexcept
     {
         access_mods_.set(access_mods);
     }
@@ -86,30 +88,42 @@ protected:
      * @brief       Sets the file types to filter or use.
      * @param       file_typs : A bitmask or enumeration value representing the file types to set.
      */
-    inline void set_file_types(speed::system::filesystem::file_types file_typs) noexcept
+    inline void set_file_types(system::filesystem::file_types file_typs) noexcept
     {
         file_typs_.set(file_typs);
     }
     
+    /**
+     * @brief       Specifies is symlinks has to be resolved.
+     * @param       enabl : Specifies whether or not the symlinks will be resolved.
+     */
+    inline void set_resolve_symlink(bool enabl) noexcept
+    {
+        resolve_symlnk = enabl;
+    }
+    
 private:
     /** The access modes to check. */
-    speed::containers::flags<speed::system::filesystem::access_modes> access_mods_ =
+    containers::flags<system::filesystem::access_modes> access_mods_ =
             system::filesystem::access_modes::NIL;
     
     /** The types of file to check. */
-    speed::containers::flags<speed::system::filesystem::file_types> file_typs_ =
+    containers::flags<system::filesystem::file_types> file_typs_ =
             system::filesystem::file_types::NIL;
+    
+    /** Specifies is symlinks has to be resolved. */
+    bool resolve_symlnk = true;
 };
 
 /**
  * @brief       Path class decorator that checks whether the path can be read.
  */
-template<typename TpBase>
-class read_path_decorator : public TpBase
+template<typename BaseT>
+class read_path_decorator : public BaseT
 {
 public:
     /** Component type. */
-    using TpBase::TpBase;
+    using BaseT::BaseT;
 
     /**
      * @brief       Allows knowing whether the path is valid.
@@ -118,20 +132,20 @@ public:
      */
     [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) override
     {
-        TpBase::set_access_modes(speed::system::filesystem::access_modes::READ);
-        return TpBase::is_valid(err_code);
+        BaseT::set_access_modes(system::filesystem::access_modes::READ);
+        return BaseT::is_valid(err_code);
     }
 };
 
 /**
  * @brief       Path class decorator that checks whether the path can be written.
  */
-template<typename TpBase>
-class write_path_decorator : public TpBase
+template<typename BaseT>
+class write_path_decorator : public BaseT
 {
 public:
     /** Component type. */
-    using TpBase::TpBase;
+    using BaseT::BaseT;
 
     /**
      * @brief       Allows knowing whether the path is valid.
@@ -140,20 +154,20 @@ public:
      */
     [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) override
     {
-        TpBase::set_access_modes(speed::system::filesystem::access_modes::WRITE);
-        return TpBase::is_valid(err_code);
+        BaseT::set_access_modes(system::filesystem::access_modes::WRITE);
+        return BaseT::is_valid(err_code);
     }
 };
 
 /**
  * @brief       Path class decorator that checks whether the path can be executed.
  */
-template<typename TpBase>
-class execute_path_decorator : public TpBase
+template<typename BaseT>
+class execute_path_decorator : public BaseT
 {
 public:
     /** Component type. */
-    using TpBase::TpBase;
+    using BaseT::BaseT;
 
     /**
      * @brief       Allows knowing whether the path is valid.
@@ -162,20 +176,20 @@ public:
      */
     [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) override
     {
-        TpBase::set_access_modes(speed::system::filesystem::access_modes::EXECUTE);
-        return TpBase::is_valid(err_code);
+        BaseT::set_access_modes(system::filesystem::access_modes::EXECUTE);
+        return BaseT::is_valid(err_code);
     }
 };
 
 /**
  * @brief       Path class decorator that checks whether the path is a regular file.
  */
-template<typename TpBase>
-class regular_file_path_decorator : public TpBase
+template<typename BaseT>
+class regular_file_path_decorator : public BaseT
 {
 public:
     /** Component type. */
-    using TpBase::TpBase;
+    using BaseT::BaseT;
 
     /**
      * @brief       Allows knowing whether the path is valid.
@@ -184,20 +198,20 @@ public:
      */
     [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) override
     {
-        TpBase::set_file_types(speed::system::filesystem::file_types::REGULAR_FILE);
-        return TpBase::is_valid(err_code);
+        BaseT::set_file_types(system::filesystem::file_types::REGULAR_FILE);
+        return BaseT::is_valid(err_code);
     }
 };
 
 /**
  * @brief       Path class decorator that checks whether the path is a directory.
  */
-template<typename TpBase>
-class directory_path_decorator : public TpBase
+template<typename BaseT>
+class directory_path_decorator : public BaseT
 {
 public:
     /** Component type. */
-    using TpBase::TpBase;
+    using BaseT::BaseT;
 
     /**
      * @brief       Allows knowing whether the path is valid.
@@ -206,8 +220,8 @@ public:
      */
     [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) override
     {
-        TpBase::set_file_types(speed::system::filesystem::file_types::DIRECTORY);
-        return TpBase::is_valid(err_code);
+        BaseT::set_file_types(system::filesystem::file_types::DIRECTORY);
+        return BaseT::is_valid(err_code);
     }
 };
 
@@ -215,12 +229,12 @@ public:
  * @brief       Path class decorator that checks whether the regular file path can be used as an
  *              output.
  */
-template<typename TpBase>
-class output_regular_file_path_decorator : public TpBase
+template<typename BaseT>
+class output_regular_file_path_decorator : public BaseT
 {
 public:
     /** Component type. */
-    using TpBase::TpBase;
+    using BaseT::BaseT;
 
     /**
      * @brief       Allows knowing whether the path is valid.
@@ -229,15 +243,23 @@ public:
      */
     [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) override
     {
-        TpBase::set_access_modes(speed::system::filesystem::access_modes::WRITE);
-        TpBase::set_file_types(speed::system::filesystem::file_types::REGULAR_FILE);
+        BaseT::set_access_modes(system::filesystem::access_modes::WRITE);
+        BaseT::set_file_types(system::filesystem::file_types::REGULAR_FILE);
         
-        if (!TpBase::is_valid(err_code))
+        if (!system::filesystem::access(BaseT::c_str(), system::filesystem::access_modes::EXISTS))
         {
-            return speed::system::filesystem::touch(TpBase::c_str(), err_code);
+            auto parent_pth = BaseT::parent_path();
+            if (!parent_pth.empty())
+            {
+                system::filesystem::mkdir_recursively(parent_pth.c_str());
+            }
+            if (!system::filesystem::touch(BaseT::c_str(), err_code))
+            {
+                return false;
+            }
         }
         
-        return true;
+        return BaseT::is_valid(err_code);
     }
 };
 
@@ -245,12 +267,12 @@ public:
  * @brief       Path class decorator that checks whether the directory path can be used as an
  *              output.
  */
-template<typename TpBase>
-class output_directory_path_decorator : public TpBase
+template<typename BaseT>
+class output_directory_path_decorator : public BaseT
 {
 public:
     /** Component type. */
-    using TpBase::TpBase;
+    using BaseT::BaseT;
 
     /**
      * @brief       Allows knowing whether the path is valid.
@@ -259,15 +281,18 @@ public:
      */
     [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) override
     {
-        TpBase::set_access_modes(speed::system::filesystem::access_modes::WRITE);
-        TpBase::set_file_types(speed::system::filesystem::file_types::DIRECTORY);
+        BaseT::set_access_modes(system::filesystem::access_modes::WRITE);
+        BaseT::set_file_types(system::filesystem::file_types::DIRECTORY);
         
-        if (!TpBase::is_valid(err_code))
+        if (!system::filesystem::access(BaseT::c_str(), system::filesystem::access_modes::EXISTS))
         {
-            return speed::system::filesystem::mkdir_recursively(TpBase::c_str(), err_code);
+            if (!system::filesystem::mkdir_recursively(BaseT::c_str(), err_code))
+            {
+                return false;
+            }
         }
         
-        return true;
+        return BaseT::is_valid(err_code);
     }
 };
 

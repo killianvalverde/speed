@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -24,7 +24,7 @@
  * @date        2017/10/18
  */
 
-#include "../../../compatibility/compatibility.hpp"
+#include "../../../platform/platform.hpp"
 #ifdef SPEED_WINAPI
 
 #include "operations.hpp"
@@ -32,7 +32,7 @@
 namespace speed::system::detail::winapi::time {
 
 bool get_monotonic_time(
-        system::time::time_specification* time_spec,
+        system::time::time_specification& time_spec,
         std::error_code* err_code
 ) noexcept
 {
@@ -46,7 +46,7 @@ bool get_monotonic_time(
         return false;
     }
 
-    time_spec->set_time(
+    time_spec.set_time(
             static_cast<std::uint64_t>(count.QuadPart / freq.QuadPart),
             static_cast<std::uint64_t>(
                     ((count.QuadPart % freq.QuadPart) * 1000000000ull) / freq.QuadPart));
@@ -55,7 +55,7 @@ bool get_monotonic_time(
 }
 
 bool get_cpu_time(
-        system::time::time_specification* time_spec,
+        system::time::time_specification& time_spec,
         std::error_code* err_code
 ) noexcept
 {
@@ -78,7 +78,7 @@ bool get_cpu_time(
     };
 
     total_ns = filetime_to_uint64(user_tme) * 100 + filetime_to_uint64(kernel_tme) * 100;
-    time_spec->set_time(total_ns / 1'000'000'000ull, total_ns % 1'000'000'000ull);
+    time_spec.set_time(total_ns / 1'000'000'000ull, total_ns % 1'000'000'000ull);
 
     return true;
 }

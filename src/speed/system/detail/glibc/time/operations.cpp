@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -24,7 +24,7 @@
  * @date        2017/10/18
  */
 
-#include "../../../compatibility/compatibility.hpp"
+#include "../../../platform/platform.hpp"
 #ifdef SPEED_GLIBC
 
 #include "operations.hpp"
@@ -35,7 +35,7 @@
 namespace speed::system::detail::glibc::time {
 
 bool get_monotonic_time(
-        system::time::time_specification* time_spec,
+        system::time::time_specification& time_spec,
         std::error_code* err_code
 ) noexcept
 {
@@ -58,13 +58,13 @@ bool get_monotonic_time(
         return false;
     }
 
-    time_spec->set_time((std::uint64_t)tp.tv_sec, (std::uint64_t)tp.tv_nsec);
+    time_spec.set_time((std::uint64_t)tp.tv_sec, (std::uint64_t)tp.tv_nsec);
     
     return true;
 }
 
 bool get_cpu_time(
-        system::time::time_specification* time_spec,
+        system::time::time_specification& time_spec,
         std::error_code* err_code
 ) noexcept
 {
@@ -86,14 +86,14 @@ bool get_cpu_time(
 
     cpu_tme = buf.tms_utime + buf.tms_stime;
 
-    time_spec->set_time((std::uint64_t)cpu_tme / cps,
-                        (1'000'000'000 / cps) * ((std::uint64_t)cpu_tme % cps));
+    time_spec.set_time((std::uint64_t)cpu_tme / cps,
+            (1'000'000'000 / cps) * ((std::uint64_t)cpu_tme % cps));
     
     return true;
 }
 
 bool get_child_cpu_time(
-        system::time::time_specification* time_spec,
+        system::time::time_specification& time_spec,
         std::error_code* err_code
 ) noexcept
 {
@@ -115,8 +115,8 @@ bool get_child_cpu_time(
 
     cpu_tme = buf.tms_cutime + buf.tms_cstime;
 
-    time_spec->set_time((std::uint64_t)cpu_tme / cps,
-                        (1'000'000'000 / cps) * ((std::uint64_t)cpu_tme % cps));
+    time_spec.set_time((std::uint64_t)cpu_tme / cps,
+            (1'000'000'000 / cps) * ((std::uint64_t)cpu_tme % cps));
     
     return true;
 }

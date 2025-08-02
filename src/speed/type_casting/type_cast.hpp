@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -27,6 +27,7 @@
 #ifndef SPEED_TYPE_CASTING_TYPE_CAST_HPP
 #define SPEED_TYPE_CASTING_TYPE_CAST_HPP
 
+#include "detail/forward_declarations.hpp"
 #include "error_category.hpp"
 #include "exception.hpp"
 #include "try_type_cast.hpp"
@@ -34,31 +35,30 @@
 namespace speed::type_casting {
 
 /**
- * @brief       Convert the source to the target.
- * @param       arg : The value to convert.
- * @return      If function was successful the new value is returned, otherwise and exception is 
- *              throw.
+ * @brief       Safely casts a value from one type to another, throwing exceptions on failure.
+ * @param       arg : The input value to be cast.
+ * @return      The successfully converted value of type `TargetT`.
  */
-template<typename TpTarget, typename TpSource>
-TpTarget type_cast(const TpSource& arg)
+template<typename TargetT, typename SourceT>
+TargetT type_cast(const SourceT& arg)
 {
     std::error_code err_code;
-    TpTarget res;
+    TargetT res;
     
-    if (!try_type_cast(arg, &res, &err_code))
+    if (!try_type_cast(arg, res, &err_code))
     {
-        switch (static_cast<error_codes>(err_code.value()))
+        switch (static_cast<detail::error_code_enum>(err_code.value()))
         {
-        case error_codes::ARITHMETIC_CONVERSION_FAILS:
+        case detail::error_code_enum::ARITHMETIC_CONVERSION_FAILS:
             throw conversion_fails_exception();
 
-        case error_codes::ARITHMETIC_INVALID_SYNTAX:
+        case detail::error_code_enum::ARITHMETIC_INVALID_SYNTAX:
             throw invalid_syntax_exception();
 
-        case error_codes::ARITHMETIC_OVERFLOW_RANGE:
+        case detail::error_code_enum::ARITHMETIC_OVERFLOW_RANGE:
             throw overflow_range_exception();
 
-        case error_codes::ARITHMETIC_UNDERFLOW_RANGE:
+        case detail::error_code_enum::ARITHMETIC_UNDERFLOW_RANGE:
             throw underflow_range_exception();
 
         default:
@@ -70,20 +70,20 @@ TpTarget type_cast(const TpSource& arg)
 }
 
 /**
- * @brief       Convert the source to the target.
- * @param       arg : The value to convert.
- * @param       default_val : The value returned if the conversion fails.
- * @return      If function was successful the new value is returned, otherwise the default value
- *              is returned.
+ * @brief       Safely casts a value from one type to another with a fallback default value.
+ * @param       arg : The input value to be cast.
+ * @param       default_val : The value to return if the cast fails.
+ * @return      The successfully converted value of type `TargetT` or `default_val` if the
+ *              cast fails.
  */
-template<typename TpTarget, typename TpSource, typename TpDefaultValue>
-TpTarget type_cast(const TpSource& arg, TpDefaultValue&& default_val) noexcept
+template<typename TargetT, typename SourceT, typename DefaultValueT>
+TargetT type_cast(const SourceT& arg, DefaultValueT&& default_val) noexcept
 {
     try
     {
-        TpTarget res;
+        TargetT res;
         
-        if (try_type_cast(arg, &res))
+        if (try_type_cast(arg, res))
         {
             return res;
         }
@@ -92,7 +92,7 @@ TpTarget type_cast(const TpSource& arg, TpDefaultValue&& default_val) noexcept
     {
     }
 
-    return std::forward<TpDefaultValue>(default_val);
+    return std::forward<DefaultValueT>(default_val);
 }
 
 }

@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -44,22 +44,6 @@ public:
     char const* what() const noexcept override
     {
         return "system exception";
-    }
-};
-
-/**
- * @brief       Class that represents a system not suported exception.
- */
-class system_not_suported_exception : public exception
-{
-public:
-    /**
-     * @brief       Get the message of the exception.
-     * @return      The exception message.
-     */
-    char const* what() const noexcept override
-    {
-        return "system not suported exception";
     }
 };
 

@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -27,10 +27,9 @@
 #ifndef SPEED_SYSTEM_DETAIL_WINAPI_FILESYSTEM_FILESYSTEM_HPP
 #define SPEED_SYSTEM_DETAIL_WINAPI_FILESYSTEM_FILESYSTEM_HPP
 
-#include "../../../compatibility/compatibility.hpp"
+#include "../../../platform/platform.hpp"
 #ifdef SPEED_WINAPI
 
-#include "basic_directory_entity_extension.hpp"
 #include "operations.hpp"
 
 namespace speed::system::detail::winapi {

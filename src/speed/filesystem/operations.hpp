@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -30,10 +30,9 @@
 namespace speed::filesystem {
 
 /**
- * @brief       Normalizes the given filesystem path by replacing alternate slashes with the
- *              standard slash.
- * @param       pth : The original filesystem path to normalize.
- * @return      The normalized filesystem path.
+ * @brief       Normalizes a filesystem path by replacing alternative slash characters.
+ * @param       pth : The input filesystem path.
+ * @return      A normalized filesystem path with consistent slash separators.
  */
 inline std::filesystem::path get_normalized_path(const std::filesystem::path& pth)
 {
@@ -43,6 +42,18 @@ inline std::filesystem::path get_normalized_path(const std::filesystem::path& pt
                  SPEED_SYSTEM_FILESYSTEM_SLASH_CHAR);
     
     return {std::move(path_str)};
+}
+
+/**
+ * @brief       Selects the appropriate path string based on the filesystem's character type.
+ * @param       lhs : First string candidate.
+ * @param       rhs : Second string candidate.
+ * @return      Reference to the selected string.
+ */
+template<typename StringT1, typename StringT2>
+constexpr auto& pick_path(const StringT1& lhs, const StringT2& rhs)
+{
+    return stringutils::pick_by_char<system::filesystem::path_char_t>(lhs, rhs);
 }
 
 }

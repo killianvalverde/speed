@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -33,12 +33,12 @@
 #include <system_error>
 #include <type_traits>
 
+#include "detail/forward_declarations.hpp"
 #include "../filesystem/filesystem.hpp"
 #include "../stringutils/stringutils.hpp"
 #include "../system/system.hpp"
 #include "../type_traits/type_traits.hpp"
 #include "error_category.hpp"
-#include "error_codes.hpp"
 
 namespace speed::type_casting {
 
@@ -52,16 +52,16 @@ namespace detail {
  * @param       err_code : If function fails it holds the error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-template<typename TpTarget, typename TpSource>
+template<typename TargetT, typename CharT>
 std::enable_if_t<
-        speed::type_traits::is_character_v<TpSource> &&
-                std::is_unsigned_v<TpTarget>,
+        type_traits::is_character_v<CharT> &&
+                std::is_unsigned_v<TargetT>,
         bool
 >
-try_type_cast(const TpSource* arg, TpTarget* res, std::error_code* err_code) noexcept
+try_type_cast(const CharT* arg, TargetT& res, std::error_code* err_code) noexcept
 {
-    using unsigned_type = TpTarget;
-    using char_type = std::remove_const_t<std::remove_pointer_t<std::decay_t<TpSource>>>;
+    using unsigned_type = TargetT;
+    using char_type = std::remove_const_t<std::remove_pointer_t<std::decay_t<CharT>>>;
     using string_pointer_type = const char_type*;
 
     constexpr unsigned_type max_unsigned = std::numeric_limits<unsigned_type>::max();
@@ -73,8 +73,7 @@ try_type_cast(const TpSource* arg, TpTarget* res, std::error_code* err_code) noe
 
     if (str == nullptr)
     {
-        assign_type_casting_error_code(
-            static_cast<int>(error_codes::ARITHMETIC_CONVERSION_FAILS), err_code);
+        detail::assign_error_code(error_code_enum::ARITHMETIC_CONVERSION_FAILS, err_code);
         return false;
     }
     
@@ -91,8 +90,7 @@ try_type_cast(const TpSource* arg, TpTarget* res, std::error_code* err_code) noe
 
     if (*str == '\0')
     {
-        assign_type_casting_error_code(
-                static_cast<int>(error_codes::ARITHMETIC_INVALID_SYNTAX), err_code);
+        detail::assign_error_code(error_code_enum::ARITHMETIC_INVALID_SYNTAX, err_code);
         return false;
     }
 
@@ -100,8 +98,7 @@ try_type_cast(const TpSource* arg, TpTarget* res, std::error_code* err_code) noe
     {
         if (!isdigit(digt))
         {
-            assign_type_casting_error_code(
-                static_cast<int>(error_codes::ARITHMETIC_INVALID_SYNTAX), err_code);
+            detail::assign_error_code(error_code_enum::ARITHMETIC_INVALID_SYNTAX, err_code);
             return false;
         }
 
@@ -110,8 +107,7 @@ try_type_cast(const TpSource* arg, TpTarget* res, std::error_code* err_code) noe
         if ((res_bldr > max_unsigned / 10) ||
             (res_bldr == max_unsigned / 10 && digt > (max_unsigned % 10)))
         {
-            assign_type_casting_error_code(
-                static_cast<int>(error_codes::ARITHMETIC_OVERFLOW_RANGE), err_code);
+            detail::assign_error_code(error_code_enum::ARITHMETIC_OVERFLOW_RANGE, err_code);
             return false;
         }
 
@@ -119,7 +115,7 @@ try_type_cast(const TpSource* arg, TpTarget* res, std::error_code* err_code) noe
         ++str;
     }
 
-    *res = res_bldr;
+    res = res_bldr;
     return true;
 }
 
@@ -130,16 +126,16 @@ try_type_cast(const TpSource* arg, TpTarget* res, std::error_code* err_code) noe
  * @param       err_code : If function fails it holds the error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-template<typename TpTarget, typename TpSource>
+template<typename TargetT, typename CharT>
 std::enable_if_t<
-        speed::type_traits::is_character_v<TpSource> &&
-                std::is_signed_v<TpTarget>,
+        type_traits::is_character_v<CharT> &&
+                std::is_signed_v<TargetT>,
         bool
 >
-try_type_cast(const TpSource* arg, TpTarget* res, std::error_code* err_code) noexcept
+try_type_cast(const CharT* arg, TargetT& res, std::error_code* err_code) noexcept
 {
-    using signed_type = TpTarget;
-    using char_type = std::remove_const_t<std::remove_pointer_t<std::decay_t<TpSource>>>;
+    using signed_type = TargetT;
+    using char_type = std::remove_const_t<std::remove_pointer_t<std::decay_t<CharT>>>;
     using string_pointer_type = const char_type*;
 
     constexpr signed_type min_signed = std::numeric_limits<signed_type>::min();
@@ -152,8 +148,7 @@ try_type_cast(const TpSource* arg, TpTarget* res, std::error_code* err_code) noe
 
     if (str == nullptr)
     {
-        assign_type_casting_error_code(
-            static_cast<int>(error_codes::ARITHMETIC_CONVERSION_FAILS), err_code);
+        detail::assign_error_code(error_code_enum::ARITHMETIC_CONVERSION_FAILS, err_code);
         return false;
     }
 
@@ -170,8 +165,7 @@ try_type_cast(const TpSource* arg, TpTarget* res, std::error_code* err_code) noe
 
     if (*str == '\0')
     {
-        assign_type_casting_error_code(
-            static_cast<int>(error_codes::ARITHMETIC_INVALID_SYNTAX), err_code);
+        detail::assign_error_code(error_code_enum::ARITHMETIC_INVALID_SYNTAX, err_code);
         return false;
     }
 
@@ -179,8 +173,7 @@ try_type_cast(const TpSource* arg, TpTarget* res, std::error_code* err_code) noe
     {
         if (!isdigit(digt))
         {
-            assign_type_casting_error_code(
-                static_cast<int>(error_codes::ARITHMETIC_INVALID_SYNTAX), err_code);
+            detail::assign_error_code(error_code_enum::ARITHMETIC_INVALID_SYNTAX, err_code);
             return false;
         }
 
@@ -189,8 +182,7 @@ try_type_cast(const TpSource* arg, TpTarget* res, std::error_code* err_code) noe
         if ((res_bldr < min_signed / 10) ||
             (res_bldr == min_signed / 10 && digt > -(min_signed % 10)))
         {
-            assign_type_casting_error_code(
-                static_cast<int>(error_codes::ARITHMETIC_OVERFLOW_RANGE), err_code);
+            detail::assign_error_code(error_code_enum::ARITHMETIC_OVERFLOW_RANGE, err_code);
             return false;
         }
 
@@ -202,15 +194,14 @@ try_type_cast(const TpSource* arg, TpTarget* res, std::error_code* err_code) noe
     {
         if (res_bldr < -max_signed)
         {
-            assign_type_casting_error_code(
-                static_cast<int>(error_codes::ARITHMETIC_OVERFLOW_RANGE), err_code);
+            detail::assign_error_code(error_code_enum::ARITHMETIC_OVERFLOW_RANGE, err_code);
             return false;
         }
 
         res_bldr *= -1;
     }
 
-    *res = res_bldr;
+    res = res_bldr;
     return true;
 }
 
@@ -221,12 +212,12 @@ try_type_cast(const TpSource* arg, TpTarget* res, std::error_code* err_code) noe
  * @param       err_code : If function fails it holds the error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-template<typename TpSource>
+template<typename CharT>
 std::enable_if_t<
-        speed::type_traits::is_character_v<TpSource>,
+        type_traits::is_character_v<CharT>,
         bool
 >
-try_type_cast(const TpSource* arg, float* res, std::error_code* err_code) noexcept
+try_type_cast(const CharT* arg, float& res, std::error_code* err_code) noexcept
 {
     errno = 0;
     char* endptr;
@@ -236,26 +227,23 @@ try_type_cast(const TpSource* arg, float* res, std::error_code* err_code) noexce
 
     if (endptr == arg || *endptr != '\0')
     {
-        assign_type_casting_error_code(
-            static_cast<int>(error_codes::ARITHMETIC_CONVERSION_FAILS), err_code);
+        detail::assign_error_code(error_code_enum::ARITHMETIC_CONVERSION_FAILS, err_code);
         return false;
     }
 
     if (res_bldr == HUGE_VALF && errno == ERANGE)
     {
-        assign_type_casting_error_code(
-            static_cast<int>(error_codes::ARITHMETIC_OVERFLOW_RANGE), err_code);
+        detail::assign_error_code(error_code_enum::ARITHMETIC_OVERFLOW_RANGE, err_code);
         return false;
     }
 
     if (errno == ERANGE)
     {
-        assign_type_casting_error_code(
-            static_cast<int>(error_codes::ARITHMETIC_UNDERFLOW_RANGE), err_code);
+        detail::assign_error_code(error_code_enum::ARITHMETIC_UNDERFLOW_RANGE, err_code);
         return false;
     }
 
-    *res = res_bldr;
+    res = res_bldr;
     return true;
 }
 
@@ -266,12 +254,12 @@ try_type_cast(const TpSource* arg, float* res, std::error_code* err_code) noexce
  * @param       err_code : If function fails it holds the error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-template<typename TpSource>
+template<typename CharT>
 std::enable_if_t<
-        speed::type_traits::is_character_v<TpSource>,
+        type_traits::is_character_v<CharT>,
         bool
 >
-try_type_cast(const TpSource* arg, double* res, std::error_code* err_code) noexcept
+try_type_cast(const CharT* arg, double& res, std::error_code* err_code) noexcept
 {
     errno = 0;
     char* endptr;
@@ -281,26 +269,23 @@ try_type_cast(const TpSource* arg, double* res, std::error_code* err_code) noexc
 
     if (endptr == arg || *endptr != '\0')
     {
-        assign_type_casting_error_code(
-            static_cast<int>(error_codes::ARITHMETIC_CONVERSION_FAILS), err_code);
+        detail::assign_error_code(error_code_enum::ARITHMETIC_CONVERSION_FAILS, err_code);
         return false;
     }
 
     if (res_bldr == HUGE_VAL && errno == ERANGE)
     {
-        assign_type_casting_error_code(
-            static_cast<int>(error_codes::ARITHMETIC_OVERFLOW_RANGE), err_code);
+        detail::assign_error_code(error_code_enum::ARITHMETIC_OVERFLOW_RANGE, err_code);
         return false;
     }
 
     if (errno == ERANGE)
     {
-        assign_type_casting_error_code(
-            static_cast<int>(error_codes::ARITHMETIC_UNDERFLOW_RANGE), err_code);
+        detail::assign_error_code(error_code_enum::ARITHMETIC_UNDERFLOW_RANGE, err_code);
         return false;
     }
 
-    *res = res_bldr;
+    res = res_bldr;
     return true;
 }
 
@@ -311,12 +296,12 @@ try_type_cast(const TpSource* arg, double* res, std::error_code* err_code) noexc
  * @param       err_code : If function fails it holds the error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-template<typename TpSource>
+template<typename CharT>
 std::enable_if_t<
-        speed::type_traits::is_character_v<TpSource>,
+        type_traits::is_character_v<CharT>,
         bool
 >
-try_type_cast(const TpSource* arg, long double* res, std::error_code* err_code) noexcept
+try_type_cast(const CharT* arg, long double& res, std::error_code* err_code) noexcept
 {
     errno = 0;
     char* endptr;
@@ -326,53 +311,48 @@ try_type_cast(const TpSource* arg, long double* res, std::error_code* err_code) 
 
     if (endptr == arg || *endptr != '\0')
     {
-        assign_type_casting_error_code(
-            static_cast<int>(error_codes::ARITHMETIC_CONVERSION_FAILS), err_code);
+        detail::assign_error_code(error_code_enum::ARITHMETIC_CONVERSION_FAILS, err_code);
         return false;
     }
 
     if (res_bldr == HUGE_VALL && errno == ERANGE)
     {
-        assign_type_casting_error_code(
-            static_cast<int>(error_codes::ARITHMETIC_OVERFLOW_RANGE), err_code);
+        detail::assign_error_code(error_code_enum::ARITHMETIC_OVERFLOW_RANGE, err_code);
         return false;
     }
 
     if (errno == ERANGE)
     {
-        assign_type_casting_error_code(
-            static_cast<int>(error_codes::ARITHMETIC_UNDERFLOW_RANGE), err_code);
+        detail::assign_error_code(error_code_enum::ARITHMETIC_UNDERFLOW_RANGE, err_code);
         return false;
     }
 
-    *res = res_bldr;
+    res = res_bldr;
     return true;
 }
 
 /**
- * @brief       Tries to convert a c_string into a string.
+ * @brief       Tries to convert a cstr into a basic_string.
  * @param       arg : The value to convert.
  * @param       res : The result of the operation if it was successful.
  * @param       err_code : If function fails it holds the error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-template<typename TpChar, typename TpCharTraits, typename TpCharAlloc>
+template<typename CharT, typename CharTraitsT, typename AllocatorT>
 bool try_type_cast(
-        const TpChar* arg,
-        std::basic_string<TpChar, TpCharTraits, TpCharAlloc>* res,
+        const CharT* arg,
+        std::basic_string<CharT, CharTraitsT, AllocatorT>& res,
         std::error_code* err_code
 ) noexcept
 {
     try
     {
-        res->assign(arg);
+        res.assign(arg);
         return true;
     }
     catch (...)
     {
-        assign_type_casting_error_code(
-                static_cast<int>(error_codes::OTHER),
-                err_code);
+        detail::assign_error_code(error_code_enum::OTHER, err_code);
     }
 
     return false;
@@ -385,19 +365,16 @@ bool try_type_cast(
  * @param       err_code : If function fails it holds the error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-template<typename TpCharTraits, typename TpCharAlloc>
+template<typename CharTraitsT, typename AllocatorT>
 bool try_type_cast(
         const char* arg,
-        std::basic_string<wchar_t, TpCharTraits, TpCharAlloc>* res,
+        std::basic_string<wchar_t, CharTraitsT, AllocatorT>& res,
         std::error_code* err_code
 ) noexcept
 {
-    if (!speed::system::codecs::convert_c_str_to_wstring(arg, res))
+    if (!system::codecs::convert_cstr_to_wstring(arg, res))
     {
-        assign_type_casting_error_code(
-                static_cast<int>(error_codes::RANGE_ERROR),
-                err_code);
-
+        detail::assign_error_code(error_code_enum::RANGE_ERROR, err_code);
         return false;
     }
 
@@ -411,19 +388,16 @@ bool try_type_cast(
  * @param       err_code : If function fails it holds the error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-template<typename TpCharTraits, typename TpCharAlloc>
+template<typename CharTraitsT, typename AllocatorT>
 bool try_type_cast(
         const wchar_t* arg,
-        std::basic_string<char, TpCharTraits, TpCharAlloc>* res,
+        std::basic_string<char, CharTraitsT, AllocatorT>& res,
         std::error_code* err_code
 ) noexcept
 {
-    if (!speed::system::codecs::convert_w_str_to_string(arg, res))
+    if (!system::codecs::convert_wcstr_to_string(arg, res))
     {
-        assign_type_casting_error_code(
-                static_cast<int>(error_codes::RANGE_ERROR),
-                err_code);
-
+        detail::assign_error_code(error_code_enum::RANGE_ERROR, err_code);
         return false;
     }
 
@@ -437,27 +411,25 @@ bool try_type_cast(
  * @param       err_code : If function fails it holds the error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-template<typename TpChar, typename TpRegexTratis>
+template<typename CharT, typename RegexTratisT>
 std::enable_if_t<
-        speed::type_traits::is_character_v<TpChar>,
+        type_traits::is_character_v<CharT>,
         bool
 >
 try_type_cast(
-        const TpChar* arg,
-        std::basic_regex<TpChar, TpRegexTratis>* res,
+        const CharT* arg,
+        std::basic_regex<CharT, RegexTratisT>& res,
         std::error_code* err_code
 ) noexcept
 {
     try
     {
-        res->assign(arg);
+        res.assign(arg);
         return true;
     }
     catch (...)
     {
-        assign_type_casting_error_code(
-                static_cast<int>(error_codes::OTHER),
-                err_code);
+        detail::assign_error_code(error_code_enum::OTHER, err_code);
     }
 
     return false;
@@ -470,36 +442,34 @@ try_type_cast(
  * @param       err_code : If function fails it holds the error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-template<typename TpRegexChar, typename TpRegexTratis, typename TpSource>
+template<typename RegexCharT, typename RegexTratisT, typename CharT>
 std::enable_if_t<
-        speed::type_traits::is_character_v<TpSource> &&
-                !std::is_same_v<TpSource, TpRegexChar>,
+        type_traits::is_character_v<CharT> &&
+                !std::is_same_v<CharT, RegexCharT>,
         bool
 >
 try_type_cast(
-        const TpSource* arg,
-        std::basic_regex<TpRegexChar, TpRegexTratis>* res,
+        const CharT* arg,
+        std::basic_regex<RegexCharT, RegexTratisT>& res,
         std::error_code* err_code
 ) noexcept
 {
     try
     {
-        using string_type = std::basic_string<TpRegexChar>;
+        using string_type = std::basic_string<RegexCharT>;
         string_type string_helpr;
         
-        if (!try_type_cast(arg, &string_helpr, err_code))
+        if (!try_type_cast(arg, string_helpr, err_code))
         {
             return false;
         }
         
-        res->assign(std::move(string_helpr));
+        res.assign(std::move(string_helpr));
         return true;
     }
     catch (...)
     {
-        assign_type_casting_error_code(
-                static_cast<int>(error_codes::OTHER),
-                err_code);
+        detail::assign_error_code(error_code_enum::OTHER, err_code);
     }
 
     return false;
@@ -512,33 +482,30 @@ try_type_cast(
  * @param       err_code : If function fails it holds the error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-template<typename TpSource>
+template<typename CharT>
 std::enable_if_t<
-        speed::type_traits::is_character_v<TpSource> &&
-                !std::is_same_v<TpSource, std::filesystem::path::value_type>,
+        type_traits::is_character_v<CharT> &&
+                !std::is_same_v<CharT, std::filesystem::path::value_type>,
         bool
 >
-try_type_cast(const TpSource* arg, std::filesystem::path* res, std::error_code* err_code) noexcept
+try_type_cast(const CharT* arg, std::filesystem::path& res, std::error_code* err_code) noexcept
 {
     try
     {
         using string_type = std::basic_string<std::filesystem::path::value_type>;
         string_type string_helpr;
         
-        if (!try_type_cast(arg, &string_helpr, err_code))
+        if (!try_type_cast(arg, string_helpr, err_code))
         {
             return false;
         }
         
-        res->assign(std::move(string_helpr));
+        res.assign(std::move(string_helpr));
         return true;
     }
     catch (...)
     {
-        assign_type_casting_error_code(
-                static_cast<int>(error_codes::FILESYSTEM_INVALID_PATH),
-                err_code);
-
+        detail::assign_error_code(error_code_enum::FILESYSTEM_INVALID_PATH, err_code);
         return false;
     }
 }
@@ -550,25 +517,22 @@ try_type_cast(const TpSource* arg, std::filesystem::path* res, std::error_code* 
  * @param       err_code : If function fails it holds the error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-template<typename TpSource>
+template<typename CharT>
 std::enable_if_t<
-        speed::type_traits::is_character_v<TpSource> &&
-                std::is_same_v<TpSource, std::filesystem::path::value_type>,
+        type_traits::is_character_v<CharT> &&
+                std::is_same_v<CharT, std::filesystem::path::value_type>,
         bool
 >
-try_type_cast(const TpSource* arg, std::filesystem::path* res, std::error_code* err_code) noexcept
+try_type_cast(const CharT* arg, std::filesystem::path& res, std::error_code* err_code) noexcept
 {
     try
     {
-        res->assign(arg);
+        res.assign(arg);
         return true;
     }
     catch (...)
     {
-        assign_type_casting_error_code(
-                static_cast<int>(error_codes::FILESYSTEM_INVALID_PATH),
-                err_code);
-
+        detail::assign_error_code(error_code_enum::FILESYSTEM_INVALID_PATH, err_code);
         return false;
     }
 }
@@ -580,29 +544,26 @@ try_type_cast(const TpSource* arg, std::filesystem::path* res, std::error_code* 
  * @param       err_code : If function fails it holds the error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-template<typename TpTarget, typename TpSource>
+template<typename TargetT, typename CharT>
 std::enable_if_t<
-        speed::type_traits::is_character_v<TpSource> &&
-                std::is_base_of_v<speed::filesystem::valid_path, TpTarget>,
+        type_traits::is_character_v<CharT> &&
+                std::is_base_of_v<filesystem::valid_path, TargetT>,
         bool
 >
-try_type_cast(const TpSource* arg, TpTarget* res, std::error_code* err_code) noexcept
+try_type_cast(const CharT* arg, TargetT& res, std::error_code* err_code) noexcept
 {
     try
     {
-        if (!try_type_cast(arg, (dynamic_cast<std::filesystem::path*>(res)), err_code))
+        if (!try_type_cast(arg, (dynamic_cast<std::filesystem::path&>(res)), err_code))
         {
             return false;
         }
         
-        return res->is_valid(err_code);
+        return res.is_valid(err_code);
     }
     catch (...)
     {
-        assign_type_casting_error_code(
-                static_cast<int>(error_codes::FILESYSTEM_INVALID_PATH),
-                err_code);
-
+        detail::assign_error_code(error_code_enum::FILESYSTEM_INVALID_PATH, err_code);
         return false;
     }
 }
@@ -614,14 +575,31 @@ try_type_cast(const TpSource* arg, TpTarget* res, std::error_code* err_code) noe
  * @param       err_code : If function fails it holds the error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-template<typename TpTarget, typename TpChar, typename TpCharTraits, typename TpCharAlloc>
+template<typename TargetT, typename CharT, typename CharTraitsT, typename AllocatorT>
 inline bool try_type_cast(
-        const std::basic_string<TpChar, TpCharTraits, TpCharAlloc>& arg,
-        TpTarget* res,
+        const std::basic_string<CharT, CharTraitsT, AllocatorT>& arg,
+        TargetT& res,
         std::error_code* err_code
 ) noexcept
 {
     return try_type_cast(arg.c_str(), res, err_code);
+}
+
+/**
+ * @brief       Tries to convert a basic_string into a type.
+ * @param       arg : The value to convert.
+ * @param       res : The result of the operation if it was successful.
+ * @param       err_code : If function fails it holds the error code.
+ * @return      If function was successful true is returned, otherwise false is returned.
+ */
+template<typename TargetT, typename CharT, typename CharTraitsT>
+inline bool try_type_cast(
+        const std::basic_string_view<CharT, CharTraitsT>& arg,
+        TargetT& res,
+        std::error_code* err_code
+) noexcept
+{
+    return try_type_cast(arg.data(), res, err_code);
 }
 
 /**
@@ -631,10 +609,10 @@ inline bool try_type_cast(
  * @param       err_code : If function fails it holds the error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-template<typename TpTarget>
+template<typename TargetT>
 inline bool try_type_cast(
         const std::filesystem::path& arg,
-        TpTarget* res,
+        TargetT& res,
         std::error_code* err_code
 ) noexcept
 {
@@ -645,16 +623,16 @@ inline bool try_type_cast(
 /** @endcond */
 
 /**
- * @brief       Tries to convert the source into the target.
- * @param       arg : The value to convert.
- * @param       res : The result of the operation if it was successful.
- * @param       err_code : If function fails it holds the error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief       Attempts to cast a value from one type to another.
+ * @param       arg : The input value to be cast.
+ * @param       res : Reference to where the converted value will be stored if successful.
+ * @param       err_code : Optional pointer to an error code object to store failure details.
+ * @return      `true` if the cast succeeds, otherwise `false`.
  */
-template<typename TpTarget, typename TpSource>
+template<typename TargetT, typename SourceT>
 inline bool try_type_cast(
-    const TpSource& arg, 
-    TpTarget* res, 
+    const SourceT& arg, 
+    TargetT& res,
     std::error_code* err_code
 ) noexcept
 {

@@ -170,7 +170,7 @@ TEST(stringutils_operations, get_length)
     const wchar_t* str2 = L"hello, world";
     char str3[] = "hello, world";
     wchar_t str4[] = L"hello, world";
-    char* str5 = nullptr;
+    const char* str5 = nullptr;
     std::string str6 = "12345";
     std::wstring str7 = L"12345";
     
@@ -195,35 +195,100 @@ TEST(stringutils_operations, match_wildcard)
 
 TEST(stringutils_operations, split)
 {
-    char str1[32] = "1;2;3;4;5;6";
-    std::wstring str2 = L"1;2;3;4;5;;6;;";
-    std::size_t i;
-    
-    auto vec1 = speed::stringutils::split(str1, ";");
-    
-    i = '1';
-    for (auto& x : vec1)
     {
-        EXPECT_TRUE(x[0] == i++);
+        // Empty string -> returns empty vector
+        auto result = speed::stringutils::split("", ",");
+        EXPECT_TRUE(result.empty());
     }
-    
-    auto vec2 = speed::stringutils::split(str2, ";");
-    
-    i = '1';
-    for (auto& x : vec2)
+
     {
-        EXPECT_TRUE(x[0] == i++);
+        // Empty separators -> returns empty vector
+        auto result = speed::stringutils::split("abc", "");
+        EXPECT_TRUE(result.empty());
+    }
+
+    {
+        // Simple split
+        auto result = speed::stringutils::split("a,b,c", ",");
+        ASSERT_EQ(result.size(), 3u);
+        EXPECT_EQ(result[0], "a");
+        EXPECT_EQ(result[1], "b");
+        EXPECT_EQ(result[2], "c");
+    }
+
+    {
+        // Multiple separators
+        auto result = speed::stringutils::split("a;b,c", ",;");
+        ASSERT_EQ(result.size(), 3u);
+        EXPECT_EQ(result[0], "a");
+        EXPECT_EQ(result[1], "b");
+        EXPECT_EQ(result[2], "c");
+    }
+
+    {
+        // Consecutive separators
+        auto result = speed::stringutils::split("a,,b", ",");
+        ASSERT_EQ(result.size(), 3u);
+        EXPECT_EQ(result[0], "a");
+        EXPECT_EQ(result[1], "");
+        EXPECT_EQ(result[2], "b");
+    }
+
+    {
+        // Trailing separator
+        auto result = speed::stringutils::split("a,b,", ",");
+        ASSERT_EQ(result.size(), 3u);
+        EXPECT_EQ(result[0], "a");
+        EXPECT_EQ(result[1], "b");
+        EXPECT_EQ(result[2], "");
+    }
+
+    {
+        // Leading separator
+        auto result = speed::stringutils::split(",a,b", ",");
+        ASSERT_EQ(result.size(), 3u);
+        EXPECT_EQ(result[0], "");
+        EXPECT_EQ(result[1], "a");
+        EXPECT_EQ(result[2], "b");
+    }
+
+    {
+        // Single token, no separators
+        auto result = speed::stringutils::split("abc", ",");
+        ASSERT_EQ(result.size(), 1u);
+        EXPECT_EQ(result[0], "abc");
+    }
+
+    {
+        // Multiple separators only
+        auto result = speed::stringutils::split(",,,", ",");
+        ASSERT_EQ(result.size(), 4u);
+        EXPECT_EQ(result[0], "");
+        EXPECT_EQ(result[1], "");
+        EXPECT_EQ(result[2], "");
+        EXPECT_EQ(result[3], "");
     }
 }
 
 TEST(stringutils_operations, to_lower)
 {
+    EXPECT_TRUE(speed::stringutils::to_lower('I') == 'i');
+    EXPECT_TRUE(speed::stringutils::to_lower("AEIOU") == "aeiou");
+    EXPECT_TRUE(speed::stringutils::to_lower(L'I') == L'i');
+    EXPECT_TRUE(speed::stringutils::to_lower(L"AEIOU") == L"aeiou");
+    // EXPECT_TRUE(speed::stringutils::to_lower('Í') == 'í');
+    // EXPECT_TRUE(speed::stringutils::to_lower("ÎÁÚÓ") == "îáúó");
     // EXPECT_TRUE(speed::stringutils::to_lower(L'Í') == L'í');
     // EXPECT_TRUE(speed::stringutils::to_lower(L"ÎÁÚÓ") == L"îáúó");
 }
 
 TEST(stringutils_operations, to_upper)
 {
+    EXPECT_TRUE(speed::stringutils::to_upper('i') == 'I');
+    EXPECT_TRUE(speed::stringutils::to_upper("aeiou") == "AEIOU");
+    EXPECT_TRUE(speed::stringutils::to_upper(L'i') == L'I');
+    EXPECT_TRUE(speed::stringutils::to_upper(L"aeiou") == L"AEIOU");
+    // EXPECT_TRUE(speed::stringutils::to_upper("îáúó") == "ÎÁÚÓ");
     // EXPECT_TRUE(speed::stringutils::to_upper(L'í') == L'Í');
     // EXPECT_TRUE(speed::stringutils::to_upper(L"îáúó") == L"ÎÁÚÓ");
 }

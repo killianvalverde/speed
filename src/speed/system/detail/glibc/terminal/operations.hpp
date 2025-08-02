@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -27,7 +27,7 @@
 #ifndef SPEED_SYSTEM_DETAIL_GLIBC_TERMINAL_OPERATIONS_HPP
 #define SPEED_SYSTEM_DETAIL_GLIBC_TERMINAL_OPERATIONS_HPP
 
-#include "../../../compatibility/compatibility.hpp"
+#include "../../../platform/platform.hpp"
 #ifdef SPEED_GLIBC
 
 #include <cstdio>
@@ -76,7 +76,18 @@ bool kbhit(
  * @return      If function was successful 0 is returned, otherwise -1 is returned.
  */
 bool set_foreground_text_attribute(
-        ::FILE* terminal_strm,
+        std::ostream& os,
+        system::terminal::text_attribute text_attr
+) noexcept;
+
+/**
+ * @brief       Set a terminal text attribute.
+ * @param       terminal_strm : Stream in which set the attribute.
+ * @param       text_attr : Attribute to set.
+ * @return      If function was successful 0 is returned, otherwise -1 is returned.
+ */
+bool set_foreground_text_attribute(
+        std::wostream& wos,
         system::terminal::text_attribute text_attr
 ) noexcept;
 

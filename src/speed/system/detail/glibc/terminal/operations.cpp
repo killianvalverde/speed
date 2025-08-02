@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -24,7 +24,7 @@
  * @date        2017/10/18
  */
 
-#include "../../../compatibility/compatibility.hpp"
+#include "../../../platform/platform.hpp"
 #ifdef SPEED_GLIBC
 
 #include "operations.hpp"
@@ -118,71 +118,167 @@ bool kbhit(
 }
 
 bool set_foreground_text_attribute(
-        ::FILE* terminal_strm,
+        std::ostream& os,
         system::terminal::text_attribute text_attr
 ) noexcept
 {
-    int res = 0;
+    bool is_stdout_terminl = (::isatty(fileno(stdout)) != 0);
+    bool is_stderr_terminl = (::isatty(fileno(stderr)) != 0);
     
-    switch (text_attr)
+    if ((&os == &std::cout && !is_stdout_terminl) ||
+        (&os == &std::cerr && !is_stderr_terminl))
     {
-    case system::terminal::text_attribute::DEFAULT:
-        res = ::fprintf(terminal_strm, "\033[0m");
-        break;
-    case system::terminal::text_attribute::BLACK:
-        res = ::fprintf(terminal_strm, "\033[0;30m");
-        break;
-    case system::terminal::text_attribute::RED:
-        res = ::fprintf(terminal_strm, "\033[0;31m");
-        break;
-    case system::terminal::text_attribute::GREEN:
-        res = ::fprintf(terminal_strm, "\033[0;32m");
-        break;
-    case system::terminal::text_attribute::BROWN:
-        res = ::fprintf(terminal_strm, "\033[0;33m");
-        break;
-    case system::terminal::text_attribute::BLUE:
-        res = ::fprintf(terminal_strm, "\033[0;34m");
-        break;
-    case system::terminal::text_attribute::PURPLE:
-        res = ::fprintf(terminal_strm, "\033[0;35m");
-        break;
-    case system::terminal::text_attribute::CYAN:
-        res = ::fprintf(terminal_strm, "\033[0;36m");
-        break;
-    case system::terminal::text_attribute::LIGHT_GRAY:
-        res = ::fprintf(terminal_strm, "\033[0;37m");
-        break;
-    case system::terminal::text_attribute::GRAY:
-        res = ::fprintf(terminal_strm, "\033[1;30m");
-        break;
-    case system::terminal::text_attribute::LIGHT_RED:
-        res = ::fprintf(terminal_strm, "\033[1;31m");
-        break;
-    case system::terminal::text_attribute::LIGHT_GREEN:
-        res = ::fprintf(terminal_strm, "\033[1;32m");
-        break;
-    case system::terminal::text_attribute::YELLOW:
-        res = ::fprintf(terminal_strm, "\033[1;33m");
-        break;
-    case system::terminal::text_attribute::LIGHT_BLUE:
-        res = ::fprintf(terminal_strm, "\033[1;34m");
-        break;
-    case system::terminal::text_attribute::LIGHT_PURPLE:
-        res = ::fprintf(terminal_strm, "\033[1;35m");
-        break;
-    case system::terminal::text_attribute::LIGHT_CYAN:
-        res = ::fprintf(terminal_strm, "\033[1;36m");
-        break;
-    case system::terminal::text_attribute::WHITE:
-        res = ::fprintf(terminal_strm, "\033[1;37m");
-        break;
-    case system::terminal::text_attribute::NIL:
-    default:
-        break;
+        return false;
     }
     
-    return (res >= 0);
+    try
+    {
+        switch (text_attr)
+        {
+        case system::terminal::text_attribute::DEFAULT:
+            os << "\033[0m";
+            break;
+        case system::terminal::text_attribute::BLACK:
+            os << "\033[0;30m";
+            break;
+        case system::terminal::text_attribute::RED:
+            os << "\033[0;31m";
+            break;
+        case system::terminal::text_attribute::GREEN:
+            os << "\033[0;32m";
+            break;
+        case system::terminal::text_attribute::BROWN:
+            os << "\033[0;33m";
+            break;
+        case system::terminal::text_attribute::BLUE:
+            os << "\033[0;34m";
+            break;
+        case system::terminal::text_attribute::PURPLE:
+            os << "\033[0;35m";
+            break;
+        case system::terminal::text_attribute::CYAN:
+            os << "\033[0;36m";
+            break;
+        case system::terminal::text_attribute::LIGHT_GRAY:
+            os << "\033[0;37m";
+            break;
+        case system::terminal::text_attribute::GRAY:
+            os << "\033[1;30m";
+            break;
+        case system::terminal::text_attribute::LIGHT_RED:
+            os << "\033[1;31m";
+            break;
+        case system::terminal::text_attribute::LIGHT_GREEN:
+            os << "\033[1;32m";
+            break;
+        case system::terminal::text_attribute::YELLOW:
+            os << "\033[1;33m";
+            break;
+        case system::terminal::text_attribute::LIGHT_BLUE:
+            os << "\033[1;34m";
+            break;
+        case system::terminal::text_attribute::LIGHT_PURPLE:
+            os << "\033[1;35m";
+            break;
+        case system::terminal::text_attribute::LIGHT_CYAN:
+            os << "\033[1;36m";
+            break;
+        case system::terminal::text_attribute::WHITE:
+            os << "\033[1;37m";
+            break;
+        case system::terminal::text_attribute::NIL:
+        default:
+            return true;
+        }
+        
+        return os.good();
+    }
+    catch (...)
+    {
+        return false;
+    }
+}
+
+bool set_foreground_text_attribute(
+        std::wostream& wos,
+        system::terminal::text_attribute text_attr
+) noexcept
+{
+    bool is_stdout_terminl = (::isatty(fileno(stdout)) != 0);
+    bool is_stderr_terminl = (::isatty(fileno(stderr)) != 0);
+    
+    if ((&wos == &std::wcout && !is_stdout_terminl) ||
+        (&wos == &std::wcerr && !is_stderr_terminl))
+    {
+        return false;
+    }
+    
+    try
+    {
+        switch (text_attr)
+        {
+        case system::terminal::text_attribute::DEFAULT:
+            wos << L"\033[0m";
+            break;
+        case system::terminal::text_attribute::BLACK:
+            wos << L"\033[0;30m";
+            break;
+        case system::terminal::text_attribute::RED:
+            wos << L"\033[0;31m";
+            break;
+        case system::terminal::text_attribute::GREEN:
+            wos << L"\033[0;32m";
+            break;
+        case system::terminal::text_attribute::BROWN:
+            wos << L"\033[0;33m";
+            break;
+        case system::terminal::text_attribute::BLUE:
+            wos << L"\033[0;34m";
+            break;
+        case system::terminal::text_attribute::PURPLE:
+            wos << L"\033[0;35m";
+            break;
+        case system::terminal::text_attribute::CYAN:
+            wos << L"\033[0;36m";
+            break;
+        case system::terminal::text_attribute::LIGHT_GRAY:
+            wos << L"\033[0;37m";
+            break;
+        case system::terminal::text_attribute::GRAY:
+            wos << L"\033[1;30m";
+            break;
+        case system::terminal::text_attribute::LIGHT_RED:
+            wos << L"\033[1;31m";
+            break;
+        case system::terminal::text_attribute::LIGHT_GREEN:
+            wos << L"\033[1;32m";
+            break;
+        case system::terminal::text_attribute::YELLOW:
+            wos << L"\033[1;33m";
+            break;
+        case system::terminal::text_attribute::LIGHT_BLUE:
+            wos << L"\033[1;34m";
+            break;
+        case system::terminal::text_attribute::LIGHT_PURPLE:
+            wos << L"\033[1;35m";
+            break;
+        case system::terminal::text_attribute::LIGHT_CYAN:
+            wos << L"\033[1;36m";
+            break;
+        case system::terminal::text_attribute::WHITE:
+            wos << L"\033[1;37m";
+            break;
+        case system::terminal::text_attribute::NIL:
+        default:
+            return true;
+        }
+        
+        return wos.good();
+    }
+    catch (...)
+    {
+        return false;
+    }
 }
 
 }

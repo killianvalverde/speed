@@ -26,7 +26,7 @@
 
 #include <gtest/gtest.h>
 
-#include "speed/lowlevel/lowlevel.hpp"
+#include "speed/scalars/scalars.hpp"
 
 enum class colors : std::uint8_t
 {
@@ -38,15 +38,9 @@ enum class colors : std::uint8_t
     FULL = 0xF
 };
 
-namespace speed {
-namespace lowlevel {
 template<>
-struct enable_bitwise_operators<colors>
-{
-    static constexpr bool enable_with_same_type = true;
-};
-}
-}
+struct speed::scalars::is_flag_enum<colors>
+        : std::true_type {};
 
 TEST(lowlevel_enum_bitwise_operators, enable)
 {

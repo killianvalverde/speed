@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -30,8 +30,6 @@ namespace speed::filesystem {
 
 directory_iteration::const_iterator::const_iterator(const directory_iteration* composit)
        : composit_(composit)
-       , end_(false)
-       , current_recursivity_levl_(0)
 {
     if (composit == nullptr)
     {
@@ -52,7 +50,7 @@ directory_iteration::const_iterator::~const_iterator() noexcept
 {
     while (!directory_entity_stck_.empty())
     {
-        speed::system::filesystem::closedir(&directory_entity_stck_.top());
+        system::filesystem::closedir(directory_entity_stck_.top());
         directory_entity_stck_.pop();
     }
 
@@ -77,7 +75,7 @@ start:
     {
         cur_fle_.replace_filename(cur_dir_ent.nme);
 
-        if (speed::system::filesystem::is_directory(&cur_dir_ent))
+        if (system::filesystem::is_directory(cur_dir_ent, composit_->resolve_directory_symlnks_))
         {
             cur_dir_ /= cur_dir_ent.nme;
 
@@ -112,17 +110,16 @@ bool directory_iteration::const_iterator::operator ==(const self_type& rhs) cons
 
 bool directory_iteration::const_iterator::open_directory()
 {
-    speed::system::filesystem::inode_t ino;
+    system::filesystem::inode_t ino;
     
     if (composit_->inode_trackr_)
     {
-        ino = speed::system::filesystem::get_file_inode(cur_dir_.c_str());
+        ino = system::filesystem::get_file_inode(directory_entity_stck_.top(),
+                composit_->resolve_directory_symlnks_);
     }
 
     if (current_recursivity_levl_ > composit_->max_recursivity_levl_ ||
-        (composit_->inode_trackr_ && vistd_inos_.contains(ino)) ||
-        (!composit_->follow_symbolic_lnks_ &&
-                speed::system::filesystem::is_symlink(cur_dir_.c_str())))
+        (composit_->inode_trackr_ && vistd_inos_.contains(ino)))
     {
         cur_fle_ = cur_dir_;
         cur_dir_ = cur_dir_.parent_path();
@@ -133,7 +130,7 @@ bool directory_iteration::const_iterator::open_directory()
     cur_fle_ /= ".";
     directory_entity_stck_.emplace();
 
-    if (!speed::system::filesystem::opendir(&directory_entity_stck_.top(), cur_dir_.c_str()))
+    if (!system::filesystem::opendir(directory_entity_stck_.top(), cur_dir_.c_str()))
     {
         exit_directory();
         return false;
@@ -154,17 +151,17 @@ bool directory_iteration::const_iterator::read_directory()
 
     do
     {
-        succss = speed::system::filesystem::readdir(&cur_dir_ent);
+        succss = system::filesystem::readdir(cur_dir_ent);
     }
-    while (succss && (speed::stringutils::cstr_compare(cur_dir_ent.nme, ".") == 0 ||
-                speed::stringutils::cstr_compare(cur_dir_ent.nme, "..") == 0));
+    while (succss && (stringutils::cstr_compare(cur_dir_ent.nme, ".") == 0 ||
+                stringutils::cstr_compare(cur_dir_ent.nme, "..") == 0));
 
     return succss;
 }
 
 void directory_iteration::const_iterator::close_directory()
 {
-    speed::system::filesystem::closedir(&directory_entity_stck_.top());
+    system::filesystem::closedir(directory_entity_stck_.top());
     exit_directory();
 }
 
@@ -197,13 +194,15 @@ void directory_iteration::const_iterator::exit_directory()
         return false;
     }
     
-    if (composit_->file_typs_ != speed::system::filesystem::file_types::NIL &&
-        !speed::system::filesystem::is_file_type(cur_fle_.c_str(), composit_->file_typs_))
+    if (composit_->file_typs_ != system::filesystem::file_types::NIL &&
+        !system::filesystem::is_file_type(directory_entity_stck_.top(),
+                composit_->resolve_entries_symlnks_, composit_->file_typs_))
     {
         return false;
     }
-    if (composit_->access_mods_ != speed::system::filesystem::access_modes::NIL &&
-        !speed::system::filesystem::access(cur_fle_.c_str(), composit_->access_mods_))
+    if (composit_->access_mods_ != system::filesystem::access_modes::NIL &&
+        !system::filesystem::access(cur_fle_.c_str(), composit_->resolve_entries_symlnks_,
+                composit_->access_mods_))
     {
         return false;
     }
@@ -217,8 +216,8 @@ void directory_iteration::const_iterator::exit_directory()
     const char_type* substr = composit_->substring_to_mtch_.c_str();
 
     return composit_->case_insensitve_
-            ? speed::stringutils::cstr_find_substr_icase(pth.c_str(), substr)
-            : speed::stringutils::cstr_find_substr(pth.c_str(), substr);
+            ? stringutils::cstr_find_substr_icase(pth.c_str(), substr)
+            : stringutils::cstr_find_substr(pth.c_str(), substr);
 }
 
 [[nodiscard]] bool directory_iteration::const_iterator::matches_wildcard() const
@@ -227,8 +226,8 @@ void directory_iteration::const_iterator::exit_directory()
     const char_type* wildcrd = composit_->wildcard_to_mtch_.c_str();
 
     return composit_->case_insensitve_
-            ? speed::stringutils::match_wildcard_icase(pth.c_str(), wildcrd)
-            : speed::stringutils::match_wildcard(pth.c_str(), wildcrd);
+            ? stringutils::match_wildcard_icase(pth.c_str(), wildcrd)
+            : stringutils::match_wildcard(pth.c_str(), wildcrd);
 }
 
 void directory_iteration::update_regex()

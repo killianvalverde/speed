@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -39,15 +39,15 @@ namespace speed::containers {
 /**
  * @brief       Class that represents flags conteiner.
  */
-template<typename TpValue>
+template<typename ValueT>
 class flags
 {
 public:
     /** Value type of the flags conteiner. */
-    using value_type = TpValue;
+    using value_type = ValueT;
     
     /** Underlying value of the flags conteiner. */
-    using underlying_type = speed::type_traits::try_underlying_type_t<TpValue>;
+    using underlying_type = type_traits::underlying_type_of_t<ValueT>;
     
     /**
      * @brief       Class that represents const iterators.
@@ -69,9 +69,7 @@ public:
          * @param       val : The value encapsulated by the iterator.
          */
         const_iterator(const value_type* val) noexcept
-                : cur_(0)
-                , las_(sizeof(underlying_type) * 8)
-                , val_(val)
+                : val_(val)
         {
             if (!end())
             {
@@ -183,10 +181,10 @@ public:
     
     protected:
         /** The current right shift to do for constant 1 to get the value of the current node. */
-        node_type cur_;
+        node_type cur_ = 0;
         
         /** Past-the-end right shift value. */
-        node_type las_;
+        node_type las_ = sizeof(underlying_type) * 8;
     
         /** The value in which iterate. */
         const value_type* val_;
@@ -285,17 +283,14 @@ public:
     /**
      * @brief       Default constructor.
      */
-    inline flags() noexcept
-            : val_(static_cast<value_type>(0))
-    {
-    }
+    inline flags() noexcept = default;
     
     /**
      * @brief       Constructor with parameters.
      * @param       vals : Default flag values.
      */
-    template<typename... Ts_>
-    inline flags(const Ts_&... vals) noexcept
+    template<typename... ValueTs_>
+    inline flags(const ValueTs_&... vals) noexcept
             : flags()
     {
         set(vals...);
@@ -363,6 +358,26 @@ public:
     }
     
     /**
+     * @brief       Allows knowing whether two flags conteiner are equal.
+     * @param       rhs : Object to compare.
+     * @return      If the objets are equal true is returned, otherwise false is returned.
+     */
+    inline bool operator ==(const flags& rhs) const noexcept
+    {
+        return (static_cast<underlying_type>(val_) == static_cast<underlying_type>(rhs.val_));
+    }
+    
+    /**
+     * @brief       Allows knowing whether two flags conteiner are different.
+     * @param       rhs : Object to compare.
+     * @return      If the objets are different true is returned, otherwise false is returned.
+     */
+    inline bool operator !=(const flags& rhs) const noexcept
+    {
+        return (static_cast<underlying_type>(val_) != static_cast<underlying_type>(rhs.val_));
+    }
+    
+    /**
      * @brief       Get the first element iterator of the collection.
      * @return      The first element iterator of the collection.
      */
@@ -417,6 +432,70 @@ public:
     }
     
     /**
+     * @brief       Allows knowing whether a flag is set in the conteiner.
+     * @param       flgs : Flags to verify its presence in the conteiner.
+     */
+    template<typename... ValueTs_>
+    inline bool is_set(const ValueTs_&... flgs) const noexcept
+    {
+        underlying_type concat = 0;
+        ((concat |= static_cast<underlying_type>(flgs)), ...);
+        
+        return ((concat & static_cast<underlying_type>(val_)) == concat);
+    }
+    
+    /**
+     * @brief       Allows knowing whether a flag is set in the conteiner.
+     * @param       flgs : Flags to verify its presence in the conteiner.
+     */
+    template<typename... ValueTs_>
+    inline bool is_not_set(const ValueTs_&... flgs) const noexcept
+    {
+        return !is_set(flgs...);
+    }
+    
+    /**
+     * @brief       Allows knowing whether a flag is set in the conteiner by index.
+     * @param       indxs : Indexes in which verify a flag presence in the conteiner.
+     */
+    template<typename... IndexTs_>
+    inline bool is_set_by_index(const IndexTs_&... indxs) noexcept
+    {
+        underlying_type concat = 0;
+        ((concat |= (1u << indxs)), ...);
+        
+        return ((concat & static_cast<underlying_type>(val_)) == concat);
+    }
+    
+    /**
+     * @brief       Allows knowing whether a flag is not set in the conteiner by index.
+     * @param       indxs : Indexes in which verify a flag presence in the conteiner.
+     */
+    template<typename... IndexTs_>
+    inline bool is_not_set_by_index(const IndexTs_&... indxs) noexcept
+    {
+        return !is_set_by_index(indxs...);
+    }
+    
+    /**
+     * @brief       Allows knowing whether the container is empty.
+     * @return      If function was successfull true is returned, otherwise false is returned.
+     */
+    inline bool is_empty() const noexcept
+    {
+        return (static_cast<underlying_type>(val_) == 0);
+    }
+    
+    /**
+     * @brief       Allows knowing whether the container is not empty.
+     * @return      If function was successfull true is returned, otherwise false is returned.
+     */
+    inline bool is_not_empty() const noexcept
+    {
+        return (static_cast<underlying_type>(val_) != 0);
+    }
+    
+    /**
      * @brief       Get the value that contains the flags conteiner.
      * @return      The value that constains the flags conteiner.
      */
@@ -438,8 +517,8 @@ public:
      * @brief       Set a frag in the conteiner.
      * @param       flgs : Flags to set in the conteiner.
      */
-    template<typename... Ts_>
-    inline flags& set(const Ts_&... flgs) noexcept
+    template<typename... ValueTs_>
+    inline flags& set(const ValueTs_&... flgs) noexcept
     {
         ((val_ = static_cast<value_type>(
                 static_cast<underlying_type>(val_) |
@@ -452,8 +531,8 @@ public:
      * @brief       Set a frag in the conteiner by index.
      * @param       indxs : Indexes in which set a flag in the conteiner.
      */
-    template<typename... Ts_>
-    inline flags& set_by_index(const Ts_&... indxs) noexcept
+    template<typename... IndexTs_>
+    inline flags& set_by_index(const IndexTs_&... indxs) noexcept
     {
         ((val_ = static_cast<value_type>(
                 static_cast<underlying_type>(val_) |
@@ -466,8 +545,8 @@ public:
      * @brief       Unset a flag in the conteiner.
      * @param       flgs : Flags to unset in the conteiner.
      */
-    template<typename... Ts_>
-    inline flags& unset(const Ts_&... flgs) noexcept
+    template<typename... ValueTs_>
+    inline flags& unset(const ValueTs_&... flgs) noexcept
     {
         ((val_ = static_cast<value_type>(
                 static_cast<underlying_type>(val_) &
@@ -480,8 +559,8 @@ public:
      * @brief       Unset a flag in the conteiner.
      * @param       indxs : Index in which unset a flag in the conteiner.
      */
-    template<typename... Ts_>
-    inline flags& unset_by_index(const Ts_&... indxs) noexcept
+    template<typename... IndexTs_>
+    inline flags& unset_by_index(const IndexTs_&... indxs) noexcept
     {
         ((val_ = static_cast<value_type>(
                 static_cast<underlying_type>(val_) &
@@ -498,121 +577,36 @@ public:
         val_ = static_cast<value_type>(0);
         return *this;
     }
-    
-    /**
-     * @brief       Allows knowing whether a flag is set in the conteiner.
-     * @param       flgs : Flags to verify its presence in the conteiner.
-     */
-    template<typename... Ts_>
-    inline bool is_set(const Ts_&... flgs) const noexcept
-    {
-        underlying_type concat = 0;
-        ((concat |= static_cast<underlying_type>(flgs)), ...);
-        
-        return ((concat & static_cast<underlying_type>(val_)) == concat);
-    }
-    
-    /**
-     * @brief       Allows knowing whether a flag is set in the conteiner.
-     * @param       flgs : Flags to verify its presence in the conteiner.
-     */
-    template<typename... Ts_>
-    inline bool is_not_set(const Ts_&... flgs) const noexcept
-    {
-        underlying_type concat = 0;
-        ((concat |= static_cast<underlying_type>(flgs)), ...);
-        
-        return ((concat & static_cast<underlying_type>(val_)) != concat);
-    }
-    
-    /**
-     * @brief       Allows knowing whether a flag is set in the conteiner by index.
-     * @param       indxs : Indexes in which verify a flag presence in the conteiner.
-     */
-    template<typename... Ts_>
-    inline bool is_set_by_index(const Ts_&... indxs) noexcept
-    {
-        underlying_type concat = 0;
-        ((concat |= (1u << indxs)), ...);
-        
-        return ((concat & static_cast<underlying_type>(val_)) == concat);
-    }
-    
-    /**
-     * @brief       Allows knowing whether a flag is not set in the conteiner by index.
-     * @param       indxs : Indexes in which verify a flag presence in the conteiner.
-     */
-    template<typename... Ts_>
-    inline bool is_not_set_by_index(const Ts_&... indxs) noexcept
-    {
-        underlying_type concat = 0;
-        ((concat |= (1u << indxs)), ...);
-        
-        return ((concat & static_cast<underlying_type>(val_)) != concat);
-    }
-    
-    /**
-     * @brief       Allows knowing whether the container is empty.
-     * @return      If function was successfull true is returned, otherwise false is returned.
-     */
-    inline bool is_empty() const noexcept
-    {
-        return (static_cast<underlying_type>(val_) == 0);
-    }
-    
-    /**
-     * @brief       Allows knowing whether the container is not empty.
-     * @return      If function was successfull true is returned, otherwise false is returned.
-     */
-    inline bool is_not_empty() const noexcept
-    {
-        return (static_cast<underlying_type>(val_) != 0);
-    }
      
     /**
      * @brief       Print the flag in the standard output with a byte separator.
+     * @param       os : The object used to print the elapsed time.
      * @param       sequence_len : The number of flags to print until print a white space.
      */
-    void print(std::uint8_t sequence_len = 8) const
+    template<typename CharT_, typename CharTraitsT_>
+    std::basic_ostream<CharT_, CharTraitsT_>& print(
+            std::basic_ostream<CharT_, CharTraitsT_>& os,
+            std::uint8_t sequence_len = 8
+    ) const
     {
         constexpr std::uint8_t n_bits = sizeof(value_type) * 8;
         
         for (std::uint8_t i = 0; i < n_bits; i++)
         {
-            std::cout << (static_cast<underlying_type>(val_) >> (n_bits - 1 - i) & 1);
+            os << (static_cast<underlying_type>(val_) >> (n_bits - 1 - i) & 1);
     
             if (sequence_len != 0 && (i + 1) % sequence_len == 0 && i + 1 < n_bits)
             {
-                std::cout << ' ';
+                os << ' ';
             }
         }
         
-        speed::iostream::newl(std::cout);
-    }
-    
-    /**
-     * @brief       Allows knowing whether two flags conteiner are equal.
-     * @param       rhs : Object to compare.
-     * @return      If the objets are equal true is returned, otherwise false is returned.
-     */
-    inline bool operator ==(const flags& rhs) const noexcept
-    {
-        return (static_cast<underlying_type>(val_) == static_cast<underlying_type>(rhs.val_));
-    }
-    
-    /**
-     * @brief       Allows knowing whether two flags conteiner are different.
-     * @param       rhs : Object to compare.
-     * @return      If the objets are different true is returned, otherwise false is returned.
-     */
-    inline bool operator !=(const flags& rhs) const noexcept
-    {
-        return (static_cast<underlying_type>(val_) != static_cast<underlying_type>(rhs.val_));
+        return iostream::newl(os);
     }
 
 private:
     /** The raw value hold by the object. */
-    value_type val_;
+    value_type val_ = static_cast<value_type>(0);
 };
 
 /**
@@ -622,13 +616,13 @@ private:
  * @param       flgs : The flags conteiner to print in standard output.
  * @return      The object who call the function.
  */
-template<typename TpChar, typename TpCharTraits, typename TpValue>
-std::basic_ostream<TpChar, TpCharTraits>& operator <<(
-        std::basic_ostream<TpChar, TpCharTraits>& os,
-        const flags<TpValue>& flgs
+template<typename CharT, typename CharTraitsT, typename ValueT>
+std::basic_ostream<CharT, CharTraitsT>& operator <<(
+        std::basic_ostream<CharT, CharTraitsT>& os,
+        const flags<ValueT>& flgs
 )
 {
-    constexpr std::uint8_t n_bits = sizeof(TpValue) * 8;
+    constexpr std::uint8_t n_bits = sizeof(ValueT) * 8;
     
     for (std::uint8_t i = 0; i < n_bits; i++)
     {

@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -28,7 +28,7 @@
 #define SPEED_SYSTEM_PROCESS_OPERATIONS_HPP
 
 #include "../detail/detail.hpp"
-#include "../compatibility/compatibility.hpp"
+#include "../platform/platform.hpp"
 #include "../time/time.hpp"
 #include "types.hpp"
 

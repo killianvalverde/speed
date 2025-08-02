@@ -43,11 +43,11 @@ TEST(system_time, get_monotonic_time)
     speed::system::time::time_specification tme_spec1;
     speed::system::time::time_specification tme_spec2;
 
-    ASSERT_TRUE(speed::system::time::get_monotonic_time(&tme_spec1));
+    ASSERT_TRUE(speed::system::time::get_monotonic_time(tme_spec1));
 
     do
     {
-        speed::system::time::get_monotonic_time(&tme_spec2);
+        speed::system::time::get_monotonic_time(tme_spec2);
     } while (tme_spec1 == tme_spec2);
 
     ASSERT_TRUE(tme_spec1 != tme_spec2);
@@ -58,11 +58,11 @@ TEST(system_time, get_cpu_time)
     speed::system::time::time_specification tme_spec1;
     speed::system::time::time_specification tme_spec2;
 
-    ASSERT_TRUE(speed::system::time::get_cpu_time(&tme_spec1));
+    ASSERT_TRUE(speed::system::time::get_cpu_time(tme_spec1));
 
     do
     {
-        speed::system::time::get_cpu_time(&tme_spec2);
+        speed::system::time::get_cpu_time(tme_spec2);
     } while (tme_spec1 == tme_spec2);
 
     ASSERT_TRUE(tme_spec1 != tme_spec2);

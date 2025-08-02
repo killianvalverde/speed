@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -27,7 +27,7 @@
 #ifndef SPEED_SCALARS_SCALARS_HPP
 #define SPEED_SCALARS_SCALARS_HPP
 
-#include "scalar.hpp"
+#include "is_flag_enum.hpp"
 #include "operations.hpp"
 
 namespace speed {

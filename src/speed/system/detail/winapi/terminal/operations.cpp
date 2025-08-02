@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -24,29 +24,16 @@
  * @date        2017/10/18
  */
 
-#include "../../../compatibility/compatibility.hpp"
+#include "../../../platform/platform.hpp"
 #ifdef SPEED_WINAPI
-
-#include <conio.h>
-#include <io.h>
 
 #include "operations.hpp"
 
-namespace speed::system::detail::winapi::terminal {
+#include <iostream>
+#include <conio.h>
+#include <io.h>
 
-bool get_current_text_attribute(HANDLE console_handl, WORD* text_attr) noexcept
-{
-    CONSOLE_SCREEN_BUFFER_INFO console_screen_buffer_inf;
-    
-    if (console_handl == INVALID_HANDLE_VALUE ||
-        !::GetConsoleScreenBufferInfo(console_handl, &console_screen_buffer_inf))
-    {
-        return false;
-    }
-    
-    *text_attr = console_screen_buffer_inf.wAttributes;
-    return true;
-}
+namespace speed::system::detail::winapi::terminal {
 
 bool flush_input_terminal(::FILE* input_strm, std::error_code* err_code) noexcept
 {
@@ -87,12 +74,9 @@ bool kbhit(
         std::printf("%s", mess);
     }
 
-    if (flush_input_term)
+    if (flush_input_term && !flush_input_terminal(stdin, err_code))
     {
-        if (!flush_input_terminal(stdin, err_code))
-        {
-            return false;
-        }
+        return false;
     }
     
     if ((input_handl = ::GetStdHandle(STD_INPUT_HANDLE)) == INVALID_HANDLE_VALUE)
@@ -110,7 +94,7 @@ bool kbhit(
         }
         
         if (res == WAIT_OBJECT_0 &&
-            ReadConsoleInput(input_handl, &input_rec, 1, &event_red) &&
+            ::ReadConsoleInput(input_handl, &input_rec, 1, &event_red) &&
             event_red == 1 &&
             input_rec.EventType == KEY_EVENT &&
             input_rec.Event.KeyEvent.bKeyDown)
@@ -123,7 +107,37 @@ bool kbhit(
 }
 
 bool set_foreground_text_attribute(
-        ::FILE* terminal_strm,
+        std::ostream& os,
+        system::terminal::text_attribute text_attr
+) noexcept
+{
+    return set_foreground_text_attribute(&os, text_attr);
+}
+
+bool set_foreground_text_attribute(
+        std::wostream& wos,
+        system::terminal::text_attribute text_attr
+) noexcept
+{
+    return set_foreground_text_attribute(&wos, text_attr);
+}
+
+static bool get_current_text_attribute(HANDLE console_handl, WORD* text_attr) noexcept
+{
+    CONSOLE_SCREEN_BUFFER_INFO console_screen_buffer_inf;
+    
+    if (console_handl == INVALID_HANDLE_VALUE ||
+        !::GetConsoleScreenBufferInfo(console_handl, &console_screen_buffer_inf))
+    {
+        return false;
+    }
+    
+    *text_attr = console_screen_buffer_inf.wAttributes;
+    return true;
+}
+
+static bool set_foreground_text_attribute(
+        void* os,
         system::terminal::text_attribute text_attr
 ) noexcept
 {
@@ -131,13 +145,24 @@ bool set_foreground_text_attribute(
     static WORD default_text_attr;
     
     HANDLE console_handl;
-    DWORD mode;
+    DWORD mod;
     WORD new_text_attr;
     
-    console_handl = (HANDLE)::_get_osfhandle(_fileno(terminal_strm));
+    if (os == &std::cout || os == &std::wcout)
+    {
+        console_handl = ::GetStdHandle(STD_OUTPUT_HANDLE);
+    }
+    else if (os == &std::cerr || os == &std::wcerr)
+    {
+        console_handl = ::GetStdHandle(STD_ERROR_HANDLE);
+    }
+    else
+    {
+        return false;
+    }
+    
     if (console_handl == INVALID_HANDLE_VALUE ||
-        !console_handl ||
-        !::GetConsoleMode(console_handl, &mode))
+        !::GetConsoleMode(console_handl, &mod))
     {
         return false;
     }

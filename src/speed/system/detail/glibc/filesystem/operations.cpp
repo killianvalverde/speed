@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -24,187 +24,88 @@
  * @date        2017/05/26
  */
 
-#include "../../../compatibility/compatibility.hpp"
+#include "../../../platform/platform.hpp"
 #ifdef SPEED_GLIBC
 
 #include "operations.hpp"
 
 #include <fcntl.h>
-#include <sys/stat.h>
 #include <cstdlib>
 #include <ctime>
 
 #include "../../../../stringutils/stringutils.hpp"
-#include "../../../codecs/codecs.hpp"
 
 namespace speed::system::detail::glibc::filesystem {
 
 bool access(
-        const char* file_pth,
-        system::filesystem::access_modes access_mods,
+        const struct ::stat& stt,
+        access_modes access_mods,
         std::error_code* err_code
 ) noexcept
 {
-    decltype(F_OK) mode_buildr = 0;
+    ::uid_t euid;
+    ::gid_t egid;
+    ::mode_t fle_permissions;
+    ::mode_t relevant_bts = 0;
+    bool succss = true;
 
-    if (access_mods == system::filesystem::access_modes::NIL)
+    if (access_mods == access_modes::EXISTS || access_mods == access_modes::NIL)
     {
         return true;
     }
-    if ((access_mods & system::filesystem::access_modes::EXISTS) !=
-                system::filesystem::access_modes::NIL)
-    {
-        mode_buildr |= F_OK;
-    }
-    if ((access_mods & system::filesystem::access_modes::READ) !=
-                system::filesystem::access_modes::NIL)
-    {
-        mode_buildr |= R_OK;
-    }
-    if ((access_mods & system::filesystem::access_modes::WRITE) !=
-                system::filesystem::access_modes::NIL)
-    {
-        mode_buildr |= W_OK;
-    }
-    if ((access_mods & system::filesystem::access_modes::EXECUTE) !=
-                system::filesystem::access_modes::NIL)
-    {
-        mode_buildr |= X_OK;
-    }
     
-    if (::access(file_pth, mode_buildr) == -1)
+    euid = ::geteuid();
+    egid = ::getegid();
+    fle_permissions = stt.st_mode;
+    
+    if (stt.st_uid == euid)
     {
-        system::errors::assign_system_error_code(errno, err_code);
+        relevant_bts = (fle_permissions >> 6) & 0x7;
+    }
+    else if (stt.st_gid == egid)
+    {
+        relevant_bts = (fle_permissions >> 3) & 0x7;
+    }
+    else
+    {
+        relevant_bts = fle_permissions & 0x7;
+    }
+
+    if ((access_mods & access_modes::READ) != access_modes::NIL && !(relevant_bts & 0b100))
+    {
+        succss = false;
+    }
+    if ((access_mods & access_modes::WRITE) != access_modes::NIL && !(relevant_bts & 0b010))
+    {
+        succss = false;
+    }
+    if ((access_mods & access_modes::EXECUTE) != access_modes::NIL && !(relevant_bts & 0b001))
+    {
+        succss = false;
+    }
+    if (!succss)
+    {
+        system::errors::assign_system_error_code(EACCES, err_code);
         return false;
     }
-    
+
     return true;
 }
 
 bool access(
-        const wchar_t* file_pth,
-        system::filesystem::access_modes access_mods,
+        const path_char_t* file_pth,
+        bool resolve_symlnk,
+        access_modes access_mods,
         std::error_code* err_code
 ) noexcept
 {
-    std::string str;
-    if (codecs::convert_w_str_to_string(file_pth, &str))
-    {
-        return access(str.c_str(), access_mods, err_code);
-    }
-    return false;
+    struct ::stat stt;
+    
+    return (stat(file_pth, resolve_symlnk, stt, err_code) &&
+            access(stt, access_mods, err_code));
 }
 
-bool access(
-        const char* file_pth,
-        system::filesystem::access_modes access_mods,
-        system::filesystem::file_types file_typ,
-        std::error_code* err_code
-) noexcept
-{
-    return (is_file_type(file_pth, file_typ, err_code) &&
-            access(file_pth, access_mods, err_code));
-}
-
-bool access(
-        const wchar_t* file_pth,
-        system::filesystem::access_modes access_mods,
-        system::filesystem::file_types file_typ,
-        std::error_code* err_code
-) noexcept
-{
-    std::string str;
-    if (codecs::convert_w_str_to_string(file_pth, &str))
-    {
-        return access(str.c_str(), access_mods, file_typ, err_code);
-    }
-    return false;
-}
-
-bool can_directory_be_created(const char* directory_pth, std::error_code* err_code) noexcept
-{
-    char parent_pth[PATH_MAX] = {0};
-    std::size_t dir_path_len = stringutils::cstr_length(directory_pth);
-    char* last_char_p;
-
-    if (dir_path_len >= PATH_MAX ||
-        dir_path_len == 0 ||
-        access(directory_pth, system::filesystem::access_modes::EXISTS, err_code))
-    {
-        return false;
-    }
-
-    stringutils::cstr_copy(parent_pth, directory_pth);
-    stringutils::cstr_remove_trailing_if(parent_pth, [](char ch) { return ch == '/'; });
-    last_char_p = stringutils::cstr_cut(parent_pth, '/');
-    dir_path_len = last_char_p == nullptr ? 0 : parent_pth - last_char_p + 1;
-
-    if (dir_path_len == 0)
-    {
-        parent_pth[0] = '.';
-        parent_pth[1] = '\0';
-    }
-
-    return access(parent_pth, system::filesystem::access_modes::WRITE |
-            system::filesystem::access_modes::EXECUTE, err_code);
-}
-
-bool can_directory_be_created(const wchar_t* directory_pth, std::error_code* err_code) noexcept
-{
-    std::string str;
-    if (codecs::convert_w_str_to_string(directory_pth, &str))
-    {
-        return can_directory_be_created(str.c_str(), err_code);
-    }
-    return false;
-}
-
-bool can_regular_file_be_created(const char* regular_file_pth, std::error_code* err_code) noexcept
-{
-    char parent_pth[PATH_MAX] = {0};
-    std::size_t path_len = stringutils::cstr_length(regular_file_pth);
-    char* last_char_p;
-
-    if (path_len >= PATH_MAX || path_len == 0)
-    {
-        return false;
-    }
-
-    if (access(regular_file_pth, system::filesystem::access_modes::EXISTS, err_code))
-    {
-        return access(regular_file_pth, system::filesystem::access_modes::WRITE,
-                      system::filesystem::file_types::REGULAR_FILE, err_code);
-    }
-
-    stringutils::cstr_copy(parent_pth, regular_file_pth);
-    stringutils::cstr_remove_trailing_if(parent_pth, [](char ch) { return ch == '/'; });
-    last_char_p = stringutils::cstr_cut(parent_pth, '/');
-    path_len = last_char_p == nullptr ? 0 : parent_pth - last_char_p + 1;
-
-    if (path_len == 0)
-    {
-        parent_pth[0] = '.';
-        parent_pth[1] = '\0';
-    }
-
-    return access(parent_pth, system::filesystem::access_modes::WRITE |
-            system::filesystem::access_modes::EXECUTE, err_code);
-}
-
-bool can_regular_file_be_created(
-        const wchar_t* regular_file_pth,
-        std::error_code* err_code
-) noexcept
-{
-    std::string str;
-    if (codecs::convert_w_str_to_string(regular_file_pth, &str))
-    {
-        return can_regular_file_be_created(str.c_str(), err_code);
-    }
-    return false;
-}
-
-bool chdir(const char* directory_pth, std::error_code* err_code) noexcept
+bool chdir(const path_char_t* directory_pth, std::error_code* err_code) noexcept
 {
     if (::chdir(directory_pth) == -1)
     {
@@ -215,67 +116,68 @@ bool chdir(const char* directory_pth, std::error_code* err_code) noexcept
     return true;
 }
 
-bool chdir(const wchar_t* directory_pth, std::error_code* err_code) noexcept
-{
-    std::string str;
-    if (codecs::convert_w_str_to_string(directory_pth, &str))
-    {
-        return chdir(str.c_str(), err_code);
-    }
-    return false;
-}
-
-bool closedir(
-        system::filesystem::directory_entity* directory_ent,
-        std::error_code* err_code
-) noexcept
-{
-    auto* directory_ent_ext = &directory_ent->__priv;
-    
-    if (::closedir(directory_ent_ext->dir) == -1)
-    {
-        system::errors::assign_system_error_code(errno, err_code);
-        return false;
-    }
-    
-    return true;
-}
-
-bool closedir(
-        system::filesystem::wdirectory_entity* directory_ent,
-        std::error_code* err_code
-) noexcept
-{
-    auto* directory_ent_ext = &directory_ent->__priv;
-    
-    if (::closedir(directory_ent_ext->dir) == -1)
-    {
-        system::errors::assign_system_error_code(errno, err_code);
-        return false;
-    }
-    
-    return true;
-}
-
-bool file_exists(const char* file_pth, std::error_code* err_code) noexcept
-{
-    return access(file_pth, system::filesystem::access_modes::EXISTS, err_code);
-}
-
-bool file_exists(const wchar_t* file_pth, std::error_code* err_code) noexcept
-{
-    return access(file_pth, system::filesystem::access_modes::EXISTS, err_code);
-}
-
-system::filesystem::inode_t get_file_inode(
-        const char* file_pth,
+bool check_file(
+        const path_char_t* file_pth,
+        bool resolve_symlnk,
+        access_modes access_mods,
+        file_types file_typ,
         std::error_code* err_code
 ) noexcept
 {
     struct ::stat stt;
-    errno = 0;
     
-    if (::lstat(file_pth, &stt) == -1)
+    return (stat(file_pth, resolve_symlnk, stt, err_code) &&
+            access(stt, access_mods, err_code) &&
+            is_file_type(stt, file_typ));
+}
+
+bool closedir(directory_entity& directory_ent, std::error_code* err_code) noexcept
+{
+    const auto& directory_ent_ext = directory_ent._ext;
+    
+    if (::closedir(directory_ent_ext.dir) == -1)
+    {
+        system::errors::assign_system_error_code(errno, err_code);
+        return false;
+    }
+    
+    return true;
+}
+
+bool file_exists(
+        const path_char_t* file_pth,
+        bool resolve_symlnk,
+        std::error_code* err_code
+) noexcept
+{
+    return access(file_pth, resolve_symlnk, access_modes::EXISTS, err_code);
+}
+
+inode_t get_file_inode(
+        const path_char_t* file_pth,
+        bool resolve_symlnk,
+        std::error_code* err_code
+) noexcept
+{
+    struct ::stat stt;
+    return stat(file_pth, resolve_symlnk, stt, err_code) ? stt.st_ino : ~0ull;
+}
+
+inode_t get_file_inode(
+        const directory_entity& directory_ent,
+        bool resolve_symlnk,
+        std::error_code* err_code
+) noexcept
+{
+    if (!resolve_symlnk || !is_symlink(directory_ent, false, err_code))
+    {
+        return directory_ent._ext.entry->d_ino;
+    }
+    
+    struct ::stat stt;
+    auto& directory_ent_ext = directory_ent._ext;
+    auto* entry = directory_ent_ext.entry;
+    if (::fstatat(::dirfd(directory_ent_ext.dir), entry->d_name, &stt, AT_SYMLINK_NOFOLLOW) == -1)
     {
         system::errors::assign_system_error_code(errno, err_code);
         return ~0ull;
@@ -284,309 +186,191 @@ system::filesystem::inode_t get_file_inode(
     return stt.st_ino;
 }
 
-system::filesystem::inode_t get_file_inode(
-        const wchar_t* file_pth,
+uid_t get_file_uid(
+        const path_char_t* file_pth,
+        bool resolve_symlnk,
         std::error_code* err_code
 ) noexcept
-{
-    std::string str;
-    if (codecs::convert_w_str_to_string(file_pth, &str))
-    {
-        return get_file_inode(str.c_str(), err_code);
-    }
-    return false;
-}
-
-system::filesystem::inode_t get_file_inode(
-        system::filesystem::directory_entity* directory_ent,
-        std::error_code* err_code
-) noexcept
-{
-    return directory_ent->__priv.ino;
-}
-
-system::filesystem::inode_t get_file_inode(
-        system::filesystem::wdirectory_entity* directory_ent,
-        std::error_code* err_code
-) noexcept
-{
-    return directory_ent->__priv.ino;
-}
-
-uid_t get_file_uid(const char* file_pth, std::error_code* err_code) noexcept
 {
     struct ::stat stt;
-    errno = 0;
-    
-    if (::stat(file_pth, &stt) == -1)
-    {
-        system::errors::assign_system_error_code(errno, err_code);
-        return -1;
-    }
-    
-    return stt.st_uid;
+    return stat(file_pth, resolve_symlnk, stt, err_code) ? stt.st_uid : -1;
 }
 
-uid_t get_file_uid(const wchar_t* file_pth, std::error_code* err_code) noexcept
-{
-    std::string str;
-    if (codecs::convert_w_str_to_string(file_pth, &str))
-    {
-        return get_file_uid(str.c_str(), err_code);
-    }
-    return false;
-}
-
-gid_t get_file_gid(const char* file_pth, std::error_code* err_code) noexcept
+gid_t get_file_gid(
+        const path_char_t* file_pth,
+        bool resolve_symlnk,
+        std::error_code* err_code
+) noexcept
 {
     struct ::stat stt;
-    errno = 0;
-    
-    if (::stat(file_pth, &stt) == -1)
-    {
-        system::errors::assign_system_error_code(errno, err_code);
-        return -1;
-    }
-    
-    return stt.st_gid;
+    return stat(file_pth, resolve_symlnk, stt, err_code) ? stt.st_gid : -1;
 }
 
-gid_t get_file_gid(const wchar_t* file_pth, std::error_code* err_code) noexcept
+std::size_t get_file_size(
+        const path_char_t* file_pth,
+        bool resolve_symlnk,
+        std::error_code* err_code
+) noexcept
 {
-    std::string str;
-    if (codecs::convert_w_str_to_string(file_pth, &str))
-    {
-        return get_file_gid(str.c_str(), err_code);
-    }
-    return false;
-}
-
-std::size_t get_file_size(const char* file_pth, std::error_code* err_code) noexcept
-{
-    struct stat file_stt;
-
-    if (::stat(file_pth, &file_stt) == -1)
-    {
-        system::errors::assign_system_error_code(errno, err_code);
-        return ~0ull;
-    }
-
-    return (std::size_t)file_stt.st_size;
-}
-
-std::size_t get_file_size(const wchar_t* file_pth, std::error_code* err_code) noexcept
-{
-    std::string str;
-    if (codecs::convert_w_str_to_string(file_pth, &str))
-    {
-        return get_file_size(str.c_str(), err_code);
-    }
-    return false;
+    struct ::stat stt;
+    return stat(file_pth, resolve_symlnk, stt, err_code) ? (std::size_t)stt.st_size : ~0ull;
 }
 
 bool get_modification_time(
-        const char* file_pth,
-        system::time::system_time* system_tme,
+        const path_char_t* file_pth,
+        bool resolve_symlnk,
+        system::time::system_time& system_tme,
         std::error_code* err_code
 ) noexcept
 {
     struct ::stat stt;
     std::tm* local_tme;
     
-    if (stat(file_pth, &stt) == -1)
+    if (!stat(file_pth, resolve_symlnk, stt, err_code))
     {
-        system::errors::assign_system_error_code(errno, err_code);
         return false;
     }
     
     local_tme = std::localtime(&stt.st_mtime);
     
-    system_tme->set_years(local_tme->tm_year + 1900)
-               .set_months(local_tme->tm_mon + 1)
-               .set_days(local_tme->tm_mday)
-               .set_hours(local_tme->tm_hour)
-               .set_minutes(local_tme->tm_min)
-               .set_seconds(local_tme->tm_sec);
+    system_tme.set_years(local_tme->tm_year + 1900)
+              .set_months(local_tme->tm_mon + 1)
+              .set_days(local_tme->tm_mday)
+              .set_hours(local_tme->tm_hour)
+              .set_minutes(local_tme->tm_min)
+              .set_seconds(local_tme->tm_sec);
 
     return true;
 }
 
-bool get_modification_time(
-        const wchar_t* file_pth,
-        system::time::system_time* system_tme,
-        std::error_code* err_code
-) noexcept
-{
-    std::string str;
-    if (codecs::convert_w_str_to_string(file_pth, &str))
-    {
-        return get_modification_time(str.c_str(), system_tme, err_code);
-    }
-    return false;
-}
-
-const char* get_temporal_path() noexcept
+const path_char_t* get_temporal_path() noexcept
 {
     return "/tmp/";
 }
 
-bool is_block_device(const char* file_pth, std::error_code* err_code) noexcept
+bool is_block_device(
+        const path_char_t* file_pth,
+        bool resolve_symlnk,
+        std::error_code* err_code
+) noexcept
 {
-    struct ::stat infos;
-    errno = 0;
-    
-    if (::stat(file_pth, &infos) == -1)
-    {
-        system::errors::assign_system_error_code(errno, err_code);
-        return false;
-    }
-    
-    return S_ISBLK(infos.st_mode);
+    return is_file_type(file_pth, resolve_symlnk, file_types::BLOCK_DEVICE, err_code);
 }
 
-bool is_block_device(const wchar_t* file_pth, std::error_code* err_code) noexcept
+bool is_block_device(
+        const directory_entity& directory_ent,
+        bool resolve_symlnk,
+        std::error_code* err_code
+) noexcept
 {
-    std::string str;
-    if (codecs::convert_w_str_to_string(file_pth, &str))
-    {
-        return is_block_device(str.c_str(), err_code);
-    }
-    return false;
+    return is_file_type(directory_ent, resolve_symlnk, file_types::BLOCK_DEVICE, err_code);
 }
 
-bool is_character_device(const char* file_pth, std::error_code* err_code) noexcept
+bool is_character_device(
+        const path_char_t* file_pth,
+        bool resolve_symlnk,
+        std::error_code* err_code
+) noexcept
 {
-    struct ::stat infos;
-    errno = 0;
-    
-    if (::stat(file_pth, &infos) == -1)
-    {
-        system::errors::assign_system_error_code(errno, err_code);
-        return false;
-    }
-    
-    return S_ISCHR(infos.st_mode);
+    return is_file_type(file_pth, resolve_symlnk, file_types::CHARACTER_DEVICE, err_code);
 }
 
-bool is_character_device(const wchar_t* file_pth, std::error_code* err_code) noexcept
+bool is_character_device(
+        const directory_entity& directory_ent,
+        bool resolve_symlnk,
+        std::error_code* err_code
+) noexcept
 {
-    std::string str;
-    if (codecs::convert_w_str_to_string(file_pth, &str))
-    {
-        return is_character_device(str.c_str(), err_code);
-    }
-    return false;
-}
-
-bool is_directory(const char* file_pth, std::error_code* err_code) noexcept
-{
-    struct ::stat infos;
-    errno = 0;
-    
-    if (::stat(file_pth, &infos) == -1)
-    {
-        system::errors::assign_system_error_code(errno, err_code);
-        return false;
-    }
-    
-    return S_ISDIR(infos.st_mode);
-}
-
-bool is_directory(const wchar_t* file_pth, std::error_code* err_code) noexcept
-{
-    std::string str;
-    if (codecs::convert_w_str_to_string(file_pth, &str))
-    {
-        return is_directory(str.c_str(), err_code);
-    }
-    return false;
+    return is_file_type(directory_ent, resolve_symlnk, file_types::CHARACTER_DEVICE, err_code);
 }
 
 bool is_directory(
-        system::filesystem::directory_entity* directory_ent,
+        const path_char_t* file_pth,
+        bool resolve_symlnk,
         std::error_code* err_code
 ) noexcept
 {
-    auto* directory_ent_ext = &directory_ent->__priv;
-    auto* entry = directory_ent_ext->entry;
-    
-    if (entry->d_type != DT_UNKNOWN)
-    {
-        return entry->d_type == DT_DIR;
-    }
-    
-    struct ::stat st;
-    ::fstatat(::dirfd(directory_ent_ext->dir), entry->d_name, &st, AT_SYMLINK_NOFOLLOW);
-    
-    return S_ISDIR(st.st_mode);
+    return is_file_type(file_pth, resolve_symlnk, file_types::DIRECTORY, err_code);
 }
 
 bool is_directory(
-        system::filesystem::wdirectory_entity* directory_ent,
+        const directory_entity& directory_ent,
+        bool resolve_symlnk,
         std::error_code* err_code
 ) noexcept
 {
-    auto* directory_ent_ext = &directory_ent->__priv;
-    auto* entry = directory_ent_ext->entry;
-    
-    if (entry->d_type != DT_UNKNOWN)
-    {
-        return entry->d_type == DT_DIR;
-    }
-    
-    struct ::stat st;
-    ::fstatat(::dirfd(directory_ent_ext->dir), entry->d_name, &st, AT_SYMLINK_NOFOLLOW);
-    
-    return S_ISDIR(st.st_mode);
+    return is_file_type(directory_ent, resolve_symlnk, file_types::DIRECTORY, err_code);
 }
 
-bool is_file_type(
-        const char* file_pth,
-        system::filesystem::file_types file_typ,
-        std::error_code* err_code
-) noexcept
+bool is_file_type(const struct ::stat& stt, file_types file_typ) noexcept
 {
-    struct ::stat infos;
-    errno = 0;
-    
-    if (::stat(file_pth, &infos) == -1)
-    {
-        system::errors::assign_system_error_code(errno, err_code);
-        return false;
-    }
-    
-    if ((file_typ & system::filesystem::file_types::BLOCK_DEVICE) !=
-                system::filesystem::file_types::NIL && S_ISBLK(infos.st_mode))
+    if (file_typ == file_types::NIL)
     {
         return true;
     }
-    if ((file_typ & system::filesystem::file_types::CHARACTER_DEVICE) !=
-                system::filesystem::file_types::NIL && S_ISCHR(infos.st_mode))
+    if ((file_typ & file_types::BLOCK_DEVICE) != file_types::NIL && S_ISBLK(stt.st_mode))
     {
         return true;
     }
-    if ((file_typ & system::filesystem::file_types::DIRECTORY) !=
-                system::filesystem::file_types::NIL && S_ISDIR(infos.st_mode))
+    if ((file_typ & file_types::CHARACTER_DEVICE) != file_types::NIL && S_ISCHR(stt.st_mode))
     {
         return true;
     }
-    if ((file_typ & system::filesystem::file_types::PIPE) !=
-                system::filesystem::file_types::NIL && S_ISFIFO(infos.st_mode))
+    if ((file_typ & file_types::DIRECTORY) != file_types::NIL && S_ISDIR(stt.st_mode))
     {
         return true;
     }
-    if ((file_typ & system::filesystem::file_types::REGULAR_FILE) !=
-                system::filesystem::file_types::NIL && S_ISREG(infos.st_mode))
+    if ((file_typ & file_types::PIPE) != file_types::NIL && S_ISFIFO(stt.st_mode))
     {
         return true;
     }
-    if ((file_typ & system::filesystem::file_types::SOCKET) !=
-                system::filesystem::file_types::NIL && S_ISSOCK(infos.st_mode))
+    if ((file_typ & file_types::REGULAR_FILE) != file_types::NIL && S_ISREG(stt.st_mode))
     {
         return true;
     }
-    if ((file_typ & system::filesystem::file_types::SYMLINK) !=
-                system::filesystem::file_types::NIL && S_ISLNK(infos.st_mode))
+    if ((file_typ & file_types::SOCKET) != file_types::NIL && S_ISSOCK(stt.st_mode))
+    {
+        return true;
+    }
+    if ((file_typ & file_types::SYMLINK) != file_types::NIL && S_ISLNK(stt.st_mode))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool is_file_type(unsigned char d_type, file_types file_typ) noexcept
+{
+    if (file_typ == file_types::NIL)
+    {
+        return true;
+    }
+    if ((file_typ & file_types::BLOCK_DEVICE) != file_types::NIL && d_type == DT_BLK)
+    {
+        return true;
+    }
+    if ((file_typ & file_types::CHARACTER_DEVICE) != file_types::NIL && d_type == DT_CHR)
+    {
+        return true;
+    }
+    if ((file_typ & file_types::DIRECTORY) != file_types::NIL && d_type == DT_DIR)
+    {
+        return true;
+    }
+    if ((file_typ & file_types::PIPE) != file_types::NIL && d_type == DT_FIFO)
+    {
+        return true;
+    }
+    if ((file_typ & file_types::REGULAR_FILE) != file_types::NIL && d_type == DT_REG)
+    {
+        return true;
+    }
+    if ((file_typ & file_types::SOCKET) != file_types::NIL && d_type == DT_SOCK)
+    {
+        return true;
+    }
+    if ((file_typ & file_types::SYMLINK) != file_types::NIL && d_type == DT_LNK)
     {
         return true;
     }
@@ -595,112 +379,111 @@ bool is_file_type(
 }
 
 bool is_file_type(
-        const wchar_t* file_pth,
-        system::filesystem::file_types file_typ,
+        const path_char_t* file_pth,
+        bool resolve_symlnk,
+        file_types file_typ,
         std::error_code* err_code
 ) noexcept
 {
-    std::string str;
-    if (codecs::convert_w_str_to_string(file_pth, &str))
-    {
-        return is_file_type(str.c_str(), file_typ, err_code);
-    }
-    return false;
+    struct ::stat stt;
+    return stat(file_pth, resolve_symlnk, stt, err_code) && is_file_type(stt, file_typ);
 }
 
-bool is_pipe(const char* file_pth, std::error_code* err_code) noexcept
+bool is_file_type(
+        const directory_entity& directory_ent,
+        bool resolve_symlnk,
+        file_types file_typ,
+        std::error_code* err_code
+) noexcept
 {
-    struct ::stat infos;
+    struct ::stat stt;
+    auto& directory_ent_ext = directory_ent._ext;
+    auto* entry = directory_ent_ext.entry;
     
-    if (::stat(file_pth, &infos) == -1)
+    if (entry->d_type != DT_UNKNOWN && (entry->d_type != DT_LNK || !resolve_symlnk))
+    {
+        return is_file_type(entry->d_type, file_typ);
+    }
+    
+    if (::fstatat(::dirfd(directory_ent_ext.dir), entry->d_name, &stt,
+            resolve_symlnk ? 0 : AT_SYMLINK_NOFOLLOW) == -1)
     {
         system::errors::assign_system_error_code(errno, err_code);
         return false;
     }
     
-    return S_ISFIFO(infos.st_mode);
+    return is_file_type(stt, file_typ);
 }
 
-bool is_pipe(const wchar_t* file_pth, std::error_code* err_code) noexcept
+bool is_pipe(const path_char_t* file_pth, bool resolve_symlnk, std::error_code* err_code) noexcept
 {
-    std::string str;
-    if (codecs::convert_w_str_to_string(file_pth, &str))
-    {
-        return is_pipe(str.c_str(), err_code);
-    }
-    return false;
+    return is_file_type(file_pth, resolve_symlnk, file_types::PIPE, err_code);
 }
 
-bool is_regular_file(const char* file_pth, std::error_code* err_code) noexcept
+bool is_pipe(
+        const directory_entity& directory_ent,
+        bool resolve_symlnk,
+        std::error_code* err_code
+) noexcept
 {
-    struct ::stat infos;
-    
-    if (::stat(file_pth, &infos) == -1)
-    {
-        system::errors::assign_system_error_code(errno, err_code);
-        return false;
-    }
-    
-    return S_ISREG(infos.st_mode);
+    return is_file_type(directory_ent, resolve_symlnk, file_types::PIPE, err_code);
 }
 
-bool is_regular_file(const wchar_t* file_pth, std::error_code* err_code) noexcept
+bool is_regular_file(
+        const path_char_t* file_pth,
+        bool resolve_symlnk,
+        std::error_code* err_code
+) noexcept
 {
-    std::string str;
-    if (codecs::convert_w_str_to_string(file_pth, &str))
-    {
-        return is_regular_file(str.c_str(), err_code);
-    }
-    return false;
+    return is_file_type(file_pth, resolve_symlnk, file_types::REGULAR_FILE, err_code);
 }
 
-bool is_socket(const char* file_pth, std::error_code* err_code) noexcept
+bool is_regular_file(
+        const directory_entity& directory_ent,
+        bool resolve_symlnk,
+        std::error_code* err_code
+) noexcept
 {
-    struct ::stat infos;
-    
-    if (::stat(file_pth, &infos) == -1)
-    {
-        system::errors::assign_system_error_code(errno, err_code);
-        return false;
-    }
-    
-    return S_ISSOCK(infos.st_mode);
+    return is_file_type(directory_ent, resolve_symlnk, file_types::REGULAR_FILE, err_code);
 }
 
-bool is_socket(const wchar_t* file_pth, std::error_code* err_code) noexcept
+bool is_socket(
+        const path_char_t* file_pth,
+        bool resolve_symlnk,
+        std::error_code* err_code
+) noexcept
 {
-    std::string str;
-    if (codecs::convert_w_str_to_string(file_pth, &str))
-    {
-        return is_socket(str.c_str(), err_code);
-    }
-    return false;
+    return is_file_type(file_pth, resolve_symlnk, file_types::SOCKET, err_code);
 }
 
-bool is_symlink(const char* file_pth, std::error_code* err_code) noexcept
+bool is_socket(
+        const directory_entity& directory_ent,
+        bool resolve_symlnk,
+        std::error_code* err_code
+) noexcept
 {
-    struct ::stat infos;
-    
-    if (::lstat(file_pth, &infos) == -1)
-    {
-        system::errors::assign_system_error_code(errno, err_code);
-        return false;
-    }
-    
-    return S_ISLNK(infos.st_mode);
+    return is_file_type(directory_ent, resolve_symlnk, file_types::SOCKET, err_code);
 }
 
-bool is_symlink(const wchar_t* file_pth, std::error_code* err_code) noexcept
+bool is_symlink(
+        const path_char_t* file_pth,
+        bool resolve_symlnk,
+        std::error_code* err_code
+) noexcept
 {
-    std::string str;
-    if (codecs::convert_w_str_to_string(file_pth, &str))
-    {
-        return is_symlink(str.c_str(), err_code);
-    }
-    return false;
+    return is_file_type(file_pth, resolve_symlnk, file_types::SYMLINK, err_code);
 }
 
-bool mkdir(const char* directory_pth, std::error_code* err_code) noexcept
+bool is_symlink(
+        const directory_entity& directory_ent,
+        bool resolve_symlnk,
+        std::error_code* err_code
+) noexcept
+{
+    return is_file_type(directory_ent, resolve_symlnk, file_types::SYMLINK, err_code);
+}
+
+bool mkdir(const path_char_t* directory_pth, std::error_code* err_code) noexcept
 {
     if (::mkdir(directory_pth, 0755) == -1)
     {
@@ -711,18 +494,8 @@ bool mkdir(const char* directory_pth, std::error_code* err_code) noexcept
     return true;
 }
 
-bool mkdir(const wchar_t* directory_pth, std::error_code* err_code) noexcept
-{
-    std::string str;
-    if (codecs::convert_w_str_to_string(directory_pth, &str))
-    {
-        return mkdir(str.c_str(), err_code);
-    }
-    return false;
-}
-
 bool mkdir_recursively(
-        const char* directory_pth,
+        const path_char_t* directory_pth,
         std::error_code* err_code
 ) noexcept
 {
@@ -736,7 +509,7 @@ bool mkdir_recursively(
     
     if (pth_len >= PATH_MAX ||
         pth_len == 0 ||
-        access(directory_pth, system::filesystem::access_modes::EXISTS, err_code))
+        access(directory_pth, false, access_modes::EXISTS, err_code))
     {
         system::errors::assign_system_error_code(EINVAL, err_code);
         return false;
@@ -762,8 +535,8 @@ bool mkdir_recursively(
         pth_len = lst_ch - parnt_path;
         slash_pos[slash_pos_sz++] = pth_len;
         
-    } while (!access(parnt_path, system::filesystem::access_modes::EXISTS, err_code) &&
-             pth_len > 0);
+    }
+    while (!access(parnt_path, false, access_modes::EXISTS, err_code) && pth_len > 0);
     
     while (slash_pos_sz > 0)
     {
@@ -778,69 +551,31 @@ bool mkdir_recursively(
     return true;
 }
 
-bool mkdir_recursively(
-        const wchar_t* directory_pth,
-        std::error_code* err_code
-) noexcept
-{
-    std::string str;
-    if (codecs::convert_w_str_to_string(directory_pth, &str))
-    {
-        return mkdir(str.c_str(), err_code);
-    }
-    return false;
-}
-
 bool opendir(
-        system::filesystem::directory_entity* directory_ent,
+        directory_entity& directory_ent,
         const char* directory_pth,
         std::error_code* err_code
 ) noexcept
 {
-    auto* directory_ent_ext = &directory_ent->__priv;
-    
-    if ((directory_ent_ext->dir = ::opendir(directory_pth)) == nullptr)
+    if ((directory_ent._ext.dir = ::opendir(directory_pth)) == nullptr)
     {
         system::errors::assign_system_error_code(errno, err_code);
         return false;
     }
     
-    return true;
-}
-
-bool opendir(
-        system::filesystem::wdirectory_entity* directory_ent,
-        const wchar_t* directory_pth,
-        std::error_code* err_code
-) noexcept
-{
-    std::string str;
-    if (!codecs::convert_w_str_to_string(directory_pth, &str))
-    {
-        return false;
-    }
-
-    auto* directory_ent_ext = &directory_ent->__priv;
-
-    if ((directory_ent_ext->dir = ::opendir(str.c_str())) == nullptr)
-    {
-        system::errors::assign_system_error_code(errno, err_code);
-        return false;
-    }
-
     return true;
 }
 
 bool readdir(
-        system::filesystem::directory_entity* directory_ent,
+        directory_entity& directory_ent,
         std::error_code* err_code
 ) noexcept
 {
-    auto* directory_ent_ext = &directory_ent->__priv;
+    auto& directory_ent_ext = directory_ent._ext;
     
     errno = 0;
-    directory_ent_ext->entry = ::readdir(directory_ent_ext->dir);
-    if (directory_ent_ext->entry == nullptr)
+    directory_ent_ext.entry = ::readdir(directory_ent_ext.dir);
+    if (directory_ent_ext.entry == nullptr)
     {
         if (errno != 0)
         {
@@ -850,43 +585,12 @@ bool readdir(
         return false;
     }
     
-    directory_ent_ext->ino = directory_ent_ext->entry->d_ino;
-    directory_ent->nme = directory_ent_ext->entry->d_name;
+    directory_ent.nme = directory_ent_ext.entry->d_name;
     
     return true;
 }
 
-bool readdir(
-        system::filesystem::wdirectory_entity* directory_ent,
-        std::error_code* err_code
-) noexcept
-{
-    auto* directory_ent_ext = &directory_ent->__priv;
-
-    errno = 0;
-    directory_ent_ext->entry = ::readdir(directory_ent_ext->dir);
-    if (directory_ent_ext->entry == nullptr)
-    {
-        if (errno != 0)
-        {
-            system::errors::assign_system_error_code(errno, err_code);
-        }
-        
-        return false;
-    }
-
-    directory_ent_ext->ino = directory_ent_ext->entry->d_ino;
-    if (!codecs::convert_c_str_to_wstring(directory_ent_ext->entry->d_name,
-            &directory_ent_ext->name_holdr))
-    {
-        return false;
-    }
-    directory_ent->nme = &directory_ent_ext->name_holdr[0];
-
-    return true;
-}
-
-bool rmdir(const char* directory_pth, std::error_code* err_code) noexcept
+bool rmdir(const path_char_t* directory_pth, std::error_code* err_code) noexcept
 {
     if (::rmdir(directory_pth) == -1)
     {
@@ -897,35 +601,44 @@ bool rmdir(const char* directory_pth, std::error_code* err_code) noexcept
     return true;
 }
 
-bool rmdir(const wchar_t* directory_pth, std::error_code* err_code) noexcept
+bool shortcut(
+        const path_char_t* target_pth,
+        const path_char_t* shortcut_pth,
+        std::error_code* err_code
+) noexcept
 {
-    std::string str;
-    if (codecs::convert_w_str_to_string(directory_pth, &str))
+    return symlink(target_pth, shortcut_pth, err_code);
+}
+
+bool stat(
+        const path_char_t* file_pth,
+        bool resolve_symlnk,
+        struct ::stat& stt,
+        std::error_code* err_code
+) noexcept
+{
+    if (resolve_symlnk)
     {
-        return rmdir(str.c_str(), err_code);
+        if (::stat(file_pth, &stt) == -1)
+        {
+            system::errors::assign_system_error_code(errno, err_code);
+            return false;
+        }
     }
-    return false;
+    else if (::lstat(file_pth, &stt) == -1)
+    {
+        system::errors::assign_system_error_code(errno, err_code);
+        return false;
+    }
+    
+    return true;
 }
 
-bool shortcut(
-        const char* target_pth,
-        const char* shortcut_pth,
+bool symlink(
+        const path_char_t* target_pth,
+        const path_char_t* link_pth,
         std::error_code* err_code
 ) noexcept
-{
-    return symlink(target_pth, shortcut_pth, err_code);
-}
-
-bool shortcut(
-        const wchar_t* target_pth,
-        const wchar_t* shortcut_pth,
-        std::error_code* err_code
-) noexcept
-{
-    return symlink(target_pth, shortcut_pth, err_code);
-}
-
-bool symlink(const char* target_pth, const char* link_pth, std::error_code* err_code) noexcept
 {
     if (::symlink(target_pth, link_pth) == -1)
     {
@@ -936,19 +649,7 @@ bool symlink(const char* target_pth, const char* link_pth, std::error_code* err_
     return true;
 }
 
-bool symlink(const wchar_t* target_pth, const wchar_t* link_pth, std::error_code* err_code) noexcept
-{
-    std::string trg_str;
-    std::string lnk_str;
-    if (codecs::convert_w_str_to_string(target_pth, &trg_str) &&
-        codecs::convert_w_str_to_string(link_pth, &lnk_str))
-    {
-        return symlink(trg_str.c_str(), lnk_str.c_str(), err_code);
-    }
-    return false;
-}
-
-bool touch(const char* regular_file_pth, std::error_code* err_code) noexcept
+bool touch(const path_char_t* regular_file_pth, std::error_code* err_code) noexcept
 {
     if (::mknod(regular_file_pth, 0755, S_IFREG) == -1)
     {
@@ -959,17 +660,7 @@ bool touch(const char* regular_file_pth, std::error_code* err_code) noexcept
     return true;
 }
 
-bool touch(const wchar_t* regular_file_pth, std::error_code* err_code) noexcept
-{
-    std::string str;
-    if (codecs::convert_w_str_to_string(regular_file_pth, &str))
-    {
-        return touch(str.c_str(), err_code);
-    }
-    return false;
-}
-
-bool unlink(const char* regular_file_pth, std::error_code* err_code) noexcept
+bool unlink(const path_char_t* regular_file_pth, std::error_code* err_code) noexcept
 {
     if (::unlink(regular_file_pth) == -1)
     {
@@ -978,16 +669,6 @@ bool unlink(const char* regular_file_pth, std::error_code* err_code) noexcept
     }
 
     return true;
-}
-
-bool unlink(const wchar_t* regular_file_pth, std::error_code* err_code) noexcept
-{
-    std::string str;
-    if (codecs::convert_w_str_to_string(regular_file_pth, &str))
-    {
-        return unlink(str.c_str(), err_code);
-    }
-    return false;
 }
 
 }

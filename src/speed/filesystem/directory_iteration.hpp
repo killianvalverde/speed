@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2025 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -32,6 +32,7 @@
 #include <set>
 #include <stack>
 
+#include "detail/forward_declarations.hpp"
 #include "../containers/containers.hpp"
 #include "../stringutils/stringutils.hpp"
 #include "../system/system.hpp"
@@ -49,12 +50,11 @@ public:
     /** Character type used in the class. */
     using char_type = std::filesystem::path::value_type;
 
-    /** Directory entity type. */
-    using directory_entity_type = speed::system::filesystem::basic_directory_entity<char_type>;
-
     /** String type used in the class. */
-    using string_type = std::basic_string<
-            char_type, std::char_traits<char_type>, std::allocator<char_type>>;
+    using string_type = std::filesystem::path::string_type;
+
+    /** Directory entity type. */
+    using directory_entity_type = system::filesystem::directory_entity;
 
     /** Regex type used in the class. */
     using regex_type = std::basic_regex<char_type, std::regex_traits<char_type>>;
@@ -176,16 +176,16 @@ public:
         std::stack<directory_entity_type> directory_entity_stck_;
 
         /** Set of visited inodes to avoid infinite recursions in case of fs corruptions. */
-        std::set<speed::system::filesystem::inode_t> vistd_inos_;
+        std::set<system::filesystem::inode_t> vistd_inos_;
 
         /** Pointer to the composite object. */
         const directory_iteration* composit_;
 
         /** Current level of recursivity. */
-        std::uint64_t current_recursivity_levl_;
+        std::uint64_t current_recursivity_levl_ = 0;
 
         /** Represents whether or not the iteration is finished. */
-        bool end_;
+        bool end_ = false;
     };
 
     /**
@@ -193,22 +193,15 @@ public:
      * @param       root_pth : Path where to do the iteration.
      */
     template<
-            typename TpPath_,
+            typename PathT_,
             typename = std::enable_if_t<
-                    !std::is_base_of<directory_iteration, std::decay_t<TpPath_>>::value
+                    !std::is_base_of<directory_iteration, std::decay_t<PathT_>>::value
             >
     >
-    explicit directory_iteration(TpPath_&& root_pth)
-            : root_pth_(std::forward<TpPath_>(root_pth))
-            , access_mods_(speed::system::filesystem::access_modes::NIL)
-            , file_typs_(speed::system::filesystem::file_types::NIL)
-            , max_recursivity_levl_(~0ull)
-            , case_insensitve_(true)
-            , follow_symbolic_lnks_(false)
-            , inode_trackr_(false)
+    explicit directory_iteration(PathT_&& root_pth)
+            : root_pth_(std::forward<PathT_>(root_pth))
     {
-        if (speed::stringutils::cstr_find_first_char(root_pth_.c_str(),
-                SPEED_SYSTEM_FILESYSTEM_ALT_SLASH_CHAR))
+        if (root_pth_.native().find(SPEED_SYSTEM_FILESYSTEM_ALT_SLASH_CHAR) != string_type::npos)
         {
             root_pth_ = get_normalized_path(root_pth_);
         }
@@ -292,17 +285,6 @@ public:
         file_typs_ = file_typs;
         return *this;
     }
-
-    /**
-     * @brief       Specify wether or not the symbolic links will be followed.
-     * @param       enabl : If true the symbolic links will be followed.
-     * @return      The object who call the method.
-     */
-    inline directory_iteration& follow_symbolic_links(bool enabl)
-    {
-        follow_symbolic_lnks_ = enabl;
-        return *this;
-    }
     
     /**
      * @brief       Enables or disables inode tracking to prevent duplicate file entries.
@@ -331,14 +313,35 @@ public:
      * @param       regex_to_mtch : Regex string that all the file names have to match.
      * @return      The object who call the method.
      */
-    template<typename TpString_>
-    inline directory_iteration& regex_to_match(TpString_&& regex_to_mtch)
+    template<typename StringT_>
+    inline directory_iteration& regex_to_match(StringT_&& regex_to_mtch)
     {
-        regex_to_mtch_str_ = speed::type_casting::type_cast<string_type>(
-                std::forward<TpString_>(regex_to_mtch));
+        regex_to_mtch_str_ = type_casting::type_cast<string_type>(
+                std::forward<StringT_>(regex_to_mtch));
         
         update_regex();
-        
+        return *this;
+    }
+
+    /**
+     * @brief       Specify wether or not the directory symbolic links will be resolved.
+     * @param       enabl : If true the directories symbolic links will be followed.
+     * @return      The object who call the method.
+     */
+    inline directory_iteration& resolve_directory_symlinks(bool enabl)
+    {
+        resolve_directory_symlnks_ = enabl;
+        return *this;
+    }
+
+    /**
+     * @brief       Specify wether or not the entries symbolic links will be resolved.
+     * @param       enabl : If true the entries symbolic links will be resolved.
+     * @return      The object who call the method.
+     */
+    inline directory_iteration& resolve_entries_symlinks(bool enabl)
+    {
+        resolve_directory_symlnks_ = enabl;
         return *this;
     }
 
@@ -347,11 +350,11 @@ public:
      * @param       substring_to_mtch : Wildcard string that all the file names have to match.
      * @return      The object who call the method.
      */
-    template<typename TpString_>
-    inline directory_iteration& substring_to_match(TpString_&& substring_to_mtch)
+    template<typename StringT_>
+    inline directory_iteration& substring_to_match(StringT_&& substring_to_mtch)
     {
-        substring_to_mtch_ = speed::type_casting::type_cast<string_type>(
-                std::forward<TpString_>(substring_to_mtch));
+        substring_to_mtch_ = type_casting::type_cast<string_type>(
+                std::forward<StringT_>(substring_to_mtch));
         
         return *this;
     }
@@ -361,11 +364,11 @@ public:
      * @param       wildcard_to_mtch : Wildcard string that all the file names have to match.
      * @return      The object who call the method.
      */
-    template<typename TpString_>
-    inline directory_iteration& wildcard_to_match(TpString_&& wildcard_to_mtch)
+    template<typename StringT_>
+    inline directory_iteration& wildcard_to_match(StringT_&& wildcard_to_mtch)
     {
-        wildcard_to_mtch_ = speed::type_casting::type_cast<string_type>(
-                std::forward<TpString_>(wildcard_to_mtch));
+        wildcard_to_mtch_ = type_casting::type_cast<string_type>(
+                std::forward<StringT_>(wildcard_to_mtch));
         
         return *this;
     }
@@ -395,22 +398,25 @@ private:
     regex_type regex_to_mtch_;
 
     /** Maximum level of recursivity allowed. */
-    std::uint64_t max_recursivity_levl_;
+    std::uint64_t max_recursivity_levl_ = ~0ull;
 
     /** Access mods that all the iterated files have to match. */
-    system::filesystem::access_modes access_mods_;
+    system::filesystem::access_modes access_mods_ = system::filesystem::access_modes::NIL;
 
     /** List of file types that are allowed to be iterated. */
-    system::filesystem::file_types file_typs_;
+    system::filesystem::file_types file_typs_ = system::filesystem::file_types::NIL;
     
     /** Specify wheter or not the regex will be case sensitive. */
-    bool case_insensitve_;
-
-    /** Specify wheter or not follow symbolic links during the iteration. */
-    bool follow_symbolic_lnks_;
+    bool case_insensitve_ = true;
     
     /** Specify wheter or not the inodes will be tracked. */
-    bool inode_trackr_;
+    bool inode_trackr_ = false;
+
+    /** Specify wheter or not follow symbolic links during the iteration. */
+    bool resolve_directory_symlnks_ = false;
+
+    /** Specify wheter or not resolve directory symbolic links during the iteration. */
+    bool resolve_entries_symlnks_ = false;
 
     friend class const_iterator;
 };
