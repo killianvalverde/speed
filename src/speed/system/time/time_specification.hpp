@@ -41,11 +41,7 @@ public:
     /**
      * @brief       Default constructor.
      */
-    inline time_specification() noexcept
-            : sec_(0)
-            , nsec_(0)
-    {
-    }
+    inline time_specification() noexcept = default;
     
     /**
      * @brief       Constructor with parameters.
@@ -281,10 +277,10 @@ private:
     
 private:
     /** Seconds. */
-    std::uint64_t sec_;
+    std::uint64_t sec_ = 0;
     
     /** Nanoseconds. */
-    std::uint64_t nsec_;
+    std::uint64_t nsec_ = 0;
 };
 
 }
