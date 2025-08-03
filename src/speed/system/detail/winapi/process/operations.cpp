@@ -36,15 +36,17 @@
 
 namespace speed::system::detail::winapi::process {
 
-bool execute_command(
+bool execute(
         const char* cmd,
         int* ret_val,
+        system::time::time_specification* cpu_time_spec,
+        system::time::time_specification* elapsed_time_spec,
         std::error_code* err_code
 ) noexcept
 {
     STARTUPINFOA startup_info;
     PROCESS_INFORMATION process_info;
-    DWORD ret_val_buildr;
+    bool succss = true;
 
     ZeroMemory(&startup_info, sizeof(startup_info));
     ZeroMemory(&process_info, sizeof(process_info));
@@ -64,26 +66,69 @@ bool execute_command(
     ))
     {
         system::errors::assign_system_error_code((int)GetLastError(), err_code);
-        return false;
+        succss = false;
+        goto cleanup;
     }
 
     ::WaitForSingleObject(process_info.hProcess, INFINITE);
 
     if (ret_val != nullptr)
     {
-        if (!::GetExitCodeProcess(process_info.hProcess, &ret_val_buildr))
+        DWORD exit_cod;
+        if (!::GetExitCodeProcess(process_info.hProcess, &exit_cod))
         {
-            system::errors::assign_system_error_code((int)GetLastError(), err_code);
-            return false;
+            system::errors::assign_system_error_code((int) GetLastError(), err_code);
+            succss = false;
+            goto cleanup;
         }
 
-        *ret_val = (int)ret_val_buildr;
+        *ret_val = (int) exit_cod;
+    }
+    
+    if (cpu_time_spec || elapsed_time_spec)
+    {
+        FILETIME create_tm, exit_tm, kernel_tm, user_tm;
+        if (!::GetProcessTimes(process_info.hProcess, &create_tm, &exit_tm, &kernel_tm, &user_tm))
+        {
+            system::errors::assign_system_error_code((int)GetLastError(), err_code);
+            succss = false;
+            goto cleanup;
+        }
+
+        if (cpu_time_spec)
+        {
+            std::uint64_t kt = ((std::uint64_t)kernel_tm.dwHighDateTime << 32) |
+                    kernel_tm.dwLowDateTime;
+            std::uint64_t ut = ((std::uint64_t)user_tm.dwHighDateTime << 32) |
+                    user_tm.dwLowDateTime;
+            std::uint64_t total_time_100ns = kt + ut;
+
+            std::uint64_t secs = total_time_100ns / 10'000'000ULL;
+            std::uint64_t nsecs = (total_time_100ns % 10'000'000ULL) * 100ULL;
+
+            cpu_time_spec->set_time(secs, nsecs);
+        }
+
+        if (elapsed_time_spec)
+        {
+            std::uint64_t ct = ((std::uint64_t)create_tm.dwHighDateTime << 32) |
+                    create_tm.dwLowDateTime;
+            std::uint64_t et   = ((std::uint64_t)exit_tm.dwHighDateTime << 32) |
+                    exit_tm.dwLowDateTime;
+
+            std::uint64_t elapsed_100ns = et - ct;
+            std::uint64_t secs = elapsed_100ns / 10'000'000ULL;
+            std::uint64_t nsecs = (elapsed_100ns % 10'000'000ULL) * 100ULL;
+
+            elapsed_time_spec->set_time(secs, nsecs);
+        }
     }
 
+cleanup:
     ::CloseHandle(process_info.hProcess);
     ::CloseHandle(process_info.hThread);
-
-    return true;
+    
+    return succss;
 }
 
 system::process::pid_t get_pid() noexcept
