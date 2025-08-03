@@ -27,8 +27,10 @@
 #ifndef SPEED_IOSTREAM_OPERATIONS_HPP
 #define SPEED_IOSTREAM_OPERATIONS_HPP
 
+#include <cstdlib>
 #include <iostream>
 
+#include "detail/forward_declarations.hpp"
 #include "../safety/safety.hpp"
 #include "../system/system.hpp"
 
@@ -110,6 +112,28 @@ int printf(const char* formt, ...) noexcept;
  *              set to EILSEQ and a negative number is returned.
  */
 int printf(const wchar_t* formt, ...) noexcept;
+
+/**
+ * @brief       Prints a formatted error message in red text and terminates the program.
+ * @param       os : The output stream where the error message will be printed.
+ * @param       nme : The name or identifier of the error.
+ * @param       messge : The detailed error message.
+ * @param       exit_cod : The exit code with which the program will terminate.
+ */
+template<typename CharT, typename CharTraitsT, typename StringT1, typename StringT2>
+inline void print_error_and_exit(
+        std::basic_ostream<CharT, CharTraitsT>& os,
+        const StringT1& nme,
+        const StringT2& messge,
+        int exit_cod
+) noexcept
+{
+    os << set_light_red_text << nme << ':' << ' '
+       << set_default_text << messge
+       << std::endl;
+    
+    exit(exit_cod);
+}
 
 /**
  * @brief       Print a string wrapping if necessary.
