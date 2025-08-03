@@ -84,6 +84,7 @@ set(SPEED_FILESYSTEM_SOURCE_FILES
 )
 
 set(SPEED_IOSTREAM_SOURCE_FILES
+        iostream/detail/forward_declarations.hpp
         iostream/basic_ios_redirect.hpp
         iostream/indentation.cpp
         iostream/indentation.hpp
