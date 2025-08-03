@@ -58,7 +58,7 @@ bool get_monotonic_time(
         return false;
     }
 
-    time_spec.set_time((std::uint64_t)tp.tv_sec, (std::uint64_t)tp.tv_nsec);
+    time_spec.set_time((std::uint64_t) tp.tv_sec, (std::uint64_t) tp.tv_nsec);
     
     return true;
 }
@@ -87,7 +87,7 @@ bool get_cpu_time(
     cpu_tme = buf.tms_utime + buf.tms_stime;
 
     time_spec.set_time((std::uint64_t)cpu_tme / cps,
-            (1'000'000'000 / cps) * ((std::uint64_t)cpu_tme % cps));
+            (1'000'000'000 / cps) * ((std::uint64_t) cpu_tme % cps));
     
     return true;
 }
@@ -116,7 +116,7 @@ bool get_child_cpu_time(
     cpu_tme = buf.tms_cutime + buf.tms_cstime;
 
     time_spec.set_time((std::uint64_t)cpu_tme / cps,
-            (1'000'000'000 / cps) * ((std::uint64_t)cpu_tme % cps));
+            (1'000'000'000 / cps) * ((std::uint64_t) cpu_tme % cps));
     
     return true;
 }

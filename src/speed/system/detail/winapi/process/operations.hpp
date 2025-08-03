@@ -32,6 +32,7 @@
 
 #include "../../../errors/errors.hpp"
 #include "../../../process/types.hpp"
+#include "../../../time/time_specification.hpp"
 
 namespace speed::system::detail::winapi::process {
 
@@ -42,9 +43,11 @@ namespace speed::system::detail::winapi::process {
  * @param       err_code : If function fails it holds the platform-dependent error code.
  * @return      If function was successful true is returned, otherwise false is returned.
  */
-bool execute_command(
+bool execute(
         const char* cmd,
         int* ret_val = nullptr,
+        system::time::time_specification* cpu_time_spec = nullptr,
+        system::time::time_specification* elapsed_time_spec = nullptr,
         std::error_code* err_code = nullptr
 ) noexcept;
 

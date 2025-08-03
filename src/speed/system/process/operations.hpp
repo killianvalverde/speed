@@ -35,19 +35,32 @@
 namespace speed::system::process {
 
 /**
- * @brief       Execute the specified command.
- * @param       cmd : The command to execute.
- * @param       return_val : The return value of the command.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief       Executes a command line process and optionally retrieves its exit code, CPU time,
+ *              and elapsed time.
+ * @param       cmd : The command line string to execute.
+ * @param       exit_cod : Optional pointer to an integer to receive the exit code of the process.
+ *              If nullptr, the exit code is ignored.
+ * @param       cpu_time_spec : Optional pointer to a time_specification object to receive the CPU
+ *              time (user + kernel) consumed by the process. If nullptr, CPU time is not retrieved.
+ * @param       elapsed_time_spec : Optional pointer to a time_specification object to receive the
+ *              elapsed wall-clock time of the process execution. If nullptr, elapsed time is not
+ *              retrieved.
+ * @param       err_code : Optional pointer to a std::error_code object to receive error
+ *              information if the execution fails. If nullptr, error information is discarded.
+ * @return      true if the command was successfully executed and (if requested) exit code and
+ *              times were retrieved. false if the process creation, execution, or information
+ *              retrieval failed.
  */
-inline bool execute_command(
+inline bool execute(
         const char* cmd,
-        int* return_val = nullptr,
+        int* exit_cod = nullptr,
+        time::time_specification* cpu_time_spec = nullptr,
+        time::time_specification* elapsed_time_spec = nullptr,
         std::error_code* err_code = nullptr
 ) noexcept
 {
-    return SPEED_SELECT_API(process::execute_command, false, cmd, return_val, err_code);
+    return SPEED_SELECT_API(process::execute, false, cmd, exit_cod, cpu_time_spec,
+            elapsed_time_spec, err_code);
 }
 
 /**
