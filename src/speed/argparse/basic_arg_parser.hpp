@@ -831,7 +831,7 @@ public:
         
         if (flgs_.is_set(detail::arg_parser_flags::PKILL_AFTER_PRINTING_ERRORS))
         {
-            exit_program(-1);
+            exit_program(SPEED_EXIT_CODE_USAGE_ERROR);
         }
     }
 
