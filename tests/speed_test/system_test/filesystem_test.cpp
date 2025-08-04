@@ -59,9 +59,9 @@ protected:
     const speed::system::filesystem::path_char_t* shortcut_nme =
             speed::filesystem::pick_path(
                     "f57475c9df7a624a05e842b5f852336015de44ba"
-                    SPEED_SYSTEM_FILESYSTEM_SHORTCUT_EXTENSION_CSTR,
+                    SPEED_SHORTCUT_EXTENSION_CSTR,
                     L"f57475c9df7a624a05e842b5f852336015de44ba"
-                    SPEED_SYSTEM_FILESYSTEM_SHORTCUT_EXTENSION_CSTR);
+                    SPEED_SHORTCUT_EXTENSION_CSTR);
 };
 
 TEST_F(system_filesystem, access)
