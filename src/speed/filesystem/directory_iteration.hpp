@@ -201,7 +201,7 @@ public:
     explicit directory_iteration(PathT_&& root_pth)
             : root_pth_(std::forward<PathT_>(root_pth))
     {
-        if (root_pth_.native().find(SPEED_SYSTEM_FILESYSTEM_ALT_SLASH_CHAR) != string_type::npos)
+        if (root_pth_.native().find(SPEED_ALT_PATH_SEPARATOR_CHAR) != string_type::npos)
         {
             root_pth_ = get_normalized_path(root_pth_);
         }
