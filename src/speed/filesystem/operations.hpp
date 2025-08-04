@@ -38,8 +38,8 @@ inline std::filesystem::path get_normalized_path(const std::filesystem::path& pt
 {
     auto path_str = pth.native();
     
-    std::replace(path_str.begin(), path_str.end(), SPEED_SYSTEM_FILESYSTEM_ALT_SLASH_CHAR,
-                 SPEED_SYSTEM_FILESYSTEM_SLASH_CHAR);
+    std::replace(path_str.begin(), path_str.end(), SPEED_ALT_PATH_SEPARATOR_CHAR,
+                 SPEED_PATH_SEPARATOR_CHAR);
     
     return {std::move(path_str)};
 }
