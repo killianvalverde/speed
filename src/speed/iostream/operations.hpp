@@ -46,18 +46,47 @@ namespace speed::iostream {
 void fpurge(::FILE* fp) noexcept;
 
 /**
+ * @brief       Get the current 'std::basic_ostream' object used to print CharT in standard error
+ *              output.
+ * @return      The current 'std::basic_ostream' object used to print CharT in standard error
+ *              output.
+ */
+template<typename CharT>
+constexpr std::basic_ostream<CharT>& get_cerr() noexcept;
+
+/**
+ * @brief       Get the current 'std::ostream' object used to print in standard error output.
+ * @return      The current 'std::ostream' object used to print in standard error output.
+ */
+template<>
+constexpr std::ostream& get_cerr<char>() noexcept
+{
+    return std::cerr;
+}
+
+/**
+ * @brief       Get the current 'std::wostream' object used to print in standard error output.
+ * @return      The current 'std::wostream' object used to print in standard error output.
+ */
+template<>
+constexpr std::wostream& get_cerr<wchar_t>() noexcept
+{
+    return std::wcerr;
+}
+
+/**
  * @brief       Get the current 'std::basic_ostream' object used to print CharT in standard output.
  * @return      The current 'std::basic_ostream' object used to print CharT in standard output.
  */
 template<typename CharT>
-inline std::basic_ostream<CharT>& get_cout() noexcept;
+constexpr std::basic_ostream<CharT>& get_cout() noexcept;
 
 /**
  * @brief       Get the current 'std::ostream' object used to print in standard output.
  * @return      The current 'std::ostream' object used to print in standard output.
  */
 template<>
-inline std::ostream& get_cout<char>() noexcept
+constexpr std::ostream& get_cout<char>() noexcept
 {
     return std::cout;
 }
@@ -67,7 +96,7 @@ inline std::ostream& get_cout<char>() noexcept
  * @return      The current 'std::wostream' object used to print in standard output.
  */
 template<>
-inline std::wostream& get_cout<wchar_t>() noexcept
+constexpr std::wostream& get_cout<wchar_t>() noexcept
 {
     return std::wcout;
 }
