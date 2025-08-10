@@ -123,7 +123,7 @@ public:
      */
     inline void print_version_information()
     {
-        std::cout << vers_information_ << std::endl;
+        base_arg_type::get_arg_parser()->get_ostream() << vers_information_ << std::endl;
     }
 
 private:

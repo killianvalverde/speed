@@ -295,7 +295,7 @@ public:
             throw key_not_found_exception();
         }
         
-        std::cout << kys_.front().get_string();
+        base_arg_type::get_arg_parser()->get_ostream() << kys_.front().get_string();
     }
 
     /**
@@ -330,17 +330,18 @@ public:
         std::size_t current_ky_len = 0;
         std::size_t n_args_printd = 0;
         std::size_t i;
+        auto& os = base_arg_type::get_arg_parser()->get_ostream();
     
         for (i = args_indent; i > 0; --i)
         {
-            std::cout << ' ';
+            os.put(' ');
         }
 
         print_keys(n_args_printd, current_ky_len, true);
         
         if (n_args_printd < kys_.size() && n_args_printd > 0)
         {
-            std::cout << ", ";
+            os << ", ";
             safety::try_addm(current_ky_len, 2);
         }
         
@@ -348,7 +349,7 @@ public:
         {
             for (i = short_kys_len - current_ky_len; i > 0; --i)
             {
-                std::cout << ' ';
+                os.put(' ');
             }
         }
         
@@ -361,7 +362,7 @@ public:
         {
             for (i = long_kys_len - current_ky_len; i > 0; --i)
             {
-                std::cout << ' ';
+                os.put(' ');
             }
         }
     
@@ -384,18 +385,20 @@ public:
             bool just_print_short_kys
     )
     {
+        auto& os = base_arg_type::get_arg_parser()->get_ostream();
+        
         for (auto& ky : kys_)
         {
             if (ky.is_prefix_long() ^ just_print_short_kys)
             {
                 if (nr_args_printd > 0)
                 {
-                    std::cout << ", " << ky.get_string();
+                    os << ", " << ky.get_string();
                     safety::try_addm(cur_ky_len, ky.get_string_length(), 2);
                 }
                 else
                 {
-                    std::cout << ky.get_string();
+                    os << ky.get_string();
                     safety::try_addm(cur_ky_len, ky.get_string_length());
                 }
     

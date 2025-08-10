@@ -646,22 +646,24 @@ public:
         {
             return;
         }
+        
+        auto& os = base_arg_type::get_arg_parser()->get_ostream();
 
         base_arg_type::print_errors();
         
         if (base_arg_type::is_error_flag_set(arg_error_flags::MIN_VALUES_ERROR))
         {
             base_arg_type::print_error_message();
-            std::cout << base_arg_type::get_tittle() << " requires at least " << minmax_vals_.first
-                      << (minmax_vals_.first > 1 ? " values" : " value") << '\n';
+            os << base_arg_type::get_tittle() << " requires at least " << minmax_vals_.first
+               << (minmax_vals_.first > 1 ? " values" : " value") << '\n';
         }
         
         if (base_arg_type::is_error_flag_set(arg_error_flags::MAX_VALUES_ERROR))
         {
             base_arg_type::print_error_message();
-            std::cout << base_arg_type::get_tittle() << " must have a maximum of "
-                      << minmax_vals_.second
-                      << (minmax_vals_.second > 1 ? " values" : " value") << '\n';
+            os << base_arg_type::get_tittle() << " must have a maximum of "
+               << minmax_vals_.second
+               << (minmax_vals_.second > 1 ? " values" : " value") << '\n';
         }
         
         if (base_arg_type::is_error_flag_set(arg_error_flags::VALUES_ERROR) && !vals_.empty())

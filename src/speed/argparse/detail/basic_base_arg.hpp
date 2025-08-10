@@ -485,18 +485,19 @@ public:
     virtual void print_errors() const
     {
         auto tittl = get_tittle();
+        auto& os = arg_parsr_->get_ostream();
         
         if (err_flgs_.is_set(arg_error_flags::MIN_OCCURRENCES_ERROR))
         {
             print_error_message();
             if (minmax_occurrencs_.first == 1)
             {
-                std::cout << tittl << " is allways required\n";
+                os << tittl << " is allways required\n";
             }
             else
             {
-                std::cout << tittl << " must appear at least "
-                          << minmax_occurrencs_.first << " times\n";
+                os << tittl << " must appear at least "
+                   << minmax_occurrencs_.first << " times\n";
             }
         }
         if (err_flgs_.is_set(arg_error_flags::MAX_OCCURRENCES_ERROR))
@@ -504,12 +505,12 @@ public:
             print_error_message();
             if (minmax_occurrencs_.second == 1)
             {
-                std::cout << tittl << " has appeared more than once\n";
+                os << tittl << " has appeared more than once\n";
             }
             else
             {
-                std::cout << tittl << " must appear no more than "
-                          << minmax_occurrencs_.first << " times\n";
+                os << tittl << " must appear no more than "
+                   << minmax_occurrencs_.first << " times\n";
             }
         }
     }
@@ -519,18 +520,20 @@ public:
      */
     void print_error_message() const
     {
-        std::cout << arg_parsr_->get_program_name() << ": ";
+        auto& os = arg_parsr_->get_ostream();
+        
+        os << arg_parsr_->get_program_name() << ": ";
         if (!err_name_.empty())
         {
             if (arg_parsr_->colors_enabled())
             {
-                std::cout << iostream::set_light_red_text
-                          << err_name_ << ": "
-                          << iostream::set_default_text;
+                os << iostream::set_light_red_text
+                   << err_name_ << ": "
+                   << iostream::set_default_text;
             }
             else
             {
-                std::cout << err_name_ << ": ";
+                os << err_name_ << ": ";
             }
         }
     }
@@ -552,8 +555,10 @@ public:
             return;
         }
         
-        iostream::print_wrapped(std::cout, desc_, max_line_len, new_line_indent, current_line_len);
-        std::cout << '\n';
+        auto& os = arg_parsr_->get_ostream();
+        
+        iostream::print_wrapped(os, desc_, max_line_len, new_line_indent, current_line_len);
+        os.put('\n');
     }
 
     /**

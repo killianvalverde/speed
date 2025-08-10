@@ -176,7 +176,7 @@ public:
      */
     void print_name() override
     {
-        std::cout << ky_;
+        base_arg_type::get_arg_parser()->get_ostream() << ky_;
     }
     
     /**
@@ -184,18 +184,20 @@ public:
      */
     void print_usage() override
     {
+        auto& os = base_arg_type::get_arg_parser()->get_ostream();
+        
         if (!base_arg_type::is_option())
         {
-            std::cout << ky_;
+            os << ky_;
         }
         else
         {
-            std::cout << "[" << ky_ << "]";
+            os << "[" << ky_ << "]";
         }
         
         if (value_arg_type::get_max_values() > 1)
         {
-            std::cout << "...";
+            os << "...";
         }
     }
     
@@ -223,19 +225,20 @@ public:
         std::size_t current_id_len = safety::addm(ky_.length(), 2);
         std::size_t total_id_len = safety::addm(short_kys_len, long_kys_len);
         std::size_t i;
+        auto& os = base_arg_type::get_arg_parser()->get_ostream();
     
         for (i = args_indent; i > 0; i--)
         {
-            std::cout << ' ';
+            os.put(' ');
         }
     
-        std::cout << ky_ << "  ";
+        os << ky_ << "  ";
         
         if (current_id_len < total_id_len)
         {
             for (i = total_id_len - current_id_len; i > 0; i--)
             {
-                std::cout << ' ';
+                os.put(' ');
             }
         }
     

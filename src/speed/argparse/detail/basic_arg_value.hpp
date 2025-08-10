@@ -267,20 +267,22 @@ public:
             return;
         }
         
-        std::cout << arg_parsr_->get_program_name() << ": ";
+        auto& os = arg_parsr_->get_ostream();
+        
+        os << arg_parsr_->get_program_name() << ": ";
         
         if (!val_arg_->is_error_name_empty() &&
             !err_flgs_.is_set(arg_value_error_flags::INVALID_PATH_ERROR))
         {
             if (arg_parsr_->colors_enabled())
             {
-                std::cout << iostream::set_light_red_text
-                          << val_arg_->get_error_name() << ": "
-                          << iostream::set_default_text;
+                os << iostream::set_light_red_text
+                   << val_arg_->get_error_name() << ": "
+                   << iostream::set_default_text;
             }
             else
             {
-                std::cout << val_arg_->get_error_name() << ": ";
+                os << val_arg_->get_error_name() << ": ";
             }
         }
         
@@ -288,20 +290,20 @@ public:
         {
             if (arg_parsr_->colors_enabled())
             {
-                std::cout << iostream::set_light_red_text
-                          << val_ << ": "
-                          << iostream::set_default_text
-                          << err_message_
-                          << iostream::newl;
+                os << iostream::set_light_red_text
+                   << val_ << ": "
+                   << iostream::set_default_text
+                   << err_message_
+                   << iostream::newl;
             }
             else
             {
-                std::cout << val_ << ": " << err_message_ << iostream::newl;
+                os << val_ << ": " << err_message_ << iostream::newl;
             }
         }
         else
         {
-            std::cout << err_message_ << " '" << val_ << "'\n";
+            os << err_message_ << " '" << val_ << "'\n";
         }
     }
 

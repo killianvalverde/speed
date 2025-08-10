@@ -73,6 +73,9 @@ public:
     /** The character type used in the argument parser. */
     using char_type = char;
     
+    /** The ostream type used in the argument parser. */
+    using ostream_type = std::basic_ostream<char_type>;
+    
     /** Allocator type used in the class. */
     template<typename T>
     using allocator_type = typename std::allocator_traits<AllocatorT>::template rebind_alloc<T>;
@@ -485,7 +488,7 @@ public:
      * @return      If function was successful true is returned, otherwise false is returned.
      */
     template<typename StringT_>
-    [[nodiscard]] inline bool arg_has_errors(const StringT_& ky) const
+    [[nodiscard]] bool arg_has_errors(const StringT_& ky) const
     {
         base_arg_type* bse_arg = get_base_arg(ky);
         
@@ -501,7 +504,7 @@ public:
      * @brief       Allows knowing whether there are errors in the argument parser.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool has_errors() const noexcept
+    [[nodiscard]] bool has_errors() const noexcept
     {
         return err_flgs_.is_not_empty();
     }
@@ -779,6 +782,9 @@ public:
             return;
         }
         
+        use_error_stream();
+        auto& os = get_ostream();
+        
         if (err_flgs_.is_set(detail::arg_parser_error_flags::ARGS_ERROR))
         {
             for (auto& bse_arg : bse_arg_list_)
@@ -799,40 +805,45 @@ public:
         {
             for (auto& unrecog_arg : unrecog_args_)
             {
-                std::cout << prog_name_ << ": ";
+                os << prog_name_ << ": ";
                 if (!err_id_.empty())
                 {
                     if (flgs_.is_set(detail::arg_parser_flags::USE_COLORS))
                     {
-                        std::cout << iostream::set_light_red_text
-                                  << err_id_ << ": "
-                                  << iostream::set_default_text;
+                        os << iostream::set_light_red_text
+                           << err_id_ << ": "
+                           << iostream::set_default_text;
                     }
                     else
                     {
-                        std::cout << err_id_ << ": ";
+                        os << err_id_ << ": ";
                     }
-
                 }
-                std::cout << "Unrecognized option '" << unrecog_arg << "'\n";
+                os << "Unrecognized option '" << unrecog_arg << "'\n";
             }
         }
 
         if (!prog_name_.empty() && default_hlp_arg_ != nullptr)
         {
-            std::cout << "Try '" << prog_name_ << ' ' << default_hlp_arg_->get_front_key()
-                      << "' for more information.\n";
+            os << "Try '" << prog_name_ << ' ' << default_hlp_arg_->get_front_key()
+               << "' for more information.\n";
         }
         
         if (flgs_.is_set(detail::arg_parser_flags::PRINT_HELP_AFTER_PRINTING_ERRORS))
         {
             print_help();
         }
+        else
+        {
+            flush_output_stream();
+        }
         
         if (flgs_.is_set(detail::arg_parser_flags::PKILL_AFTER_PRINTING_ERRORS))
         {
             exit_program(SPEED_EXIT_CODE_USAGE_ERROR);
         }
+        
+        use_output_stream();
     }
 
 private:
@@ -841,7 +852,7 @@ private:
      * @param       ky : Key to check.
      */
     template<typename StringT_>
-    inline void assert_valid_key(const StringT_& ky) const
+    void assert_valid_key(const StringT_& ky) const
     {
         if (arg_key_exists(ky))
         {
@@ -852,7 +863,7 @@ private:
     /**
      * @brief       Assert the validity of adding a version argument.
      */
-    inline void assert_valid_version() const
+    void assert_valid_version() const
     {
         if (current_vers_arg_ != nullptr)
         {
@@ -879,7 +890,7 @@ private:
      * @brief       Register in the data stuctures a specified key value argument and its keys.
      * @param       ky_val_arg : Key value argument to register.
      */
-    inline void register_key_value_arg(unique_ptr_type<key_value_arg_type> ky_val_arg)
+    void register_key_value_arg(unique_ptr_type<key_value_arg_type> ky_val_arg)
     {
         register_key_arg(std::move(ky_val_arg));
     }
@@ -888,7 +899,7 @@ private:
      * @brief       Register in the data stuctures a specified positional argument and its key.
      * @param       positionl_arg : positional argument to register.
      */
-    inline void register_positional_arg(unique_ptr_type<positional_arg_type> positionl_arg)
+    void register_positional_arg(unique_ptr_type<positional_arg_type> positionl_arg)
     {
         bse_arg_map_.emplace(positionl_arg->get_key(), positionl_arg.get());
         register_into_help_menus(positionl_arg.get());
@@ -899,7 +910,7 @@ private:
      * @brief       Register in the data stuctures a specified help argument and its keys.
      * @param       hlp_arg : Help argument to register.
      */
-    inline void register_help_arg(unique_ptr_type<help_arg_type> hlp_arg)
+    void register_help_arg(unique_ptr_type<help_arg_type> hlp_arg)
     {
         if (default_hlp_arg_ == nullptr)
         {
@@ -912,7 +923,7 @@ private:
      * @brief       Register in the data stuctures a specified version argument and its keys.
      * @param       vers_arg : Version argument to register.
      */
-    inline void register_version_arg(unique_ptr_type<version_arg_type> vers_arg)
+    void register_version_arg(unique_ptr_type<version_arg_type> vers_arg)
     {
         if (current_vers_arg_ == nullptr)
         {
@@ -957,10 +968,18 @@ private:
      * @brief       Exit the program with the value specified.
      * @param       val : Value that the program will return.
      */
-    inline void exit_program(int val) const noexcept
+    void exit_program(int val) const noexcept
     {
         this->~basic_arg_parser();
         exit(val);
+    }
+    
+    /**
+     * @brief       Flushes the current output stream.
+     */
+    void flush_output_stream()
+    {
+        std::flush(*ostrm);
     }
     
     /**
@@ -1329,6 +1348,22 @@ private:
             }
         }
     }
+    
+    /**
+     * @brief       Redirects the output to the standard error stream.
+     */
+    void use_error_stream()
+    {
+        ostrm = &speed::iostream::get_cerr<char_type>();
+    }
+    
+    /**
+     * @brief       Redirects the output to the standard output stream.
+     */
+    void use_output_stream()
+    {
+        ostrm = &speed::iostream::get_cout<char_type>();
+    }
 
     /**
      * @brief       Allows knowing whether a string contains an eq operator.
@@ -1360,7 +1395,7 @@ private:
      * @return      If function was successful true is returned, otherwise false is returned.
      */
     template<typename StringT_>
-    [[nodiscard]] inline bool arg_key_exists(const StringT_& ky) const noexcept
+    [[nodiscard]] bool arg_key_exists(const StringT_& ky) const noexcept
     {
         return bse_arg_map_.contains(ky);
     }
@@ -1393,7 +1428,7 @@ private:
      * @brief       Allows knowing whether colors are enalbled.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool colors_enabled() const noexcept
+    [[nodiscard]] bool colors_enabled() const noexcept
     {
         return flgs_.is_set(detail::arg_parser_flags::USE_COLORS);
     }
@@ -1402,7 +1437,7 @@ private:
      * @brief       Allows knowing whether the parse of the arguements have been done.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool has_parsed() const noexcept
+    [[nodiscard]] bool has_parsed() const noexcept
     {
         return parsd_;
     }
@@ -1412,7 +1447,7 @@ private:
      * @param       flg : Flag to check.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool is_error_flag_set(detail::arg_parser_error_flags flg) const noexcept
+    [[nodiscard]] bool is_error_flag_set(detail::arg_parser_error_flags flg) const noexcept
     {
         return err_flgs_.is_set(flg);
     }
@@ -1422,7 +1457,7 @@ private:
      * @param       flg : Flag to check.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool is_flag_set(detail::arg_parser_flags flg) const noexcept
+    [[nodiscard]] bool is_flag_set(detail::arg_parser_flags flg) const noexcept
     {
         return flgs_.is_set(flg);
     }
@@ -1681,7 +1716,7 @@ private:
      * @return      An iterator pointing to the first `positional_arg_type` element found, or to the
      *              end of the list.
      */
-    inline vector_type<unique_ptr_type<base_arg_type>>::iterator get_first_positional_arg(
+    vector_type<unique_ptr_type<base_arg_type>>::iterator get_first_positional_arg(
             vector_type<unique_ptr_type<base_arg_type>>::iterator it
     ) const noexcept
     {
@@ -1738,7 +1773,7 @@ private:
      * @return      An iterator pointing to the next positional argument, or `bse_arg_list_.end()`
      *              if none is found.
      */
-    inline vector_type<unique_ptr_type<base_arg_type>>::iterator get_next_positional_arg(
+    vector_type<unique_ptr_type<base_arg_type>>::iterator get_next_positional_arg(
             vector_type<unique_ptr_type<base_arg_type>>::iterator it
     ) const noexcept
     {
@@ -1754,7 +1789,7 @@ private:
      * @brief       Get the number of arguments that are options.
      * @return      The number of arguments that are options.
      */
-    [[nodiscard]] inline std::size_t get_options_count() const noexcept
+    [[nodiscard]] std::size_t get_options_count() const noexcept
     {
         key_arg_type* ky_arg;
         std::size_t nr_options_bldr = 0;
@@ -1780,11 +1815,16 @@ private:
         return (nr_options_bldr == 0 && nr_term_not_always_requird > 0) ? 1 : nr_options_bldr;
     }
     
+    [[nodiscard]] ostream_type& get_ostream() noexcept
+    {
+        return *ostrm;
+    }
+    
     /**
      * @brief       Get the program name.
      * @return      The program name.
      */
-    [[nodiscard]] inline const string_type& get_program_name() const noexcept
+    [[nodiscard]] const string_type& get_program_name() const noexcept
     {
         return prog_name_;
     }
@@ -1794,7 +1834,7 @@ private:
      * @param       err_id : Error id used by the parser for generic errors.
      */
     template<typename StringT_>
-    inline void set_error_id(StringT_&& err_id) noexcept
+    void set_error_id(StringT_&& err_id) noexcept
     {
         err_id_ = std::forward<StringT_>(err_id);
     }
@@ -1803,7 +1843,7 @@ private:
      * @brief       Set an argument parser flag.
      * @param       flg : Flag to set.
      */
-    inline void set_flag(detail::arg_parser_flags flg) noexcept
+    void set_flag(detail::arg_parser_flags flg) noexcept
     {
         flgs_.set(flg);
     }
@@ -1824,7 +1864,7 @@ private:
      * @brief       Set the maximum amount of unrecognized arguments.
      * @param       max : The maximum amount of unrecognized arguments.
      */
-    inline void set_maximum_unrecognized_args(std::size_t max) noexcept
+    void set_maximum_unrecognized_args(std::size_t max) noexcept
     {
         max_unrecog_args_ = max;
     }
@@ -1846,7 +1886,7 @@ private:
      * @param       prog_name : The program name.
      */
     template<typename StringT_>
-    inline void set_program_name(StringT_&& prog_name)
+    void set_program_name(StringT_&& prog_name)
     {
         prog_name_ = std::forward<StringT_>(prog_name);
     }
@@ -1855,7 +1895,7 @@ private:
      * @brief       Unset an argument parser flag.
      * @param       flg : Flag to unset.
      */
-    inline void unset_flag(detail::arg_parser_flags flg) noexcept
+    void unset_flag(detail::arg_parser_flags flg) noexcept
     {
         flgs_.unset(flg);
     }
@@ -1866,25 +1906,26 @@ private:
     void print_usage()
     {
         std::size_t nr_options = get_options_count();
+        auto& os = get_ostream();
 
-        std::cout << "Usage: ";
+        os << "Usage: ";
 
         if (!prog_name_.empty())
         {
-            std::cout << prog_name_ << ' ';
+            os << prog_name_ << ' ';
         }
         else
         {
-            std::cout << "???" << ' ';
+            os << "???" << ' ';
         }
 
         if (nr_options > 0)
         {
-            std::cout << "[OPTION]";
+            os << "[OPTION]";
 
             if (nr_options > 1)
             {
-                std::cout << "...";
+                os << "...";
             }
         }
 
@@ -1892,22 +1933,23 @@ private:
         print_values_usage();
         print_constraints_usage();
 
-        std::cout << "\n\n";
+        os << "\n\n";
     }
 
     /**
      * @brief       Print the commands usage.
      */
-    inline void print_commands_usage()
+    void print_commands_usage()
     {
         key_arg_type* ky_arg;
+        auto& os = get_ostream();
 
         for (auto& bse_arg : bse_arg_list_)
         {
             ky_arg = dynamic_cast<key_arg_type*>(bse_arg.get());
             if (ky_arg != nullptr && !ky_arg->is_option())
             {
-                std::cout << ' ';
+                os.put(' ');
                 ky_arg->print_usage();
             }
         }
@@ -1916,16 +1958,17 @@ private:
     /**
      * @brief       Pring the values usage.
      */
-    inline void print_values_usage()
+    void print_values_usage()
     {
         positional_arg_type* positionl_arg;
+        auto& os = get_ostream();
 
         for (auto& bse_arg : bse_arg_list_)
         {
             positionl_arg = dynamic_cast<positional_arg_type*>(bse_arg.get());
             if (positionl_arg != nullptr)
             {
-                std::cout << ' ';
+                os.put(' ');
                 positionl_arg->print_usage();
             }
         }
@@ -1934,22 +1977,23 @@ private:
     /**
      * @brief       Print the constraints usage.
      */
-    inline void print_constraints_usage()
+    void print_constraints_usage()
     {
         if (constrnts_.empty())
         {
             return;
         }
 
-        std::cout << " ";
+        auto& os = get_ostream();
+        os.put(' ');
         
         if (constrnts_.size() > 1)
         {
-            std::cout << "{CONSTRAINTS}";
+            os << "{CONSTRAINTS}";
         }
         else
         {
-            std::cout << "{CONSTRAINT}";
+            os << "{CONSTRAINT}";
         }
     }
 
@@ -2025,6 +2069,8 @@ private:
 
     /** Contains the current version argument. */
     version_arg_type* current_vers_arg_ = nullptr;
+    
+    ostream_type* ostrm = &speed::iostream::get_cout<char_type>();
     
     /** Contains the maximum number of unrecognized args to be catched. */
     std::size_t max_unrecog_args_ = 1;

@@ -252,7 +252,7 @@ public:
         print_constraints();
         print_epilog();
 
-        std::flush(std::cout);
+        arg_parsr_->flush_output_stream();
     }
 
 private:
@@ -335,10 +335,12 @@ private:
      */
     inline void print_description()
     {
+        auto& os = arg_parsr_->get_ostream();
+        
         if (flgs_.is_set(help_menu_flags::PRINT_DESCRIPTION) && !desc_.empty())
         {
-            iostream::print_wrapped(std::cout, desc_, max_line_len_, 0);
-            std::cout << "\n\n";
+            iostream::print_wrapped(os, desc_, max_line_len_, 0);
+            os << "\n\n";
         }
     }
 
@@ -354,6 +356,7 @@ private:
         
         key_arg_type* ky_arg;
         bool fnd = false;
+        auto& os = arg_parsr_->get_ostream();
 
         for (auto& bs_arg : bse_args_)
         {
@@ -369,7 +372,7 @@ private:
             return;
         }
 
-        std::cout << "Options:\n";
+        os << "Options:\n";
 
         for (auto& bs_arg : bse_args_)
         {
@@ -380,7 +383,7 @@ private:
             }
         }
 
-        std::cout << '\n';
+        os.put('\n');
     }
 
     /**
@@ -395,6 +398,7 @@ private:
 
         key_arg_type* ky_arg;
         bool fnd = false;
+        auto& os = arg_parsr_->get_ostream();
 
         for (auto& bs_arg : bse_args_)
         {
@@ -410,7 +414,7 @@ private:
             return;
         }
 
-        std::cout << "Commands:\n";
+        os << "Commands:\n";
 
         for (auto& bs_arg : bse_args_)
         {
@@ -421,7 +425,7 @@ private:
             }
         }
 
-        std::cout << '\n';
+        os.put('\n');
     }
 
     /**
@@ -436,6 +440,7 @@ private:
 
         positional_arg_type* ps_arg;
         bool fnd = false;
+        auto& os = arg_parsr_->get_ostream();
 
         for (auto& bs_arg : bse_args_)
         {
@@ -451,7 +456,7 @@ private:
             return;
         }
 
-        std::cout << "Values:\n";
+        os << "Values:\n";
 
         for (auto& bs_arg : bse_args_)
         {
@@ -462,7 +467,7 @@ private:
             }
         }
 
-        std::cout << '\n';
+        os.put('\n');
     }
 
     /**
@@ -477,6 +482,8 @@ private:
         
         bool fnd = false;
         auto& constrnts = arg_parsr_->get_constraints();
+        auto& os = arg_parsr_->get_ostream();
+        
         for (auto& constrnt : constrnts)
         {
             if (constrnt.contains_any_of(bse_args_))
@@ -490,7 +497,7 @@ private:
             return;
         }
 
-        std::cout << "Constraints:\n";
+        os << "Constraints:\n";
         
         for (auto& constrnt : constrnts)
         {
@@ -509,8 +516,9 @@ private:
     {
         if (flgs_.is_set(help_menu_flags::PRINT_EPILOGUE) && !epilg_.empty())
         {
-            iostream::print_wrapped(std::cout, epilg_, max_line_len_, 0);
-            std::cout << "\n\n";
+            auto& os = arg_parsr_->get_ostream();
+            iostream::print_wrapped(os, epilg_, max_line_len_, 0);
+            os << "\n\n";
         }
     }
 
