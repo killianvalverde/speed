@@ -1262,7 +1262,7 @@ TEST_F(argparse_arg_parser, print_number_errors)
             "-s", "4896K"
     };
 
-    speed::iostream::ios_redirect ios_redirect(std::cout);
+    speed::iostream::ios_redirect ios_redirect(std::cerr);
     ios_redirect.redirect_to_internal_stream();
 
     ap.add_key_value_arg("--seconds", "-s")
