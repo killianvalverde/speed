@@ -77,7 +77,7 @@ public:
      * @brief       Constructor with parameters.
      * @param       arg_parsr : Argument parser that holds this object.
      */
-    explicit basic_base_arg(arg_parser_type* arg_parsr)
+    explicit basic_base_arg(arg_parser_type& arg_parsr)
             : arg_parsr_(arg_parsr)
     {
     }
@@ -166,7 +166,7 @@ public:
      */
     virtual inline void update_error_flags() noexcept
     {
-        if (nr_occurrencs_ < minmax_occurrencs_.first && arg_parsr_->has_parsed())
+        if (nr_occurrencs_ < minmax_occurrencs_.first && arg_parsr_.has_parsed())
         {
             err_flgs_.set(arg_error_flags::MIN_OCCURRENCES_ERROR);
         }
@@ -269,7 +269,7 @@ public:
      * @brief       Get the composite object of this class.
      * @return      The composite object of this class.
      */
-    [[nodiscard]] inline arg_parser_type* get_arg_parser() const noexcept
+    [[nodiscard]] inline arg_parser_type& get_arg_parser() const noexcept
     {
         return arg_parsr_;
     }
@@ -310,7 +310,7 @@ public:
      */
     [[nodiscard]] const string_type& get_program_name() const noexcept
     {
-        return arg_parsr_->get_program_name();
+        return arg_parsr_.get_program_name();
     }
 
     /**
@@ -393,8 +393,8 @@ public:
     template<typename... StringTs_>
     void set_help_menus_assigned(StringTs_&&... hlp_menus_ids)
     {
-        arg_parsr_->remove_from_help_menus(this);
-        arg_parsr_->register_into_help_menus(this, std::forward<StringTs_>(hlp_menus_ids)...);
+        arg_parsr_.remove_from_help_menus(this);
+        arg_parsr_.register_into_help_menus(this, std::forward<StringTs_>(hlp_menus_ids)...);
     }
 
     /**
@@ -485,7 +485,7 @@ public:
     virtual void print_errors() const
     {
         auto tittl = get_tittle();
-        auto& os = arg_parsr_->get_ostream();
+        auto& os = arg_parsr_.get_ostream();
         
         if (err_flgs_.is_set(arg_error_flags::MIN_OCCURRENCES_ERROR))
         {
@@ -520,12 +520,12 @@ public:
      */
     void print_error_message() const
     {
-        auto& os = arg_parsr_->get_ostream();
+        auto& os = arg_parsr_.get_ostream();
         
-        os << arg_parsr_->get_program_name() << ": ";
+        os << arg_parsr_.get_program_name() << ": ";
         if (!err_name_.empty())
         {
-            if (arg_parsr_->colors_enabled())
+            if (arg_parsr_.colors_enabled())
             {
                 os << iostream::set_light_red_text
                    << err_name_ << ": "
@@ -555,7 +555,7 @@ public:
             return;
         }
         
-        auto& os = arg_parsr_->get_ostream();
+        auto& os = arg_parsr_.get_ostream();
         
         iostream::print_wrapped(os, desc_, max_line_len, new_line_indent, current_line_len);
         os.put('\n');
@@ -601,7 +601,7 @@ private:
     action_type actn_;
 
     /** Reference to the argument parser that holds this object. */
-    arg_parser_type* arg_parsr_;
+    arg_parser_type& arg_parsr_;
 
     /** Reference to a boolen that will be set to indicate whether the argument has been found. */
     bool* presence_holdr_ = nullptr;

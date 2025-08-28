@@ -109,7 +109,7 @@ public:
      * @brief       Constructor with parameters.
      * @param       arg_parsr : Argument parser that holds this object.
      */
-    explicit basic_value_arg(arg_parser_type* arg_parsr)
+    explicit basic_value_arg(arg_parser_type& arg_parsr)
             : base_arg_type(arg_parsr)
     {
         nr_vals_.emplace_back(0);
@@ -144,21 +144,7 @@ public:
      * @param       rhs : Object to move.
      * @return      The object who call the method.
      */
-    basic_value_arg& operator =(basic_value_arg&& rhs) noexcept
-    {
-        if (this != &rhs)
-        {
-            base_arg_type::operator =(std::move(rhs));
-            minmax_vals_ = std::move(rhs.minmax_vals_);
-            vals_ = std::move(rhs.vals_);
-            nr_vals_ = std::move(rhs.nr_vals_);
-            castrs_ = std::move(rhs.castrs_);
-            assertns_ = std::move(rhs.assertns_);
-            regxes_ = std::move(rhs.regxes_);
-        }
-        
-        return *this;
-    }
+    basic_value_arg& operator =(basic_value_arg&& rhs) noexcept = default;
 
     /**
      * @brief       Add a value to the argument.
@@ -171,7 +157,7 @@ public:
         if (!max_values_reached())
         {
             vals_.emplace_back(std::forward<StringT_>(val), get_next_caster(),
-                    get_next_assertion(), get_next_regex(), base_arg_type::get_arg_parser(), this);
+                    get_next_assertion(), get_next_regex(), base_arg_type::get_arg_parser(), *this);
             ++nr_vals_.back();
             return true;
         }
@@ -192,7 +178,7 @@ public:
         if (!max_values_reached())
         {
             arg_value_type arg_val(std::forward<StringT_>(val), get_next_caster(),
-                    get_next_assertion(), get_next_regex(), base_arg_type::get_arg_parser(), this);
+                    get_next_assertion(), get_next_regex(), base_arg_type::get_arg_parser(), *this);
 
             if (!arg_val.has_errors())
             {
@@ -647,7 +633,7 @@ public:
             return;
         }
         
-        auto& os = base_arg_type::get_arg_parser()->get_ostream();
+        auto& os = base_arg_type::get_arg_parser().get_ostream();
 
         base_arg_type::print_errors();
         

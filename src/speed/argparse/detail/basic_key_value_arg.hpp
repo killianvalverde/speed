@@ -86,7 +86,7 @@ public:
      * @param       kys : Argument keys.
      */
     template<typename... StringTs_>
-    explicit basic_key_value_arg(arg_parser_type* arg_parsr, StringTs_&&... kys)
+    explicit basic_key_value_arg(arg_parser_type& arg_parsr, StringTs_&&... kys)
             : base_arg_type(arg_parsr)
             , key_arg_type(arg_parsr, std::forward<StringTs_>(kys)...)
             , value_arg_type(arg_parsr)
@@ -236,7 +236,7 @@ public:
     {
         build_usage_string();
         key_arg_type::print_usage();
-        base_arg_type::get_arg_parser()->get_ostream() << usage_str_;
+        base_arg_type::get_arg_parser().get_ostream() << usage_str_;
     }
 
     /**
@@ -263,7 +263,7 @@ public:
         std::size_t current_id_len = 0;
         std::size_t n_args_printd = 0;
         std::size_t i;
-        auto& os = base_arg_type::get_arg_parser()->get_ostream();
+        auto& os = base_arg_type::get_arg_parser().get_ostream();
 
         build_usage_string();
     

@@ -315,7 +315,7 @@ public:
         (assert_valid_key(kys), ...);
         
         unique_ptr_type<key_arg_type> ky_arg = memory::allocate_unique<key_arg_type>(
-                allocator_type<key_arg_type>(), this, std::forward<StringTs_>(kys)...);
+                allocator_type<key_arg_type>(), *this, std::forward<StringTs_>(kys)...);
         
         key_arg_type* ky_arg_ref = ky_arg.get();
         register_key_arg(std::move(ky_arg));
@@ -335,7 +335,7 @@ public:
         
         unique_ptr_type<key_value_arg_type> ky_val_arg =
                 memory::allocate_unique<key_value_arg_type>(
-                        allocator_type<key_value_arg_type>(), this,
+                        allocator_type<key_value_arg_type>(), *this,
                         std::forward<StringTs_>(kys)...);
         
         key_value_arg_type* ky_val_arg_ref = ky_val_arg.get();
@@ -356,7 +356,7 @@ public:
         
         unique_ptr_type<positional_arg_type> positionl_arg =
                 memory::allocate_unique<positional_arg_type>(
-                        allocator_type<positional_arg_type>(), this, std::forward<StringTs_>(ky));
+                        allocator_type<positional_arg_type>(), *this, std::forward<StringTs_>(ky));
         
         positional_arg_type* positionl_arg_ref = positionl_arg.get();
         register_positional_arg(std::move(positionl_arg));
@@ -375,7 +375,7 @@ public:
         (assert_valid_key(kys), ...);
         
         unique_ptr_type<help_arg_type> hlp_arg = memory::allocate_unique<help_arg_type>(
-                allocator_type<help_arg_type>(), this, std::forward<StringTs_>(kys)...);
+                allocator_type<help_arg_type>(), *this, std::forward<StringTs_>(kys)...);
         
         help_arg_type* hlp_arg_ref = hlp_arg.get();
         register_help_arg(std::move(hlp_arg));
@@ -396,7 +396,7 @@ public:
         
         unique_ptr_type<version_arg_type> vers_arg =
                 memory::allocate_unique<version_arg_type>(
-                        allocator_type<version_arg_type>(), this, std::forward<StringTs_>(kys)...);
+                        allocator_type<version_arg_type>(), *this, std::forward<StringTs_>(kys)...);
         
         version_arg_type* vers_arg_ref = vers_arg.get();
         register_version_arg(std::move(vers_arg));
@@ -1702,7 +1702,7 @@ private:
             it = hlp_menu_map_.emplace(
                     std::forward<StringT_>(hlp_menu_id),
                     memory::allocate_unique<help_menu_type>(
-                            allocator_type<help_menu_type>(), this)).first;
+                            allocator_type<help_menu_type>(), *this)).first;
         }
 
         return *(it->second);

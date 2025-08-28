@@ -99,7 +99,7 @@ public:
      * @brief       Constructor with parameters.
      * @param       arg_parsr : Argument parser that holds this object.
      */
-    basic_help_menu(arg_parser_type* arg_parsr)
+    basic_help_menu(arg_parser_type& arg_parsr)
             : arg_parsr_(arg_parsr)
     {
         bse_args_.reserve(10);
@@ -252,7 +252,7 @@ public:
         print_constraints();
         print_epilog();
 
-        arg_parsr_->flush_output_stream();
+        arg_parsr_.flush_output_stream();
     }
 
 private:
@@ -326,7 +326,7 @@ private:
     {
         if (flgs_.is_set(help_menu_flags::PRINT_USAGE))
         {
-            arg_parsr_->print_usage();
+            arg_parsr_.print_usage();
         }
     }
 
@@ -335,7 +335,7 @@ private:
      */
     inline void print_description()
     {
-        auto& os = arg_parsr_->get_ostream();
+        auto& os = arg_parsr_.get_ostream();
         
         if (flgs_.is_set(help_menu_flags::PRINT_DESCRIPTION) && !desc_.empty())
         {
@@ -356,7 +356,7 @@ private:
         
         key_arg_type* ky_arg;
         bool fnd = false;
-        auto& os = arg_parsr_->get_ostream();
+        auto& os = arg_parsr_.get_ostream();
 
         for (auto& bs_arg : bse_args_)
         {
@@ -398,7 +398,7 @@ private:
 
         key_arg_type* ky_arg;
         bool fnd = false;
-        auto& os = arg_parsr_->get_ostream();
+        auto& os = arg_parsr_.get_ostream();
 
         for (auto& bs_arg : bse_args_)
         {
@@ -440,7 +440,7 @@ private:
 
         positional_arg_type* ps_arg;
         bool fnd = false;
-        auto& os = arg_parsr_->get_ostream();
+        auto& os = arg_parsr_.get_ostream();
 
         for (auto& bs_arg : bse_args_)
         {
@@ -481,8 +481,8 @@ private:
         }
         
         bool fnd = false;
-        auto& constrnts = arg_parsr_->get_constraints();
-        auto& os = arg_parsr_->get_ostream();
+        auto& constrnts = arg_parsr_.get_constraints();
+        auto& os = arg_parsr_.get_ostream();
         
         for (auto& constrnt : constrnts)
         {
@@ -516,7 +516,7 @@ private:
     {
         if (flgs_.is_set(help_menu_flags::PRINT_EPILOGUE) && !epilg_.empty())
         {
-            auto& os = arg_parsr_->get_ostream();
+            auto& os = arg_parsr_.get_ostream();
             iostream::print_wrapped(os, epilg_, max_line_len_, 0);
             os << "\n\n";
         }
@@ -555,7 +555,7 @@ private:
     vector_type<base_arg_type*> bse_args_;
 
     /** Reference to the argument parser that holds this object. */
-    arg_parser_type* arg_parsr_;
+    arg_parser_type& arg_parsr_;
 
     /** Indentation of the arugments keys in the help menu. */
     std::size_t args_indent_ = 2;

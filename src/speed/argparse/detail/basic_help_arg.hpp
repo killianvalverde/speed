@@ -94,7 +94,7 @@ public:
      * @param       kys : Argument keys.
      */
     template<typename... StringTs_>
-    explicit basic_help_arg(arg_parser_type* arg_parsr, StringTs_&&... kys)
+    explicit basic_help_arg(arg_parser_type& arg_parsr, StringTs_&&... kys)
             : base_arg_type(arg_parsr)
             , key_arg_type(arg_parsr, std::forward<StringTs_>(kys)...)
     {
@@ -140,7 +140,7 @@ public:
     void set_help_menu_triggered(StringT_&& hlp_menu_triggerd)
     {
         hlp_menu_triggerd_ = &(base_arg_type::get_arg_parser()
-                ->get_help_menu(std::forward<StringT_>(hlp_menu_triggerd)));
+                .get_help_menu(std::forward<StringT_>(hlp_menu_triggerd)));
     }
     
     /**

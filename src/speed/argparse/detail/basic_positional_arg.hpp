@@ -74,7 +74,7 @@ public:
      * @param       usage_ky : Key used in the usage message.
      */
     template<typename StringT_>
-    basic_positional_arg(arg_parser_type* arg_parsr, StringT_&& usage_ky)
+    basic_positional_arg(arg_parser_type& arg_parsr, StringT_&& usage_ky)
             : base_arg_type(arg_parsr)
             , value_arg_type(arg_parsr)
             , ky_(std::forward<StringT_>(usage_ky))
@@ -176,7 +176,7 @@ public:
      */
     void print_name() override
     {
-        base_arg_type::get_arg_parser()->get_ostream() << ky_;
+        base_arg_type::get_arg_parser().get_ostream() << ky_;
     }
     
     /**
@@ -184,7 +184,7 @@ public:
      */
     void print_usage() override
     {
-        auto& os = base_arg_type::get_arg_parser()->get_ostream();
+        auto& os = base_arg_type::get_arg_parser().get_ostream();
         
         if (!base_arg_type::is_option())
         {
@@ -225,7 +225,7 @@ public:
         std::size_t current_id_len = safety::addm(ky_.length(), 2);
         std::size_t total_id_len = safety::addm(short_kys_len, long_kys_len);
         std::size_t i;
-        auto& os = base_arg_type::get_arg_parser()->get_ostream();
+        auto& os = base_arg_type::get_arg_parser().get_ostream();
     
         for (i = args_indent; i > 0; i--)
         {

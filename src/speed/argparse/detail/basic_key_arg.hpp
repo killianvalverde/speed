@@ -73,7 +73,7 @@ public:
      * @param       kys : Argument keys.
      */
     template<typename... StringTs_>
-    explicit basic_key_arg(arg_parser_type* arg_parsr, StringTs_&&... kys)
+    explicit basic_key_arg(arg_parser_type& arg_parsr, StringTs_&&... kys)
             : base_arg_type(arg_parsr)
     {
         base_arg_type::set_flags(arg_flags::DEFAULT_KEY_ARG_FLAGS);
@@ -134,18 +134,7 @@ public:
      * @param       rhs : Object to move.
      * @return      The object who call the method.
      */
-    basic_key_arg& operator =(basic_key_arg&& rhs) noexcept
-    {
-        if (this != &rhs)
-        {
-            base_arg_type::operator =(std::move(rhs));
-            kys_ = std::move(rhs.kys_);
-            std::swap(short_kys_len_, rhs.short_kys_len_);
-            std::swap(long_kys_len_, rhs.long_kys_len_);
-        }
-    
-        return *this;
-    }
+    basic_key_arg& operator =(basic_key_arg&& rhs) noexcept = default;
 
     /**
      * @brief       Parse the arg key arg sub parser.
@@ -295,7 +284,7 @@ public:
             throw key_not_found_exception();
         }
         
-        base_arg_type::get_arg_parser()->get_ostream() << kys_.front().get_string();
+        base_arg_type::get_arg_parser().get_ostream() << kys_.front().get_string();
     }
 
     /**
@@ -330,7 +319,7 @@ public:
         std::size_t current_ky_len = 0;
         std::size_t n_args_printd = 0;
         std::size_t i;
-        auto& os = base_arg_type::get_arg_parser()->get_ostream();
+        auto& os = base_arg_type::get_arg_parser().get_ostream();
     
         for (i = args_indent; i > 0; --i)
         {
@@ -385,7 +374,7 @@ public:
             bool just_print_short_kys
     )
     {
-        auto& os = base_arg_type::get_arg_parser()->get_ostream();
+        auto& os = base_arg_type::get_arg_parser().get_ostream();
         
         for (auto& ky : kys_)
         {

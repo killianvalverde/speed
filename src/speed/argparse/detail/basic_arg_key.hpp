@@ -57,10 +57,10 @@ public:
      * @param       arg_parsr : Argument parser that holds this object.
      */
     template<typename StringT_>
-    basic_arg_key(StringT_&& ky, arg_parser_type* arg_parsr)
+    basic_arg_key(StringT_&& ky, arg_parser_type& arg_parsr)
             : ky_(std::forward<StringT_>(ky))
             , arg_parsr_(arg_parsr)
-            , is_prefx_long_(arg_parsr->is_key_prefix_long(ky_))
+            , is_prefx_long_(arg_parsr.is_key_prefix_long(ky_))
     {
     }
     
@@ -74,14 +74,7 @@ public:
      * @brief       Move constructor.
      * @param       rhs : Object to move.
      */
-    basic_arg_key(basic_arg_key&& rhs) noexcept
-            : ky_(std::move(rhs.ky_))
-            , arg_parsr_(rhs.arg_parsr_)
-            , is_prefx_long_(rhs.is_prefx_long_)
-    {
-        rhs.arg_parsr_ = nullptr;
-        rhs.is_prefx_long_ = false;
-    }
+    basic_arg_key(basic_arg_key&& rhs) noexcept = default;
     
     /**
      * @brief       Destructor.
@@ -100,17 +93,7 @@ public:
      * @param       rhs : Object to move.
      * @return      The object who call the method.
      */
-    basic_arg_key& operator =(basic_arg_key&& rhs) noexcept
-    {
-        if (this != &rhs)
-        {
-            ky_ = std::move(rhs.ky_);
-            std::swap(arg_parsr_, rhs.arg_parsr_);
-            std::swap(is_prefx_long_, rhs.is_prefx_long_);
-        }
-        
-        return *this;
-    }
+    basic_arg_key& operator =(basic_arg_key&& rhs) noexcept = default;
     
     /**
      * @brief       Allows knowing whether two objects are equal.
@@ -175,7 +158,7 @@ public:
      */
     void update_prefix_type() noexcept
     {
-        is_prefx_long_ = arg_parsr_->is_key_prefix_long(ky_);
+        is_prefx_long_ = arg_parsr_.is_key_prefix_long(ky_);
     }
     
     /**
@@ -201,7 +184,7 @@ private:
     string_type ky_;
 
     /** Reference to the argument parser that holds this object. */
-    arg_parser_type* arg_parsr_;
+    arg_parser_type& arg_parsr_;
     
     /** The value that allows knowing whether the key prefix is a long prefix. */
     bool is_prefx_long_;

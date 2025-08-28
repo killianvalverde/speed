@@ -106,8 +106,8 @@ public:
             caster_base_type* castr,
             assertion_type* assrt,
             regex_type* regx,
-            arg_parser_type* arg_parsr,
-            value_arg_type* val_arg
+            arg_parser_type& arg_parsr,
+            value_arg_type& val_arg
     )
             : val_(std::forward<StringT_>(val))
             , castr_(castr)
@@ -267,28 +267,28 @@ public:
             return;
         }
         
-        auto& os = arg_parsr_->get_ostream();
+        auto& os = arg_parsr_.get_ostream();
         
-        os << arg_parsr_->get_program_name() << ": ";
+        os << arg_parsr_.get_program_name() << ": ";
         
-        if (!val_arg_->is_error_name_empty() &&
+        if (!val_arg_.is_error_name_empty() &&
             !err_flgs_.is_set(arg_value_error_flags::INVALID_PATH_ERROR))
         {
-            if (arg_parsr_->colors_enabled())
+            if (arg_parsr_.colors_enabled())
             {
                 os << iostream::set_light_red_text
-                   << val_arg_->get_error_name() << ": "
+                   << val_arg_.get_error_name() << ": "
                    << iostream::set_default_text;
             }
             else
             {
-                os << val_arg_->get_error_name() << ": ";
+                os << val_arg_.get_error_name() << ": ";
             }
         }
         
         if (err_flgs_.is_set(arg_value_error_flags::INVALID_PATH_ERROR))
         {
-            if (arg_parsr_->colors_enabled())
+            if (arg_parsr_.colors_enabled())
             {
                 os << iostream::set_light_red_text
                    << val_ << ": "
@@ -324,10 +324,10 @@ private:
     regex_type* regx_;
 
     /** Holds a reference to the argument parser object. */
-    arg_parser_type* arg_parsr_;
+    arg_parser_type& arg_parsr_;
 
     /** Holds a reference to the value arg object. */
-    value_arg_type* val_arg_;
+    value_arg_type& val_arg_;
 
     /** Error flags that allows knowing whether there are errors. */
     flags_type<arg_value_error_flags> err_flgs_ = arg_value_error_flags::NIL;
