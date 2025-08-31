@@ -431,7 +431,7 @@ public:
      * @brief       Get the first element iterator of the container.
      * @return      The first element iterator of the container.
      */
-    inline iterator begin() noexcept
+    iterator begin() noexcept
     {
         constexpr std::size_t hb_size = get_hash_buffer_size();
         
@@ -452,7 +452,7 @@ public:
      * @brief       Get the first element const iterator of the container.
      * @return      The first element const iterator of the container.
      */
-    inline const_iterator cbegin() const noexcept
+    const_iterator cbegin() const noexcept
     {
         return const_cast<static_cache>(*this).begin();
     }
@@ -461,7 +461,7 @@ public:
      * @brief       Get an iterator to the past-the-end element in the container.
      * @return      An iterator to the past-the-end element in the container.
      */
-    inline iterator end() noexcept
+    iterator end() noexcept
     {
         return iterator(hbuf_, get_hash_buffer_size(), get_hash_buffer_size(), nullptr);
     }
@@ -470,7 +470,7 @@ public:
      * @brief       Get a const iterator to the past-the-end element in the container.
      * @return      A const iterator to the past-the-end element in the container
      */
-    inline const_iterator cend() const noexcept
+    const_iterator cend() const noexcept
     {
         return const_iterator(hbuf_, get_hash_buffer_size(), get_hash_buffer_size(), nullptr);
     }
@@ -617,7 +617,7 @@ public:
      * @brief       Check whether the least recently used element is free (never used).
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool is_least_recently_used_free() const
+    [[nodiscard]] bool is_least_recently_used_free() const
     {
         return !get_least_recently_used_buffer()->flgs_.is_set(scbf_t::INSERTED_IN_HASH_BUFFER);
     }
