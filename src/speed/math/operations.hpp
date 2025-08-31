@@ -37,7 +37,7 @@ namespace speed::math {
  * @return      The absolute number of the specified integral.
  */
 template<typename IntegralT>
-inline std::enable_if_t<
+std::enable_if_t<
         std::is_signed_v<IntegralT>,
         IntegralT
 >
@@ -57,7 +57,7 @@ abs(IntegralT val) noexcept
  * @return      The absolute number of the specified integral.
  */
 template<typename IntegralT>
-inline std::enable_if_t<
+std::enable_if_t<
         std::is_unsigned_v<IntegralT>,
         IntegralT
 >
