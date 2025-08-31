@@ -576,7 +576,7 @@ try_type_cast(const CharT* arg, TargetT& res, std::error_code* err_code) noexcep
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 template<typename TargetT, typename CharT, typename CharTraitsT, typename AllocatorT>
-inline bool try_type_cast(
+bool try_type_cast(
         const std::basic_string<CharT, CharTraitsT, AllocatorT>& arg,
         TargetT& res,
         std::error_code* err_code
@@ -593,7 +593,7 @@ inline bool try_type_cast(
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 template<typename TargetT, typename CharT, typename CharTraitsT>
-inline bool try_type_cast(
+bool try_type_cast(
         const std::basic_string_view<CharT, CharTraitsT>& arg,
         TargetT& res,
         std::error_code* err_code
@@ -610,7 +610,7 @@ inline bool try_type_cast(
  * @return      If function was successful true is returned, otherwise false is returned.
  */
 template<typename TargetT>
-inline bool try_type_cast(
+bool try_type_cast(
         const std::filesystem::path& arg,
         TargetT& res,
         std::error_code* err_code
@@ -630,7 +630,7 @@ inline bool try_type_cast(
  * @return      `true` if the cast succeeds, otherwise `false`.
  */
 template<typename TargetT, typename SourceT>
-inline bool try_type_cast(
+bool try_type_cast(
     const SourceT& arg, 
     TargetT& res,
     std::error_code* err_code

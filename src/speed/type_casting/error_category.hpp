@@ -115,7 +115,7 @@ public:
      * @param       cond : The condition.
      * @return      If function is successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool equivalent(
+    [[nodiscard]] bool equivalent(
             const std::error_code& err_code,
             int cond
     ) const noexcept override
