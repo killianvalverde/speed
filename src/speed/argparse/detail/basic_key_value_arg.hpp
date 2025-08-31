@@ -129,7 +129,7 @@ public:
      * @brief       Get the necessary length to print long arguments keys.
      * @return      The necessary length to print long arguments keys.
      */
-    [[nodiscard]] inline std::size_t get_long_keys_length() noexcept override
+    [[nodiscard]] std::size_t get_long_keys_length() noexcept override
     {
         std::size_t additional_len = 0;
 
@@ -151,7 +151,7 @@ public:
      * @brief       Get the necessary length to print short arguments keys.
      * @return      The necessary length to print short arguments keys.
      */
-    [[nodiscard]] inline std::size_t get_short_keys_length() noexcept override
+    [[nodiscard]] std::size_t get_short_keys_length() noexcept override
     {
         std::size_t additional_len = 0;
 
@@ -173,7 +173,7 @@ public:
      * @brief       Set an argument flag.
      * @param       flg : Flag to set.
      */
-    inline void set_flag(arg_flags flg) noexcept override
+    void set_flag(arg_flags flg) noexcept override
     {
         base_arg_type::set_flag(flg);
         if (flg == arg_flags::ASSIGNMENT_OPERATOR)
@@ -220,7 +220,7 @@ public:
      * @brief       Unset an argument flag.
      * @param       flg : Flag to unset.
      */
-    inline void unset_flag(arg_flags flg) noexcept override
+    void unset_flag(arg_flags flg) noexcept override
     {
         base_arg_type::unset_flag(flg);
         if (flg == arg_flags::ASSIGNMENT_OPERATOR)

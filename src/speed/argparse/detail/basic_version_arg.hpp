@@ -113,7 +113,7 @@ public:
      * @param       vers_information : The version information to set.
      */
     template<typename StringT_>
-    inline void set_version_information(StringT_&& vers_information)
+    void set_version_information(StringT_&& vers_information)
     {
         vers_information_ = std::forward<StringT_>(vers_information);
     }
@@ -121,7 +121,7 @@ public:
     /**
      * @brief       Print version information.
      */
-    inline void print_version_information()
+    void print_version_information()
     {
         base_arg_type::get_arg_parser().get_ostream() << vers_information_ << std::endl;
     }

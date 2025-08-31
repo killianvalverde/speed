@@ -100,7 +100,7 @@ public:
      * @param       rhs : Object to compare.
      * @return      If the objets are equal true is returned, otherwise false is returned.
      */
-    inline bool operator ==(const basic_arg_key& rhs) const noexcept
+    bool operator ==(const basic_arg_key& rhs) const noexcept
     {
         return (ky_ == rhs.ky_);
     }
@@ -110,7 +110,7 @@ public:
      * @param       ky : String to compare.
      * @return      If the objets are equal true is returned, otherwise false is returned.
      */
-    inline bool operator ==(const string_type& ky) const noexcept
+    bool operator ==(const string_type& ky) const noexcept
     {
         return (ky_ == ky);
     }
@@ -120,7 +120,7 @@ public:
      * @param       rhs : Object to compare.
      * @return      If the objets are different true is returned, otherwise false is returned.
      */
-    inline bool operator !=(const basic_arg_key& rhs) const noexcept
+    bool operator !=(const basic_arg_key& rhs) const noexcept
     {
         return (ky_ != rhs.ky_);
     }
@@ -130,7 +130,7 @@ public:
      * @param       ky : String to compare.
      * @return      If the objets are different true is returned, otherwise false is returned.
      */
-    inline bool operator !=(const string_type& ky) const noexcept
+    bool operator !=(const string_type& ky) const noexcept
     {
         return (ky_ != ky);
     }
@@ -139,7 +139,7 @@ public:
      * @brief       Get the key in a character string.
      * @return      The key in a character stirng.
      */
-    inline const string_type& get_string() const noexcept
+    const string_type& get_string() const noexcept
     {
         return ky_;
     }
@@ -148,7 +148,7 @@ public:
      * @brief       Get the key lenght in number of characters.
      * @return      The key lenght in number of characters.
      */
-    [[nodiscard]] inline std::size_t get_string_length() const noexcept
+    [[nodiscard]] std::size_t get_string_length() const noexcept
     {
         return ky_.length();
     }
@@ -165,7 +165,7 @@ public:
      * @brief       Get the key lenght in number of characters.
      * @return      The key lenght in number of characters.
      */
-    [[nodiscard]] inline std::size_t is_empty() const noexcept
+    [[nodiscard]] std::size_t is_empty() const noexcept
     {
         return ky_.empty();
     }
@@ -174,7 +174,7 @@ public:
      * @brief       Allows knowing whether the key prefix is a long prefix.
      * @return      A value that allows knowing whether the key prefix is a long prefix.
      */
-    [[nodiscard]] inline bool is_prefix_long() const noexcept
+    [[nodiscard]] bool is_prefix_long() const noexcept
     {
         return is_prefx_long_;
     }

@@ -150,7 +150,7 @@ public:
     /**
      * @brief       Resets the internal state of the object.
      */
-    virtual inline void reset() noexcept
+    virtual void reset() noexcept
     {
         err_flgs_.clear();
         nr_occurrencs_ = 0;
@@ -164,7 +164,7 @@ public:
     /**
      * @brief       Set errors flags if required.
      */
-    virtual inline void update_error_flags() noexcept
+    virtual void update_error_flags() noexcept
     {
         if (nr_occurrencs_ < minmax_occurrencs_.first && arg_parsr_.has_parsed())
         {
@@ -194,7 +194,7 @@ public:
      * @brief       Allows knowing whether there are errors.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool has_errors() const noexcept
+    [[nodiscard]] bool has_errors() const noexcept
     {
         return err_flgs_.is_not_empty();
     }
@@ -203,7 +203,7 @@ public:
      * @brief       Allows knowing whether the argument description is empty.
      * @return      If the function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool is_description_empty() const
+    [[nodiscard]] bool is_description_empty() const
     {
         return desc_.empty();
     }
@@ -213,7 +213,7 @@ public:
      * @param       flg : The error flag to check.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool is_error_flag_set(arg_error_flags flg) const noexcept
+    [[nodiscard]] bool is_error_flag_set(arg_error_flags flg) const noexcept
     {
         return err_flgs_.is_set(flg);
     }
@@ -222,7 +222,7 @@ public:
      * @brief       Allows knowing whether the argument error name is empty.
      * @return      If the function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool is_error_name_empty() const noexcept
+    [[nodiscard]] bool is_error_name_empty() const noexcept
     {
         return err_name_.empty();
     }
@@ -232,7 +232,7 @@ public:
      * @param       flg : The flag to check.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool is_flag_set(arg_flags flg) const noexcept
+    [[nodiscard]] bool is_flag_set(arg_flags flg) const noexcept
     {
         return flgs_.is_set(flg);
     }
@@ -241,7 +241,7 @@ public:
      * @brief       Allows knowing if the argument in an option.
      * @return      If the function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool is_option() const noexcept
+    [[nodiscard]] bool is_option() const noexcept
     {
         return minmax_occurrencs_.first == 0;
     }
@@ -250,7 +250,7 @@ public:
      * @brief       Allows knowing whether the argument can't get more values.
      * @return      If function was successfull true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool max_occurrences_reached() const noexcept
+    [[nodiscard]] bool max_occurrences_reached() const noexcept
     {
         return nr_occurrencs_ >= minmax_occurrencs_.second;
     }
@@ -260,7 +260,7 @@ public:
      * @return      The value that specifies whether the argument has been found in the program
      *              call.
      */
-    [[nodiscard]] inline bool was_found() const noexcept
+    [[nodiscard]] bool was_found() const noexcept
     {
         return nr_occurrencs_ != 0;
     }
@@ -269,7 +269,7 @@ public:
      * @brief       Get the composite object of this class.
      * @return      The composite object of this class.
      */
-    [[nodiscard]] inline arg_parser_type& get_arg_parser() const noexcept
+    [[nodiscard]] arg_parser_type& get_arg_parser() const noexcept
     {
         return arg_parsr_;
     }
@@ -278,7 +278,7 @@ public:
      * @brief       Give access to the argument error name.
      * @return      The argument error id.
      */
-    [[nodiscard]] inline const string_type& get_error_name() const noexcept
+    [[nodiscard]] const string_type& get_error_name() const noexcept
     {
         return err_name_;
     }
@@ -323,7 +323,7 @@ public:
      * @brief       Get a string that represents the kind of argument it is.
      * @return      A string that represents the kind of argument it is.
      */
-    [[nodiscard]] inline virtual string_view_type get_tittle() const
+    [[nodiscard]] virtual string_view_type get_tittle() const
     {
         return is_option() ? "Option" : "Command";
     }
@@ -334,7 +334,7 @@ public:
      *              call.
      */
     template<typename CallableT>
-    inline void set_action(CallableT&& actn)
+    void set_action(CallableT&& actn)
     {
         actn_ = std::forward<CallableT>(actn);
     }
@@ -344,7 +344,7 @@ public:
      * @param       desc : The description to set.
      */
     template<typename StringT_>
-    inline void set_description(StringT_&& desc)
+    void set_description(StringT_&& desc)
     {
         desc_ = std::forward<StringT_>(desc);
     }
@@ -353,7 +353,7 @@ public:
      * @brief       Set an argument error flag.
      * @param       flg : Error flag to set.
      */
-    inline void set_error_flag(arg_error_flags flg) noexcept
+    void set_error_flag(arg_error_flags flg) noexcept
     {
         err_flgs_.set(flg);
     }
@@ -363,7 +363,7 @@ public:
      * @param       err_name : The argument error name.
      */
     template<typename StringT_>
-    inline void set_error_name(StringT_&& err_name) noexcept
+    void set_error_name(StringT_&& err_name) noexcept
     {
         err_name_ = std::forward<StringT_>(err_name);
     }
@@ -372,7 +372,7 @@ public:
      * @brief       Set an argument flag.
      * @param       flg : Flag to set.
      */
-    virtual inline void set_flag(arg_flags flg) noexcept
+    virtual void set_flag(arg_flags flg) noexcept
     {
         flgs_.set(flg);
     }
@@ -381,7 +381,7 @@ public:
      * @brief       Set the argument flags.
      * @param       flgs : The argument flags.
      */
-    virtual inline void set_flags(arg_flags flgs) noexcept
+    virtual void set_flags(arg_flags flgs) noexcept
     {
         flgs_ = flgs;
     }
@@ -452,7 +452,7 @@ public:
      * @brief       Set the presence synchronizer.
      * @param       presence_holdr : The presence synchronizer.
      */
-    inline void set_presence_holder(bool& presence_holdr) noexcept
+    void set_presence_holder(bool& presence_holdr) noexcept
     {
         presence_holdr_ = &presence_holdr;
         if (presence_holdr_ != nullptr)
@@ -465,7 +465,7 @@ public:
      * @brief       Unset a argument error flag.
      * @param       flg : Error flag to unset.
      */
-    inline void unset_error_flag(arg_error_flags flg) noexcept
+    void unset_error_flag(arg_error_flags flg) noexcept
     {
         err_flgs_.unset(flg);
     }
@@ -474,7 +474,7 @@ public:
      * @brief       Unset an argument flag.
      * @param       flg : Flag to unset.
      */
-    virtual inline void unset_flag(arg_flags flg) noexcept
+    virtual void unset_flag(arg_flags flg) noexcept
     {
         flgs_.unset(flg);
     }

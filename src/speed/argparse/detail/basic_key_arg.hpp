@@ -186,7 +186,7 @@ public:
      * @brief       Allows knowing if the argument has any key with a long prefix.
      * @return      If the function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline std::size_t has_long_prefix_keys() const noexcept
+    [[nodiscard]] std::size_t has_long_prefix_keys() const noexcept
     {
         return long_kys_len_ > 0;
     }
@@ -209,7 +209,7 @@ public:
      * @brief       Get the keys.
      * @return      The keys.
      */
-    [[nodiscard]] inline const vector_type<arg_key_type>& get_keys() const noexcept
+    [[nodiscard]] const vector_type<arg_key_type>& get_keys() const noexcept
     {
         return kys_;
     }
@@ -218,7 +218,7 @@ public:
      * @brief       Get the number of keys.
      * @return      The number of keys.
      */
-    [[nodiscard]] inline std::size_t get_keys_size() const noexcept
+    [[nodiscard]] std::size_t get_keys_size() const noexcept
     {
         return kys_.size();
     }
@@ -227,7 +227,7 @@ public:
      * @brief       Get the necessary length to print long arguments keys.
      * @return      The necessary length to print long arguments keys.
      */
-    [[nodiscard]] inline std::size_t get_long_keys_length() noexcept override
+    [[nodiscard]] std::size_t get_long_keys_length() noexcept override
     {
         if (base_arg_type::is_description_empty())
         {
@@ -255,7 +255,7 @@ public:
      * @brief       Get the necessary length to print short arguments keys.
      * @return      The necessary length to print short arguments keys.
      */
-    [[nodiscard]] inline std::size_t get_short_keys_length() noexcept override
+    [[nodiscard]] std::size_t get_short_keys_length() noexcept override
     {
         if (base_arg_type::is_description_empty())
         {
@@ -269,7 +269,7 @@ public:
      * @brief       Set a sub argument parser.
      * @param       sub_arg_parsr : Sub arguement parser.
      */
-    inline void set_sub_arg_parser(arg_parser_type* sub_arg_parsr) noexcept
+    void set_sub_arg_parser(arg_parser_type* sub_arg_parsr) noexcept
     {
         sub_arg_parsr_ = sub_arg_parsr;
     }

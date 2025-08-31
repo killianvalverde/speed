@@ -203,7 +203,7 @@ public:
      * @brief       Set a flad in the help menu.
      * @param       flg : Flag to set.
      */
-    inline void set_flag(help_menu_flags flg) noexcept
+    void set_flag(help_menu_flags flg) noexcept
     {
         flgs_.set(flg);
     }
@@ -221,7 +221,7 @@ public:
      * @brief       Set a flad in the help menu.
      * @param       flg : Flag to set.
      */
-    inline basic_help_menu& unset_flag(help_menu_flags flg) noexcept
+    basic_help_menu& unset_flag(help_menu_flags flg) noexcept
     {
         flgs_.unset(flg);
         return *this;
@@ -232,7 +232,7 @@ public:
      * @param       flg : The flag to check.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool is_flag_set(help_menu_flags flg) const noexcept
+    [[nodiscard]] bool is_flag_set(help_menu_flags flg) const noexcept
     {
         return flgs_.is_set(flg);
     }
@@ -333,7 +333,7 @@ private:
     /**
      * @brief       Print the description.
      */
-    inline void print_description()
+    void print_description()
     {
         auto& os = arg_parsr_.get_ostream();
         
@@ -526,7 +526,7 @@ private:
      * @brief       Print the argument.
      * @param       bse_arg : Print the base arguement.
      */
-    inline void print_arg(base_arg_type* bse_arg)
+    void print_arg(base_arg_type* bse_arg)
     {
         if (bse_arg->is_description_empty())
         {

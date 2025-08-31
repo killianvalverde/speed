@@ -125,7 +125,7 @@ public:
      * @brief       Returns the arguement key.
      * @return      The arguement key.
      */
-    [[nodiscard]] inline const string_type& get_key() const noexcept
+    [[nodiscard]] const string_type& get_key() const noexcept
     {
         return ky_;
     }
@@ -134,7 +134,7 @@ public:
      * @brief       Only used for polymorphic propose.
      * @return      0 is returned always.
      */
-    [[nodiscard]] inline std::size_t get_long_keys_length() noexcept override
+    [[nodiscard]] std::size_t get_long_keys_length() noexcept override
     {
         return 0;
     }
@@ -152,7 +152,7 @@ public:
      * @brief       Get the necessary length to print the usage key.
      * @return      The necessary length to print the usage key.
      */
-    [[nodiscard]] inline std::size_t get_short_keys_length() noexcept override
+    [[nodiscard]] std::size_t get_short_keys_length() noexcept override
     {
         if (base_arg_type::is_description_empty())
         {
@@ -166,7 +166,7 @@ public:
      * @brief       Get a string that represents the kind of argument it is.
      * @return      A string that represents the kind of argument it is.
      */
-    [[nodiscard]] inline string_view_type get_tittle() const override
+    [[nodiscard]] string_view_type get_tittle() const override
     {
         return "Value";
     }

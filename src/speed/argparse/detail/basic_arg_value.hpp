@@ -210,7 +210,7 @@ public:
      * @brief       Get the value in a string type.
      * @return      The value in a string type.
      */
-    [[nodiscard]] inline const string_type& get_value() const noexcept
+    [[nodiscard]] const string_type& get_value() const noexcept
     {
         return val_;
     }
@@ -252,7 +252,7 @@ public:
      * @brief       Allows knowing whether the argument value has errors.
      * @return      If there are errors true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool has_errors() const noexcept
+    [[nodiscard]] bool has_errors() const noexcept
     {
         return err_flgs_.is_not_empty();
     }
