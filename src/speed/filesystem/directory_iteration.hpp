@@ -211,7 +211,7 @@ public:
      * @brief       Get a const iterator for the first file.
      * @return      A const iterator for the first file.
      */
-    [[nodiscard]] inline const_iterator begin() noexcept
+    [[nodiscard]] const_iterator begin() noexcept
     {
         return const_iterator(this);
     }
@@ -220,7 +220,7 @@ public:
      * @brief       Get a const iterator to the past-the-end file.
      * @return      A const iterator to the past-the-end file.
      */
-    [[nodiscard]] inline const_iterator end() noexcept
+    [[nodiscard]] const_iterator end() noexcept
     {
         return const_iterator(nullptr);
     }
@@ -229,7 +229,7 @@ public:
      * @brief       Get a const iterator for the first file.
      * @return      A const iterator for the first file.
      */
-    [[nodiscard]] inline const_iterator cbegin() const noexcept
+    [[nodiscard]] const_iterator cbegin() const noexcept
     {
         return const_iterator(this);
     }
@@ -238,7 +238,7 @@ public:
      * @brief       Get a const iterator to the past-the-end file.
      * @return      A const iterator to the past-the-end file.
      */
-    [[nodiscard]] inline const_iterator cend() const noexcept
+    [[nodiscard]] const_iterator cend() const noexcept
     {
         return const_iterator(nullptr);
     }
@@ -248,7 +248,7 @@ public:
      * @param       access_mods : Access modes that the files are mandatory to have.
      * @return      The object who call the method.
      */
-    inline directory_iteration& access_modes(system::filesystem::access_modes access_mods)
+    directory_iteration& access_modes(system::filesystem::access_modes access_mods)
     {
         access_mods_ = access_mods;
         return *this;
@@ -260,7 +260,7 @@ public:
      *              matching.
      * @return      The object who call the method.
      */
-    inline directory_iteration& case_insensitive(bool enabl)
+    directory_iteration& case_insensitive(bool enabl)
     {
         if (case_insensitve_ != enabl)
         {
@@ -280,7 +280,7 @@ public:
      * @param       file_typs : File types that will be considered during the iteration.
      * @return      The object who call the method.
      */
-    inline directory_iteration& file_types(system::filesystem::file_types file_typs)
+    directory_iteration& file_types(system::filesystem::file_types file_typs)
     {
         file_typs_ = file_typs;
         return *this;
@@ -291,7 +291,7 @@ public:
      * @param       enabl : Set to `true` to enable inode tracking, or `false` to disable it.
      * @return      The object who call the method.
      */
-    inline directory_iteration& inode_tracking(bool enabl)
+    directory_iteration& inode_tracking(bool enabl)
     {
         inode_trackr_ = enabl;
         return *this;
@@ -302,7 +302,7 @@ public:
      * @param       recursivity_levl : Access modes that the files are mandatory to have.
      * @return      The object who call the method.
      */
-    inline directory_iteration& recursivity_level(std::uint64_t recursivity_levl)
+    directory_iteration& recursivity_level(std::uint64_t recursivity_levl)
     {
         max_recursivity_levl_ = recursivity_levl;
         return *this;
@@ -314,7 +314,7 @@ public:
      * @return      The object who call the method.
      */
     template<typename StringT_>
-    inline directory_iteration& regex_to_match(StringT_&& regex_to_mtch)
+    directory_iteration& regex_to_match(StringT_&& regex_to_mtch)
     {
         regex_to_mtch_str_ = type_casting::type_cast<string_type>(
                 std::forward<StringT_>(regex_to_mtch));
@@ -328,7 +328,7 @@ public:
      * @param       enabl : If true the directories symbolic links will be followed.
      * @return      The object who call the method.
      */
-    inline directory_iteration& resolve_directory_symlinks(bool enabl)
+    directory_iteration& resolve_directory_symlinks(bool enabl)
     {
         resolve_directory_symlnks_ = enabl;
         return *this;
@@ -339,7 +339,7 @@ public:
      * @param       enabl : If true the entries symbolic links will be resolved.
      * @return      The object who call the method.
      */
-    inline directory_iteration& resolve_entries_symlinks(bool enabl)
+    directory_iteration& resolve_entries_symlinks(bool enabl)
     {
         resolve_directory_symlnks_ = enabl;
         return *this;
@@ -351,7 +351,7 @@ public:
      * @return      The object who call the method.
      */
     template<typename StringT_>
-    inline directory_iteration& substring_to_match(StringT_&& substring_to_mtch)
+    directory_iteration& substring_to_match(StringT_&& substring_to_mtch)
     {
         substring_to_mtch_ = type_casting::type_cast<string_type>(
                 std::forward<StringT_>(substring_to_mtch));
@@ -365,7 +365,7 @@ public:
      * @return      The object who call the method.
      */
     template<typename StringT_>
-    inline directory_iteration& wildcard_to_match(StringT_&& wildcard_to_mtch)
+    directory_iteration& wildcard_to_match(StringT_&& wildcard_to_mtch)
     {
         wildcard_to_mtch_ = type_casting::type_cast<string_type>(
                 std::forward<StringT_>(wildcard_to_mtch));
