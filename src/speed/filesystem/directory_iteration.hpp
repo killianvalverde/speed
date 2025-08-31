@@ -31,6 +31,7 @@
 #include <regex>
 #include <set>
 #include <stack>
+#include <vector>
 
 #include "detail/forward_declarations.hpp"
 #include "../containers/containers.hpp"
@@ -58,6 +59,14 @@ public:
 
     /** Regex type used in the class. */
     using regex_type = std::basic_regex<char_type, std::regex_traits<char_type>>;
+
+    /** Set type used in the class. */
+    template<typename T>
+    using set_type = std::set<T, std::less<T>, std::allocator<T>>;
+    
+    /** Stack type used in the class. */
+    template<typename T>
+    using stack_type = std::stack<T>;
 
     /**
      * @brief       Class that represents const iterators.
@@ -173,10 +182,10 @@ public:
         std::filesystem::path cur_fle_;
 
         /** Stack of directories entities used to explore recursivelly the filesystem. */
-        std::stack<directory_entity_type> directory_entity_stck_;
+        stack_type<directory_entity_type> directory_entity_stck_;
 
         /** Set of visited inodes to avoid infinite recursions in case of fs corruptions. */
-        std::set<system::filesystem::inode_t> vistd_inos_;
+        set_type<system::filesystem::inode_t> vistd_inos_;
 
         /** Pointer to the composite object. */
         const directory_iteration* composit_;
