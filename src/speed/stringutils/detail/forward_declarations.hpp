@@ -147,7 +147,7 @@ template<typename CharT, typename CharTraitsT, typename AllocatorT>
 bool escape_regex_inplace(std::basic_string<CharT, CharTraitsT, AllocatorT>& str);
 
 template<typename StringT>
-[[nodiscard]] inline std::size_t get_length(const StringT& str) noexcept;
+[[nodiscard]] std::size_t get_length(const StringT& str) noexcept;
 
 template<typename StringT>
 [[nodiscard]] constexpr bool is_empty(const StringT& str) noexcept;

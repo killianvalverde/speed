@@ -1000,7 +1000,7 @@ bool escape_regex_inplace(std::basic_string<CharT, CharTraitsT, AllocatorT>& str
  * @return      The number of characters in the string.
  */
 template<typename StringT>
-[[nodiscard]] inline std::size_t get_length(const StringT& str) noexcept
+[[nodiscard]] std::size_t get_length(const StringT& str) noexcept
 {
     if (is_null(str))
     {
