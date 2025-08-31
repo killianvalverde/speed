@@ -32,12 +32,12 @@
 namespace speed::iostream {
 
 template<typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT>& set_default_text(
+std::basic_ostream<CharT, TraitsT>& set_default_text(
         std::basic_ostream<CharT, TraitsT>& os
 );
 
 template<typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT>& set_light_red_text(
+std::basic_ostream<CharT, TraitsT>& set_light_red_text(
         std::basic_ostream<CharT, TraitsT>& os
 );
 
