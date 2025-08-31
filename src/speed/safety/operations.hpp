@@ -41,7 +41,7 @@ namespace speed::safety {
  * @param       vals : Values to add to the integral.
  */
 template<typename TargetT, typename... ValueTs>
-inline TargetT add(TargetT trg, ValueTs... vals)
+TargetT add(TargetT trg, ValueTs... vals)
 {
     constexpr TargetT max_trg = std::numeric_limits<TargetT>::max();
     
@@ -59,7 +59,7 @@ inline TargetT add(TargetT trg, ValueTs... vals)
  * @return      If the function was successful true is returned, otherwise false is returned.
  */
 template<typename TargetT, typename... ValueTs>
-inline bool try_add(TargetT& trg, ValueTs... vals) noexcept
+bool try_add(TargetT& trg, ValueTs... vals) noexcept
 {
     constexpr TargetT max_trg = std::numeric_limits<TargetT>::max();
     bool succss = true;
@@ -80,7 +80,7 @@ inline bool try_add(TargetT& trg, ValueTs... vals) noexcept
  * @param       vals : Values to add to the integral.
  */
 template<typename TargetT, typename... ValueTs>
-inline TargetT addm(TargetT trg, ValueTs... vals) noexcept
+TargetT addm(TargetT trg, ValueTs... vals) noexcept
 {
     constexpr TargetT max_trg = std::numeric_limits<TargetT>::max();
     bool saturatd = false;
@@ -100,7 +100,7 @@ inline TargetT addm(TargetT trg, ValueTs... vals) noexcept
  * @return      If the function was successful true is returned, otherwise false is returned.
  */
 template<typename TargetT, typename... ValueTs>
-inline bool try_addm(
+bool try_addm(
         TargetT& trg,
         ValueTs... vals
 ) noexcept
