@@ -507,6 +507,8 @@ private:
                         max_short_kys_len_, max_long_kys_len_);
             }
         }
+        
+        os.put('\n');
     }
 
     /**
