@@ -262,6 +262,29 @@ public:
         access_mods_ = access_mods;
         return *this;
     }
+    
+    /**
+     * @brief       Ensures the stored root path is absolute, optionally resolving symlinks.
+     * @param       enabl : Whether to enforce absolute/canonical form of the path.
+     * @return      Reference to the current `directory_iteration` instance (`*this`), allowing
+     *              method chaining.
+     */
+    directory_iteration& absolute(bool enabl)
+    {
+        if (enabl)
+        {
+            try
+            {
+                root_pth_ = std::filesystem::canonical(root_pth_);
+            }
+            catch (...)
+            {
+                root_pth_ = std::filesystem::absolute(root_pth_);
+            }
+        }
+        
+        return *this;
+    }
 
     /**
      * @brief       Sets the case sensitivity option for directory iteration.
