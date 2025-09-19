@@ -257,7 +257,7 @@ public:
      * @param       access_mods : Access modes that the files are mandatory to have.
      * @return      The object who call the method.
      */
-    directory_iteration& access_modes(system::filesystem::access_modes access_mods)
+    directory_iteration& access_modes(system::filesystem::access_modes access_mods) noexcept
     {
         access_mods_ = access_mods;
         return *this;
@@ -289,7 +289,7 @@ public:
      * @param       file_typs : File types that will be considered during the iteration.
      * @return      The object who call the method.
      */
-    directory_iteration& file_types(system::filesystem::file_types file_typs)
+    directory_iteration& file_types(system::filesystem::file_types file_typs) noexcept
     {
         file_typs_ = file_typs;
         return *this;
@@ -300,7 +300,7 @@ public:
      * @param       enabl : Set to `true` to enable inode tracking, or `false` to disable it.
      * @return      The object who call the method.
      */
-    directory_iteration& inode_tracking(bool enabl)
+    directory_iteration& inode_tracking(bool enabl) noexcept
     {
         inode_trackr_ = enabl;
         return *this;
@@ -311,7 +311,7 @@ public:
      * @param       recursivity_levl : Access modes that the files are mandatory to have.
      * @return      The object who call the method.
      */
-    directory_iteration& recursivity_level(std::uint64_t recursivity_levl)
+    directory_iteration& recursivity_level(std::uint64_t recursivity_levl) noexcept
     {
         max_recursivity_levl_ = recursivity_levl;
         return *this;
@@ -337,7 +337,7 @@ public:
      * @param       enabl : If true the directories symbolic links will be followed.
      * @return      The object who call the method.
      */
-    directory_iteration& resolve_directory_symlinks(bool enabl)
+    directory_iteration& resolve_directory_symlinks(bool enabl) noexcept
     {
         resolve_directory_symlnks_ = enabl;
         return *this;
@@ -348,7 +348,7 @@ public:
      * @param       enabl : If true the entries symbolic links will be resolved.
      * @return      The object who call the method.
      */
-    directory_iteration& resolve_entries_symlinks(bool enabl)
+    directory_iteration& resolve_entries_symlinks(bool enabl) noexcept
     {
         resolve_directory_symlnks_ = enabl;
         return *this;
