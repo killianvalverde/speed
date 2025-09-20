@@ -220,7 +220,7 @@ public:
      * @brief       Get a const iterator for the first file.
      * @return      A const iterator for the first file.
      */
-    [[nodiscard]] const_iterator begin() noexcept
+    [[nodiscard]] const_iterator begin() const noexcept
     {
         return const_iterator(this);
     }
@@ -229,7 +229,7 @@ public:
      * @brief       Get a const iterator to the past-the-end file.
      * @return      A const iterator to the past-the-end file.
      */
-    [[nodiscard]] const_iterator end() noexcept
+    [[nodiscard]] const_iterator end() const noexcept
     {
         return const_iterator(nullptr);
     }
