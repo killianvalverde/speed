@@ -30,21 +30,21 @@ namespace speed::type_casting {
 
 std::error_condition error_category::default_error_condition(int val) const noexcept
 {
-    if (val == static_cast<int>(detail::error_code_enum::NIL))
+    if (val == static_cast<int>(detail::error_code_value::NIL))
     {
         return {errc::NIL};
     }
-    else if (val >= static_cast<int>(detail::error_code_enum::ARITHMETIC_CODES_BEGINS) &&
-             val <= static_cast<int>(detail::error_code_enum::ARITHMETIC_CODES_ENDS))
+    else if (val >= static_cast<int>(detail::error_code_value::ARITHMETIC_CODES_BEGINS) &&
+             val <= static_cast<int>(detail::error_code_value::ARITHMETIC_CODES_ENDS))
     {
         return {errc::ARITHMETIC_ERROR};
     }
-    else if (val >= static_cast<int>(detail::error_code_enum::SYSTEM_CODES_BEGINS) &&
-             val <= static_cast<int>(detail::error_code_enum::SYSTEM_CODES_ENDS))
+    else if (val >= static_cast<int>(detail::error_code_value::SYSTEM_CODES_BEGINS) &&
+             val <= static_cast<int>(detail::error_code_value::SYSTEM_CODES_ENDS))
     {
         return {errc::SYSTEM_ERROR};
     }
-    else if (val >= static_cast<int>(detail::error_code_enum::OTHERS_BEGINS))
+    else if (val >= static_cast<int>(detail::error_code_value::OTHERS_BEGINS))
     {
         return {errc::OTHER};
     }
@@ -54,41 +54,35 @@ std::error_condition error_category::default_error_condition(int val) const noex
 
 std::string error_category::message(int val) const
 {
-    switch (static_cast<detail::error_code_enum>(val))
+    switch (static_cast<detail::error_code_value>(val))
     {
-        case detail::error_code_enum::NIL:
+        case detail::error_code_value::NIL:
             return "No error";
 
-        case detail::error_code_enum::ARITHMETIC_CONVERSION_FAILS:
+        case detail::error_code_value::ARITHMETIC_CONVERSION_FAILS:
             return "Conversion fails";
 
-        case detail::error_code_enum::ARITHMETIC_INVALID_SYNTAX:
+        case detail::error_code_value::ARITHMETIC_INVALID_SYNTAX:
             return "Invalid syntax";
 
-        case detail::error_code_enum::ARITHMETIC_OVERFLOW_RANGE:
+        case detail::error_code_value::ARITHMETIC_OVERFLOW_RANGE:
             return "Overflow range";
 
-        case detail::error_code_enum::ARITHMETIC_UNDERFLOW_RANGE:
+        case detail::error_code_value::ARITHMETIC_UNDERFLOW_RANGE:
             return "Underflow range";
 
-        case detail::error_code_enum::FILESYSTEM_INVALID_PATH:
+        case detail::error_code_value::FILESYSTEM_INVALID_PATH:
             return "Invalid path";
 
-        case detail::error_code_enum::RANGE_ERROR:
+        case detail::error_code_value::RANGE_ERROR:
             return "Invalid syntax";
 
-        case detail::error_code_enum::OTHER:
+        case detail::error_code_value::OTHER:
             return "Invalid syntax";
 
         default:
             return "Unknown error";
     }
 }
-
-/** @cond */
-namespace detail {
-error_category error_category_obj;
-}
-/** @endcond */
 
 }

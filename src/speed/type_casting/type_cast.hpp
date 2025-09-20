@@ -47,18 +47,18 @@ TargetT type_cast(const SourceT& arg)
     
     if (!try_type_cast(arg, res, &err_code))
     {
-        switch (static_cast<detail::error_code_enum>(err_code.value()))
+        switch (static_cast<detail::error_code_value>(err_code.value()))
         {
-        case detail::error_code_enum::ARITHMETIC_CONVERSION_FAILS:
+        case detail::error_code_value::ARITHMETIC_CONVERSION_FAILS:
             throw conversion_fails_exception();
 
-        case detail::error_code_enum::ARITHMETIC_INVALID_SYNTAX:
+        case detail::error_code_value::ARITHMETIC_INVALID_SYNTAX:
             throw invalid_syntax_exception();
 
-        case detail::error_code_enum::ARITHMETIC_OVERFLOW_RANGE:
+        case detail::error_code_value::ARITHMETIC_OVERFLOW_RANGE:
             throw overflow_range_exception();
 
-        case detail::error_code_enum::ARITHMETIC_UNDERFLOW_RANGE:
+        case detail::error_code_value::ARITHMETIC_UNDERFLOW_RANGE:
             throw underflow_range_exception();
 
         default:

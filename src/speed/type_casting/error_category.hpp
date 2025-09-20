@@ -34,7 +34,7 @@ namespace speed::type_casting {
 /** @cond */
 namespace detail {
 
-enum class error_code_enum : std::uint8_t
+enum class error_code_value : std::uint8_t
 {
     NIL = 0x0,
     ARITHMETIC_CODES_BEGINS = 0x1,
@@ -93,6 +93,36 @@ class error_category : public std::error_category
 {
 public:
     /**
+     * @brief Deleted copy constructor.
+     */
+    error_category(const error_category&) = delete;
+
+    /**
+     * @brief Deleted move constructor.
+     */
+    error_category(error_category&&) = delete;
+
+    /**
+     * @brief Deleted copy assignment operator.
+     */
+    error_category& operator=(const error_category&) = delete;
+
+    /**
+     * @brief Deleted move assignment operator.
+     */
+    error_category& operator=(error_category&&) = delete;
+
+    /**
+     * @brief Provides access to the singleton instance of error_category.
+     * @return Reference to the single error_category instance.
+     */
+    static error_category& instance()
+    {
+        static error_category obj;
+        return obj;
+    }
+    
+    /**
      * @brief       Allows gettin the name of the category.
      * @return      The name of the category.
      */
@@ -130,18 +160,27 @@ public:
      * @return      The string describing the error code value.
      */
     [[nodiscard]] std::string message(int val) const override;
+    
+private:
+    /**
+     * @brief Default constructor.
+     */
+    error_category() = default;
+
+    /**
+     * @brief Default destructor.
+     */
+    ~error_category() override = default;
 };
 
 /** @cond */
 namespace detail {
 
-extern error_category error_category_obj;
-
-inline void assign_error_code(error_code_enum ec, std::error_code* err_code)
+inline void assign_error_code(error_code_value ec, std::error_code* err_code)
 {
     if (err_code != nullptr)
     {
-        err_code->assign(static_cast<int>(ec), detail::error_category_obj);
+        err_code->assign(static_cast<int>(ec), error_category::instance());
     }
 }
 
@@ -155,7 +194,7 @@ inline void assign_error_code(error_code_enum ec, std::error_code* err_code)
  */
 inline std::error_condition make_error_condition(type_casting::errc errc)
 {
-    return {static_cast<int>(errc), detail::error_category_obj};
+    return {static_cast<int>(errc), error_category::instance()};
 }
 
 }

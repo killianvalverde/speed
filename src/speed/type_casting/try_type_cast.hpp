@@ -73,7 +73,7 @@ try_type_cast(const CharT* arg, TargetT& res, std::error_code* err_code) noexcep
 
     if (str == nullptr)
     {
-        detail::assign_error_code(error_code_enum::ARITHMETIC_CONVERSION_FAILS, err_code);
+        detail::assign_error_code(error_code_value::ARITHMETIC_CONVERSION_FAILS, err_code);
         return false;
     }
     
@@ -90,7 +90,7 @@ try_type_cast(const CharT* arg, TargetT& res, std::error_code* err_code) noexcep
 
     if (*str == '\0')
     {
-        detail::assign_error_code(error_code_enum::ARITHMETIC_INVALID_SYNTAX, err_code);
+        detail::assign_error_code(error_code_value::ARITHMETIC_INVALID_SYNTAX, err_code);
         return false;
     }
 
@@ -98,7 +98,7 @@ try_type_cast(const CharT* arg, TargetT& res, std::error_code* err_code) noexcep
     {
         if (!isdigit(digt))
         {
-            detail::assign_error_code(error_code_enum::ARITHMETIC_INVALID_SYNTAX, err_code);
+            detail::assign_error_code(error_code_value::ARITHMETIC_INVALID_SYNTAX, err_code);
             return false;
         }
 
@@ -107,7 +107,7 @@ try_type_cast(const CharT* arg, TargetT& res, std::error_code* err_code) noexcep
         if ((res_bldr > max_unsigned / 10) ||
             (res_bldr == max_unsigned / 10 && digt > (max_unsigned % 10)))
         {
-            detail::assign_error_code(error_code_enum::ARITHMETIC_OVERFLOW_RANGE, err_code);
+            detail::assign_error_code(error_code_value::ARITHMETIC_OVERFLOW_RANGE, err_code);
             return false;
         }
 
@@ -148,7 +148,7 @@ try_type_cast(const CharT* arg, TargetT& res, std::error_code* err_code) noexcep
 
     if (str == nullptr)
     {
-        detail::assign_error_code(error_code_enum::ARITHMETIC_CONVERSION_FAILS, err_code);
+        detail::assign_error_code(error_code_value::ARITHMETIC_CONVERSION_FAILS, err_code);
         return false;
     }
 
@@ -165,7 +165,7 @@ try_type_cast(const CharT* arg, TargetT& res, std::error_code* err_code) noexcep
 
     if (*str == '\0')
     {
-        detail::assign_error_code(error_code_enum::ARITHMETIC_INVALID_SYNTAX, err_code);
+        detail::assign_error_code(error_code_value::ARITHMETIC_INVALID_SYNTAX, err_code);
         return false;
     }
 
@@ -173,7 +173,7 @@ try_type_cast(const CharT* arg, TargetT& res, std::error_code* err_code) noexcep
     {
         if (!isdigit(digt))
         {
-            detail::assign_error_code(error_code_enum::ARITHMETIC_INVALID_SYNTAX, err_code);
+            detail::assign_error_code(error_code_value::ARITHMETIC_INVALID_SYNTAX, err_code);
             return false;
         }
 
@@ -182,7 +182,7 @@ try_type_cast(const CharT* arg, TargetT& res, std::error_code* err_code) noexcep
         if ((res_bldr < min_signed / 10) ||
             (res_bldr == min_signed / 10 && digt > -(min_signed % 10)))
         {
-            detail::assign_error_code(error_code_enum::ARITHMETIC_OVERFLOW_RANGE, err_code);
+            detail::assign_error_code(error_code_value::ARITHMETIC_OVERFLOW_RANGE, err_code);
             return false;
         }
 
@@ -194,7 +194,7 @@ try_type_cast(const CharT* arg, TargetT& res, std::error_code* err_code) noexcep
     {
         if (res_bldr < -max_signed)
         {
-            detail::assign_error_code(error_code_enum::ARITHMETIC_OVERFLOW_RANGE, err_code);
+            detail::assign_error_code(error_code_value::ARITHMETIC_OVERFLOW_RANGE, err_code);
             return false;
         }
 
@@ -227,19 +227,19 @@ try_type_cast(const CharT* arg, float& res, std::error_code* err_code) noexcept
 
     if (endptr == arg || *endptr != '\0')
     {
-        detail::assign_error_code(error_code_enum::ARITHMETIC_CONVERSION_FAILS, err_code);
+        detail::assign_error_code(error_code_value::ARITHMETIC_CONVERSION_FAILS, err_code);
         return false;
     }
 
     if (res_bldr == HUGE_VALF && errno == ERANGE)
     {
-        detail::assign_error_code(error_code_enum::ARITHMETIC_OVERFLOW_RANGE, err_code);
+        detail::assign_error_code(error_code_value::ARITHMETIC_OVERFLOW_RANGE, err_code);
         return false;
     }
 
     if (errno == ERANGE)
     {
-        detail::assign_error_code(error_code_enum::ARITHMETIC_UNDERFLOW_RANGE, err_code);
+        detail::assign_error_code(error_code_value::ARITHMETIC_UNDERFLOW_RANGE, err_code);
         return false;
     }
 
@@ -269,19 +269,19 @@ try_type_cast(const CharT* arg, double& res, std::error_code* err_code) noexcept
 
     if (endptr == arg || *endptr != '\0')
     {
-        detail::assign_error_code(error_code_enum::ARITHMETIC_CONVERSION_FAILS, err_code);
+        detail::assign_error_code(error_code_value::ARITHMETIC_CONVERSION_FAILS, err_code);
         return false;
     }
 
     if (res_bldr == HUGE_VAL && errno == ERANGE)
     {
-        detail::assign_error_code(error_code_enum::ARITHMETIC_OVERFLOW_RANGE, err_code);
+        detail::assign_error_code(error_code_value::ARITHMETIC_OVERFLOW_RANGE, err_code);
         return false;
     }
 
     if (errno == ERANGE)
     {
-        detail::assign_error_code(error_code_enum::ARITHMETIC_UNDERFLOW_RANGE, err_code);
+        detail::assign_error_code(error_code_value::ARITHMETIC_UNDERFLOW_RANGE, err_code);
         return false;
     }
 
@@ -311,19 +311,19 @@ try_type_cast(const CharT* arg, long double& res, std::error_code* err_code) noe
 
     if (endptr == arg || *endptr != '\0')
     {
-        detail::assign_error_code(error_code_enum::ARITHMETIC_CONVERSION_FAILS, err_code);
+        detail::assign_error_code(error_code_value::ARITHMETIC_CONVERSION_FAILS, err_code);
         return false;
     }
 
     if (res_bldr == HUGE_VALL && errno == ERANGE)
     {
-        detail::assign_error_code(error_code_enum::ARITHMETIC_OVERFLOW_RANGE, err_code);
+        detail::assign_error_code(error_code_value::ARITHMETIC_OVERFLOW_RANGE, err_code);
         return false;
     }
 
     if (errno == ERANGE)
     {
-        detail::assign_error_code(error_code_enum::ARITHMETIC_UNDERFLOW_RANGE, err_code);
+        detail::assign_error_code(error_code_value::ARITHMETIC_UNDERFLOW_RANGE, err_code);
         return false;
     }
 
@@ -352,7 +352,7 @@ bool try_type_cast(
     }
     catch (...)
     {
-        detail::assign_error_code(error_code_enum::OTHER, err_code);
+        detail::assign_error_code(error_code_value::OTHER, err_code);
     }
 
     return false;
@@ -374,7 +374,7 @@ bool try_type_cast(
 {
     if (!system::codecs::convert_cstr_to_wstring(arg, res))
     {
-        detail::assign_error_code(error_code_enum::RANGE_ERROR, err_code);
+        detail::assign_error_code(error_code_value::RANGE_ERROR, err_code);
         return false;
     }
 
@@ -397,7 +397,7 @@ bool try_type_cast(
 {
     if (!system::codecs::convert_wcstr_to_string(arg, res))
     {
-        detail::assign_error_code(error_code_enum::RANGE_ERROR, err_code);
+        detail::assign_error_code(error_code_value::RANGE_ERROR, err_code);
         return false;
     }
 
@@ -429,7 +429,7 @@ try_type_cast(
     }
     catch (...)
     {
-        detail::assign_error_code(error_code_enum::OTHER, err_code);
+        detail::assign_error_code(error_code_value::OTHER, err_code);
     }
 
     return false;
@@ -469,7 +469,7 @@ try_type_cast(
     }
     catch (...)
     {
-        detail::assign_error_code(error_code_enum::OTHER, err_code);
+        detail::assign_error_code(error_code_value::OTHER, err_code);
     }
 
     return false;
@@ -505,7 +505,7 @@ try_type_cast(const CharT* arg, std::filesystem::path& res, std::error_code* err
     }
     catch (...)
     {
-        detail::assign_error_code(error_code_enum::FILESYSTEM_INVALID_PATH, err_code);
+        detail::assign_error_code(error_code_value::FILESYSTEM_INVALID_PATH, err_code);
         return false;
     }
 }
@@ -532,7 +532,7 @@ try_type_cast(const CharT* arg, std::filesystem::path& res, std::error_code* err
     }
     catch (...)
     {
-        detail::assign_error_code(error_code_enum::FILESYSTEM_INVALID_PATH, err_code);
+        detail::assign_error_code(error_code_value::FILESYSTEM_INVALID_PATH, err_code);
         return false;
     }
 }
@@ -563,7 +563,7 @@ try_type_cast(const CharT* arg, TargetT& res, std::error_code* err_code) noexcep
     }
     catch (...)
     {
-        detail::assign_error_code(error_code_enum::FILESYSTEM_INVALID_PATH, err_code);
+        detail::assign_error_code(error_code_value::FILESYSTEM_INVALID_PATH, err_code);
         return false;
     }
 }
