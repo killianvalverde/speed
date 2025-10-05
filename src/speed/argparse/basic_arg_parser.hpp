@@ -1100,7 +1100,8 @@ private:
         
         auto for_each_grouping_key = [&](auto&& actn) -> bool
         {
-            for (auto i = ky_prefix.size(); i < cur_argv.size(); ++i)
+            std::size_t i = ky_prefix.size();
+            for (; i < cur_argv.size(); ++i)
             {
                 ky_builder[ky_prefix.size()] = cur_argv[i];
                 key_arg_type* ky_arg = get_key_arg(ky_builder);
@@ -1109,7 +1110,7 @@ private:
                     return false;
                 }
             }
-            return true;
+            return i > ky_prefix.size();
         };
         
         valid_groupng = for_each_grouping_key([&](key_arg_type* ky_arg) -> bool
