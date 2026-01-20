@@ -438,7 +438,7 @@ install(EXPORT speedTargets
 
 write_basic_package_version_file(
     "${CMAKE_CURRENT_BINARY_DIR}/speedConfigVersion.cmake"
-    VERSION 0.5.0
+    VERSION 0.6.0
     COMPATIBILITY AnyNewerVersion
 )
 
