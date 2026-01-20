@@ -57,10 +57,10 @@ public:
      * @param       arg_parsr : Argument parser that holds this object.
      */
     template<typename StringT_>
-    basic_arg_key(StringT_&& ky, arg_parser_type* arg_parsr)
+    basic_arg_key(StringT_&& ky, arg_parser_type& arg_parsr)
             : ky_(std::forward<StringT_>(ky))
             , arg_parsr_(arg_parsr)
-            , is_prefx_long_(arg_parsr->is_key_prefix_long(ky_))
+            , is_prefx_long_(arg_parsr.is_key_prefix_long(ky_))
     {
     }
     
@@ -74,14 +74,7 @@ public:
      * @brief       Move constructor.
      * @param       rhs : Object to move.
      */
-    basic_arg_key(basic_arg_key&& rhs) noexcept
-            : ky_(std::move(rhs.ky_))
-            , arg_parsr_(rhs.arg_parsr_)
-            , is_prefx_long_(rhs.is_prefx_long_)
-    {
-        rhs.arg_parsr_ = nullptr;
-        rhs.is_prefx_long_ = false;
-    }
+    basic_arg_key(basic_arg_key&& rhs) noexcept = default;
     
     /**
      * @brief       Destructor.
@@ -100,24 +93,14 @@ public:
      * @param       rhs : Object to move.
      * @return      The object who call the method.
      */
-    basic_arg_key& operator =(basic_arg_key&& rhs) noexcept
-    {
-        if (this != &rhs)
-        {
-            ky_ = std::move(rhs.ky_);
-            std::swap(arg_parsr_, rhs.arg_parsr_);
-            std::swap(is_prefx_long_, rhs.is_prefx_long_);
-        }
-        
-        return *this;
-    }
+    basic_arg_key& operator =(basic_arg_key&& rhs) noexcept = default;
     
     /**
      * @brief       Allows knowing whether two objects are equal.
      * @param       rhs : Object to compare.
      * @return      If the objets are equal true is returned, otherwise false is returned.
      */
-    inline bool operator ==(const basic_arg_key& rhs) const noexcept
+    bool operator ==(const basic_arg_key& rhs) const noexcept
     {
         return (ky_ == rhs.ky_);
     }
@@ -127,7 +110,7 @@ public:
      * @param       ky : String to compare.
      * @return      If the objets are equal true is returned, otherwise false is returned.
      */
-    inline bool operator ==(const string_type& ky) const noexcept
+    bool operator ==(const string_type& ky) const noexcept
     {
         return (ky_ == ky);
     }
@@ -137,7 +120,7 @@ public:
      * @param       rhs : Object to compare.
      * @return      If the objets are different true is returned, otherwise false is returned.
      */
-    inline bool operator !=(const basic_arg_key& rhs) const noexcept
+    bool operator !=(const basic_arg_key& rhs) const noexcept
     {
         return (ky_ != rhs.ky_);
     }
@@ -147,7 +130,7 @@ public:
      * @param       ky : String to compare.
      * @return      If the objets are different true is returned, otherwise false is returned.
      */
-    inline bool operator !=(const string_type& ky) const noexcept
+    bool operator !=(const string_type& ky) const noexcept
     {
         return (ky_ != ky);
     }
@@ -156,7 +139,7 @@ public:
      * @brief       Get the key in a character string.
      * @return      The key in a character stirng.
      */
-    inline const string_type& get_string() const noexcept
+    const string_type& get_string() const noexcept
     {
         return ky_;
     }
@@ -165,7 +148,7 @@ public:
      * @brief       Get the key lenght in number of characters.
      * @return      The key lenght in number of characters.
      */
-    [[nodiscard]] inline std::size_t get_string_length() const noexcept
+    [[nodiscard]] std::size_t get_string_length() const noexcept
     {
         return ky_.length();
     }
@@ -175,14 +158,14 @@ public:
      */
     void update_prefix_type() noexcept
     {
-        is_prefx_long_ = arg_parsr_->is_key_prefix_long(ky_);
+        is_prefx_long_ = arg_parsr_.is_key_prefix_long(ky_);
     }
     
     /**
      * @brief       Get the key lenght in number of characters.
      * @return      The key lenght in number of characters.
      */
-    [[nodiscard]] inline std::size_t is_empty() const noexcept
+    [[nodiscard]] std::size_t is_empty() const noexcept
     {
         return ky_.empty();
     }
@@ -191,7 +174,7 @@ public:
      * @brief       Allows knowing whether the key prefix is a long prefix.
      * @return      A value that allows knowing whether the key prefix is a long prefix.
      */
-    [[nodiscard]] inline bool is_prefix_long() const noexcept
+    [[nodiscard]] bool is_prefix_long() const noexcept
     {
         return is_prefx_long_;
     }
@@ -201,7 +184,7 @@ private:
     string_type ky_;
 
     /** Reference to the argument parser that holds this object. */
-    arg_parser_type* arg_parsr_;
+    arg_parser_type& arg_parsr_;
     
     /** The value that allows knowing whether the key prefix is a long prefix. */
     bool is_prefx_long_;

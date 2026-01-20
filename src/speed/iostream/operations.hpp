@@ -27,8 +27,10 @@
 #ifndef SPEED_IOSTREAM_OPERATIONS_HPP
 #define SPEED_IOSTREAM_OPERATIONS_HPP
 
+#include <cstdlib>
 #include <iostream>
 
+#include "detail/forward_declarations.hpp"
 #include "../safety/safety.hpp"
 #include "../system/system.hpp"
 
@@ -44,18 +46,47 @@ namespace speed::iostream {
 void fpurge(::FILE* fp) noexcept;
 
 /**
+ * @brief       Get the current 'std::basic_ostream' object used to print CharT in standard error
+ *              output.
+ * @return      The current 'std::basic_ostream' object used to print CharT in standard error
+ *              output.
+ */
+template<typename CharT>
+constexpr std::basic_ostream<CharT>& get_cerr() noexcept;
+
+/**
+ * @brief       Get the current 'std::ostream' object used to print in standard error output.
+ * @return      The current 'std::ostream' object used to print in standard error output.
+ */
+template<>
+constexpr std::ostream& get_cerr<char>() noexcept
+{
+    return std::cerr;
+}
+
+/**
+ * @brief       Get the current 'std::wostream' object used to print in standard error output.
+ * @return      The current 'std::wostream' object used to print in standard error output.
+ */
+template<>
+constexpr std::wostream& get_cerr<wchar_t>() noexcept
+{
+    return std::wcerr;
+}
+
+/**
  * @brief       Get the current 'std::basic_ostream' object used to print CharT in standard output.
  * @return      The current 'std::basic_ostream' object used to print CharT in standard output.
  */
 template<typename CharT>
-inline std::basic_ostream<CharT>& get_cout() noexcept;
+constexpr std::basic_ostream<CharT>& get_cout() noexcept;
 
 /**
  * @brief       Get the current 'std::ostream' object used to print in standard output.
  * @return      The current 'std::ostream' object used to print in standard output.
  */
 template<>
-inline std::ostream& get_cout<char>() noexcept
+constexpr std::ostream& get_cout<char>() noexcept
 {
     return std::cout;
 }
@@ -65,7 +96,7 @@ inline std::ostream& get_cout<char>() noexcept
  * @return      The current 'std::wostream' object used to print in standard output.
  */
 template<>
-inline std::wostream& get_cout<wchar_t>() noexcept
+constexpr std::wostream& get_cout<wchar_t>() noexcept
 {
     return std::wcout;
 }
@@ -76,7 +107,7 @@ inline std::wostream& get_cout<wchar_t>() noexcept
  * @return      Argument os.
  */
 template<typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT>& newl(std::basic_ostream<CharT, TraitsT>& os)
+std::basic_ostream<CharT, TraitsT>& newl(std::basic_ostream<CharT, TraitsT>& os)
 {
     return os.put(os.widen('\n'));
 }
@@ -110,6 +141,28 @@ int printf(const char* formt, ...) noexcept;
  *              set to EILSEQ and a negative number is returned.
  */
 int printf(const wchar_t* formt, ...) noexcept;
+
+/**
+ * @brief       Prints a formatted error message in red text and terminates the program.
+ * @param       os : The output stream where the error message will be printed.
+ * @param       nme : The name or identifier of the error.
+ * @param       messge : The detailed error message.
+ * @param       exit_cod : The exit code with which the program will terminate.
+ */
+template<typename CharT, typename CharTraitsT, typename StringT1, typename StringT2>
+void print_error_and_exit(
+        std::basic_ostream<CharT, CharTraitsT>& os,
+        const StringT1& nme,
+        const StringT2& messge,
+        int exit_cod
+) noexcept
+{
+    os << set_light_red_text << nme << ':' << ' '
+       << set_default_text << messge
+       << std::endl;
+    
+    exit(exit_cod);
+}
 
 /**
  * @brief       Print a string wrapping if necessary.
@@ -191,7 +244,7 @@ std::basic_ostream<CharT, CharTraitsT>& print_wrapped(
  * @return      os is returned.
  */
 template<typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT>& set_default_text(
+std::basic_ostream<CharT, TraitsT>& set_default_text(
         std::basic_ostream<CharT, TraitsT>& os
 )
 {
@@ -206,7 +259,7 @@ inline std::basic_ostream<CharT, TraitsT>& set_default_text(
  * @return      os is returned.
  */
 template<typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT>& set_black_text(
+std::basic_ostream<CharT, TraitsT>& set_black_text(
         std::basic_ostream<CharT, TraitsT>& os
 )
 {
@@ -221,7 +274,7 @@ inline std::basic_ostream<CharT, TraitsT>& set_black_text(
  * @return      os is returned.
  */
 template<typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT>& set_red_text(
+std::basic_ostream<CharT, TraitsT>& set_red_text(
         std::basic_ostream<CharT, TraitsT>& os
 )
 {
@@ -236,7 +289,7 @@ inline std::basic_ostream<CharT, TraitsT>& set_red_text(
  * @return      os is returned.
  */
 template<typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT>& set_green_text(
+std::basic_ostream<CharT, TraitsT>& set_green_text(
         std::basic_ostream<CharT, TraitsT>& os
 )
 {
@@ -251,7 +304,7 @@ inline std::basic_ostream<CharT, TraitsT>& set_green_text(
  * @return      os is returned.
  */
 template<typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT>& set_brown_text(
+std::basic_ostream<CharT, TraitsT>& set_brown_text(
         std::basic_ostream<CharT, TraitsT>& os
 )
 {
@@ -266,7 +319,7 @@ inline std::basic_ostream<CharT, TraitsT>& set_brown_text(
  * @return      os is returned.
  */
 template<typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT>& set_blue_text(
+std::basic_ostream<CharT, TraitsT>& set_blue_text(
         std::basic_ostream<CharT, TraitsT>& os
 )
 {
@@ -281,7 +334,7 @@ inline std::basic_ostream<CharT, TraitsT>& set_blue_text(
  * @return      os is returned.
  */
 template<typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT>& set_purple_text(
+std::basic_ostream<CharT, TraitsT>& set_purple_text(
         std::basic_ostream<CharT, TraitsT>& os
 )
 {
@@ -296,7 +349,7 @@ inline std::basic_ostream<CharT, TraitsT>& set_purple_text(
  * @return      os is returned.
  */
 template<typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT>& set_cyan_text(
+std::basic_ostream<CharT, TraitsT>& set_cyan_text(
         std::basic_ostream<CharT, TraitsT>& os
 )
 {
@@ -311,7 +364,7 @@ inline std::basic_ostream<CharT, TraitsT>& set_cyan_text(
  * @return      os is returned.
  */
 template<typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT>& set_light_gray_text(
+std::basic_ostream<CharT, TraitsT>& set_light_gray_text(
         std::basic_ostream<CharT, TraitsT>& os
 )
 {
@@ -326,7 +379,7 @@ inline std::basic_ostream<CharT, TraitsT>& set_light_gray_text(
  * @return      os is returned.
  */
 template<typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT>& set_dark_gray_text(
+std::basic_ostream<CharT, TraitsT>& set_dark_gray_text(
         std::basic_ostream<CharT, TraitsT>& os
 )
 {
@@ -341,7 +394,7 @@ inline std::basic_ostream<CharT, TraitsT>& set_dark_gray_text(
  * @return      os is returned.
  */
 template<typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT>& set_light_red_text(
+std::basic_ostream<CharT, TraitsT>& set_light_red_text(
         std::basic_ostream<CharT, TraitsT>& os
 )
 {
@@ -356,7 +409,7 @@ inline std::basic_ostream<CharT, TraitsT>& set_light_red_text(
  * @return      os is returned.
  */
 template<typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT>& set_light_green_text(
+std::basic_ostream<CharT, TraitsT>& set_light_green_text(
         std::basic_ostream<CharT, TraitsT>& os
 )
 {
@@ -371,7 +424,7 @@ inline std::basic_ostream<CharT, TraitsT>& set_light_green_text(
  * @return      os is returned.
  */
 template<typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT>& set_yellow_text(
+std::basic_ostream<CharT, TraitsT>& set_yellow_text(
         std::basic_ostream<CharT, TraitsT>& os
 )
 {
@@ -386,7 +439,7 @@ inline std::basic_ostream<CharT, TraitsT>& set_yellow_text(
  * @return      os is returned.
  */
 template<typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT>& set_light_blue_text(
+std::basic_ostream<CharT, TraitsT>& set_light_blue_text(
         std::basic_ostream<CharT, TraitsT>& os
 )
 {
@@ -401,7 +454,7 @@ inline std::basic_ostream<CharT, TraitsT>& set_light_blue_text(
  * @return      os is returned.
  */
 template<typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT>& set_light_purple_text(
+std::basic_ostream<CharT, TraitsT>& set_light_purple_text(
         std::basic_ostream<CharT, TraitsT>& os
 )
 {
@@ -416,7 +469,7 @@ inline std::basic_ostream<CharT, TraitsT>& set_light_purple_text(
  * @return      os is returned.
  */
 template<typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT>& set_light_cyan_text(
+std::basic_ostream<CharT, TraitsT>& set_light_cyan_text(
         std::basic_ostream<CharT, TraitsT>& os
 )
 {
@@ -431,7 +484,7 @@ inline std::basic_ostream<CharT, TraitsT>& set_light_cyan_text(
  * @return      os is returned.
  */
 template<typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT>& set_white_text(
+std::basic_ostream<CharT, TraitsT>& set_white_text(
         std::basic_ostream<CharT, TraitsT>& os
 )
 {

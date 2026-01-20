@@ -64,7 +64,7 @@ public:
                     !std::is_base_of<basic_message_exception, std::decay_t<StringT_>>::value
             >
     >
-    explicit inline basic_message_exception(StringT_&& mess) noexcept
+    explicit basic_message_exception(StringT_&& mess) noexcept
             : mess_(std::forward<StringT_>(mess))
     {
     }
@@ -104,7 +104,7 @@ public:
      * @brief       Get the message of the exception.
      * @return      The exception message.
      */
-    [[nodiscard]] inline const char_type* what() const noexcept override
+    [[nodiscard]] const char_type* what() const noexcept override
     {
         return mess_.c_str();
     }

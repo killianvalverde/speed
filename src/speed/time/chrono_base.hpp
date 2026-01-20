@@ -88,7 +88,7 @@ public:
      * @param       chrn_state : The state to check.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] virtual inline bool is(chrono_states chrn_state) const noexcept
+    [[nodiscard]] virtual bool is(chrono_states chrn_state) const noexcept
     {
         return chrn_state_ == chrn_state;
     }

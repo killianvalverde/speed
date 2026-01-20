@@ -99,7 +99,7 @@ public:
      * @brief       Constructor with parameters.
      * @param       arg_parsr : Argument parser that holds this object.
      */
-    basic_help_menu(arg_parser_type* arg_parsr)
+    basic_help_menu(arg_parser_type& arg_parsr)
             : arg_parsr_(arg_parsr)
     {
         bse_args_.reserve(10);
@@ -203,7 +203,7 @@ public:
      * @brief       Set a flad in the help menu.
      * @param       flg : Flag to set.
      */
-    inline void set_flag(help_menu_flags flg) noexcept
+    void set_flag(help_menu_flags flg) noexcept
     {
         flgs_.set(flg);
     }
@@ -221,7 +221,7 @@ public:
      * @brief       Set a flad in the help menu.
      * @param       flg : Flag to set.
      */
-    inline basic_help_menu& unset_flag(help_menu_flags flg) noexcept
+    basic_help_menu& unset_flag(help_menu_flags flg) noexcept
     {
         flgs_.unset(flg);
         return *this;
@@ -232,7 +232,7 @@ public:
      * @param       flg : The flag to check.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool is_flag_set(help_menu_flags flg) const noexcept
+    [[nodiscard]] bool is_flag_set(help_menu_flags flg) const noexcept
     {
         return flgs_.is_set(flg);
     }
@@ -252,7 +252,7 @@ public:
         print_constraints();
         print_epilog();
 
-        std::flush(std::cout);
+        arg_parsr_.flush_output_stream();
     }
 
 private:
@@ -326,19 +326,21 @@ private:
     {
         if (flgs_.is_set(help_menu_flags::PRINT_USAGE))
         {
-            arg_parsr_->print_usage();
+            arg_parsr_.print_usage();
         }
     }
 
     /**
      * @brief       Print the description.
      */
-    inline void print_description()
+    void print_description()
     {
+        auto& os = arg_parsr_.get_ostream();
+        
         if (flgs_.is_set(help_menu_flags::PRINT_DESCRIPTION) && !desc_.empty())
         {
-            iostream::print_wrapped(std::cout, desc_, max_line_len_, 0);
-            std::cout << "\n\n";
+            iostream::print_wrapped(os, desc_, max_line_len_, 0);
+            os << "\n\n";
         }
     }
 
@@ -354,6 +356,7 @@ private:
         
         key_arg_type* ky_arg;
         bool fnd = false;
+        auto& os = arg_parsr_.get_ostream();
 
         for (auto& bs_arg : bse_args_)
         {
@@ -369,7 +372,7 @@ private:
             return;
         }
 
-        std::cout << "Options:\n";
+        os << "Options:\n";
 
         for (auto& bs_arg : bse_args_)
         {
@@ -380,7 +383,7 @@ private:
             }
         }
 
-        std::cout << '\n';
+        os.put('\n');
     }
 
     /**
@@ -395,6 +398,7 @@ private:
 
         key_arg_type* ky_arg;
         bool fnd = false;
+        auto& os = arg_parsr_.get_ostream();
 
         for (auto& bs_arg : bse_args_)
         {
@@ -410,7 +414,7 @@ private:
             return;
         }
 
-        std::cout << "Commands:\n";
+        os << "Commands:\n";
 
         for (auto& bs_arg : bse_args_)
         {
@@ -421,7 +425,7 @@ private:
             }
         }
 
-        std::cout << '\n';
+        os.put('\n');
     }
 
     /**
@@ -436,6 +440,7 @@ private:
 
         positional_arg_type* ps_arg;
         bool fnd = false;
+        auto& os = arg_parsr_.get_ostream();
 
         for (auto& bs_arg : bse_args_)
         {
@@ -451,7 +456,7 @@ private:
             return;
         }
 
-        std::cout << "Values:\n";
+        os << "Values:\n";
 
         for (auto& bs_arg : bse_args_)
         {
@@ -462,7 +467,7 @@ private:
             }
         }
 
-        std::cout << '\n';
+        os.put('\n');
     }
 
     /**
@@ -476,7 +481,9 @@ private:
         }
         
         bool fnd = false;
-        auto& constrnts = arg_parsr_->get_constraints();
+        auto& constrnts = arg_parsr_.get_constraints();
+        auto& os = arg_parsr_.get_ostream();
+        
         for (auto& constrnt : constrnts)
         {
             if (constrnt.contains_any_of(bse_args_))
@@ -490,7 +497,7 @@ private:
             return;
         }
 
-        std::cout << "Constraints:\n";
+        os << "Constraints:\n";
         
         for (auto& constrnt : constrnts)
         {
@@ -500,6 +507,8 @@ private:
                         max_short_kys_len_, max_long_kys_len_);
             }
         }
+        
+        os.put('\n');
     }
 
     /**
@@ -509,8 +518,9 @@ private:
     {
         if (flgs_.is_set(help_menu_flags::PRINT_EPILOGUE) && !epilg_.empty())
         {
-            iostream::print_wrapped(std::cout, epilg_, max_line_len_, 0);
-            std::cout << "\n\n";
+            auto& os = arg_parsr_.get_ostream();
+            iostream::print_wrapped(os, epilg_, max_line_len_, 0);
+            os << "\n\n";
         }
     }
 
@@ -518,7 +528,7 @@ private:
      * @brief       Print the argument.
      * @param       bse_arg : Print the base arguement.
      */
-    inline void print_arg(base_arg_type* bse_arg)
+    void print_arg(base_arg_type* bse_arg)
     {
         if (bse_arg->is_description_empty())
         {
@@ -547,7 +557,7 @@ private:
     vector_type<base_arg_type*> bse_args_;
 
     /** Reference to the argument parser that holds this object. */
-    arg_parser_type* arg_parsr_;
+    arg_parser_type& arg_parsr_;
 
     /** Indentation of the arugments keys in the help menu. */
     std::size_t args_indent_ = 2;

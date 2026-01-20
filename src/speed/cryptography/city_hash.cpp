@@ -37,12 +37,12 @@ static const std::uint64_t k0 = 0xc3a5c85c97cb3127ULL;
 static const std::uint64_t k1 = 0xb492b66fbe98f273ULL;
 static const std::uint64_t k2 = 0x9ae16a3b2f90404fULL;
 
-inline std::uint64_t uint_128_low_64(const uint128_t& x)
+std::uint64_t uint_128_low_64(const uint128_t& x)
 {
     return x.first;
 }
 
-inline std::uint64_t uint_128_high_64(const uint128_t& x)
+std::uint64_t uint_128_high_64(const uint128_t& x)
 {
     return x.second;
 }
@@ -141,7 +141,7 @@ static uint128_t weak_hash_len_32_with_seeds(const char* s, std::uint64_t a, std
                                        fetch_64(s + 24), a, b);
 }
 
-inline std::uint64_t hash_128_to_64(const uint128_t& x)
+std::uint64_t hash_128_to_64(const uint128_t& x)
 {
     const std::uint64_t kMul = 0x9ddfea08eb382d69ULL;
     std::uint64_t a;

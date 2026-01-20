@@ -30,12 +30,15 @@
 #include "operations.hpp"
 
 #include <cstring>
+#include <sys/resource.h>
 
 namespace speed::system::detail::glibc::process {
 
-bool execute_command(
+bool execute(
         const char* cmd,
         int* return_val,
+        system::time::time_specification* cpu_time_spec,
+        system::time::time_specification* elapsed_time_spec,
         std::error_code* err_code
 ) noexcept
 {
@@ -44,15 +47,19 @@ bool execute_command(
         ++cmd;
     }
     
+    struct ::timespec start_ts{};
+    struct ::timespec end_ts{};
+    
+    ::clock_gettime(CLOCK_MONOTONIC, &start_ts);
     ::pid_t pid = ::fork();
     
     switch (pid)
     {
-        case -1:
-            system::errors::assign_system_error_code(errno, err_code);
-            return false;
+    case -1:
+        system::errors::assign_system_error_code(errno, err_code);
+        return false;
         
-        case 0:
+    case 0:
         {
             constexpr const std::size_t initial_argv_max = 1024;
             std::size_t max_argv = initial_argv_max;
@@ -111,8 +118,9 @@ bool execute_command(
                     if (cur_argv == max_argv)
                     {
                         max_argv *= 2;
-                        auto** nptr = (const char**)realloc(argv == initial_argv ? nullptr : argv,
-                                                            max_argv * sizeof (const char*));
+                        auto** nptr = (const char**) realloc(argv == initial_argv ? nullptr : argv,
+                                max_argv * sizeof (const char*));
+                        
                         if (nptr == nullptr)
                         {
                             goto alloc_fail;
@@ -134,26 +142,26 @@ bool execute_command(
                     }
 
                     // Tomamos memoria para la cadena actual.
-                    argv[cur_argv] = (const char*)calloc(1, i - lst_cursor + 1);
+                    argv[cur_argv] = (const char*) calloc(1, i - lst_cursor + 1);
                     if (argv[cur_argv] == nullptr)
                     {
                         goto alloc_fail;
                     }
                     
                     // Realizamos la copia de la cadena de caracteres.
-                    memcpy((void*)argv[cur_argv], &cmd[lst_cursor], i - lst_cursor);
+                    memcpy((void*) argv[cur_argv], &cmd[lst_cursor], i - lst_cursor);
                     ++cur_argv;
 
                     // Si es el primer argumento entonces el nombre del programa debe de ser tomado
                     // como parámetro.
                     if (first_arg)
                     {
-                        argv[cur_argv] = (const char*)calloc(1, i - lst_slash);
+                        argv[cur_argv] = (const char*) calloc(1, i - lst_slash);
                         if (argv[cur_argv] == nullptr)
                         {
                             goto alloc_fail;
                         }
-                        memcpy((void*)argv[cur_argv], &cmd[lst_slash], i - lst_slash);
+                        memcpy((void*) argv[cur_argv], &cmd[lst_slash], i - lst_slash);
                         ++cur_argv;
                         first_arg = false;
                     }
@@ -174,7 +182,7 @@ bool execute_command(
             
             // Ejecutamos el proceso.
             argv[cur_argv] = nullptr;
-            ::execvp(argv[0], (char**)&argv[1]);
+            ::execvp(argv[0], (char**) &argv[1]);
             
 alloc_fail:
             for (std::size_t i = 0; i < max_argv; ++i)
@@ -191,21 +199,51 @@ alloc_fail:
             ::_exit(-1);
         }
         
-        default:
+    default:
         {
             int status;
-            while (::waitpid(pid, &status, 0) == -1)
+            struct ::rusage usage{};
+
+            if (::wait4(pid, &status, 0, &usage) == -1)
             {
-                if (errno != EINTR)
-                {
-                    system::errors::assign_system_error_code(errno, err_code);
-                    return false;
-                }
+                system::errors::assign_system_error_code(errno, err_code);
+                return false;
             }
+            
+            ::clock_gettime(CLOCK_MONOTONIC, &end_ts);
+            
             if (return_val != nullptr)
             {
-                *return_val = WEXITSTATUS(status);
+                *return_val = WIFEXITED(status) ? WEXITSTATUS(status) : -1;
             }
+            
+            if (cpu_time_spec)
+            {
+                ::time_t total_sec = usage.ru_utime.tv_sec + usage.ru_stime.tv_sec;
+                ::suseconds_t total_usec = usage.ru_utime.tv_usec + usage.ru_stime.tv_usec;
+            
+                if (total_usec >= 1'000'000)
+                {
+                    total_sec += total_usec / 1'000'000;
+                    total_usec %= 1'000'000;
+                }
+            
+                cpu_time_spec->set_time(total_sec, total_usec * 1'000ULL);
+            }
+            if (elapsed_time_spec)
+            {
+                ::time_t elapsed_sec = end_ts.tv_sec - start_ts.tv_sec;
+                long elapsed_nsec = end_ts.tv_nsec - start_ts.tv_nsec;
+            
+                if (elapsed_nsec < 0)
+                {
+                    elapsed_sec -= 1;
+                    elapsed_nsec += 1'000'000'000L;
+                }
+            
+                elapsed_time_spec->set_time(elapsed_sec, static_cast<std::uint64_t>(elapsed_nsec));
+            }
+            
             return true;
         }
     }

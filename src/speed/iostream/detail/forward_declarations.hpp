@@ -18,25 +18,29 @@
  */
 
 /**
- * @file        version.hpp
- * @brief       File that include the library version macros.
+ * @file        forward_declarations.hpp
+ * @brief       forward_declarations header.
  * @author      Killian Valverde
- * @date        2018/06/09
+ * @date        2025/08/03
  */
 
-#ifndef SPEED_VERSION_HPP
-#define SPEED_VERSION_HPP
+#ifndef SPEED_IOSTREAM_DETAIL_FORWARD_DECLARATIONS_HPP
+#define SPEED_IOSTREAM_DETAIL_FORWARD_DECLARATIONS_HPP
 
-/** The major version number. */
-#define SPEED_VERSION_MAJOR 0
+#include <iostream>
 
-/** The minor version number. */
-#define SPEED_VERSION_MINOR 6
+namespace speed::iostream {
 
-/** The patch version number */
-#define SPEED_VERSION_PATCH 0
+template<typename CharT, typename TraitsT>
+std::basic_ostream<CharT, TraitsT>& set_default_text(
+        std::basic_ostream<CharT, TraitsT>& os
+);
 
-/** The hole version number in string type. */
-#define SPEED_VERSION ("0.6.0")
+template<typename CharT, typename TraitsT>
+std::basic_ostream<CharT, TraitsT>& set_light_red_text(
+        std::basic_ostream<CharT, TraitsT>& os
+);
+
+}
 
 #endif

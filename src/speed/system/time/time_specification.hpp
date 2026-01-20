@@ -41,18 +41,14 @@ public:
     /**
      * @brief       Default constructor.
      */
-    inline time_specification() noexcept
-            : sec_(0)
-            , nsec_(0)
-    {
-    }
+    time_specification() noexcept = default;
     
     /**
      * @brief       Constructor with parameters.
      * @param       sec : The number of seconds.
      * @param       nsec : The number of nanoseconds.
      */
-    inline time_specification(std::uint64_t sec, std::uint64_t nsec) noexcept
+    time_specification(std::uint64_t sec, std::uint64_t nsec) noexcept
             : sec_(sec)
             , nsec_(nsec)
     {
@@ -63,13 +59,13 @@ public:
      * @brief       Copy constructor.
      * @param       rhs : The object to copy.
      */
-    inline time_specification(const time_specification& rhs) = default;
+    time_specification(const time_specification& rhs) = default;
     
     /**
      * @brief       Move constructor.
      * @param       rhs : Object to move.
      */
-    inline time_specification(time_specification&& rhs) noexcept
+    time_specification(time_specification&& rhs) noexcept
             : sec_(rhs.sec_)
             , nsec_(rhs.nsec_)
     {
@@ -87,14 +83,14 @@ public:
      * @param       rhs : Object to copy.
      * @return      The object who call the method.
      */
-    inline time_specification& operator =(const time_specification& rhs) = default;
+    time_specification& operator =(const time_specification& rhs) = default;
     
     /**
      * @brief       Move assignment operator.
      * @param       rhs : Object to move.
      * @return      The object who call the method.
      */
-    inline time_specification& operator =(time_specification&& rhs) noexcept
+    time_specification& operator =(time_specification&& rhs) noexcept
     {
         if (this != &rhs)
         {
@@ -110,7 +106,7 @@ public:
      * @param       rhs : The object to compare.
      * @return      If the objects are the same true is returned, otherwise false is returned.
      */
-    inline bool operator ==(const time_specification& rhs) const noexcept
+    bool operator ==(const time_specification& rhs) const noexcept
     {
         return sec_ == rhs.sec_ &&
                nsec_ == rhs.nsec_;
@@ -121,7 +117,7 @@ public:
      * @param       rhs : The object to compare.
      * @return      If the objects are different true is returned, otherwise false is returned.
      */
-    inline bool operator !=(const time_specification& rhs) const noexcept
+    bool operator !=(const time_specification& rhs) const noexcept
     {
         return !(rhs == *this);
     }
@@ -131,7 +127,7 @@ public:
      * @param       rhs : The object to compare.
      * @return      True if this object is less than rhs, otherwise false.
      */
-    inline bool operator <(const time_specification& rhs) const noexcept
+    bool operator <(const time_specification& rhs) const noexcept
     {
         if (sec_ != rhs.sec_)
         {
@@ -146,7 +142,7 @@ public:
      * @param       rhs : The object to compare.
      * @return      True if this object is greater than rhs, otherwise false.
      */
-    inline bool operator >(const time_specification& rhs) const noexcept
+    bool operator >(const time_specification& rhs) const noexcept
     {
         return !(*this <= rhs);
     }
@@ -156,7 +152,7 @@ public:
      * @param       rhs : The object to compare.
      * @return      True if this object is greater than or equal to rhs, otherwise false.
      */
-    inline bool operator >=(const time_specification& rhs) const noexcept
+    bool operator >=(const time_specification& rhs) const noexcept
     {
         return !(*this < rhs);
     }
@@ -166,7 +162,7 @@ public:
      * @param       rhs : The object to compare.
      * @return      True if this object is less than or equal to rhs, otherwise false.
      */
-    inline bool operator <=(const time_specification& rhs) const noexcept
+    bool operator <=(const time_specification& rhs) const noexcept
     {
         return *this < rhs || *this == rhs;
     }
@@ -175,7 +171,7 @@ public:
      * @brief       Check whether the time is null.
      * @return      If function was successful true is returned, otherwise false is returned.
      */
-    inline bool is_null() const noexcept
+    bool is_null() const noexcept
     {
         return sec_ == 0 && nsec_ == 0;
     }
@@ -183,7 +179,7 @@ public:
     /**
      * @brief       Reset the current time to zero.
      */
-    inline void reset() noexcept
+    void reset() noexcept
     {
         sec_ = 0;
         nsec_ = 0;
@@ -193,7 +189,7 @@ public:
      * @brief       Get the number of nano seconds.
      * @return      The number of nano seconds.
      */
-    [[nodiscard]] inline std::uint64_t get_nseconds() const noexcept
+    [[nodiscard]] std::uint64_t get_nseconds() const noexcept
     {
         return nsec_;
     }
@@ -202,7 +198,7 @@ public:
      * @brief       Get the number of seconds.
      * @return      The number of seconds.
      */
-    [[nodiscard]] inline std::uint64_t get_seconds() const noexcept
+    [[nodiscard]] std::uint64_t get_seconds() const noexcept
     {
         return sec_;
     }
@@ -211,7 +207,7 @@ public:
      * @brief       Get the relative number of nano seconds.
      * @return      The relative number of nano seconds.
      */
-    [[nodiscard]] inline std::uint64_t get_relative_nseconds() const noexcept
+    [[nodiscard]] std::uint64_t get_relative_nseconds() const noexcept
     {
         return nsec_;
     }
@@ -220,7 +216,7 @@ public:
      * @brief       Get the relative number of seconds.
      * @return      The relative number of seconds.
      */
-    [[nodiscard]] inline std::uint64_t get_relative_seconds() const noexcept
+    [[nodiscard]] std::uint64_t get_relative_seconds() const noexcept
     {
         return sec_ % 60;
     }
@@ -229,7 +225,7 @@ public:
      * @brief       Get the relative number of minutes.
      * @return      The relative number of minutes.
      */
-    [[nodiscard]] inline std::uint64_t get_relative_minutes() const noexcept
+    [[nodiscard]] std::uint64_t get_relative_minutes() const noexcept
     {
         return (sec_ / 60) % 60;
     }
@@ -238,7 +234,7 @@ public:
      * @brief       Get the relative number of hours.
      * @return      The relative number of hours.
      */
-    [[nodiscard]] inline std::uint64_t get_relative_hours() const noexcept
+    [[nodiscard]] std::uint64_t get_relative_hours() const noexcept
     {
         return sec_ / 3600;
     }
@@ -247,7 +243,7 @@ public:
      * @brief       Get the current time under a floating point data type.
      * @return      The time under a floating point data type.
      */
-    [[nodiscard]] inline long double get_time() const noexcept
+    [[nodiscard]] long double get_time() const noexcept
     {
         return ((long double)sec_ + ((long double)nsec_ / 10e8l));
     }
@@ -264,7 +260,7 @@ public:
      * @param       sec : The new number of seconds.
      * @param       nsec : The new number of nano seconds.
      */
-    inline void set_time(std::uint64_t sec, std::uint64_t nsec) noexcept
+    void set_time(std::uint64_t sec, std::uint64_t nsec) noexcept
     {
         sec_ = sec;
         nsec_ = nsec;
@@ -281,10 +277,10 @@ private:
     
 private:
     /** Seconds. */
-    std::uint64_t sec_;
+    std::uint64_t sec_ = 0;
     
     /** Nanoseconds. */
-    std::uint64_t nsec_;
+    std::uint64_t nsec_ = 0;
 };
 
 }

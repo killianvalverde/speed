@@ -79,7 +79,7 @@ protected:
      * @param       access_mods : A bitmask or enumeration value representing the desired access
      *              modes.
      */
-    inline void set_access_modes(system::filesystem::access_modes access_mods) noexcept
+    void set_access_modes(system::filesystem::access_modes access_mods) noexcept
     {
         access_mods_.set(access_mods);
     }
@@ -88,7 +88,7 @@ protected:
      * @brief       Sets the file types to filter or use.
      * @param       file_typs : A bitmask or enumeration value representing the file types to set.
      */
-    inline void set_file_types(system::filesystem::file_types file_typs) noexcept
+    void set_file_types(system::filesystem::file_types file_typs) noexcept
     {
         file_typs_.set(file_typs);
     }
@@ -97,7 +97,7 @@ protected:
      * @brief       Specifies is symlinks has to be resolved.
      * @param       enabl : Specifies whether or not the symlinks will be resolved.
      */
-    inline void set_resolve_symlink(bool enabl) noexcept
+    void set_resolve_symlink(bool enabl) noexcept
     {
         resolve_symlnk = enabl;
     }

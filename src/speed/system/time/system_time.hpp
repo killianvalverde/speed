@@ -43,7 +43,7 @@ public:
     /**
      * @brief       Default constructor.
      */
-    inline system_time() noexcept
+    system_time() noexcept
             : yer_(0)
             , monh_(0)
             , dy_(0)
@@ -56,7 +56,7 @@ public:
     /**
      * @brief       Constructor with parameters.
      */
-    inline system_time(
+    system_time(
             time_type yer,
             time_type monh,
             time_type dy,
@@ -77,13 +77,13 @@ public:
      * @brief       Copy constructor.
      * @param       rhs : The object to copy.
      */
-    inline system_time(const system_time& rhs) = default;
+    system_time(const system_time& rhs) = default;
     
     /**
      * @brief       Move constructor.
      * @param       rhs : Object to move.
      */
-    inline system_time(system_time&& rhs) noexcept
+    system_time(system_time&& rhs) noexcept
             : yer_(rhs.yer_)
             , monh_(rhs.monh_)
             , dy_(rhs.dy_)
@@ -109,14 +109,14 @@ public:
      * @param       rhs : Object to copy.
      * @return      The object who call the method.
      */
-    inline system_time& operator =(const system_time& rhs) = default;
+    system_time& operator =(const system_time& rhs) = default;
     
     /**
      * @brief       Move assignment operator.
      * @param       rhs : Object to move.
      * @return      The object who call the method.
      */
-    inline system_time& operator =(system_time&& rhs) noexcept
+    system_time& operator =(system_time&& rhs) noexcept
     {
         if (this != &rhs)
         {
@@ -136,7 +136,7 @@ public:
      * @param       rhs : The object to compare.
      * @return      If the objects are the same true is returned, otherwise false is returned.
      */
-    inline bool operator ==(const system_time& rhs) const noexcept
+    bool operator ==(const system_time& rhs) const noexcept
     {
         return yer_ == rhs.yer_ &&
                monh_ == rhs.monh_ &&
@@ -151,7 +151,7 @@ public:
      * @param       rhs : The object to compare.
      * @return      If the objects are different true is returned, otherwise false is returned.
      */
-    inline bool operator !=(const system_time& rhs) const noexcept
+    bool operator !=(const system_time& rhs) const noexcept
     {
         return !(rhs == *this);
     }
@@ -161,7 +161,7 @@ public:
      * @param       rhs : The object to compare.
      * @return      True if this object is less than rhs, otherwise false.
      */
-    inline bool operator <(const system_time& rhs) const noexcept
+    bool operator <(const system_time& rhs) const noexcept
     {
         if (yer_ != rhs.yer_)
         {
@@ -192,7 +192,7 @@ public:
      * @param       rhs : The object to compare.
      * @return      True if this object is less than or equal to rhs, otherwise false.
      */
-    inline bool operator <=(const system_time& rhs) const noexcept
+    bool operator <=(const system_time& rhs) const noexcept
     {
         return *this < rhs || *this == rhs;
     }
@@ -202,7 +202,7 @@ public:
      * @param       rhs : The object to compare.
      * @return      True if this object is greater than rhs, otherwise false.
      */
-    inline bool operator >(const system_time& rhs) const noexcept
+    bool operator >(const system_time& rhs) const noexcept
     {
         return !(*this <= rhs);
     }
@@ -212,7 +212,7 @@ public:
      * @param       rhs : The object to compare.
      * @return      True if this object is greater than or equal to rhs, otherwise false.
      */
-    inline bool operator >=(const system_time& rhs) const noexcept
+    bool operator >=(const system_time& rhs) const noexcept
     {
         return !(*this < rhs);
     }
@@ -221,7 +221,7 @@ public:
      * @brief       Get the number of years.
      * @return      The number of years.
      */
-    [[nodiscard]] inline time_type get_years() const noexcept
+    [[nodiscard]] time_type get_years() const noexcept
     {
         return yer_;
     }
@@ -230,7 +230,7 @@ public:
      * @brief       Get the number of months.
      * @return      The number of months.
      */
-    [[nodiscard]] inline time_type get_months() const noexcept
+    [[nodiscard]] time_type get_months() const noexcept
     {
         return monh_;
     }
@@ -239,7 +239,7 @@ public:
      * @brief       Get the number of days.
      * @return      The number of days.
      */
-    [[nodiscard]] inline time_type get_days() const noexcept
+    [[nodiscard]] time_type get_days() const noexcept
     {
         return dy_;
     }
@@ -248,7 +248,7 @@ public:
      * @brief       Get the number of hours.
      * @return      The number of hours.
      */
-    [[nodiscard]] inline time_type get_hours() const noexcept
+    [[nodiscard]] time_type get_hours() const noexcept
     {
         return hor_;
     }
@@ -257,7 +257,7 @@ public:
      * @brief       Get the number of minutes.
      * @return      The number of minutes.
      */
-    [[nodiscard]] inline time_type get_minutes() const noexcept
+    [[nodiscard]] time_type get_minutes() const noexcept
     {
         return min_;
     }
@@ -266,7 +266,7 @@ public:
      * @brief       Get the number of seconds.
      * @return      The number of seconds.
      */
-    [[nodiscard]] inline time_type get_seconds() const noexcept
+    [[nodiscard]] time_type get_seconds() const noexcept
     {
         return sec_;
     }
@@ -275,7 +275,7 @@ public:
      * @brief       Set the number of years.
      * @return      The object who called the method.
      */
-    inline system_time& set_years(time_type yer) noexcept
+    system_time& set_years(time_type yer) noexcept
     {
         yer_ = yer;
         return *this;
@@ -285,7 +285,7 @@ public:
      * @brief       Set the number of months.
      * @return      The object who called the method.
      */
-    inline system_time& set_months(time_type monh) noexcept
+    system_time& set_months(time_type monh) noexcept
     {
         monh_ = monh;
         return *this;
@@ -295,7 +295,7 @@ public:
      * @brief       Set the number of days.
      * @return      The object who called the method.
      */
-    inline system_time& set_days(time_type dy) noexcept
+    system_time& set_days(time_type dy) noexcept
     {
         dy_ = dy;
         return *this;
@@ -305,7 +305,7 @@ public:
      * @brief       Set the number of hours.
      * @return      The object who called the method.
      */
-    inline system_time& set_hours(time_type hor) noexcept
+    system_time& set_hours(time_type hor) noexcept
     {
         hor_ = hor;
         return *this;
@@ -315,7 +315,7 @@ public:
      * @brief       Set the number of minutes.
      * @return      The object who called the method.
      */
-    inline system_time& set_minutes(time_type min) noexcept
+    system_time& set_minutes(time_type min) noexcept
     {
         min_ = min;
         return *this;
@@ -325,7 +325,7 @@ public:
      * @brief       Set the number of seconds.
      * @return      The object who called the method.
      */
-    inline system_time& set_seconds(time_type sec) noexcept
+    system_time& set_seconds(time_type sec) noexcept
     {
         sec_ = sec;
         return *this;

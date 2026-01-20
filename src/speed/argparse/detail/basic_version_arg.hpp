@@ -70,7 +70,7 @@ public:
      * @param       kys : Argument keys.
      */
     template<typename... StringTs_>
-    explicit basic_version_arg(arg_parser_type* arg_parsr, StringTs_&&... kys)
+    explicit basic_version_arg(arg_parser_type& arg_parsr, StringTs_&&... kys)
             : base_arg_type(arg_parsr)
             , key_arg_type(arg_parsr, std::forward<StringTs_>(kys)...)
     {
@@ -113,7 +113,7 @@ public:
      * @param       vers_information : The version information to set.
      */
     template<typename StringT_>
-    inline void set_version_information(StringT_&& vers_information)
+    void set_version_information(StringT_&& vers_information)
     {
         vers_information_ = std::forward<StringT_>(vers_information);
     }
@@ -121,9 +121,9 @@ public:
     /**
      * @brief       Print version information.
      */
-    inline void print_version_information()
+    void print_version_information()
     {
-        std::cout << vers_information_ << std::endl;
+        base_arg_type::get_arg_parser().get_ostream() << vers_information_ << std::endl;
     }
 
 private:

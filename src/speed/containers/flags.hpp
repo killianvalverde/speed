@@ -283,14 +283,14 @@ public:
     /**
      * @brief       Default constructor.
      */
-    inline flags() noexcept = default;
+    flags() noexcept = default;
     
     /**
      * @brief       Constructor with parameters.
      * @param       vals : Default flag values.
      */
     template<typename... ValueTs_>
-    inline flags(const ValueTs_&... vals) noexcept
+    flags(const ValueTs_&... vals) noexcept
             : flags()
     {
         set(vals...);
@@ -300,13 +300,13 @@ public:
      * @brief       Copy constructor.
      * @param       rhs : The object to copy.
      */
-    inline flags(const flags& rhs) = default;
+    flags(const flags& rhs) = default;
     
     /**
      * @brief       Move constructor.
      * @param       rhs : The object to move.
      */
-    inline flags(flags&& rhs) noexcept
+    flags(flags&& rhs) noexcept
             : val_(std::move(rhs.val_))
     {
         rhs.val_ = static_cast<value_type>(0);
@@ -362,7 +362,7 @@ public:
      * @param       rhs : Object to compare.
      * @return      If the objets are equal true is returned, otherwise false is returned.
      */
-    inline bool operator ==(const flags& rhs) const noexcept
+    bool operator ==(const flags& rhs) const noexcept
     {
         return (static_cast<underlying_type>(val_) == static_cast<underlying_type>(rhs.val_));
     }
@@ -372,7 +372,7 @@ public:
      * @param       rhs : Object to compare.
      * @return      If the objets are different true is returned, otherwise false is returned.
      */
-    inline bool operator !=(const flags& rhs) const noexcept
+    bool operator !=(const flags& rhs) const noexcept
     {
         return (static_cast<underlying_type>(val_) != static_cast<underlying_type>(rhs.val_));
     }
@@ -381,7 +381,7 @@ public:
      * @brief       Get the first element iterator of the collection.
      * @return      The first element iterator of the collection.
      */
-    inline iterator begin() noexcept
+    iterator begin() noexcept
     {
         return iterator(&val_);
     }
@@ -390,7 +390,7 @@ public:
      * @brief       Get the first element const iterator of the container.
      * @return      The first element const iterator of the container.
      */
-    inline const_iterator begin() const noexcept
+    const_iterator begin() const noexcept
     {
         return const_iterator(&val_);
     }
@@ -399,7 +399,7 @@ public:
      * @brief       Get the first element const iterator of the container.
      * @return      The first element const iterator of the container.
      */
-    inline const_iterator cbegin() const noexcept
+    const_iterator cbegin() const noexcept
     {
         return const_iterator(&val_);
     }
@@ -408,7 +408,7 @@ public:
      * @brief       Get an iterator to the past-the-end element in the container.
      * @return      An iterator to the past-the-end element in the container.
      */
-    inline iterator end() noexcept
+    iterator end() noexcept
     {
         return iterator(nullptr);
     }
@@ -417,7 +417,7 @@ public:
      * @brief       Get a const iterator to the past-the-end element in the container.
      * @return      A const iterator to the past-the-end element in the container
      */
-    inline const_iterator end() const noexcept
+    const_iterator end() const noexcept
     {
         return const_iterator(nullptr);
     }
@@ -426,7 +426,7 @@ public:
      * @brief       Get a const iterator to the past-the-end element in the container.
      * @return      A const iterator to the past-the-end element in the container
      */
-    inline const_iterator cend() const noexcept
+    const_iterator cend() const noexcept
     {
         return const_iterator(nullptr);
     }
@@ -436,7 +436,7 @@ public:
      * @param       flgs : Flags to verify its presence in the conteiner.
      */
     template<typename... ValueTs_>
-    inline bool is_set(const ValueTs_&... flgs) const noexcept
+    bool is_set(const ValueTs_&... flgs) const noexcept
     {
         underlying_type concat = 0;
         ((concat |= static_cast<underlying_type>(flgs)), ...);
@@ -449,7 +449,7 @@ public:
      * @param       flgs : Flags to verify its presence in the conteiner.
      */
     template<typename... ValueTs_>
-    inline bool is_not_set(const ValueTs_&... flgs) const noexcept
+    bool is_not_set(const ValueTs_&... flgs) const noexcept
     {
         return !is_set(flgs...);
     }
@@ -459,7 +459,7 @@ public:
      * @param       indxs : Indexes in which verify a flag presence in the conteiner.
      */
     template<typename... IndexTs_>
-    inline bool is_set_by_index(const IndexTs_&... indxs) noexcept
+    bool is_set_by_index(const IndexTs_&... indxs) noexcept
     {
         underlying_type concat = 0;
         ((concat |= (1u << indxs)), ...);
@@ -472,7 +472,7 @@ public:
      * @param       indxs : Indexes in which verify a flag presence in the conteiner.
      */
     template<typename... IndexTs_>
-    inline bool is_not_set_by_index(const IndexTs_&... indxs) noexcept
+    bool is_not_set_by_index(const IndexTs_&... indxs) noexcept
     {
         return !is_set_by_index(indxs...);
     }
@@ -481,7 +481,7 @@ public:
      * @brief       Allows knowing whether the container is empty.
      * @return      If function was successfull true is returned, otherwise false is returned.
      */
-    inline bool is_empty() const noexcept
+    bool is_empty() const noexcept
     {
         return (static_cast<underlying_type>(val_) == 0);
     }
@@ -490,7 +490,7 @@ public:
      * @brief       Allows knowing whether the container is not empty.
      * @return      If function was successfull true is returned, otherwise false is returned.
      */
-    inline bool is_not_empty() const noexcept
+    bool is_not_empty() const noexcept
     {
         return (static_cast<underlying_type>(val_) != 0);
     }
@@ -499,7 +499,7 @@ public:
      * @brief       Get the value that contains the flags conteiner.
      * @return      The value that constains the flags conteiner.
      */
-    inline const value_type& get_value() const noexcept
+    const value_type& get_value() const noexcept
     {
         return val_;
     }
@@ -508,7 +508,7 @@ public:
      * @brief       Get the underlying value that contains the flags conteiner.
      * @return      The underlying value that constains the flags conteiner.
      */
-    inline underlying_type get_underlying_value() const noexcept
+    underlying_type get_underlying_value() const noexcept
     {
         return static_cast<underlying_type>(val_);
     }
@@ -518,7 +518,7 @@ public:
      * @param       flgs : Flags to set in the conteiner.
      */
     template<typename... ValueTs_>
-    inline flags& set(const ValueTs_&... flgs) noexcept
+    flags& set(const ValueTs_&... flgs) noexcept
     {
         ((val_ = static_cast<value_type>(
                 static_cast<underlying_type>(val_) |
@@ -532,7 +532,7 @@ public:
      * @param       indxs : Indexes in which set a flag in the conteiner.
      */
     template<typename... IndexTs_>
-    inline flags& set_by_index(const IndexTs_&... indxs) noexcept
+    flags& set_by_index(const IndexTs_&... indxs) noexcept
     {
         ((val_ = static_cast<value_type>(
                 static_cast<underlying_type>(val_) |
@@ -546,7 +546,7 @@ public:
      * @param       flgs : Flags to unset in the conteiner.
      */
     template<typename... ValueTs_>
-    inline flags& unset(const ValueTs_&... flgs) noexcept
+    flags& unset(const ValueTs_&... flgs) noexcept
     {
         ((val_ = static_cast<value_type>(
                 static_cast<underlying_type>(val_) &
@@ -560,7 +560,7 @@ public:
      * @param       indxs : Index in which unset a flag in the conteiner.
      */
     template<typename... IndexTs_>
-    inline flags& unset_by_index(const IndexTs_&... indxs) noexcept
+    flags& unset_by_index(const IndexTs_&... indxs) noexcept
     {
         ((val_ = static_cast<value_type>(
                 static_cast<underlying_type>(val_) &
@@ -572,7 +572,7 @@ public:
     /**
      * @brief       Put all the flags to zero.
      */
-    inline flags& clear() noexcept
+    flags& clear() noexcept
     {
         val_ = static_cast<value_type>(0);
         return *this;

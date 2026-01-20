@@ -109,7 +109,7 @@ public:
      * @brief       Constructor with parameters.
      * @param       arg_parsr : Argument parser that holds this object.
      */
-    explicit basic_value_arg(arg_parser_type* arg_parsr)
+    explicit basic_value_arg(arg_parser_type& arg_parsr)
             : base_arg_type(arg_parsr)
     {
         nr_vals_.emplace_back(0);
@@ -144,21 +144,7 @@ public:
      * @param       rhs : Object to move.
      * @return      The object who call the method.
      */
-    basic_value_arg& operator =(basic_value_arg&& rhs) noexcept
-    {
-        if (this != &rhs)
-        {
-            base_arg_type::operator =(std::move(rhs));
-            minmax_vals_ = std::move(rhs.minmax_vals_);
-            vals_ = std::move(rhs.vals_);
-            nr_vals_ = std::move(rhs.nr_vals_);
-            castrs_ = std::move(rhs.castrs_);
-            assertns_ = std::move(rhs.assertns_);
-            regxes_ = std::move(rhs.regxes_);
-        }
-        
-        return *this;
-    }
+    basic_value_arg& operator =(basic_value_arg&& rhs) noexcept = default;
 
     /**
      * @brief       Add a value to the argument.
@@ -171,7 +157,7 @@ public:
         if (!max_values_reached())
         {
             vals_.emplace_back(std::forward<StringT_>(val), get_next_caster(),
-                    get_next_assertion(), get_next_regex(), base_arg_type::get_arg_parser(), this);
+                    get_next_assertion(), get_next_regex(), base_arg_type::get_arg_parser(), *this);
             ++nr_vals_.back();
             return true;
         }
@@ -192,7 +178,7 @@ public:
         if (!max_values_reached())
         {
             arg_value_type arg_val(std::forward<StringT_>(val), get_next_caster(),
-                    get_next_assertion(), get_next_regex(), base_arg_type::get_arg_parser(), this);
+                    get_next_assertion(), get_next_regex(), base_arg_type::get_arg_parser(), *this);
 
             if (!arg_val.has_errors())
             {
@@ -229,7 +215,7 @@ public:
     /**
      * @brief       Clear values collection.
      */
-    inline void reset() noexcept override
+    void reset() noexcept override
     {
         vals_.clear();
         nr_vals_.clear();
@@ -298,7 +284,7 @@ public:
      * @brief       Allows knowing whether the argument can't get more values.
      * @return      If function was successfull true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool max_values_reached() const noexcept
+    [[nodiscard]] bool max_values_reached() const noexcept
     {
         return nr_vals_.back() >= minmax_vals_.second;
     }
@@ -307,7 +293,7 @@ public:
      * @brief       Allows knowing whether the argument has rached the minimal number of values.
      * @return      If function was successfull true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline bool min_values_reached() const noexcept
+    [[nodiscard]] bool min_values_reached() const noexcept
     {
         return nr_vals_.back() >= minmax_vals_.first;
     }
@@ -317,7 +303,7 @@ public:
      * @return      The front arg value converted to target.
      */
     template<typename TargetT_>
-    [[nodiscard]] inline TargetT_ get_front_value_as() const
+    [[nodiscard]] TargetT_ get_front_value_as() const
     {
         if (vals_.empty())
         {
@@ -334,10 +320,11 @@ public:
      *              otherwise the specified default value is returned.
      */
     template<typename TargetT_, typename TargetT_DefaultValue_>
-    [[nodiscard]] inline TargetT_ get_front_value_as(TargetT_DefaultValue_&& default_val) const noexcept
+    [[nodiscard]] TargetT_ get_front_value_as(TargetT_DefaultValue_&& default_val) const noexcept
     {
         return vals_.empty() ? std::forward<TargetT_DefaultValue_>(default_val) : 
-                vals_.front().template as<TargetT_>(std::forward<TargetT_DefaultValue_>(default_val));
+                vals_.front().template as<TargetT_>(std::forward<TargetT_DefaultValue_>(
+                        default_val));
     }
     
     /**
@@ -346,7 +333,7 @@ public:
      * @return      If function was successful true is returned, otherwise false is returned.
      */
     template<typename TargetT_>
-    [[nodiscard]] inline bool try_get_front_value_as(TargetT_& res) const noexcept
+    [[nodiscard]] bool try_get_front_value_as(TargetT_& res) const noexcept
     {
         return !vals_.empty() && vals_.front().template try_as<TargetT_>(res);
     }
@@ -357,7 +344,7 @@ public:
      * @return      The specified arg value converted to target.
      */
     template<typename TargetT_>
-    [[nodiscard]] inline TargetT_ get_value_at_as(std::size_t indx) const
+    [[nodiscard]] TargetT_ get_value_at_as(std::size_t indx) const
     {
         if (indx >= vals_.size())
         {
@@ -375,7 +362,7 @@ public:
      *              otherwise the specified default value is returned.
      */
     template<typename TargetT_, typename TargetT_DefaultValue_>
-    [[nodiscard]] inline TargetT_ get_value_at_as(
+    [[nodiscard]] TargetT_ get_value_at_as(
             std::size_t indx, 
             TargetT_DefaultValue_&& default_val
     ) const noexcept
@@ -392,7 +379,7 @@ public:
      * @return      If function was successful true is returned, otherwise false is returned.
      */
     template<typename TargetT_>
-    [[nodiscard]] inline bool try_get_value_at_as(std::size_t indx, TargetT_& res) const noexcept
+    [[nodiscard]] bool try_get_value_at_as(std::size_t indx, TargetT_& res) const noexcept
     {
         return indx < vals_.size() && vals_.at(indx).template try_as<TargetT_>(res);
     }
@@ -402,7 +389,7 @@ public:
      * @return      All the arg values converted to target.
      */
     template<typename TargetT_>
-    [[nodiscard]] inline vector_type<TargetT_> get_values_as() const
+    [[nodiscard]] vector_type<TargetT_> get_values_as() const
     {
         vector_type<TargetT_> ret_vals;
 
@@ -421,7 +408,7 @@ public:
      *              otherwise the specified default value is returned.
      */
     template<typename TargetT_, typename TargetT_DefaultValue_ = vector_type<TargetT_>>
-    [[nodiscard]] inline vector_type<TargetT_> get_values_as(
+    [[nodiscard]] vector_type<TargetT_> get_values_as(
         TargetT_DefaultValue_&& default_val
     ) const noexcept
     {
@@ -449,7 +436,7 @@ public:
      * @return      If function was successful true is returned, otherwise false is returned.
      */
     template<typename TargetT_>
-    [[nodiscard]] inline vector_type<TargetT_> try_get_values_as(
+    [[nodiscard]] vector_type<TargetT_> try_get_values_as(
             vector_type<TargetT_>& res
     ) const noexcept
     {
@@ -486,7 +473,7 @@ public:
      * @brief       Get maximum number of values for an option.
      * @return      The maximum number of values for an option.
      */
-    [[nodiscard]] inline std::size_t get_max_values() const noexcept
+    [[nodiscard]] std::size_t get_max_values() const noexcept
     {
         return minmax_vals_.second;
     }
@@ -495,7 +482,7 @@ public:
      * @brief       Get minimum number of values for an option.
      * @return      The minimum number of values for an option.
      */
-    [[nodiscard]] inline std::size_t get_min_values() const noexcept
+    [[nodiscard]] std::size_t get_min_values() const noexcept
     {
         return minmax_vals_.first;
     }
@@ -631,7 +618,7 @@ public:
      * @param       assertns : Functions to execute in order to know if the values are valid.
      */
     template<typename... AssertionTs_>
-    inline void set_assertions(AssertionTs_&&... assertns)
+    void set_assertions(AssertionTs_&&... assertns)
     {
         assertns_.clear();
         (assertns_.emplace_back(std::forward<AssertionTs_>(assertns)), ...);
@@ -646,22 +633,24 @@ public:
         {
             return;
         }
+        
+        auto& os = base_arg_type::get_arg_parser().get_ostream();
 
         base_arg_type::print_errors();
         
         if (base_arg_type::is_error_flag_set(arg_error_flags::MIN_VALUES_ERROR))
         {
             base_arg_type::print_error_message();
-            std::cout << base_arg_type::get_tittle() << " requires at least " << minmax_vals_.first
-                      << (minmax_vals_.first > 1 ? " values" : " value") << '\n';
+            os << base_arg_type::get_tittle() << " requires at least " << minmax_vals_.first
+               << (minmax_vals_.first > 1 ? " values" : " value") << '\n';
         }
         
         if (base_arg_type::is_error_flag_set(arg_error_flags::MAX_VALUES_ERROR))
         {
             base_arg_type::print_error_message();
-            std::cout << base_arg_type::get_tittle() << " must have a maximum of "
-                      << minmax_vals_.second
-                      << (minmax_vals_.second > 1 ? " values" : " value") << '\n';
+            os << base_arg_type::get_tittle() << " must have a maximum of "
+               << minmax_vals_.second
+               << (minmax_vals_.second > 1 ? " values" : " value") << '\n';
         }
         
         if (base_arg_type::is_error_flag_set(arg_error_flags::VALUES_ERROR) && !vals_.empty())

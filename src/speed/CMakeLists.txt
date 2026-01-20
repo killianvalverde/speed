@@ -84,6 +84,7 @@ set(SPEED_FILESYSTEM_SOURCE_FILES
 )
 
 set(SPEED_IOSTREAM_SOURCE_FILES
+        iostream/detail/forward_declarations.hpp
         iostream/basic_ios_redirect.hpp
         iostream/indentation.cpp
         iostream/indentation.hpp
@@ -437,7 +438,7 @@ install(EXPORT speedTargets
 
 write_basic_package_version_file(
     "${CMAKE_CURRENT_BINARY_DIR}/speedConfigVersion.cmake"
-    VERSION 0.5.0
+    VERSION 0.6.0
     COMPATIBILITY AnyNewerVersion
 )
 

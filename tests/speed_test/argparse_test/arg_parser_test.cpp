@@ -798,6 +798,30 @@ TEST_F(argparse_arg_parser, parse_nested_container_as_holder_array_type)
     EXPECT_TRUE(containr.size() == 3);
 }
 
+TEST_F(argparse_arg_parser, parse_standalone_prefix)
+{
+    std::vector<const char*> argv = {
+        "speed",
+        "fire", "-", "--"
+    };
+    
+    std::string pattrn;
+    
+    ap.add_positional_arg("PATTERN")
+            .description("Pattern to match.")
+            .store_into(pattrn);
+    
+    ap.add_help_arg("-h", "--help")
+            .description("Display help menu and exit.");
+    
+    ap.add_version_arg("-v", "--version")
+            .description("Print version information and exit.");
+
+    EXPECT_NO_THROW(ap.parse_args(argv.size(), argv));
+    EXPECT_TRUE(ap.has_errors());
+    EXPECT_TRUE(pattrn == "fire");
+}
+
 TEST_F(argparse_arg_parser, strore_into_tuple)
 {
     std::vector<const char*> argv = {
@@ -1262,7 +1286,7 @@ TEST_F(argparse_arg_parser, print_number_errors)
             "-s", "4896K"
     };
 
-    speed::iostream::ios_redirect ios_redirect(std::cout);
+    speed::iostream::ios_redirect ios_redirect(std::cerr);
     ios_redirect.redirect_to_internal_stream();
 
     ap.add_key_value_arg("--seconds", "-s")

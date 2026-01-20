@@ -253,6 +253,7 @@ public:
         bool is_mutually_exclusiv = flgs_.is_set(arg_constraint_flags::MUTUALLY_EXCLUSIVE);
         bool is_one_or_more_requird = flgs_.is_set(arg_constraint_flags::ONE_OR_MORE_REQUIRED);
         std::size_t i;
+        auto& os = arg_parsr_->get_ostream();
         
         if (is_mutually_exclusiv && is_one_or_more_requird)
         {
@@ -269,14 +270,14 @@ public:
     
         for (i = args_indent; i > 0; --i)
         {
-            std::cout << ' ';
+            os.put(' ');
         }
         
         for (auto& bse_arg : bse_args_)
         {
             if (arg_printd)
             {
-                std::cout << ", ";
+                os << ", ";
                 bse_arg->print_name();
                 safety::try_addm(kys_len, bse_arg->get_name_length(), 2);
             }
@@ -287,15 +288,15 @@ public:
                 arg_printd = true;
             }
         }
-        
-        std::cout << "  ";
+
+        os << "  ";
         safety::try_addm(kys_len, 2);
         
         if (kys_len < actual_kys_len)
         {
             for (i = actual_kys_len - kys_len; i > 0; i--)
             {
-                std::cout << ' ';
+                os.put(' ');
             }
             
             kys_len = actual_kys_len;
@@ -304,8 +305,8 @@ public:
         safety::try_addm(kys_len, args_indent);
         safety::try_addm(new_line_indent, args_indent, actual_kys_len);
         
-        iostream::print_wrapped(std::cout, desc, max_line_len, new_line_indent, kys_len);
-        std::cout << '\n';
+        iostream::print_wrapped(os, desc, max_line_len, new_line_indent, kys_len);
+        os.put('\n');
     }
     
     /**
@@ -389,7 +390,7 @@ private:
 
         print_arguments_during_error();
         
-        std::cout << "The arguments are mutually exclusive.\n";
+        arg_parsr_->get_ostream() << "The arguments are mutually exclusive.\n";
     }
     
     /**
@@ -404,7 +405,7 @@ private:
 
         print_arguments_during_error();
         
-        std::cout << "At least one of the arguments has to be found.\n";
+        arg_parsr_->get_ostream() << "At least one of the arguments has to be found.\n";
     }
     
     /**
@@ -414,8 +415,9 @@ private:
     {
         const string_type* err_name;
         bool colors_enabld = arg_parsr_->is_flag_set(arg_parser_flags::USE_COLORS);
+        auto& os = arg_parsr_->get_ostream();
         
-        std::cout << arg_parsr_->get_program_name() << ": ";
+        os << arg_parsr_->get_program_name() << ": ";
         
         for (auto it = bse_args_.cbegin(); it != bse_args_.cend(); )
         {
@@ -425,22 +427,22 @@ private:
             {
                 if (colors_enabld)
                 {
-                    std::cout << iostream::set_light_red_text;
+                    os << iostream::set_light_red_text;
                 }
-                std::cout << *err_name;
+                os << *err_name;
 
                 if (++it != bse_args_.cend())
                 {
-                    std::cout << ", ";
+                    os << ", ";
                 }
                 else
                 {
-                    std::cout << ": ";
+                    os << ": ";
                 }
                 
                 if (colors_enabld)
                 {
-                    std::cout << iostream::set_default_text;
+                    os << iostream::set_default_text;
                 }
             }
         }

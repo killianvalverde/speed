@@ -31,6 +31,7 @@
 #include <regex>
 #include <set>
 #include <stack>
+#include <vector>
 
 #include "detail/forward_declarations.hpp"
 #include "../containers/containers.hpp"
@@ -58,6 +59,14 @@ public:
 
     /** Regex type used in the class. */
     using regex_type = std::basic_regex<char_type, std::regex_traits<char_type>>;
+
+    /** Set type used in the class. */
+    template<typename T>
+    using set_type = std::set<T, std::less<T>, std::allocator<T>>;
+    
+    /** Stack type used in the class. */
+    template<typename T>
+    using stack_type = std::stack<T>;
 
     /**
      * @brief       Class that represents const iterators.
@@ -173,10 +182,10 @@ public:
         std::filesystem::path cur_fle_;
 
         /** Stack of directories entities used to explore recursivelly the filesystem. */
-        std::stack<directory_entity_type> directory_entity_stck_;
+        stack_type<directory_entity_type> directory_entity_stck_;
 
         /** Set of visited inodes to avoid infinite recursions in case of fs corruptions. */
-        std::set<system::filesystem::inode_t> vistd_inos_;
+        set_type<system::filesystem::inode_t> vistd_inos_;
 
         /** Pointer to the composite object. */
         const directory_iteration* composit_;
@@ -201,7 +210,7 @@ public:
     explicit directory_iteration(PathT_&& root_pth)
             : root_pth_(std::forward<PathT_>(root_pth))
     {
-        if (root_pth_.native().find(SPEED_SYSTEM_FILESYSTEM_ALT_SLASH_CHAR) != string_type::npos)
+        if (root_pth_.native().find(SPEED_ALT_PATH_SEPARATOR_CHAR) != string_type::npos)
         {
             root_pth_ = get_normalized_path(root_pth_);
         }
@@ -211,7 +220,7 @@ public:
      * @brief       Get a const iterator for the first file.
      * @return      A const iterator for the first file.
      */
-    [[nodiscard]] inline const_iterator begin() noexcept
+    [[nodiscard]] const_iterator begin() const noexcept
     {
         return const_iterator(this);
     }
@@ -220,7 +229,7 @@ public:
      * @brief       Get a const iterator to the past-the-end file.
      * @return      A const iterator to the past-the-end file.
      */
-    [[nodiscard]] inline const_iterator end() noexcept
+    [[nodiscard]] const_iterator end() const noexcept
     {
         return const_iterator(nullptr);
     }
@@ -229,7 +238,7 @@ public:
      * @brief       Get a const iterator for the first file.
      * @return      A const iterator for the first file.
      */
-    [[nodiscard]] inline const_iterator cbegin() const noexcept
+    [[nodiscard]] const_iterator cbegin() const noexcept
     {
         return const_iterator(this);
     }
@@ -238,7 +247,7 @@ public:
      * @brief       Get a const iterator to the past-the-end file.
      * @return      A const iterator to the past-the-end file.
      */
-    [[nodiscard]] inline const_iterator cend() const noexcept
+    [[nodiscard]] const_iterator cend() const noexcept
     {
         return const_iterator(nullptr);
     }
@@ -248,9 +257,32 @@ public:
      * @param       access_mods : Access modes that the files are mandatory to have.
      * @return      The object who call the method.
      */
-    inline directory_iteration& access_modes(system::filesystem::access_modes access_mods)
+    directory_iteration& access_modes(system::filesystem::access_modes access_mods) noexcept
     {
         access_mods_ = access_mods;
+        return *this;
+    }
+    
+    /**
+     * @brief       Ensures the stored root path is absolute, optionally resolving symlinks.
+     * @param       enabl : Whether to enforce absolute/canonical form of the path.
+     * @return      Reference to the current `directory_iteration` instance (`*this`), allowing
+     *              method chaining.
+     */
+    directory_iteration& absolute(bool enabl)
+    {
+        if (enabl)
+        {
+            try
+            {
+                root_pth_ = std::filesystem::canonical(root_pth_);
+            }
+            catch (...)
+            {
+                root_pth_ = std::filesystem::absolute(root_pth_);
+            }
+        }
+        
         return *this;
     }
 
@@ -260,7 +292,7 @@ public:
      *              matching.
      * @return      The object who call the method.
      */
-    inline directory_iteration& case_insensitive(bool enabl)
+    directory_iteration& case_insensitive(bool enabl)
     {
         if (case_insensitve_ != enabl)
         {
@@ -280,7 +312,7 @@ public:
      * @param       file_typs : File types that will be considered during the iteration.
      * @return      The object who call the method.
      */
-    inline directory_iteration& file_types(system::filesystem::file_types file_typs)
+    directory_iteration& file_types(system::filesystem::file_types file_typs) noexcept
     {
         file_typs_ = file_typs;
         return *this;
@@ -291,7 +323,7 @@ public:
      * @param       enabl : Set to `true` to enable inode tracking, or `false` to disable it.
      * @return      The object who call the method.
      */
-    inline directory_iteration& inode_tracking(bool enabl)
+    directory_iteration& inode_tracking(bool enabl) noexcept
     {
         inode_trackr_ = enabl;
         return *this;
@@ -302,7 +334,7 @@ public:
      * @param       recursivity_levl : Access modes that the files are mandatory to have.
      * @return      The object who call the method.
      */
-    inline directory_iteration& recursivity_level(std::uint64_t recursivity_levl)
+    directory_iteration& recursivity_level(std::uint64_t recursivity_levl) noexcept
     {
         max_recursivity_levl_ = recursivity_levl;
         return *this;
@@ -314,7 +346,7 @@ public:
      * @return      The object who call the method.
      */
     template<typename StringT_>
-    inline directory_iteration& regex_to_match(StringT_&& regex_to_mtch)
+    directory_iteration& regex_to_match(StringT_&& regex_to_mtch)
     {
         regex_to_mtch_str_ = type_casting::type_cast<string_type>(
                 std::forward<StringT_>(regex_to_mtch));
@@ -328,7 +360,7 @@ public:
      * @param       enabl : If true the directories symbolic links will be followed.
      * @return      The object who call the method.
      */
-    inline directory_iteration& resolve_directory_symlinks(bool enabl)
+    directory_iteration& resolve_directory_symlinks(bool enabl) noexcept
     {
         resolve_directory_symlnks_ = enabl;
         return *this;
@@ -339,7 +371,7 @@ public:
      * @param       enabl : If true the entries symbolic links will be resolved.
      * @return      The object who call the method.
      */
-    inline directory_iteration& resolve_entries_symlinks(bool enabl)
+    directory_iteration& resolve_entries_symlinks(bool enabl) noexcept
     {
         resolve_directory_symlnks_ = enabl;
         return *this;
@@ -351,7 +383,7 @@ public:
      * @return      The object who call the method.
      */
     template<typename StringT_>
-    inline directory_iteration& substring_to_match(StringT_&& substring_to_mtch)
+    directory_iteration& substring_to_match(StringT_&& substring_to_mtch)
     {
         substring_to_mtch_ = type_casting::type_cast<string_type>(
                 std::forward<StringT_>(substring_to_mtch));
@@ -365,7 +397,7 @@ public:
      * @return      The object who call the method.
      */
     template<typename StringT_>
-    inline directory_iteration& wildcard_to_match(StringT_&& wildcard_to_mtch)
+    directory_iteration& wildcard_to_match(StringT_&& wildcard_to_mtch)
     {
         wildcard_to_mtch_ = type_casting::type_cast<string_type>(
                 std::forward<StringT_>(wildcard_to_mtch));

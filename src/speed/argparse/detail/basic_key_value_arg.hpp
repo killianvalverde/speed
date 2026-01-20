@@ -86,7 +86,7 @@ public:
      * @param       kys : Argument keys.
      */
     template<typename... StringTs_>
-    explicit basic_key_value_arg(arg_parser_type* arg_parsr, StringTs_&&... kys)
+    explicit basic_key_value_arg(arg_parser_type& arg_parsr, StringTs_&&... kys)
             : base_arg_type(arg_parsr)
             , key_arg_type(arg_parsr, std::forward<StringTs_>(kys)...)
             , value_arg_type(arg_parsr)
@@ -129,7 +129,7 @@ public:
      * @brief       Get the necessary length to print long arguments keys.
      * @return      The necessary length to print long arguments keys.
      */
-    [[nodiscard]] inline std::size_t get_long_keys_length() noexcept override
+    [[nodiscard]] std::size_t get_long_keys_length() noexcept override
     {
         std::size_t additional_len = 0;
 
@@ -151,7 +151,7 @@ public:
      * @brief       Get the necessary length to print short arguments keys.
      * @return      The necessary length to print short arguments keys.
      */
-    [[nodiscard]] inline std::size_t get_short_keys_length() noexcept override
+    [[nodiscard]] std::size_t get_short_keys_length() noexcept override
     {
         std::size_t additional_len = 0;
 
@@ -173,7 +173,7 @@ public:
      * @brief       Set an argument flag.
      * @param       flg : Flag to set.
      */
-    inline void set_flag(arg_flags flg) noexcept override
+    void set_flag(arg_flags flg) noexcept override
     {
         base_arg_type::set_flag(flg);
         if (flg == arg_flags::ASSIGNMENT_OPERATOR)
@@ -220,7 +220,7 @@ public:
      * @brief       Unset an argument flag.
      * @param       flg : Flag to unset.
      */
-    inline void unset_flag(arg_flags flg) noexcept override
+    void unset_flag(arg_flags flg) noexcept override
     {
         base_arg_type::unset_flag(flg);
         if (flg == arg_flags::ASSIGNMENT_OPERATOR)
@@ -236,7 +236,7 @@ public:
     {
         build_usage_string();
         key_arg_type::print_usage();
-        std::cout << usage_str_;
+        base_arg_type::get_arg_parser().get_ostream() << usage_str_;
     }
 
     /**
@@ -263,25 +263,26 @@ public:
         std::size_t current_id_len = 0;
         std::size_t n_args_printd = 0;
         std::size_t i;
+        auto& os = base_arg_type::get_arg_parser().get_ostream();
 
         build_usage_string();
     
         for (i = args_indent; i > 0; --i)
         {
-            std::cout << ' ';
+            os.put(' ');
         }
 
         key_arg_type::print_keys(n_args_printd, current_id_len, true);
 
         if (!key_arg_type::has_long_prefix_keys())
         {
-            std::cout << usage_str_;
+            os << usage_str_;
             safety::try_addm(current_id_len, usage_str_.length());
         }
         
         if (n_args_printd < key_arg_type::get_keys_size() && n_args_printd > 0)
         {
-            std::cout << ", ";
+            os << ", ";
             safety::try_addm(current_id_len, 2);
         }
         
@@ -289,7 +290,7 @@ public:
         {
             for (i = short_kys_len - current_id_len; i > 0; --i)
             {
-                std::cout << ' ';
+                os << ' ';
             }
         }
         
@@ -300,7 +301,7 @@ public:
 
         if (key_arg_type::has_long_prefix_keys())
         {
-            std::cout << usage_str_;
+            os << usage_str_;
             safety::try_addm(current_id_len, usage_str_.length());
         }
         
@@ -308,7 +309,7 @@ public:
         {
             for (i = long_kys_len - current_id_len; i > 0; --i)
             {
-                std::cout << ' ';
+                os << ' ';
             }
         }
     

@@ -74,7 +74,7 @@ public:
      * @param       usage_ky : Key used in the usage message.
      */
     template<typename StringT_>
-    basic_positional_arg(arg_parser_type* arg_parsr, StringT_&& usage_ky)
+    basic_positional_arg(arg_parser_type& arg_parsr, StringT_&& usage_ky)
             : base_arg_type(arg_parsr)
             , value_arg_type(arg_parsr)
             , ky_(std::forward<StringT_>(usage_ky))
@@ -125,7 +125,7 @@ public:
      * @brief       Returns the arguement key.
      * @return      The arguement key.
      */
-    [[nodiscard]] inline const string_type& get_key() const noexcept
+    [[nodiscard]] const string_type& get_key() const noexcept
     {
         return ky_;
     }
@@ -134,7 +134,7 @@ public:
      * @brief       Only used for polymorphic propose.
      * @return      0 is returned always.
      */
-    [[nodiscard]] inline std::size_t get_long_keys_length() noexcept override
+    [[nodiscard]] std::size_t get_long_keys_length() noexcept override
     {
         return 0;
     }
@@ -152,7 +152,7 @@ public:
      * @brief       Get the necessary length to print the usage key.
      * @return      The necessary length to print the usage key.
      */
-    [[nodiscard]] inline std::size_t get_short_keys_length() noexcept override
+    [[nodiscard]] std::size_t get_short_keys_length() noexcept override
     {
         if (base_arg_type::is_description_empty())
         {
@@ -166,7 +166,7 @@ public:
      * @brief       Get a string that represents the kind of argument it is.
      * @return      A string that represents the kind of argument it is.
      */
-    [[nodiscard]] inline string_view_type get_tittle() const override
+    [[nodiscard]] string_view_type get_tittle() const override
     {
         return "Value";
     }
@@ -176,7 +176,7 @@ public:
      */
     void print_name() override
     {
-        std::cout << ky_;
+        base_arg_type::get_arg_parser().get_ostream() << ky_;
     }
     
     /**
@@ -184,18 +184,20 @@ public:
      */
     void print_usage() override
     {
+        auto& os = base_arg_type::get_arg_parser().get_ostream();
+        
         if (!base_arg_type::is_option())
         {
-            std::cout << ky_;
+            os << ky_;
         }
         else
         {
-            std::cout << "[" << ky_ << "]";
+            os << "[" << ky_ << "]";
         }
         
         if (value_arg_type::get_max_values() > 1)
         {
-            std::cout << "...";
+            os << "...";
         }
     }
     
@@ -223,19 +225,20 @@ public:
         std::size_t current_id_len = safety::addm(ky_.length(), 2);
         std::size_t total_id_len = safety::addm(short_kys_len, long_kys_len);
         std::size_t i;
+        auto& os = base_arg_type::get_arg_parser().get_ostream();
     
         for (i = args_indent; i > 0; i--)
         {
-            std::cout << ' ';
+            os.put(' ');
         }
     
-        std::cout << ky_ << "  ";
+        os << ky_ << "  ";
         
         if (current_id_len < total_id_len)
         {
             for (i = total_id_len - current_id_len; i > 0; i--)
             {
-                std::cout << ' ';
+                os.put(' ');
             }
         }
     

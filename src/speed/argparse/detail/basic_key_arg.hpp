@@ -73,7 +73,7 @@ public:
      * @param       kys : Argument keys.
      */
     template<typename... StringTs_>
-    explicit basic_key_arg(arg_parser_type* arg_parsr, StringTs_&&... kys)
+    explicit basic_key_arg(arg_parser_type& arg_parsr, StringTs_&&... kys)
             : base_arg_type(arg_parsr)
     {
         base_arg_type::set_flags(arg_flags::DEFAULT_KEY_ARG_FLAGS);
@@ -134,18 +134,7 @@ public:
      * @param       rhs : Object to move.
      * @return      The object who call the method.
      */
-    basic_key_arg& operator =(basic_key_arg&& rhs) noexcept
-    {
-        if (this != &rhs)
-        {
-            base_arg_type::operator =(std::move(rhs));
-            kys_ = std::move(rhs.kys_);
-            std::swap(short_kys_len_, rhs.short_kys_len_);
-            std::swap(long_kys_len_, rhs.long_kys_len_);
-        }
-    
-        return *this;
-    }
+    basic_key_arg& operator =(basic_key_arg&& rhs) noexcept = default;
 
     /**
      * @brief       Parse the arg key arg sub parser.
@@ -197,7 +186,7 @@ public:
      * @brief       Allows knowing if the argument has any key with a long prefix.
      * @return      If the function was successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] inline std::size_t has_long_prefix_keys() const noexcept
+    [[nodiscard]] std::size_t has_long_prefix_keys() const noexcept
     {
         return long_kys_len_ > 0;
     }
@@ -220,7 +209,7 @@ public:
      * @brief       Get the keys.
      * @return      The keys.
      */
-    [[nodiscard]] inline const vector_type<arg_key_type>& get_keys() const noexcept
+    [[nodiscard]] const vector_type<arg_key_type>& get_keys() const noexcept
     {
         return kys_;
     }
@@ -229,7 +218,7 @@ public:
      * @brief       Get the number of keys.
      * @return      The number of keys.
      */
-    [[nodiscard]] inline std::size_t get_keys_size() const noexcept
+    [[nodiscard]] std::size_t get_keys_size() const noexcept
     {
         return kys_.size();
     }
@@ -238,7 +227,7 @@ public:
      * @brief       Get the necessary length to print long arguments keys.
      * @return      The necessary length to print long arguments keys.
      */
-    [[nodiscard]] inline std::size_t get_long_keys_length() noexcept override
+    [[nodiscard]] std::size_t get_long_keys_length() noexcept override
     {
         if (base_arg_type::is_description_empty())
         {
@@ -266,7 +255,7 @@ public:
      * @brief       Get the necessary length to print short arguments keys.
      * @return      The necessary length to print short arguments keys.
      */
-    [[nodiscard]] inline std::size_t get_short_keys_length() noexcept override
+    [[nodiscard]] std::size_t get_short_keys_length() noexcept override
     {
         if (base_arg_type::is_description_empty())
         {
@@ -280,7 +269,7 @@ public:
      * @brief       Set a sub argument parser.
      * @param       sub_arg_parsr : Sub arguement parser.
      */
-    inline void set_sub_arg_parser(arg_parser_type* sub_arg_parsr) noexcept
+    void set_sub_arg_parser(arg_parser_type* sub_arg_parsr) noexcept
     {
         sub_arg_parsr_ = sub_arg_parsr;
     }
@@ -295,7 +284,7 @@ public:
             throw key_not_found_exception();
         }
         
-        std::cout << kys_.front().get_string();
+        base_arg_type::get_arg_parser().get_ostream() << kys_.front().get_string();
     }
 
     /**
@@ -330,17 +319,18 @@ public:
         std::size_t current_ky_len = 0;
         std::size_t n_args_printd = 0;
         std::size_t i;
+        auto& os = base_arg_type::get_arg_parser().get_ostream();
     
         for (i = args_indent; i > 0; --i)
         {
-            std::cout << ' ';
+            os.put(' ');
         }
 
         print_keys(n_args_printd, current_ky_len, true);
         
         if (n_args_printd < kys_.size() && n_args_printd > 0)
         {
-            std::cout << ", ";
+            os << ", ";
             safety::try_addm(current_ky_len, 2);
         }
         
@@ -348,7 +338,7 @@ public:
         {
             for (i = short_kys_len - current_ky_len; i > 0; --i)
             {
-                std::cout << ' ';
+                os.put(' ');
             }
         }
         
@@ -361,7 +351,7 @@ public:
         {
             for (i = long_kys_len - current_ky_len; i > 0; --i)
             {
-                std::cout << ' ';
+                os.put(' ');
             }
         }
     
@@ -384,18 +374,20 @@ public:
             bool just_print_short_kys
     )
     {
+        auto& os = base_arg_type::get_arg_parser().get_ostream();
+        
         for (auto& ky : kys_)
         {
             if (ky.is_prefix_long() ^ just_print_short_kys)
             {
                 if (nr_args_printd > 0)
                 {
-                    std::cout << ", " << ky.get_string();
+                    os << ", " << ky.get_string();
                     safety::try_addm(cur_ky_len, ky.get_string_length(), 2);
                 }
                 else
                 {
-                    std::cout << ky.get_string();
+                    os << ky.get_string();
                     safety::try_addm(cur_ky_len, ky.get_string_length());
                 }
     
