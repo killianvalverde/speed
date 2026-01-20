@@ -27,6 +27,7 @@
 #ifndef SPEED_TYPE_CASTING_ERROR_CATEGORY_HPP
 #define SPEED_TYPE_CASTING_ERROR_CATEGORY_HPP
 
+#include <cstdint>
 #include <system_error>
 
 namespace speed::type_casting {
