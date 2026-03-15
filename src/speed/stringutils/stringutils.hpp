@@ -28,6 +28,7 @@
 #define SPEED_STRINGUTILS_STRINGUTILS_HPP
 
 #include "operations.hpp"
+#include "tstring.hpp"
 
 namespace speed {
 
