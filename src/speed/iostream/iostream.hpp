@@ -30,6 +30,7 @@
 #include "basic_ios_redirect.hpp"
 #include "indentation.hpp"
 #include "operations.hpp"
+#include "tiostream.hpp"
 
 namespace speed {
 
