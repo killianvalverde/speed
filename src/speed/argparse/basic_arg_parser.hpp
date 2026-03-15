@@ -979,7 +979,7 @@ private:
      */
     void flush_output_stream()
     {
-        std::flush(*ostrm);
+        std::flush(*ostrm_);
     }
     
     /**
@@ -1355,7 +1355,7 @@ private:
      */
     void use_error_stream()
     {
-        ostrm = &speed::iostream::get_cerr<char_type>();
+        ostrm_ = &speed::iostream::get_cerr<char_type>();
     }
     
     /**
@@ -1363,7 +1363,7 @@ private:
      */
     void use_output_stream()
     {
-        ostrm = &speed::iostream::get_cout<char_type>();
+        ostrm_ = &speed::iostream::get_cout<char_type>();
     }
 
     /**
@@ -1818,7 +1818,7 @@ private:
     
     [[nodiscard]] ostream_type& get_ostream() noexcept
     {
-        return *ostrm;
+        return *ostrm_;
     }
     
     /**
@@ -2071,7 +2071,7 @@ private:
     /** Contains the current version argument. */
     version_arg_type* current_vers_arg_ = nullptr;
     
-    ostream_type* ostrm = &speed::iostream::get_cout<char_type>();
+    ostream_type* ostrm_ = &speed::iostream::get_cout<char_type>();
     
     /** Contains the maximum number of unrecognized args to be catched. */
     std::size_t max_unrecog_args_ = 1;
