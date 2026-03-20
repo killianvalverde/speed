@@ -40,28 +40,18 @@ protected:
     {
     }
 
-    const speed::system::filesystem::path_char_t* cur_dir_pth =
-            speed::filesystem::pick_path(".", L".");
+    const speed::system::filesystem::path_char_t* cur_dir_pth = SPEED_T(".");
     
-    const speed::system::filesystem::path_char_t* parent_dir_pth =
-            speed::filesystem::pick_path("..", L"..");
+    const speed::system::filesystem::path_char_t* parent_dir_pth = SPEED_T("..");
     
     const speed::system::filesystem::path_char_t* dir_nme =
-            speed::filesystem::pick_path(
-                    "6bd55a4e9d240fe0bcc137ad1eaeaf67517cfe4c",
-                    L"6bd55a4e9d240fe0bcc137ad1eaeaf67517cfe4c");
+            SPEED_T("6bd55a4e9d240fe0bcc137ad1eaeaf67517cfe4c");
     
     const speed::system::filesystem::path_char_t* regfile_nme =
-            speed::filesystem::pick_path(
-                    "f57475c9df7a624a05e842b5f852336015de44ba",
-                    L"f57475c9df7a624a05e842b5f852336015de44ba");
+            SPEED_T("f57475c9df7a624a05e842b5f852336015de44ba");
     
     const speed::system::filesystem::path_char_t* shortcut_nme =
-            speed::filesystem::pick_path(
-                    "f57475c9df7a624a05e842b5f852336015de44ba"
-                    SPEED_SHORTCUT_EXTENSION_CSTR,
-                    L"f57475c9df7a624a05e842b5f852336015de44ba"
-                    SPEED_SHORTCUT_EXTENSION_CSTR);
+            SPEED_T("f57475c9df7a624a05e842b5f852336015de44ba") SPEED_SHORTCUT_EXTENSION_CSTR;
 };
 
 TEST_F(system_filesystem, access)
