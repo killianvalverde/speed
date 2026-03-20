@@ -1199,32 +1199,6 @@ template<typename SourceStringT, typename PatternStringT>
 }
 
 /**
- * @brief       Selects the first string when its character type matches a specified type.
- * @param       str1 : The first string (returned if it matches the specified character type).
- * @param       str2 : The second string (ignored in this overload).
- * @return      A reference to `str1`.
- */
-template<typename TpChar, typename TpString1, typename TpString2>
-requires std::is_same_v<TpChar, type_traits::character_type_of_t<TpString1>>
-constexpr TpString1& pick_by_char(TpString1& str1, TpString2& str2)
-{
-    return str1;
-}
-
-/**
- * @brief       Selects the second string when the first string's character type
- *              does not match a specified type.
- * @param       str1 : The first string (ignored if character type doesn't match).
- * @param       str2 : The second string (returned if `str1` doesn't match).
- * @return      A reference to `str2`.
- */
-template<typename TpChar, typename TpString1, typename TpString2>
-constexpr TpString2& pick_by_char(TpString1& str1, TpString2& str2)
-{
-    return str2;
-}
-
-/**
  * @brief       Splits a string into substrings based on a set of separator characters.
  * @param       str : The string to be split.
  * @param       seps : The string containing one or more separator characters.

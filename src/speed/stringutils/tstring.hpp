@@ -29,12 +29,14 @@
 
 #include <string>
 
+#include "../type_traits/type_traits.hpp"
+
 namespace speed::stringutils {
 
 #ifdef _WIN32
-#define SPD_T(x) L##x
+#define SPEED_T(x) L##x
 #else
-#define SPD_T(x) x
+#define SPEED_T(x) x
 #endif
 
 /** Platform character type. */
@@ -54,6 +56,31 @@ using basic_tstring = std::basic_string<tchar_t, CharTraitsT, AllocatorT>;
 
 /** Equivalent to `basic_tstring` with `std::char_traits<tchar_t>` and `std::allocator<tchar_t>`. */
 using tstring = basic_tstring<std::char_traits<tchar_t>, std::allocator<tchar_t>>;
+
+/**
+ * @brief       Selects the string whose character type matches the specified CharT.
+ * @param       str1 : Reference to the first string.
+ * @param       str2 : Reference to the second string.
+ * @return      Reference to the string whose character type matches CharT.
+ */
+template<typename CharT, typename StringT1, typename StringT2>
+requires (
+        std::is_same_v<CharT, type_traits::character_type_of_t<StringT1>> ||
+        std::is_same_v<CharT, type_traits::character_type_of_t<StringT2>>
+)
+constexpr auto& select_string(StringT1& str1, StringT2& str2)
+{
+    using char_type_1 = type_traits::character_type_of_t<StringT1>;
+
+    if constexpr (std::is_same_v<CharT, char_type_1>)
+    {
+        return str1;
+    }
+    else
+    {
+        return str2;
+    }
+}
 
 }
 
