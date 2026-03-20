@@ -44,18 +44,6 @@ inline std::filesystem::path get_normalized_path(const std::filesystem::path& pt
     return {std::move(path_str)};
 }
 
-/**
- * @brief       Selects the appropriate path string based on the filesystem's character type.
- * @param       lhs : First string candidate.
- * @param       rhs : Second string candidate.
- * @return      Reference to the selected string.
- */
-template<typename StringT1, typename StringT2>
-constexpr auto& pick_path(const StringT1& lhs, const StringT2& rhs)
-{
-    return stringutils::pick_by_char<system::filesystem::path_char_t>(lhs, rhs);
-}
-
 }
 
 #endif
