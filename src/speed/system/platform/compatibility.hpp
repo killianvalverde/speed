@@ -37,6 +37,7 @@
 #include <linux/version.h>
 #endif
 #define SPEED_GLIBC 1
+#define SPEED_TMAIN main
 #define SPEED_EXIT_CODE_USAGE_ERROR 2
 #define SPEED_PATH_SEPARATOR_CHAR '/'
 #define SPEED_PATH_SEPARATOR_WCHAR L'/'
@@ -64,6 +65,7 @@
        " version 16.5 with /Zc:preprocessor compiler switch"
 #endif
 #define SPEED_WINAPI 1
+#define SPEED_TMAIN wmain
 #define SPEED_EXIT_CODE_USAGE_ERROR 1
 #define SPEED_PATH_SEPARATOR_CHAR '\\'
 #define SPEED_PATH_SEPARATOR_WCHAR L'\\'
