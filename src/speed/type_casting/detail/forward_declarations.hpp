@@ -27,6 +27,7 @@
 #ifndef SPEED_TYPE_CASTING_DETAIL_FORWARD_DECLARATIONS_HPP
 #define SPEED_TYPE_CASTING_DETAIL_FORWARD_DECLARATIONS_HPP
 
+#include <cstdint>
 #include <system_error>
 
 namespace speed::type_casting {
@@ -43,6 +44,9 @@ TargetT type_cast(const SourceT&);
 
 template<typename TargetT, typename SourceT, typename DefaultValueT>
 TargetT type_cast(const SourceT&, DefaultValueT&&) noexcept;
+
+template<typename SourceT>
+std::string to_utf8(const SourceT& arg);
 
 }
 

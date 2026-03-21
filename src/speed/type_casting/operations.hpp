@@ -18,34 +18,31 @@
  */
 
 /**
- * @file        type_casting.hpp
- * @brief       compatibility main header.
+ * @file        operations.hpp
+ * @brief       operations main header.
  * @author      Killian Valverde
- * @date        2016/08/05
+ * @date        2026/03/21
  */
 
-#ifndef SPEED_TYPE_CASTING_TYPE_CASTING_HPP
-#define SPEED_TYPE_CASTING_TYPE_CASTING_HPP
+#ifndef SPEED_TYPE_CASTING_OPERATIONS_HPP
+#define SPEED_TYPE_CASTING_OPERATIONS_HPP
 
-#include "error_category.hpp"
-#include "exception.hpp"
-#include "operations.hpp"
-#include "try_type_cast.hpp"
+#include <string>
+
 #include "type_cast.hpp"
 
-namespace speed {
+namespace speed::type_casting {
 
 /**
- * @brief       Contains utilities for type casting.
+ * @brief       Converts a value to a UTF-8 encoded string.
+ * @param       arg : The input value to be converted to UTF-8.
+ * @return      A std::string containing the UTF-8 encoded representation of the input.
  */
-namespace type_casting {}
-
-#ifndef SPEED_DISABLE_ALIAS
-/**
- * @brief       Contains utilities for type casting.
- */
-namespace cast = type_casting;
-#endif
+template<typename SourceT>
+std::string to_utf8(const SourceT& arg)
+{
+    return type_cast<std::string>(arg);
+}
 
 }
 
