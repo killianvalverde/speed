@@ -192,9 +192,9 @@ public:
     }
 
     /**
-     * @brief       Specifies whether the argument has been found in the program call.
-     * @param       fnd : The value that specifies whether the argument has been found in the
-     *              program call.
+     * @brief       Increases the occurrence count and handles nested container updates.
+     * @return      true if the occurrence was successfully increased, false otherwise
+     *              (as determined by the base implementation).
      */
     bool increase_occurrence() noexcept override
     {

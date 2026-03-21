@@ -290,8 +290,8 @@ public:
     [[nodiscard]] virtual std::size_t get_long_keys_length() noexcept = 0;
 
     /**
-     * @brief       Set whether the max occurrences have to auto-update.
-     * @param       auto_updat : Wheter the max occurrences have to auto-update.
+     * @brief Indicates whether the maximum occurrences value should be updated.
+     * @return true if the maximum occurrences should be updated, false otherwise.
      */
     [[nodiscard]] bool get_max_occurrences_update() const noexcept
     {

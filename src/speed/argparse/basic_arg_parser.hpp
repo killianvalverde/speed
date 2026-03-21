@@ -1815,7 +1815,11 @@ private:
 
         return (nr_options_bldr == 0 && nr_term_not_always_requird > 0) ? 1 : nr_options_bldr;
     }
-    
+
+    /**
+     * @brief       Returns the associated output stream.
+     * @return      A reference to the output stream.
+     */
     [[nodiscard]] ostream_type& get_ostream() noexcept
     {
         return *ostrm_;
@@ -2070,7 +2074,8 @@ private:
 
     /** Contains the current version argument. */
     version_arg_type* current_vers_arg_ = nullptr;
-    
+
+    /** Pointer to the output stream used by this object. */
     ostream_type* ostrm_ = &speed::iostream::get_cout<char_type>();
     
     /** Contains the maximum number of unrecognized args to be catched. */
