@@ -33,6 +33,7 @@
 
 namespace speed::stringutils {
 
+/** Platform-dependent string literal helper. */
 #ifdef _WIN32
 #define SPEED_T(x) L##x
 #else
