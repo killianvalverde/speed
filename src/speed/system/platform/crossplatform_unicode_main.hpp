@@ -32,44 +32,42 @@
 /** @cond */
 #ifdef SPEED_CROSSPLATFORM_UNICODE_MAIN
 #if defined(SPEED_WINAPI)
-#define main(c, v) \
-    __secondary(c, v); \
-    int wmain(int argc, wchar_t* wargv[]) \
-    { \
-        std::string str; \
-        char** argv = (char**)calloc(argc, sizeof(char*)); \
-        int res = -1; \
-        if (argv == nullptr) \
-        { \
-            return -1; \
-        } \
-        for (int i = 0; i < argc; ++i) \
-        { \
-            if (!speed::system::codecs::convert_wcstr_to_string(wargv[i], str)) \
-            { \
-                goto cleanup; \
-            } \
-            argv[i] = (char*)malloc((str.length() + 1) * sizeof(char)); \
-            if (argv[i] == nullptr) \
-            { \
-                goto cleanup; \
-            } \
-            strcpy_s(argv[i], str.length() + 1, str.c_str()); \
-        } \
-        ::SetConsoleOutputCP(CP_UTF8); \
-        res = __secondary(argc, argv); \
-cleanup: \
-        for (int i = 0; i < argc; ++i) \
-        { \
-            if (argv[i] != nullptr) \
-            { \
-                free(argv[i]); \
-            } \
-        } \
-        free(argv); \
-        return res; \
-    } \
-    int __secondary(c, v)
+
+#include <string>
+#include <vector>
+#include <windows.h>
+#include "../detail/winapi/codecs/operations.hpp"
+
+#define main crossplatform_unicode_main
+
+int extern crossplatform_unicode_main(int argc, char* argv[]);
+
+inline int wmain(int argc, wchar_t* wargv[])
+{
+    std::vector<std::string> storage;
+    std::vector<char*> argv_utf8;
+
+    storage.reserve(argc);
+    argv_utf8.reserve(argc);
+
+    for (int i = 0; i < argc; ++i)
+    {
+        std::string tmp;
+        speed::system::detail::winapi::codecs::convert_wcstr_to_string(wargv[i], tmp);
+        storage.push_back(std::move(tmp));
+    }
+
+    for (auto& s : storage)
+    {
+        argv_utf8.push_back(s.data());
+    }
+
+    ::SetConsoleCP(CP_UTF8);
+    ::SetConsoleOutputCP(CP_UTF8);
+
+    return crossplatform_unicode_main(argc, argv_utf8.data());
+}
+
 #endif
 #endif
 /** @endcond */
