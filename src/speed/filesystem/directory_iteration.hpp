@@ -141,13 +141,11 @@ public:
 
         /**
          * @brief       Close and exit the current directory.
-         * @return      If function was successful true is returned, otherwise false is returned.
          */
         void close_directory();
 
         /**
          * @brief       Exit the current directory.
-         * @return      If function was successful true is returned, otherwise false is returned.
          */
         void exit_directory();
 
@@ -158,19 +156,15 @@ public:
         [[nodiscard]] bool is_file_valid();
         
         /**
-         * @brief       Searches for the first occurrence of a substring in a string.
-         * @param       str : The null-terminated string to search in.
-         * @param       substr : The null-terminated substring to search for.
-         * @return      Pointer to the first occurrence of `substr` in `str` if found. `nullptr` if
-         *              `substr` is not found. If `substr` is an empty string, returns `str`.
+         * @brief       Checks whether the current file name contains the configured substring.
+         * @return      true if the substring is found in the current file name, false otherwise.
          */
         [[nodiscard]] bool find_substr() const;
 
         /**
-         * @brief       Compares a string to a pattern with wildcard characters '*' and '?'.
-         * @param       str : Pointer to the string to match.
-         * @param       pattrn : Pointer to the pattern containing wildcards.
-         * @return      `true` if `str` matches the `pattrn` with wildcards; otherwise, `false`.
+         * @brief       Checks whether the current file name matches the configured wildcard
+         *              pattern.
+         * @return      true if the file name matches the wildcard pattern, false otherwise.
          */
         [[nodiscard]] bool matches_wildcard() const;
 
@@ -407,9 +401,7 @@ public:
     
 private:
     /**
-     * @brief       Specify the regex that all the file names have to match.
-     * @param       regex_to_mtch : Regex string that all the file names have to match.
-     * @return      The object who call the method.
+     * @brief       Updates the compiled regular expression used for matching.
      */
     void update_regex();
 
