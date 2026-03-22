@@ -44,8 +44,8 @@ The following compilers are currently known to be compatible:
 
 | Compiler                                                   | Standard Library | Test Environment   |
 |:-----------------------------------------------------------| :--------------- | :----------------- |
-| [GCC](https://gcc.gnu.org/) >= 11.4.0                      | libstdc++        | Ubuntu 22.04       |
-| [MSVC](https://visualstudio.microsoft.com/) >= 19.44.35213 | Microsoft STL    | Visual Studio 2022 |
+| [GCC](https://gcc.gnu.org/) >= 13.3.0                      | libstdc++        | Ubuntu 24.04       |
+| [MSVC](https://visualstudio.microsoft.com/) >= 19.50.35720 | Microsoft STL    | Visual Studio 2026 |
 
 ## Requirements
 
@@ -53,18 +53,22 @@ To compile this software, you must have the following tools and libraries instal
 
 | Software                                | Type                   | Platform Dependency | GNU/Linux Installation Command |
 |:----------------------------------------|:-----------------------|:--------------------|:-------------------------------|
-| [CMake](https://www.cmake.org/) >= 3.22 | Build system generator | All                 | `sudo apt install cmake`       |
+| [CMake](https://www.cmake.org/) >= 3.28 | Build system generator | All                 | `sudo apt install cmake`       |
 
 ## Build
 
-Use the following commands to build the __CMake__ project:
+Follow these steps to build the project:
 
-1. Create a directory to hold the build output and generate the native build scripts:
+1. __Clone__ the repository and enter the project directory:
+
+       git clone --recursive https://github.com/killianvalverde/speed.git && cd speed
+
+2. Generate the build system using __CMake__:
 
        cmake -S . -B cmake-build-debug -DCMAKE_BUILD_TYPE=Debug
        cmake -S . -B cmake-build-release -DCMAKE_BUILD_TYPE=Release
 
-2. Compile the project directly from __CMake__ using the native build scripts:
+3. __Compile__ the project:
 
        cmake --build cmake-build-debug --config Debug
        cmake --build cmake-build-release --config Release
