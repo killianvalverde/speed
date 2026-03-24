@@ -400,7 +400,7 @@ public:
      */
     directory_iteration& resolve_entries_symlinks(bool enabl) noexcept
     {
-        resolve_directory_symlnks_ = enabl;
+        resolve_entries_symlnks_ = enabl;
         return *this;
     }
 
@@ -463,16 +463,16 @@ private:
     /** List of file types that are allowed to be iterated. */
     system::filesystem::file_types file_typs_ = system::filesystem::file_types::NIL;
     
-    /** Specify wheter or not the regex will be case sensitive. */
+    /** Specify whether the regex will be case-sensitive. */
     bool case_insensitve_ = true;
     
-    /** Specify wheter or not the inodes will be tracked. */
+    /** Specify whether the inodes will be tracked. */
     bool inode_trackr_ = false;
 
-    /** Specify wheter or not follow symbolic links during the iteration. */
+    /** Specify whether follow symbolic links during the iteration. */
     bool resolve_directory_symlnks_ = false;
 
-    /** Specify wheter or not resolve directory symbolic links during the iteration. */
+    /** Specify whether resolve directory symbolic links during the iteration. */
     bool resolve_entries_symlnks_ = false;
 
     friend class const_iterator;
