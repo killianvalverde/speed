@@ -100,15 +100,6 @@ public:
         bool operator ==(const self_type& rhs) const noexcept;
 
         /**
-         * @brief       Allows knowing whether the iterator is past-the-end or not.
-         * @return      If function was successful true is returned, otherwise false is returned.
-         */
-        [[nodiscard]] bool end() const noexcept
-        {
-            return end_;
-        }
-
-        /**
          * @brief       Get the reference of the current node value.
          * @return      The reference of the current node value.
          */
@@ -124,6 +115,48 @@ public:
         const value_type* operator ->() const noexcept
         {
             return &cur_fle_;
+        }
+
+        /**
+         * @brief       Allows knowing whether the iterator is past-the-end or not.
+         * @return      If function was successful true is returned, otherwise false is returned.
+         */
+        [[nodiscard]] bool end() const noexcept
+        {
+            return end_;
+        }
+
+        /**
+         * @brief       Checks whether the current entity is a directory.
+         * @return      true if the entity is a directory, false otherwise.
+         */
+        [[nodiscard]] bool is_directory() const noexcept
+        {
+            return system::filesystem::is_file_type(directory_entity_stck_.top(),
+                    composit_->resolve_entries_symlnks_,
+                    system::filesystem::file_types::DIRECTORY);
+        }
+
+        /**
+         * @brief       Checks whether the current entity is a regular file.
+         * @return      true if the entity is a regular file, false otherwise.
+         */
+        [[nodiscard]] bool is_regular_file() const noexcept
+        {
+            return system::filesystem::is_file_type(directory_entity_stck_.top(),
+                    composit_->resolve_entries_symlnks_,
+                    system::filesystem::file_types::REGULAR_FILE);
+        }
+
+        /**
+         * @brief       Checks whether the current entity is a symbolic link.
+         * @return      true if the entity is a symbolic link, false otherwise.
+         */
+        [[nodiscard]] bool is_symlink_file() const noexcept
+        {
+            return system::filesystem::is_file_type(directory_entity_stck_.top(),
+                    composit_->resolve_entries_symlnks_,
+                    system::filesystem::file_types::SYMLINK);
         }
 
     private:
