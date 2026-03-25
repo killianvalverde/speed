@@ -31,11 +31,8 @@
 #include <regex>
 #include <set>
 #include <stack>
-#include <vector>
 
 #include "detail/forward_declarations.hpp"
-#include "../containers/containers.hpp"
-#include "../stringutils/stringutils.hpp"
 #include "../system/system.hpp"
 #include "../type_casting/type_casting.hpp"
 #include "operations.hpp"
@@ -54,12 +51,10 @@ public:
     /** String type used in the class. */
     using string_type = std::filesystem::path::string_type;
 
-    /** Directory entity type. */
-    using directory_entity_type = system::filesystem::directory_entity;
-
     /** Regex type used in the class. */
     using regex_type = std::basic_regex<char_type, std::regex_traits<char_type>>;
 
+private:
     /** Set type used in the class. */
     template<typename T>
     using set_type = std::set<T, std::less<T>, std::allocator<T>>;
@@ -67,6 +62,159 @@ public:
     /** Stack type used in the class. */
     template<typename T>
     using stack_type = std::stack<T>;
+
+    /** Directory entity type. */
+    using system_directory_entity_type = system::filesystem::directory_entity;
+
+public:
+    class const_iterator;
+
+    /**
+     * @brief       Represents a single entry in a directory traversal.
+     */
+    class directory_entity
+    {
+    private:
+        /** Directory entity type. */
+        using system_directory_entity_type = system::filesystem::directory_entity;
+
+        /** Stack type used in the class. */
+        template<typename T>
+        using stack_type = std::stack<T>;
+
+    public:
+        /**
+         * @brief       Checks whether the current entity is a directory.
+         * @return      true if the entity is a directory, false otherwise.
+         */
+        [[nodiscard]] bool is_directory() const noexcept
+        {
+            if (composit_ == nullptr)
+            {
+                return false;
+            }
+
+            return system::filesystem::is_file_type(directory_entity_stck_.top(),
+                    composit_->resolve_entries_symlnks_,
+                    system::filesystem::file_types::DIRECTORY);
+        }
+
+        /**
+         * @brief       Checks whether the current entity is a regular file.
+         * @return      true if the entity is a regular file, false otherwise.
+         */
+        [[nodiscard]] bool is_regular_file() const noexcept
+        {
+            if (composit_ == nullptr)
+            {
+                return false;
+            }
+
+            return system::filesystem::is_file_type(directory_entity_stck_.top(),
+                    composit_->resolve_entries_symlnks_,
+                    system::filesystem::file_types::REGULAR_FILE);
+        }
+
+        /**
+         * @brief       Checks whether the current entity is a symbolic link.
+         * @return      true if the entity is a symbolic link, false otherwise.
+         */
+        [[nodiscard]] bool is_symlink_file() const noexcept
+        {
+            if (composit_ == nullptr)
+            {
+                return false;
+            }
+
+            return system::filesystem::is_file_type(directory_entity_stck_.top(),
+                    composit_->resolve_entries_symlnks_,
+                    system::filesystem::file_types::SYMLINK);
+        }
+
+        /**
+         * @brief       Gets the filesystem path of the directory entry.
+         * @return      const std::filesystem::path& The current entry path.
+         */
+        [[nodiscard]] const std::filesystem::path& get_path() const noexcept
+        {
+            return cur_fle_;
+        }
+
+        /**
+         * @brief Retrieves the filename component of the current path.
+         * @return std::filesystem::path The filename part of the current path.
+         */
+        [[nodiscard]] std::filesystem::path get_filename() const
+        {
+            return cur_fle_.filename();
+        }
+
+        /**
+         * @brief Retrieves the parent directory of the current path.
+         * @return std::filesystem::path The parent path of the current path.
+         */
+        [[nodiscard]] std::filesystem::path get_parent_path() const
+        {
+            return cur_fle_.parent_path();
+        }
+
+        /**
+         * @brief       Gets the UTF-8 encoded string representation of the path.
+         * @return      std::string UTF-8 encoded representation of the path.
+         */
+        [[nodiscard]] std::string get_utf8_path() const
+        {
+            return type_casting::to_utf8(cur_fle_);
+        }
+
+        /**
+         * @brief Retrieves the filename component of the current path as a UTF-8 string.
+         * @return std::string The UTF-8 encoded filename.
+         */
+        [[nodiscard]] std::string get_utf8_filename() const
+        {
+            return type_casting::to_utf8(cur_fle_.filename());
+        }
+
+        /**
+         * @brief Retrieves the parent directory of the current path as a UTF-8 string.
+         * @return std::string The UTF-8 encoded parent path.
+         */
+        [[nodiscard]] std::string get_utf8_parent_path() const
+        {
+            return type_casting::to_utf8(cur_fle_.parent_path());
+        }
+
+    private:
+        /**
+         * @brief       Constructs a directory_entry object.
+         * @param       cur_fle_ : The current filesystem path of the directory entry.
+         * @param       directory_entity_stck : Stack containing directory entity type information.
+         * @param       composit : Pointer to a directory iteration context.
+         */
+        explicit directory_entity(
+                const std::filesystem::path& cur_fle_,
+                const stack_type<system_directory_entity_type>& directory_entity_stck,
+                const directory_iteration* composit
+        )
+                : cur_fle_(cur_fle_)
+                , directory_entity_stck_(directory_entity_stck)
+                , composit_(composit)
+        {
+        }
+
+    private:
+        /** Reference to the iterator current file path. */
+        const std::filesystem::path& cur_fle_;
+
+        /** Reference to the iterator directory entity stack. */
+        const stack_type<system_directory_entity_type>& directory_entity_stck_;
+
+        /** Pointer to the composite object. */
+        const directory_iteration* composit_;
+
+        friend class const_iterator;
+    };
 
     /**
      * @brief       Class that represents const iterators.
@@ -78,7 +226,7 @@ public:
         using self_type = const_iterator;
 
         /** The value encapsulated by the iterator. */
-        using value_type = std::filesystem::path;
+        using value_type = directory_entity;
 
         /** Constructor with parameters. */
         explicit const_iterator(const directory_iteration* composit);
@@ -105,7 +253,7 @@ public:
          */
         const value_type& operator *() const noexcept
         {
-            return cur_fle_;
+            return directory_ent_;
         }
 
         /**
@@ -114,7 +262,7 @@ public:
          */
         const value_type* operator ->() const noexcept
         {
-            return &cur_fle_;
+            return &directory_ent_;
         }
 
         /**
@@ -124,39 +272,6 @@ public:
         [[nodiscard]] bool end() const noexcept
         {
             return end_;
-        }
-
-        /**
-         * @brief       Checks whether the current entity is a directory.
-         * @return      true if the entity is a directory, false otherwise.
-         */
-        [[nodiscard]] bool is_directory() const noexcept
-        {
-            return system::filesystem::is_file_type(directory_entity_stck_.top(),
-                    composit_->resolve_entries_symlnks_,
-                    system::filesystem::file_types::DIRECTORY);
-        }
-
-        /**
-         * @brief       Checks whether the current entity is a regular file.
-         * @return      true if the entity is a regular file, false otherwise.
-         */
-        [[nodiscard]] bool is_regular_file() const noexcept
-        {
-            return system::filesystem::is_file_type(directory_entity_stck_.top(),
-                    composit_->resolve_entries_symlnks_,
-                    system::filesystem::file_types::REGULAR_FILE);
-        }
-
-        /**
-         * @brief       Checks whether the current entity is a symbolic link.
-         * @return      true if the entity is a symbolic link, false otherwise.
-         */
-        [[nodiscard]] bool is_symlink_file() const noexcept
-        {
-            return system::filesystem::is_file_type(directory_entity_stck_.top(),
-                    composit_->resolve_entries_symlnks_,
-                    system::filesystem::file_types::SYMLINK);
         }
 
     private:
@@ -209,7 +324,7 @@ public:
         std::filesystem::path cur_fle_;
 
         /** Stack of directories entities used to explore recursivelly the filesystem. */
-        stack_type<directory_entity_type> directory_entity_stck_;
+        stack_type<system_directory_entity_type> directory_entity_stck_;
 
         /** Set of visited inodes to avoid infinite recursions in case of fs corruptions. */
         set_type<system::filesystem::inode_t> vistd_inos_;
@@ -220,8 +335,11 @@ public:
         /** Current level of recursivity. */
         std::uint64_t current_recursivity_levl_ = 0;
 
-        /** Represents whether or not the iteration is finished. */
+        /** Represents whether the iteration is finished. */
         bool end_ = false;
+
+        /** Returned value by the iterator. */
+        value_type directory_ent_;
     };
 
     /**
@@ -475,6 +593,7 @@ private:
     /** Specify whether resolve directory symbolic links during the iteration. */
     bool resolve_entries_symlnks_ = false;
 
+    friend class directory_entity;
     friend class const_iterator;
 };
 

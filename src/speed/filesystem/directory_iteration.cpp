@@ -29,7 +29,8 @@
 namespace speed::filesystem {
 
 directory_iteration::const_iterator::const_iterator(const directory_iteration* composit)
-       : composit_(composit)
+        : composit_(composit)
+        , directory_ent_(cur_fle_, directory_entity_stck_, composit)
 {
     if (composit == nullptr)
     {
@@ -60,7 +61,7 @@ directory_iteration::const_iterator::~const_iterator() noexcept
 directory_iteration::const_iterator::self_type& directory_iteration::const_iterator::operator ++()
 {
 start:
-    directory_entity_type& cur_dir_ent = directory_entity_stck_.top();
+    system_directory_entity_type& cur_dir_ent = directory_entity_stck_.top();
 
     if (!read_directory())
     {
@@ -147,7 +148,7 @@ bool directory_iteration::const_iterator::open_directory()
 bool directory_iteration::const_iterator::read_directory()
 {
     bool succss;
-    directory_entity_type& cur_dir_ent = directory_entity_stck_.top();
+    system_directory_entity_type& cur_dir_ent = directory_entity_stck_.top();
 
     do
     {
