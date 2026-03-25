@@ -41,16 +41,16 @@ TEST(filesystem_directory_iteration, elementary)
 
     for (auto dir_it = dir_iteration.begin(); dir_it != dir_iteration.end(); ++dir_it)
     {
-        EXPECT_NO_THROW(str = dir_it->string());
+        EXPECT_NO_THROW(str = dir_it->get_path().string());
     }
 
     for (auto dir_it = dir_iteration.cbegin(); dir_it != dir_iteration.cend(); ++dir_it)
     {
-        EXPECT_NO_THROW(str = dir_it->string());
+        EXPECT_NO_THROW(str = dir_it->get_path().string());
     }
 
     for (auto& x : dir_iteration)
     {
-        EXPECT_NO_THROW(str = x.string());
+        EXPECT_NO_THROW(str = x.get_path().string());
     }
 }
