@@ -30,6 +30,7 @@
 #include <cctype>
 #include <cmath>
 #include <limits>
+#include <regex>
 #include <system_error>
 #include <type_traits>
 
