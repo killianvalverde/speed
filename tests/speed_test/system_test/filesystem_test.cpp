@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -107,7 +107,7 @@ TEST_F(system_filesystem, get_file_gid)
 
 TEST_F(system_filesystem, get_modification_time)
 {
-    speed::system::time::system_time system_tme;
+    speed::system::time::calendar_time system_tme;
     ASSERT_TRUE(speed::system::filesystem::get_modification_time(cur_dir_pth, false, system_tme));
 }
 

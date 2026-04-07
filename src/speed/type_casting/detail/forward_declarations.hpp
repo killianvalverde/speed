@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -18,23 +18,42 @@
  */
 
 /**
- * @file        forward_declarations.hpp
- * @brief       forward_declarations header.
- * @author      Killian Valverde
- * @date        2024/10/15
+ * @file forward_declarations.hpp
+ * @brief Internal forward declarations for the type_casting module.
+ * @author Killian Valverde
+ * @date 2024-10-15
  */
 
-#ifndef SPEED_TYPE_CASTING_DETAIL_FORWARD_DECLARATIONS_HPP
-#define SPEED_TYPE_CASTING_DETAIL_FORWARD_DECLARATIONS_HPP
+#pragma once
 
-#include <cstdint>
 #include <system_error>
 
 namespace speed::type_casting {
 
-enum class errc : std::uint8_t;
+namespace detail {
 
-class error_category;
+template<typename CharT, typename CharTraitsT, typename AllocatorT>
+bool try_type_cast(
+        const CharT* arg,
+        std::basic_string<CharT, CharTraitsT, AllocatorT>& res,
+        std::error_code* err_code
+) noexcept;
+
+template<typename CharTraitsT, typename AllocatorT>
+bool try_type_cast(
+        const char* arg,
+        std::basic_string<wchar_t, CharTraitsT, AllocatorT>& res,
+        std::error_code* err_code
+) noexcept;
+
+template<typename CharTraitsT, typename AllocatorT>
+bool try_type_cast(
+        const wchar_t* arg,
+        std::basic_string<char, CharTraitsT, AllocatorT>& res,
+        std::error_code* err_code
+) noexcept;
+
+}
 
 template<typename TargetT, typename SourceT>
 bool try_type_cast(const SourceT&, TargetT&, std::error_code* = nullptr) noexcept;
@@ -42,12 +61,12 @@ bool try_type_cast(const SourceT&, TargetT&, std::error_code* = nullptr) noexcep
 template<typename TargetT, typename SourceT>
 TargetT type_cast(const SourceT&);
 
-template<typename TargetT, typename SourceT, typename DefaultValueT>
-TargetT type_cast(const SourceT&, DefaultValueT&&) noexcept;
+template<typename TargetT, typename SourceT, typename InvocableT>
+requires std::invocable<InvocableT> &&
+        std::convertible_to<std::invoke_result_t<InvocableT>, TargetT>
+TargetT type_cast_or(const SourceT& arg, InvocableT&& callabl);
 
 template<typename SourceT>
 std::string to_utf8(const SourceT& arg);
 
 }
-
-#endif

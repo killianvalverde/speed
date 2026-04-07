@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -18,16 +18,14 @@
  */
 
 /**
- * @file        operations.hpp
- * @brief       operations functions header.
- * @author      Killian Valverde
- * @date        2016/08/05
+ * @file operations.hpp
+ * @brief Core operations for the type_traits module.
+ * @author Killian Valverde
+ * @date 2016-08-05
  */
 
-#ifndef SPEED_TYPE_TRAITS_OPERATIONS_HPP
-#define SPEED_TYPE_TRAITS_OPERATIONS_HPP
+#pragma once
 
-#include <string>
 #include <string_view>
 #include <type_traits>
 
@@ -37,172 +35,190 @@
 namespace speed::type_traits {
 
 /**
- * @brief       Type trait to deduce the allocator type used by a given type.
+ * @brief Extracts the allocator type associated with a given type.
+ *
+ * @tparam T The type from which to extract the allocator.
  */
 template<typename T>
 struct allocator_of
 {
-    /** The allocator type associated with `T`. */
-    using type = typename detail::allocator_of_helper<std::decay_t<T>>::type;
+    using type = detail::allocator_of_helper<std::decay_t<T>>::type;
 };
 
 /**
- * @brief       Helper alias to extract the allocator type of a given type.
+ * @brief Alias for allocator_of<T>::type.
+ *
+ * @tparam T The type from which to extract the allocator.
  */
 template<typename T>
-using allocator_of_t = typename allocator_of<T>::type;
+using allocator_of_t = allocator_of<T>::type;
 
 /**
- * @brief       Alias that simplifies to inherit from the base class in the context of a CRTP
- *              pattern.
+ * @brief Selects the appropriate CRTP base type depending on a sentinel.
+ *
+ * If ActualT equals SentinelT, the base is instantiated with DerivedT,
+ * otherwise with ActualT directly.
+ *
+ * @tparam BaseT Base template.
+ * @tparam DerivedT Derived template used in CRTP.
+ * @tparam ActualT Actual type provided.
+ * @tparam SentinelT Sentinel type used for comparison.
+ * @tparam ParameterTs Additional template parameters.
  */
 template<
         template<typename...> class BaseT,
         template<typename...> class DerivedT,
         typename ActualT,
-        typename ConditionT,
+        typename SentinelT,
         typename... ParameterTs
 >
-using basic_crtp_base = typename std::conditional<
-        std::is_same_v<ActualT, ConditionT>,
+using basic_crtp_base_t = std::conditional_t<
+        std::is_same_v<ActualT, SentinelT>,
         BaseT<ParameterTs..., DerivedT<ParameterTs..., ActualT>>,
         BaseT<ParameterTs..., ActualT>
->::type;
+>;
 
 /**
- * @brief       Alias that simplifies getting access to the self type in a CRTP context.
+ * @brief Selects the appropriate self type for CRTP patterns.
+ *
+ * If ActualT equals SentinelT, resolves to SelfT instantiated with parameters,
+ * otherwise resolves to ActualT.
+ *
+ * @tparam SelfT Template representing the CRTP self type.
+ * @tparam ActualT Actual type provided.
+ * @tparam SentinelT Sentinel type used for comparison.
+ * @tparam ParameterTs Additional template parameters.
  */
 template<
         template<typename...> class SelfT,
         typename ActualT,
-        typename ConditionT,
+        typename SentinelT,
         typename... ParameterTs
 >
-using basic_crtp_self = typename std::conditional<
-        std::is_same_v<ActualT, ConditionT>,
+using basic_crtp_self_t = std::conditional_t<
+        std::is_same_v<ActualT, SentinelT>,
         SelfT<ParameterTs...>,
         ActualT
->::type;
+>;
 
 /**
- * @brief       Trait class that try to obtains the character traits of any kind of String.
+ * @brief Extracts the character traits type associated with a given type.
+ *
+ * @tparam T The type from which to extract character traits.
  */
 template<typename T>
 struct character_traits_of
 {
-    /** The character traits type associated with `T`. */
-    using type = typename detail::character_traits_of_helper<std::decay_t<T>>::type;
+    using type = detail::character_traits_of_helper<std::decay_t<T>>::type;
 };
 
 /**
- * @brief       Trait class that try to obtains the character traits of any kind of String.
+ * @brief Alias for character_traits_of<T>::type.
+ *
+ * @tparam T The type from which to extract character traits.
  */
 template<typename T>
-using character_traits_of_t = typename character_traits_of<T>::type;
+using character_traits_of_t = character_traits_of<T>::type;
 
 /**
- * @brief       Trait class that try to obtains the character type of any kind of String.
+ * @brief Extracts the character type associated with a given type.
+ *
+ * @tparam T The type from which to extract the character type.
  */
 template<typename T>
 struct character_type_of
 {
-    /** The character type associated with `T`. */
-    using type = typename detail::character_type_of_helper<std::decay_t<T>>::type;
+    using type = detail::character_type_of_helper<std::decay_t<T>>::type;
 };
 
 /**
- * @brief       Trait class that try to obtains the character type of any kind of String.
+ * @brief Alias for character_type_of<T>::type.
+ *
+ * @tparam T The type from which to extract the character type.
  */
 template<typename T>
-using character_type_of_t = typename character_type_of<T>::type;
+using character_type_of_t = character_type_of<T>::type;
 
 /**
- * @brief       Trait class that identifies whether T is a character type.
+ * @brief Checks whether a type is a character type.
+ *
+ * @tparam T The type to check.
  */
 template<typename T>
-struct is_character
-        : public detail::is_character_helper<
-                typename std::remove_cv_t<T>
-          >::type
-{
-};
+struct is_character : std::disjunction<
+        std::is_same<std::remove_cv_t<T>, char>,
+        std::is_same<std::remove_cv_t<T>, unsigned char>,
+        std::is_same<std::remove_cv_t<T>, signed char>,
+        std::is_same<std::remove_cv_t<T>, wchar_t>,
+        std::is_same<std::remove_cv_t<T>, char8_t>,
+        std::is_same<std::remove_cv_t<T>, char16_t>,
+        std::is_same<std::remove_cv_t<T>, char32_t>
+> {};
 
 /**
- * @brief       Trait class that identifies whether T is a character type.
+ * @brief Convenience variable template for is_character.
  */
 template<typename T>
-inline constexpr bool is_character_v = is_character<T>::value;
+constexpr bool is_character_v = is_character<T>::value;
 
 /**
- * @brief       Trait class that identifies whether T is a character pointer type.
+ * @brief Checks whether a type is a pointer to a character type.
+ *
+ * @tparam T The type to check.
  */
 template<typename T>
-struct is_character_pointer
-        : public detail::logical_and<
-                std::is_pointer<T>,
-                is_character<typename std::remove_pointer<T>::type>
-          >::type
-{
-};
+struct is_character_pointer : std::conjunction<
+        std::is_pointer<T>,
+        is_character<std::remove_pointer_t<T>>
+> {};
 
 /**
- * @brief       Trait class that identifies whether T is a character pointer type.
+ * @brief Convenience variable template for is_character_pointer.
  */
 template<typename T>
-inline constexpr bool is_character_pointer_v = is_character_pointer<T>::value;
+constexpr bool is_character_pointer_v = is_character_pointer<T>::value;
 
 /**
- * @brief       Trait class that identifies whether T is a character that can be used in standard io
- *              operations.
- */
-template<typename T>
-struct is_stdio_character
-        : public detail::logical_or<
-                std::is_same<std::remove_cv_t<T>, char>,
-                std::is_same<std::remove_cv_t<T>, wchar_t>
-          >::type
-{
-};
-
-/**
- * @brief       Trait class that identifies whether T is a character that can be used in standard io
- *              operations.
- */
-template<typename T>
-inline constexpr bool is_stdio_character_v = is_stdio_character<T>::value;
-
-/**
- * @brief       Trait class that try to obtains the string_view that will suit the given type.
+ * @brief Produces a std::basic_string_view type associated with a given type.
+ *
+ * The character type and traits are deduced using corresponding traits.
+ *
+ * @tparam T The source type.
  */
 template<typename T>
 struct string_view_of
 {
-    /** The string view type associated with `T`. */
     using type = std::basic_string_view<character_type_of_t<T>, character_traits_of_t<T>>;
 };
 
 /**
- * @brief       Trait class that try to obtains the string_view that will suit the given type.
+ * @brief Alias for string_view_of<T>::type.
+ *
+ * @tparam T The source type.
  */
 template<typename T>
-using string_view_of_t = typename string_view_of<T>::type;
+using string_view_of_t = string_view_of<T>::type;
 
 /**
- * @brief       Trait class that try to obtains the underlying type of enum type T.
+ * @brief Extracts the underlying type of a type.
+ *
+ * If T is an enum, resolves to its underlying type,
+ * otherwise resolves to T itself.
+ *
+ * @tparam T The type to inspect.
  */
 template<typename T>
 struct underlying_type_of
 {
-    /** The underlying type associated with `T`. */
-    using type = typename detail::underlying_type_of_helper<T, std::is_enum_v<T>>::type;
+    using type = detail::underlying_type_of_helper<T, std::is_enum_v<T>>::type;
 };
 
 /**
- * @brief       Trait class that try to obtains the underlying type of enum type T.
+ * @brief Alias for underlying_type_of<T>::type.
+ *
+ * @tparam T The type to inspect.
  */
-template<typename EnumT>
-using underlying_type_of_t = typename underlying_type_of<EnumT>::type;
+template<typename T>
+using underlying_type_of_t = underlying_type_of<T>::type;
 
 }
-
-#endif

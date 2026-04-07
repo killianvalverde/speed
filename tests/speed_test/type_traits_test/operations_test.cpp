@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -18,10 +18,10 @@
  */
 
 /**
- * @file        operations_test.cpp
- * @brief       operations unit test.
- * @author      Killian Valverde
- * @date        2018/06/08
+ * @file operations_test.cpp
+ * @brief Unit tests for type traits operations.
+ * @author Killian Valverde
+ * @date 2018-06-08
  */
 
 #include <filesystem>
@@ -29,7 +29,77 @@
 
 #include "speed/type_traits/type_traits.hpp"
 
-TEST(type_traits_operations, character_type_of)
+template<typename...>
+struct base {};
+
+template<typename...>
+struct derived {};
+
+TEST(type_traits_allocator_of, resolves_allocator_type_correctly)
+{
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::allocator_of_t<
+            std::string>, std::string::allocator_type>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::allocator_of_t<
+            char*>, std::allocator<char>>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::allocator_of_t<
+            char[]>, std::allocator<char>>));
+}
+
+TEST(type_traits_basic_crtp_base, constructs_crtp_base_type_correctly)
+{
+    using result1 = speed::type_traits::basic_crtp_base_t<
+        base,       // BaseT
+        derived,    // DerivedT
+        int,        // ActualT
+        int,        // SentinelT
+        float       // ParameterTs
+    >;
+    using result2 = speed::type_traits::basic_crtp_base_t<
+        base,       // BaseT
+        derived,    // DerivedT
+        int,        // ActualT
+        bool        // SentinelT
+    >;
+
+    using expected1 = base<float, derived<float, int>>;
+    using expected2 = base<int>;
+
+    EXPECT_TRUE((std::is_same_v<result1, expected1>));
+    EXPECT_TRUE((std::is_same_v<result2, expected2>));
+}
+
+TEST(type_traits_basic_crtp_self, constructs_crtp_self_type_correctly)
+{
+    using result1 = speed::type_traits::basic_crtp_self_t<
+        derived,    // SelfT
+        int,        // ActualT
+        int,        // SentinelT
+        float       // ParameterTs
+    >;
+    using result2 = speed::type_traits::basic_crtp_self_t<
+        derived,    // SelfT
+        int,        // ActualT
+        bool        // SentinelT
+    >;
+
+    using expected1 = derived<float>;
+    using expected2 = int;
+
+    EXPECT_TRUE((std::is_same_v<result1, expected1>));
+    EXPECT_TRUE((std::is_same_v<result2, expected2>));
+}
+
+TEST(type_traits_character_traits_of, resolves_character_traits_type_correctly)
+{
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::character_traits_of_t<
+            std::string>, std::string::traits_type>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::character_traits_of_t<
+            char*>, std::char_traits<char>>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::character_traits_of_t<
+            char[]>, std::char_traits<char>>));
+}
+
+TEST(type_traits_character_type_of, extracts_character_type_correctly)
 {
     EXPECT_TRUE((std::is_same_v<speed::type_traits::character_type_of_t<
             std::string>, char>));
@@ -45,39 +115,36 @@ TEST(type_traits_operations, character_type_of)
             wchar_t*>, wchar_t>));
     EXPECT_TRUE((std::is_same_v<speed::type_traits::character_type_of_t<
             char[5]>, char>));
-    EXPECT_TRUE((std::is_same_v<speed::type_traits::character_type_of_t
-            <const wchar_t[42]>, wchar_t>));
+    EXPECT_TRUE((std::is_same_v<speed::type_traits::character_type_of_t<
+            const wchar_t[42]>, wchar_t>));
+
+    EXPECT_FALSE((std::is_same_v<speed::type_traits::character_type_of_t<
+            std::string>, int>));
 }
 
-TEST(type_traits_operations, is_character)
+TEST(type_traits_is_character, identifies_character_types_correctly)
 {
-    EXPECT_TRUE(speed::type_traits::is_character<char>::value);
-    EXPECT_TRUE(speed::type_traits::is_character<wchar_t>::value);
-    EXPECT_TRUE(speed::type_traits::is_character<char16_t>::value);
-    EXPECT_TRUE(speed::type_traits::is_character<char32_t>::value);
-    EXPECT_TRUE(!speed::type_traits::is_character<int>::value);
+    EXPECT_TRUE(speed::type_traits::is_character_v<char>);
+    EXPECT_TRUE(speed::type_traits::is_character_v<wchar_t>);
+    EXPECT_TRUE(speed::type_traits::is_character_v<char16_t>);
+    EXPECT_TRUE(speed::type_traits::is_character_v<char32_t>);
+
+    EXPECT_FALSE(speed::type_traits::is_character_v<int>);
 }
 
-TEST(type_traits_operations, is_character_pointer)
+TEST(type_traits_is_character_pointer, identifies_character_pointers_correctly)
 {
-    EXPECT_TRUE(speed::type_traits::is_character_pointer<char*>::value);
-    EXPECT_TRUE(speed::type_traits::is_character_pointer<const wchar_t*>::value);
-    EXPECT_TRUE(speed::type_traits::is_character_pointer<volatile char16_t*>::value);
-    EXPECT_TRUE(speed::type_traits::is_character_pointer<char32_t*>::value);
-    EXPECT_TRUE(!speed::type_traits::is_character_pointer<char>::value);
-    EXPECT_TRUE(!speed::type_traits::is_character_pointer<char []>::value);
-    EXPECT_TRUE(!speed::type_traits::is_character_pointer<char*&>::value);
+    EXPECT_TRUE(speed::type_traits::is_character_pointer_v<char*>);
+    EXPECT_TRUE(speed::type_traits::is_character_pointer_v<const wchar_t*>);
+    EXPECT_TRUE(speed::type_traits::is_character_pointer_v<volatile char16_t*>);
+    EXPECT_TRUE(speed::type_traits::is_character_pointer_v<char32_t*>);
+
+    EXPECT_FALSE(speed::type_traits::is_character_pointer_v<char>);
+    EXPECT_FALSE(speed::type_traits::is_character_pointer_v<char[]>);
+    EXPECT_FALSE(speed::type_traits::is_character_pointer_v<char*&>);
 }
 
-TEST(type_traits_operations, is_stdio_character)
-{
-    EXPECT_TRUE(speed::type_traits::is_stdio_character<char>::value);
-    EXPECT_TRUE(speed::type_traits::is_stdio_character<wchar_t>::value);
-    EXPECT_TRUE(!speed::type_traits::is_stdio_character<char16_t>::value);
-    EXPECT_TRUE(!speed::type_traits::is_stdio_character<char32_t>::value);
-}
-
-TEST(type_traits_operations, string_view_of)
+TEST(type_traits_string_view_of, transforms_to_string_view_correctly)
 {
     EXPECT_TRUE((std::is_same_v<speed::type_traits::string_view_of_t<
             std::string>, std::string_view>));
@@ -103,14 +170,15 @@ TEST(type_traits_operations, string_view_of)
             <const wchar_t[42]>, std::wstring_view>));
 }
 
-TEST(type_traits_operations, try_underlying_type)
+TEST(type_traits_underlying_type_of, resolves_underlying_type_when_available)
 {
     enum class item : char
     {
         POTION = 'P'
     };
-    
+
     EXPECT_TRUE((std::is_same_v<speed::type_traits::underlying_type_of_t<item>, char>));
     EXPECT_TRUE((std::is_same_v<speed::type_traits::underlying_type_of_t<char>, char>));
-    EXPECT_TRUE(!(std::is_same_v<speed::type_traits::underlying_type_of_t<int>, char>));
+
+    EXPECT_FALSE((std::is_same_v<speed::type_traits::underlying_type_of_t<int>, char>));
 }

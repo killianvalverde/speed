@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -39,34 +39,74 @@ class indentation
 public:
     /**
      * @brief       Constructor with parameters.
-     * @param       tab_size : The babulator size.
-      * @param      curr_size : The current size of the indentation.
+     * @param       tab_sz : The babulator size.
+      * @param      curr_sz : The current size of the indentation.
      */
-    indentation(std::size_t tab_size = 4, std::size_t curr_size = 0) noexcept;
+    explicit indentation(std::size_t tab_sz = 4, std::size_t curr_sz = 0) noexcept
+            : tab_sz_(tab_sz)
+            , curr_sz_(curr_sz)
+    {
+    }
     
     /**
      * @brief       Increase the indentation by the tab size.
      * @return      The object who call the method.
      */
-    indentation& operator ++() noexcept;
+    indentation& operator ++() noexcept
+    {
+        curr_sz_ += tab_sz_;
+        return *this;
+    }
     
     /**
      * @brief       Increase the indentation by the tab size.
      * @return      The object who call the method.
      */
-    const indentation operator ++(int) noexcept;
+    indentation operator ++(int) noexcept
+    {
+        indentation old_indent(*this);
+        curr_sz_ += tab_sz_;
+
+        return old_indent;
+    }
     
     /**
      * @brief       Decrease the indentation by the tab size.
      * @return      The object who call the method.
      */
-    indentation& operator --() noexcept;
-    
+    indentation& operator --() noexcept
+    {
+        if (curr_sz_ > tab_sz_)
+        {
+            curr_sz_ -= tab_sz_;
+        }
+        else
+        {
+            curr_sz_ = 0;
+        }
+
+        return *this;
+    }
+
     /**
      * @brief       Decrease the indentation by the tab size.
      * @return      The object who call the method.
      */
-    const indentation operator --(int) noexcept;
+    indentation operator --(int) noexcept
+    {
+        indentation old_indent(*this);
+
+        if (curr_sz_ > tab_sz_)
+        {
+            curr_sz_ -= tab_sz_;
+        }
+        else
+        {
+            curr_sz_ = 0;
+        }
+
+        return old_indent;
+    }
 
     /**
      * @brief       Allows to use an object to print in standard output the value that constains the
@@ -83,10 +123,10 @@ public:
 
 private:
     /** The balulator size. */
-    std::size_t tab_size_;
+    std::size_t tab_sz_;
     
     /** The size of the current indentation. */
-    std::size_t curr_size_;
+    std::size_t curr_sz_;
 };
 
 /**
@@ -102,9 +142,9 @@ std::basic_ostream<CharT, CharTraitsT>& operator <<(
         const indentation& indent
 )
 {
-    for (std::size_t i = 0; i < indent.curr_size_; i++)
+    for (std::size_t i = 0; i < indent.curr_sz_; i++)
     {
-        os << ' ';
+        os.put(' ');
     }
     
     return os;

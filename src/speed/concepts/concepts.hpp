@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -18,50 +18,31 @@
  */
 
 /**
- * @file        operations.cpp
- * @brief       operations functions source.
+ * @file        concepts.hpp
+ * @brief       concepts main header
  * @author      Killian Valverde
- * @date        2016/08/24
+ * @date        2026/03/31
  */
 
-#include <cstdarg>
-#include <cstdio>
-#include <cwchar>
-#ifdef __GLIBC__
-#include <stdio_ext.h>
-#endif
+#ifndef SPEED_CONCEPTS_CONCEPTS_HPP
+#define SPEED_CONCEPTS_CONCEPTS_HPP
 
 #include "operations.hpp"
 
-namespace speed::iostream {
+namespace speed {
 
-void fpurge(::FILE* fp) noexcept
-{
-#ifdef __GLIBC__
-    ::__fpurge(fp);
-#else
-    ::fflush(fp);
+/**
+ * @brief       Contains definitions of concepts.
+ */
+namespace concepts {}
+
+#ifndef SPEED_DISABLE_ALIAS
+/**
+ * @brief       Contains definitions of concepts.
+ */
+namespace con = concepts;
 #endif
-}
-
-int printf(const char* formt, ...) noexcept
-{
-    int dne;
-    va_list args;
-    va_start(args, formt);
-    dne = ::vfprintf(stdout, formt, args);
-    va_end(args);
-    return dne;
-}
-
-int printf(const wchar_t* formt, ...) noexcept
-{
-    int dne;
-    va_list args;
-    va_start(args, formt);
-    dne = ::vfwprintf(stdout, formt, args);
-    va_end(args);
-    return dne;
-}
 
 }
+
+#endif

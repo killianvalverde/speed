@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -18,35 +18,30 @@
  */
 
 /**
- * @file        type_traits.hpp
- * @brief       type_traits main header.
- * @author      Killian Valverde
- * @date        2016/08/05
+ * @file type_traits.hpp
+ * @brief Main header for type_traits module.
+ * @author Killian Valverde
+ * @date 2016-08-05
  */
 
-#ifndef SPEED_TYPE_TRAITS_TYPE_TRAITS_HPP
-#define SPEED_TYPE_TRAITS_TYPE_TRAITS_HPP
+#pragma once
 
 #include "operations.hpp"
 
 namespace speed {
 
 /**
- * @brief       Contains utilities for compile-time introspection and modification, including type
- *              classification traits, type property inspection traits and type transformation
- *              traits.
+ * @brief Namespace containing type trait utilities.
  */
 namespace type_traits {}
 
 #ifndef SPEED_DISABLE_ALIAS
 /**
- * @brief       Contains utilities for compile-time introspection and modification, including type
- *              classification traits, type property inspection traits and type transformation
- *              traits.
+ * @brief Alias for speed::type_traits.
+ *
+ * Define SPEED_DISABLE_ALIAS to disable this alias.
  */
 namespace traits = type_traits;
 #endif
 
 }
-
-#endif

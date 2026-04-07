@@ -2,25 +2,11 @@ cmake_minimum_required(VERSION 3.22)
 
 project(speed VERSION 0.6.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-set(SPEED_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR})
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/lib")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/lib")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
-
-if(MSVC)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    add_compile_options(/utf-8 /EHsc /Zc:preprocessor /Zc:__cplusplus)
-endif()
-
 option(BUILD_TESTS "Build tests" OFF)
 
 add_subdirectory(src)
 
-if(BUILD_TESTS)
+if(BUILD_TESTS AND PROJECT_IS_TOP_LEVEL)
+    enable_testing()
     add_subdirectory(tests)
 endif()

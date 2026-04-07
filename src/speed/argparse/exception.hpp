@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -27,14 +27,14 @@
 #ifndef SPEED_ARGPARSE_EXCEPTION_HPP
 #define SPEED_ARGPARSE_EXCEPTION_HPP
 
-#include "../exceptions/exceptions.hpp"
+#include "../exception/exception.hpp"
 
 namespace speed::argparse {
 
 /**
  * @brief       The base class that the argparse classes will use to throw exceptions.
  */
-class exception : public exceptions::exception_base
+class exception : public exception::exception_base
 {
 public:
     /**

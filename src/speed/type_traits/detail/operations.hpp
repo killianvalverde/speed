@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -18,14 +18,13 @@
  */
 
 /**
- * @file        operations.hpp
- * @brief       detail operations functions header.
- * @author      Killian Valverde
- * @date        2025/07/20
+ * @file operations.hpp
+ * @brief Internal helper operations for the type_traits module.
+ * @author Killian Valverde
+ * @date 2025-07-20
  */
 
-#ifndef SPEED_TYPE_TRAITS_DETAIL_OPERATIONS_HPP
-#define SPEED_TYPE_TRAITS_DETAIL_OPERATIONS_HPP
+#pragma once
 
 #include <string>
 #include <string_view>
@@ -107,63 +106,7 @@ struct character_type_of_helper<CharT*>
     using type = std::enable_if_t<is_character<CharT>::value, std::remove_cv_t<CharT>>;
 };
 
-template<typename...>
-struct logical_or;
-
-template<>
-struct logical_or<> : public std::false_type {};
-
-template<typename T>
-struct logical_or<T> : public T {};
-
-template<typename T1, typename T2>
-struct logical_or<T1, T2> : public std::conditional<T1::value, T1, T2>::type {};
-
-template<typename T1, typename T2, typename T3, typename... TN>
-struct logical_or<T1, T2, T3, TN...>
-        : public std::conditional<T1::value, T1, logical_or<T2, T3, TN...>>::type {};
-
-template<typename...>
-struct logical_and;
-
-template<>
-struct logical_and<> : public std::true_type {};
-
-template<typename T>
-struct logical_and<T> : public T {};
-
-template<typename T1, typename T2>
-struct logical_and<T1, T2> : public std::conditional<T1::value, T2, T1>::type {};
-
-template<typename T1, typename T2, typename T3, typename... TN>
-struct logical_and<T1, T2, T3, TN...>
-        : public std::conditional<T1::value, logical_and<T2, T3, TN...>, T1>::type {};
-
-template<typename>
-struct is_character_helper : public std::false_type {};
-
-template<>
-struct is_character_helper<char> : public std::true_type {};
-
-template<>
-struct is_character_helper<signed char> : public std::true_type {};
-
-template<>
-struct is_character_helper<unsigned char> : public std::true_type {};
-
-template<>
-struct is_character_helper<wchar_t> : public std::true_type {};
-
-template<>
-struct is_character_helper<char8_t> : std::true_type {};
-
-template<>
-struct is_character_helper<char16_t> : public std::true_type {};
-
-template<>
-struct is_character_helper<char32_t> : public std::true_type {};
-
-template<typename T, bool IsEnum>
+template<typename T, bool>
 struct underlying_type_of_helper
 {
     using type = T;
@@ -177,5 +120,3 @@ struct underlying_type_of_helper<T, true>
 
 }
 /** @endcond */
-
-#endif

@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -18,8 +18,19 @@
  */
 
 /**
- * @file        algorithm.cpp
- * @brief       algorithm module object.
- * @author      Killian Valverde
- * @date        2024/10/11
+ * @file Operations.cpp
+ * @brief Unit tests for type casting operations.
+ * @author Killian Valverde
+ * @date 2026-04-04
  */
+
+#include <filesystem>
+#include <regex>
+#include <gtest/gtest.h>
+
+#include "speed/type_casting/type_casting.hpp"
+
+TEST(type_casting_to_utf8, parses_valid_inputs_and_rejects_invalid)
+{
+    ASSERT_EQ(speed::type_casting::to_utf8(L"☆☆☆"), "☆☆☆");
+}

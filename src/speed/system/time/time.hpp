@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -18,33 +18,32 @@
  */
 
 /**
- * @file        time.hpp
- * @brief       system time main header.
- * @author      Killian Valverde
- * @date        2023/10/10
+ * @file time.hpp
+ * @brief Main header for system::time submodule.
+ * @author Killian Valverde
+ * @date 2023-10-10
  */
 
-#ifndef SPEED_SYSTEM_TIME_TIME_HPP
-#define SPEED_SYSTEM_TIME_TIME_HPP
+#pragma once
 
 #include "operations.hpp"
-#include "system_time.hpp"
-#include "time_specification.hpp"
+#include "calendar_time.hpp"
+#include "time_value.hpp"
 
 namespace speed::system {
 
 /**
- * @brief       Contains resources and facilities related to time manipulation.
+ * @brief Utilities related to system time handling and measurement.
  */
 namespace time {}
 
 #ifndef SPEED_DISABLE_ALIAS
 /**
- * @brief       Contains resources and facilities related to time manipulation.
+ * @brief Alias for speed::system::time namespace.
+ *
+ * Define SPEED_DISABLE_ALIAS to disable this alias.
  */
 namespace tm = time;
 #endif
 
 }
-
-#endif

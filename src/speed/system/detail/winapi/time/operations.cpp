@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -32,7 +32,7 @@
 namespace speed::system::detail::winapi::time {
 
 bool get_monotonic_time(
-        system::time::time_specification& time_spec,
+        system::time::time_value& time_spec,
         std::error_code* err_code
 ) noexcept
 {
@@ -55,20 +55,20 @@ bool get_monotonic_time(
 }
 
 bool get_cpu_time(
-        system::time::time_specification& time_spec,
+        system::time::time_value& time_spec,
         std::error_code* err_code
 ) noexcept
 {
-    FILETIME creation_tme;
-    FILETIME exit_tme;
-    FILETIME kernel_tme;
-    FILETIME user_tme;
-    std::uint64_t total_ns;
-    HANDLE process_handl = ::GetCurrentProcess();
+    FILETIME creation_tm;
+    FILETIME exit_tm;
+    FILETIME kernel_tm;
+    FILETIME user_tm;
 
-    if (!::GetProcessTimes(process_handl, &creation_tme, &exit_tme, &kernel_tme, &user_tme))
+    HANDLE process_handl = GetCurrentProcess();
+
+    if (!GetProcessTimes(process_handl, &creation_tm, &exit_tm, &kernel_tm, &user_tm))
     {
-        system::errors::assign_system_error_code((int)GetLastError(), err_code);
+        errors::assign_system_error_code((int)GetLastError(), err_code);
         return false;
     }
 
@@ -77,8 +77,11 @@ bool get_cpu_time(
         return (static_cast<std::uint64_t>(ft.dwHighDateTime) << 32) | ft.dwLowDateTime;
     };
 
-    total_ns = filetime_to_uint64(user_tme) * 100 + filetime_to_uint64(kernel_tme) * 100;
-    time_spec.set_time(total_ns / 1'000'000'000ull, total_ns % 1'000'000'000ull);
+    std::uint64_t total_100ns = filetime_to_uint64(user_tm) + filetime_to_uint64(kernel_tm);
+    std::uint64_t secs = total_100ns / 10'000'000ull;
+    std::uint64_t nsecs = (total_100ns % 10'000'000ull) * 100;
+
+    time_spec.set_time(secs, nsecs);
 
     return true;
 }

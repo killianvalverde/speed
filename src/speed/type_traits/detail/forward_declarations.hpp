@@ -1,5 +1,5 @@
-/* speed
- * Copyright (C) 2025 Killian Valverde.
+/* speed - Generic C++ library.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -18,20 +18,18 @@
  */
 
 /**
- * @file        forward_declarations.hpp
- * @brief       forward_declarations header.
- * @author      Killian Valverde
- * @date        2025/07/06
+ * @file forward_declarations.hpp
+ * @brief Internal forward declarations for the type_traits module.
+ * @author Killian Valverde
+ * @date 2025-07-06
  */
 
-#ifndef SPEED_TYPE_TRAITS_DETAIL_FORWARD_DECLARATIONS_HPP
-#define SPEED_TYPE_TRAITS_DETAIL_FORWARD_DECLARATIONS_HPP
+#pragma once
 
 namespace speed::type_traits {
 
 /** @cond */
 namespace detail {
-
 }
 /** @endcond */
 
@@ -39,5 +37,3 @@ template<typename Tp>
 struct is_character;
 
 }
-
-#endif

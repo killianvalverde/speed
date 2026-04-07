@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -34,7 +34,7 @@
 namespace speed::iostream {
 
 /**
- * @brief       Class used to redirect a input/output stream buffer to another one.
+ * @brief       Class used to redirect an input/output stream buffer to another one.
  */
 template<
         typename CharT,
@@ -69,14 +69,10 @@ public:
 
     /**
      * @brief       Constructor.
-     * @param       ios : Input/output stream whose buffer will be redirect.
+     * @param       ios : Input/output stream whose buffer will be redirected.
      */
     explicit basic_ios_redirect(ios_type& ios)
             : ios_(&ios)
-            , old_streambuf_(nullptr)
-            , stringstream_(nullptr)
-            , stringstream_alloc_()
-            , stringstream_constructed_(false)
     {
     }
     
@@ -176,23 +172,23 @@ public:
     }
 
 private:
+    /** Stringstream allocator. */
+    allocator_type<stringstream_type> stringstream_alloc_;
+
     /** Input/output stream to redirect. */
     ios_type* ios_;
     
     /** Old stream buffer. */
-    streambuf_type* old_streambuf_;
+    streambuf_type* old_streambuf_ = nullptr;
     
     /** The embedded string stream. */
-    stringstream_type* stringstream_;
-
-    /** Stringstream allocator. */
-    allocator_type<stringstream_type> stringstream_alloc_;
+    stringstream_type* stringstream_ = nullptr;
     
-    /** Allows to knowing whether the embedded string stream has been constructed. */
-    bool stringstream_constructed_;
+    /** Allows to know whether the embedded string stream has been constructed. */
+    bool stringstream_constructed_ = false;
 };
 
-/** Class used to redirect a 8 bits input/output stream buffer to another one. */
+/** Class used to redirect an 8 bits input/output stream buffer to another one. */
 using ios_redirect = basic_ios_redirect<char>;
 
 /** Class used to redirect a 16 bits input/output stream buffer to another one. */

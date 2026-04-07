@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -18,17 +18,16 @@
  */
 
 /**
- * @file        exceptions.hpp
- * @brief       exceptions main header.
+ * @file        exception.hpp
+ * @brief       exception main header.
  * @author      Killian Valverde
  * @date        2016/08/19
  */
 
-#ifndef SPEED_EXCEPTIONS_EXCEPTIONS_HPP
-#define SPEED_EXCEPTIONS_EXCEPTIONS_HPP
+#ifndef SPEED_EXCEPTION_EXCEPTIONS_HPP
+#define SPEED_EXCEPTION_EXCEPTIONS_HPP
 
 #include "exception_base.hpp"
-#include "basic_message_exception.hpp"
 
 namespace speed {
 
@@ -36,14 +35,14 @@ namespace speed {
  * @brief       Contains resources for all exceptions thrown by the elements of speed along with
  *              several types and utilities to assist handling exceptions.
  */
-namespace exceptions {}
+namespace exception {}
 
 #ifndef SPEED_DISABLE_ALIAS
 /**
  * @brief       Contains resources for all exceptions thrown by the elements of speed along with
  *              several types and utilities to assist handling exceptions.
  */
-namespace except = exceptions;
+namespace except = exception;
 #endif
 
 }

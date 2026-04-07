@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -40,7 +40,7 @@ namespace speed::argparse::detail {
  * @brief        Class allowing configuring a positional argument.
  */
 template<typename AllocatorT, typename ActualT = std::false_type>
-class basic_positional_arg_setter : public type_traits::basic_crtp_base<
+class basic_positional_arg_setter : public type_traits::basic_crtp_base_t<
         basic_value_arg_setter, basic_positional_arg_setter, ActualT, std::false_type, AllocatorT>
 {
 public:
@@ -58,15 +58,15 @@ public:
     using positional_arg_type = basic_positional_arg<AllocatorT>;
 
     /** Type that represents the class allowing configuring a base argument. */
-    using base_arg_setter_type = type_traits::basic_crtp_base<basic_base_arg_setter,
+    using base_arg_setter_type = type_traits::basic_crtp_base_t<basic_base_arg_setter,
             basic_positional_arg_setter, ActualT, std::false_type, AllocatorT>;
 
     /** Type that represents the class allowing configuring a value argument. */
-    using value_arg_setter_type = type_traits::basic_crtp_base<basic_value_arg_setter,
+    using value_arg_setter_type = type_traits::basic_crtp_base_t<basic_value_arg_setter,
             basic_positional_arg_setter, ActualT, std::false_type, AllocatorT>;
 
     /** Type that represents the actual type of the object. */
-    using self_type = type_traits::basic_crtp_self<
+    using self_type = type_traits::basic_crtp_self_t<
             basic_positional_arg_setter, ActualT, std::false_type, AllocatorT>;
 
     /**

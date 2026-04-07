@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -42,7 +42,7 @@ namespace speed::argparse::detail {
  * @brief        Class allowing configuring a version argument.
  */
 template<typename AllocatorT, typename ActualT = std::false_type>
-class basic_version_arg_setter : public type_traits::basic_crtp_base<basic_key_arg_setter,
+class basic_version_arg_setter : public type_traits::basic_crtp_base_t<basic_key_arg_setter,
         basic_version_arg_setter, ActualT, std::false_type, AllocatorT>
 {
 public:
@@ -63,15 +63,15 @@ public:
     using version_arg_type = basic_version_arg<AllocatorT>;
 
     /** Type that represents the class allowing configuring a base argument. */
-    using base_arg_setter_type = type_traits::basic_crtp_base<basic_base_arg_setter,
+    using base_arg_setter_type = type_traits::basic_crtp_base_t<basic_base_arg_setter,
             basic_version_arg_setter, ActualT, std::false_type, AllocatorT>;
 
     /** Type that represents the class allowing configuring a key argument. */
-    using key_arg_setter_type = type_traits::basic_crtp_base<basic_key_arg_setter,
+    using key_arg_setter_type = type_traits::basic_crtp_base_t<basic_key_arg_setter,
             basic_version_arg_setter, ActualT, std::false_type, AllocatorT>;
 
     /** Type that represents the actual type of the object. */
-    using self_type = type_traits::basic_crtp_self<basic_version_arg_setter,
+    using self_type = type_traits::basic_crtp_self_t<basic_version_arg_setter,
             ActualT, std::false_type, AllocatorT>;
 
     /**

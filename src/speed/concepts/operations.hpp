@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -18,8 +18,22 @@
  */
 
 /**
- * @file        stringutils.cpp
- * @brief       stringutils module object.
+ * @file        operations.hpp
+ * @brief       operations main header
  * @author      Killian Valverde
- * @date        2024/10/11
+ * @date        2026/03/31
  */
+
+#ifndef SPEED_CONCEPTS_OPERATIONS_HPP
+#define SPEED_CONCEPTS_OPERATIONS_HPP
+
+#include "../type_traits/type_traits.hpp"
+
+namespace speed::concepts {
+
+template<typename T>
+concept character = type_traits::is_character_v<T>;
+
+}
+
+#endif

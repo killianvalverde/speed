@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -27,14 +27,14 @@
 #ifndef SPEED_SAFETY_EXCEPTION_HPP
 #define SPEED_SAFETY_EXCEPTION_HPP
 
-#include "../exceptions/exceptions.hpp"
+#include "../exception/exception.hpp"
 
 namespace speed::safety {
 
 /**
  * @brief       Base class used to throw exceptions when a lowlevel operation fails.
  */
-class exception : public exceptions::exception_base
+class exception : public speed::exception::runtime_exception_base
 {
 public:
     /**

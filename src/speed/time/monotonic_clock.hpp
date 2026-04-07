@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -18,37 +18,42 @@
  */
 
 /**
- * @file       monotonic_chrono.hpp
- * @brief      monotonic_chrono class header.
- * @author     Killian Valverde
- * @date       2017/10/28
+ * @file monotonic_clock.hpp
+ * @brief Defines the monotonic_clock class.
+ * @author Killian Valverde
+ * @date 2017-10-28
  */
 
-#ifndef SPEED_TIME_MONOTONIC_CHRONO_HPP
-#define SPEED_TIME_MONOTONIC_CHRONO_HPP
+#pragma once
 
-#include "chrono_base.hpp"
+#include "../system/system.hpp"
+#include "clock_base.hpp"
 
 namespace speed::time {
 
 /**
- * @brief       Class that represents a monotonic chrono.
+ * @brief Monotonic clock implementation.
+ *
+ * This clock provides a monotonically increasing time value that is not
+ * affected by system clock adjustments (e.g., manual changes or NTP updates).
+ *
+ * It is typically used for measuring time intervals and durations.
  */
-class monotonic_chrono : public chrono_base
+class monotonic_clock : public clock_base
 {
 public:
     /**
-     * @brief       Get the specific implementation time since some unspecified starting point.
-     * @return      The specific implementation time since some unspecified starting point.
+     * @brief Retrieves the current monotonic time.
+     *
+     * @return A @ref system::time::time_specification representing
+     *         the current monotonic time.
      */
-    [[nodiscard]] system::time::time_specification get_time() const noexcept override
+    [[nodiscard]] system::time::time_value get_time() const noexcept override
     {
-        system::time::time_specification time_spec;
+        system::time::time_value time_spec;
         system::time::get_monotonic_time(time_spec);
         return time_spec;
     }
 };
 
 }
-
-#endif

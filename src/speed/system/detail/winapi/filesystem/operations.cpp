@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -368,7 +368,7 @@ std::size_t get_file_size(
 bool get_modification_time(
         const path_char_t* file_pth,
         bool resolve_symlnk,
-        system::time::system_time& system_tme,
+        system::time::calendar_time& system_tme,
         std::error_code* err_code
 ) noexcept
 {
@@ -391,12 +391,12 @@ bool get_modification_time(
         return false;
     }
     
-    system_tme.set_years(local_system_tme.wYear)
-              .set_months(local_system_tme.wMonth)
-              .set_days(local_system_tme.wDay)
-              .set_hours(local_system_tme.wHour)
-              .set_minutes(local_system_tme.wMinute)
-              .set_seconds(local_system_tme.wSecond);
+    system_tme.set_year(local_system_tme.wYear)
+              .set_month(local_system_tme.wMonth)
+              .set_day(local_system_tme.wDay)
+              .set_hour(local_system_tme.wHour)
+              .set_minute(local_system_tme.wMinute)
+              .set_second(local_system_tme.wSecond);
     
     ::CloseHandle(file_handl);
     return true;

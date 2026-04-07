@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -18,37 +18,42 @@
  */
 
 /**
- * @file       cpu_chrono.hpp
- * @brief      cpu_chrono class header.
- * @author     Killian Valverde
- * @date       2018/06/06
+ * @file cpu_clock.hpp
+ * @brief Defines the cpu_clock class.
+ * @author Killian Valverde
+ * @date 2018-06-06
  */
 
-#ifndef SPEED_TIME_CPU_CHRONO_HPP
-#define SPEED_TIME_CPU_CHRONO_HPP
+#pragma once
 
-#include "chrono_base.hpp"
+#include "../system/system.hpp"
+#include "clock_base.hpp"
 
 namespace speed::time {
 
 /**
- * @brief       Class that represents a cpu chrono.
+ * @brief CPU time clock implementation.
+ *
+ * This clock provides the amount of CPU time consumed by the current
+ * process.
+ *
+ * It is typically used for performance analysis and profiling.
  */
-class cpu_chrono : public chrono_base
+class cpu_clock : public clock_base
 {
 public:
     /**
-     * @brief       Get the specific implementation time since some unspecified starting point.
-     * @return      The specific implementation time since some unspecified starting point.
+     * @brief Retrieves the current CPU time.
+     *
+     * @return A @ref system::time::time_specification representing
+     *         the CPU time consumed.
      */
-    [[nodiscard]] system::time::time_specification get_time() const noexcept override
+    [[nodiscard]] system::time::time_value get_time() const noexcept override
     {
-        system::time::time_specification time_spec;
+        system::time::time_value time_spec;
         system::time::get_cpu_time(time_spec);
         return time_spec;
     }
 };
 
 }
-
-#endif

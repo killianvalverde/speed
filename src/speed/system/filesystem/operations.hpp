@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -214,7 +214,7 @@ inline std::size_t get_file_size(
 inline bool get_modification_time(
         const path_char_t* file_pth,
         bool resolve_symlnk,
-        time::system_time& system_tme,
+        time::calendar_time& system_tme,
         std::error_code* err_code = nullptr
 ) noexcept
 {

@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -62,5 +62,5 @@ TEST(system_process, nanosleep_1)
 
 TEST(system_process, nanosleep_2)
 {
-    ASSERT_TRUE(speed::system::process::nanosleep(speed::system::time::time_specification(0, 1)));
+    ASSERT_TRUE(speed::system::process::nanosleep(speed::system::time::time_value(0, 1)));
 }

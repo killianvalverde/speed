@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -27,6 +27,7 @@
 #ifndef SPEED_SYSTEM_ERRORS_OPERATIONS_HPP
 #define SPEED_SYSTEM_ERRORS_OPERATIONS_HPP
 
+#include <concepts>
 #include <system_error>
 
 namespace speed::system::errors {
@@ -36,11 +37,12 @@ namespace speed::system::errors {
  * @param       val : The value to assign.
  * @param       err_code : The object that will contain the error.
  */
-inline void assign_system_error_code(int val, std::error_code* err_code)
+template <std::integral IntegralT>
+void assign_system_error_code(IntegralT val, std::error_code* err_code)
 {
     if (err_code != nullptr)
     {
-        err_code->assign(val, std::system_category());
+        err_code->assign(static_cast<int>(val), std::system_category());
     }
 }
 
@@ -49,11 +51,28 @@ inline void assign_system_error_code(int val, std::error_code* err_code)
  * @param       val : The value to assign.
  * @param       err_code : The object that will contain the error.
  */
-inline void assign_generic_error_code(int val, std::error_code* err_code)
+template <std::integral IntegralT>
+void assign_generic_error_code(IntegralT val, std::error_code* err_code)
 {
     if (err_code != nullptr)
     {
-        err_code->assign(val, std::generic_category());
+        err_code->assign(static_cast<int>(val), std::generic_category());
+    }
+}
+
+inline void assign_errc(std::errc ec, std::error_code* err_code)
+{
+    if (err_code != nullptr)
+    {
+        *err_code = std::make_error_code(ec);
+    }
+}
+
+inline void assign_error_code(const std::error_code& ec_input, std::error_code* ec_output)
+{
+    if (ec_output != nullptr)
+    {
+        *ec_output = ec_input;
     }
 }
 

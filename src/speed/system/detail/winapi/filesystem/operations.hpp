@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -36,7 +36,7 @@
 #include "../../../filesystem/file_types.hpp"
 #include "../../../filesystem/types.hpp"
 #include "../../../process/types.hpp"
-#include "../../../time/system_time.hpp"
+#include "../../../time/calendar_time.hpp"
 #include "types.hpp"
 
 namespace speed::system::detail::winapi::filesystem {
@@ -184,7 +184,7 @@ std::size_t get_file_size(
 bool get_modification_time(
         const path_char_t* file_pth,
         bool resolve_symlnk,
-        system::time::system_time& system_tme,
+        system::time::calendar_time& system_tme,
         std::error_code* err_code = nullptr
 ) noexcept;
 

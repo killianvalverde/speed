@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -18,10 +18,10 @@
  */
 
 /**
- * @file        system.hpp
- * @brief       system functions header.
- * @author      Killian Valverde
- * @date        2017/01/08
+ * @file system.hpp
+ * @brief Main header for system module.
+ * @author Killian Valverde
+ * @date 2017-01-08
  */
 
 #ifndef SPEED_SYSTEM_SYSTEM_HPP
@@ -30,7 +30,7 @@
 #include "detail/detail.hpp"
 #include "codecs/codecs.hpp"
 #include "errors/errors.hpp"
-#include "exceptions/exceptions.hpp"
+#include "exception/exceptions.hpp"
 #include "filesystem/filesystem.hpp"
 #include "platform/platform.hpp"
 #include "process/process.hpp"
@@ -40,13 +40,17 @@
 namespace speed {
 
 /**
- * @brief       Contains resources for interact with the system.
+ * @brief Contains system-level utilities and abstractions.
+ *
+ * This namespace is intended to group functionality related to operating system interactions.
  */
 namespace system {}
 
 #ifndef SPEED_DISABLE_ALIAS
 /**
- * @brief       Contains resources for interact with the system.
+ * @brief Alias for the speed::system namespace.
+ *
+ * Define SPEED_DISABLE_ALIAS to disable this alias.
  */
 namespace sys = system;
 #endif

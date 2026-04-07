@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -18,34 +18,32 @@
  */
 
 /**
- * @file        exception.hpp
- * @brief       system exception class header.
+ * @file        exceptions.hpp
+ * @brief       system exceptions main header.
  * @author      Killian Valverde
- * @date        2017/10/18
+ * @date        2023/10/10
  */
 
-#ifndef SPEED_SYSTEM_EXCEPTIONS_EXCEPTION_HPP
-#define SPEED_SYSTEM_EXCEPTIONS_EXCEPTION_HPP
+#ifndef SPEED_SYSTEM_EXCEPTIONS_EXCEPTIONS_HPP
+#define SPEED_SYSTEM_EXCEPTIONS_EXCEPTIONS_HPP
 
-#include "../../exceptions/exceptions.hpp"
+#include "exception.hpp"
 
-namespace speed::system::exceptions {
+namespace speed::system {
 
 /**
- * @brief       Class that represents the base of system exceptions.
+ * @brief       Contains resources for all system exceptions thrown by the elements of speed along
+ *              with several types and utilities to assist handling exceptions.
  */
-class exception : public speed::exceptions::exception_base
-{
-public:
-    /**
-     * @brief       Get the message of the exception.
-     * @return      The exception message.
-     */
-    char const* what() const noexcept override
-    {
-        return "system exception";
-    }
-};
+namespace exceptions {}
+
+#ifndef SPEED_DISABLE_ALIAS
+/**
+ * @brief       Contains resources for all system exceptions thrown by the elements of speed along
+ *              with several types and utilities to assist handling exceptions.
+ */
+namespace except = exceptions;
+#endif
 
 }
 

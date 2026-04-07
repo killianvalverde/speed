@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -24,138 +24,97 @@
  * @date        2018/06/06
  */
 
-#include <cmath>
+#include <chrono>
 #include <gtest/gtest.h>
 
 #include "speed/time/time.hpp"
 
-TEST(time_monotonic_chrono, default_constructor)
+TEST(time_monotonic_chrono, initial_sets_ready_and_elapsed_time_is_null)
 {
-    speed::time::monotonic_chrono monotc_chrn;
+    speed::time::monotonic_chrono cpu_chron;
     
-    auto tme = monotc_chrn.get_elapsed_raw_time();
+    auto tme = cpu_chron.get_elapsed_time();
     
-    ASSERT_TRUE(monotc_chrn.is(speed::time::cs_t::READY));
-    ASSERT_TRUE(tme.is_null());
+    ASSERT_TRUE(cpu_chron.is_ready());
+    ASSERT_TRUE(tme.is_zero());
 }
 
-TEST(time_monotonic_chrono, start)
+TEST(time_monotonic_chrono, start_sets_running_and_elapsed_time_increases)
 {
-    speed::time::monotonic_chrono monotc_chrn;
-    
-    ASSERT_TRUE(monotc_chrn.start());
-    
-    speed::system::process::nanosleep(0, 1000);
-    auto tme = monotc_chrn.get_elapsed_raw_time();
-    
-    ASSERT_TRUE(monotc_chrn.is(speed::time::cs_t::RUNNING));
-    ASSERT_TRUE(!tme.is_null());
+    speed::time::monotonic_chrono cpu_chrn;
+
+    cpu_chrn.start();
+
+    ASSERT_TRUE(cpu_chrn.is_running());
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    auto tme = cpu_chrn.get_elapsed_time();
+
+    ASSERT_FALSE(tme.is_zero());
 }
 
-TEST(time_monotonic_chrono, stop)
+TEST(time_monotonic_chrono, stop_sets_stopped_and_freezes_elapsed_time)
 {
-    speed::time::monotonic_chrono monotc_chrn;
-    
-    ASSERT_TRUE(monotc_chrn.start());
-    
-    speed::system::process::nanosleep(0, 1000);
-    
-    ASSERT_TRUE(monotc_chrn.stop());
-    ASSERT_TRUE(monotc_chrn.is(speed::time::cs_t::STOPED));
-    
-    auto tme_1 = monotc_chrn.get_elapsed_raw_time();
-    
-    ASSERT_TRUE(!tme_1.is_null());
-    
-    speed::system::process::nanosleep(0, 1000);
-    auto tme_2 = monotc_chrn.get_elapsed_raw_time();
-    
-    ASSERT_TRUE(monotc_chrn.is(speed::time::cs_t::STOPED));
-    ASSERT_TRUE(tme_1 == tme_2);
+    speed::time::monotonic_chrono cpu_chron;
+
+    cpu_chron.start();
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+    auto time_before_stop = cpu_chron.get_elapsed_time();
+    ASSERT_FALSE(time_before_stop.is_zero());
+
+    cpu_chron.stop();
+    ASSERT_TRUE(cpu_chron.is_stopped());
+
+    auto time_after_stop_1 = cpu_chron.get_elapsed_time();
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    auto time_after_stop_2 = cpu_chron.get_elapsed_time();
+
+    ASSERT_FALSE(time_after_stop_1.is_zero());
+    ASSERT_EQ(time_after_stop_1, time_after_stop_2);
+
+    cpu_chron.stop();
+    ASSERT_TRUE(cpu_chron.is_stopped());
 }
 
-TEST(time_monotonic_chrono, resume)
+TEST(time_monotonic_chrono, resume_sets_running_and_elapsed_time_continues)
 {
-    speed::time::monotonic_chrono monotc_chrn;
-    
-    ASSERT_TRUE(monotc_chrn.start());
-    
-    speed::system::process::nanosleep(0, 1000);
-    
-    ASSERT_TRUE(monotc_chrn.stop());
-    ASSERT_TRUE(monotc_chrn.is(speed::time::cs_t::STOPED));
-    
-    auto tme_1 = monotc_chrn.get_elapsed_raw_time();
-    
-    ASSERT_TRUE(!tme_1.is_null());
-    
-    speed::system::process::nanosleep(0, 1000);
-    auto tme_2 = monotc_chrn.get_elapsed_raw_time();
-    
-    ASSERT_TRUE(monotc_chrn.is(speed::time::cs_t::STOPED));
-    ASSERT_TRUE(tme_1 == tme_2);
-    
-    ASSERT_TRUE(monotc_chrn.resume());
-    
-    speed::system::process::nanosleep(0, 1000);
-    auto tme_3 = monotc_chrn.get_elapsed_raw_time();
-    
-    ASSERT_TRUE(monotc_chrn.is(speed::time::cs_t::RUNNING));
-    ASSERT_TRUE(tme_1 != tme_3);
+    speed::time::monotonic_chrono cpu_chron;
+
+    cpu_chron.start();
+    cpu_chron.stop();
+    ASSERT_TRUE(cpu_chron.is_stopped());
+    auto time_stopped = cpu_chron.get_elapsed_time();
+
+    cpu_chron.resume();
+    ASSERT_TRUE(cpu_chron.is_running());
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    auto time_resumed = cpu_chron.get_elapsed_time();
+
+    ASSERT_GT(time_resumed, time_stopped);
 }
 
-TEST(time_monotonic_chrono, restart)
+TEST(time_monotonic_chrono, restard_sets_running_and_elapsed_time_resets)
 {
-    speed::time::monotonic_chrono monotc_chrn;
-    
-    ASSERT_TRUE(monotc_chrn.start());
-    
-    speed::system::process::nanosleep(0, 1000);
-    
-    ASSERT_TRUE(monotc_chrn.stop());
-    ASSERT_TRUE(monotc_chrn.is(speed::time::cs_t::STOPED));
-    
-    auto tme_1 = monotc_chrn.get_elapsed_raw_time();
-    
-    ASSERT_TRUE(!tme_1.is_null());
-    
-    speed::system::process::nanosleep(0, 1000);
-    auto tme_2 = monotc_chrn.get_elapsed_raw_time();
-    
-    ASSERT_TRUE(monotc_chrn.is(speed::time::cs_t::STOPED));
-    ASSERT_TRUE(tme_1 == tme_2);
-    
-    ASSERT_TRUE(monotc_chrn.restart());
-    
-    speed::system::process::nanosleep(0, 1000);
-    auto tme_3 = monotc_chrn.get_elapsed_raw_time();
-    
-    ASSERT_TRUE(monotc_chrn.is(speed::time::cs_t::RUNNING));
-    ASSERT_TRUE(!tme_3.is_null());
-}
+    speed::time::monotonic_chrono cpu_chron;
 
-TEST(time_monotonic_chrono, get_elapsed_time)
-{
-    speed::time::monotonic_chrono monotc_chrn;
-    
-    ASSERT_TRUE(monotc_chrn.start());
-    
-    auto tme_1 = monotc_chrn.get_elapsed_time();
-    speed::system::process::nanosleep(0, 1000);
-    auto tme_2 = monotc_chrn.get_elapsed_time();
-    
-    ASSERT_TRUE(tme_1 != tme_2);
-}
+    cpu_chron.start();
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
-TEST(time_monotonic_chrono, get_elapsed_raw_time)
-{
-    speed::time::monotonic_chrono monotc_chrn;
-    
-    ASSERT_TRUE(monotc_chrn.start());
-    
-    auto tme_1 = monotc_chrn.get_elapsed_raw_time();
-    speed::system::process::nanosleep(0, 1000);
-    auto tme_2 = monotc_chrn.get_elapsed_raw_time();
-    
-    ASSERT_TRUE(tme_1 != tme_2);
+    cpu_chron.stop();
+    ASSERT_TRUE(cpu_chron.is_stopped());
+    auto time_stopped = cpu_chron.get_elapsed_time();
+
+    cpu_chron.restart();
+    ASSERT_TRUE(cpu_chron.is_running());
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    auto time_after_restart = cpu_chron.get_elapsed_time();
+    ASSERT_FALSE(time_after_restart.is_zero());
+    ASSERT_LT(time_after_restart, time_stopped);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    auto time_later = cpu_chron.get_elapsed_time();
+    ASSERT_GT(time_later, time_after_restart);
 }

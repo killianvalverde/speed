@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2024 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -30,18 +30,18 @@
 
 TEST(system_time, get_elapsed_time)
 {
-    speed::system::time::time_specification tme_spec_1(1, 0);
-    speed::system::time::time_specification tme_spec_2(3, 0);
-    speed::system::time::time_specification res = tme_spec_1.get_elapsed_time(tme_spec_2);
+    speed::system::time::time_value tme_spec_1(1, 0);
+    speed::system::time::time_value tme_spec_2(3, 0);
+    speed::system::time::time_value res = tme_spec_1.get_elapsed_time(tme_spec_2);
     
     ASSERT_TRUE(res.get_seconds() == 2);
-    ASSERT_TRUE(res.get_nseconds() == 0);
+    ASSERT_TRUE(res.get_nanoseconds() == 0);
 }
 
 TEST(system_time, get_monotonic_time)
 {
-    speed::system::time::time_specification tme_spec1;
-    speed::system::time::time_specification tme_spec2;
+    speed::system::time::time_value tme_spec1;
+    speed::system::time::time_value tme_spec2;
 
     ASSERT_TRUE(speed::system::time::get_monotonic_time(tme_spec1));
 
@@ -55,8 +55,8 @@ TEST(system_time, get_monotonic_time)
 
 TEST(system_time, get_cpu_time)
 {
-    speed::system::time::time_specification tme_spec1;
-    speed::system::time::time_specification tme_spec2;
+    speed::system::time::time_value tme_spec1;
+    speed::system::time::time_value tme_spec2;
 
     ASSERT_TRUE(speed::system::time::get_cpu_time(tme_spec1));
 

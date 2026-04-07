@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -32,7 +32,7 @@
 
 #include "../../../errors/errors.hpp"
 #include "../../../process/types.hpp"
-#include "../../../time/time_specification.hpp"
+#include "../../../time/time_value.hpp"
 
 namespace speed::system::detail::winapi::process {
 
@@ -46,8 +46,8 @@ namespace speed::system::detail::winapi::process {
 bool execute(
         const char* cmd,
         int* ret_val = nullptr,
-        system::time::time_specification* cpu_time_spec = nullptr,
-        system::time::time_specification* elapsed_time_spec = nullptr,
+        system::time::time_value* cpu_time_spec = nullptr,
+        system::time::time_value* elapsed_time_spec = nullptr,
         std::error_code* err_code = nullptr
 ) noexcept;
 

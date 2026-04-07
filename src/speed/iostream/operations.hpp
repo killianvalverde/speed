@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -27,7 +27,10 @@
 #ifndef SPEED_IOSTREAM_OPERATIONS_HPP
 #define SPEED_IOSTREAM_OPERATIONS_HPP
 
+#include <cstdarg>
+#include <cstdio>
 #include <cstdlib>
+#include <cwchar>
 #include <iostream>
 
 #include "detail/forward_declarations.hpp"
@@ -37,22 +40,13 @@
 namespace speed::iostream {
 
 /**
- * @brief       Clears the buffers of the given stream. For output streams this discards any
- *              unwritten output. For input streams this discards any input read from the
- *              underlying object but not yet obtained via getc(3); this includes any text pushed
- *              back via ungetc(3).
- * @param       fp : Pointer to the FILE structure to purge.
- */
-void fpurge(::FILE* fp) noexcept;
-
-/**
  * @brief       Get the current 'std::basic_ostream' object used to print CharT in standard error
  *              output.
  * @return      The current 'std::basic_ostream' object used to print CharT in standard error
  *              output.
  */
 template<typename CharT>
-constexpr std::basic_ostream<CharT>& get_cerr() noexcept;
+std::basic_ostream<CharT>& get_cerr() noexcept;
 
 /**
  * @brief       Get the current 'std::ostream' object used to print in standard error output.
@@ -79,7 +73,7 @@ constexpr std::wostream& get_cerr<wchar_t>() noexcept
  * @return      The current 'std::basic_ostream' object used to print CharT in standard output.
  */
 template<typename CharT>
-constexpr std::basic_ostream<CharT>& get_cout() noexcept;
+std::basic_ostream<CharT>& get_cout() noexcept;
 
 /**
  * @brief       Get the current 'std::ostream' object used to print in standard output.
@@ -125,7 +119,15 @@ std::basic_ostream<CharT, TraitsT>& newl(std::basic_ostream<CharT, TraitsT>& os)
  *              multibyte character encoding error occurs while writing wide characters, errno is
  *              set to EILSEQ and a negative number is returned.
  */
-int printf(const char* formt, ...) noexcept;
+inline int printf(const char* formt, ...) noexcept
+{
+    int dne;
+    va_list args;
+    va_start(args, formt);
+    dne = ::vfprintf(stdout, formt, args);
+    va_end(args);
+    return dne;
+}
 
 /**
  * @brief       Writes the C string pointed by format to the standard output (os). If format
@@ -140,7 +142,15 @@ int printf(const char* formt, ...) noexcept;
  *              multibyte character encoding error occurs while writing wide characters, errno is
  *              set to EILSEQ and a negative number is returned.
  */
-int printf(const wchar_t* formt, ...) noexcept;
+inline int printf(const wchar_t* formt, ...) noexcept
+{
+    int dne;
+    va_list args;
+    va_start(args, formt);
+    dne = ::vfwprintf(stdout, formt, args);
+    va_end(args);
+    return dne;
+}
 
 /**
  * @brief       Prints a formatted error message in red text and terminates the program.

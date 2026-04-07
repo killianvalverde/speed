@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -18,35 +18,31 @@
  */
 
 /**
- * @file        type_casting.hpp
- * @brief       compatibility main header.
- * @author      Killian Valverde
- * @date        2016/08/05
+ * @file type_casting.hpp
+ * @brief Main header for type_casting module.
+ * @author Killian Valverde
+ * @date 2016-08-05
  */
 
-#ifndef SPEED_TYPE_CASTING_TYPE_CASTING_HPP
-#define SPEED_TYPE_CASTING_TYPE_CASTING_HPP
+#pragma once
 
-#include "error_category.hpp"
 #include "exception.hpp"
 #include "operations.hpp"
-#include "try_type_cast.hpp"
-#include "type_cast.hpp"
 
 namespace speed {
 
 /**
- * @brief       Contains utilities for type casting.
+ * @brief Utilities for type casting operations.
  */
 namespace type_casting {}
 
 #ifndef SPEED_DISABLE_ALIAS
 /**
- * @brief       Contains utilities for type casting.
+ * @brief Alias for speed::type_casting.
+ *
+ * Define SPEED_DISABLE_ALIAS to disable this alias.
  */
 namespace cast = type_casting;
 #endif
 
 }
-
-#endif

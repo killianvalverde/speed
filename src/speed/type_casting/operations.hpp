@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -18,25 +18,30 @@
  */
 
 /**
- * @file        operations.hpp
- * @brief       operations main header.
- * @author      Killian Valverde
- * @date        2026/03/21
+ * @file operations.hpp
+ * @brief Core operations for the type_casting module.
+ * @author Killian Valverde
+ * @date 2016-08-19
  */
 
-#ifndef SPEED_TYPE_CASTING_OPERATIONS_HPP
-#define SPEED_TYPE_CASTING_OPERATIONS_HPP
+#pragma once
 
-#include <string>
-
-#include "type_cast.hpp"
+#include "detail/forward_declarations.hpp"
+#include "detail/operations.hpp"
+#include "exception.hpp"
 
 namespace speed::type_casting {
 
 /**
- * @brief       Converts a value to a UTF-8 encoded string.
- * @param       arg : The input value to be converted to UTF-8.
- * @return      A std::string containing the UTF-8 encoded representation of the input.
+ * @brief Converts a value to a UTF-8 encoded string.
+ *
+ * @tparam SourceT Type of the source value.
+ *
+ * @param arg Value to convert.
+ *
+ * @return A UTF-8 encoded @ref std::string representation of the input.
+ *
+ * @details This function forwards to @ref type_cast to perform the conversion.
  */
 template<typename SourceT>
 std::string to_utf8(const SourceT& arg)
@@ -44,6 +49,123 @@ std::string to_utf8(const SourceT& arg)
     return type_cast<std::string>(arg);
 }
 
+/**
+ * @brief Attempts to convert a value to the specified target type.
+ *
+ * @tparam TargetT Target type of the conversion.
+ * @tparam SourceT Source type of the value.
+ *
+ * @param arg Value to convert.
+ * @param res Output parameter receiving the converted value on success.
+ * @param err_code Optional pointer to an error code receiving failure details.
+ *
+ * @return true if the conversion succeeded, false otherwise.
+ *
+ * @details This function does not throw. On failure, @p res is left unchanged and @p err_code
+ * (if not null) is set to indicate the error.
+ */
+template<typename TargetT, typename SourceT>
+bool try_type_cast(
+        const SourceT& arg,
+        TargetT& res,
+        std::error_code* err_code
+) noexcept
+{
+    return detail::try_type_cast(arg, res, err_code);
 }
 
+/**
+ * @brief Converts a value to the specified target type.
+ *
+ * @tparam TargetT Target type of the conversion.
+ * @tparam SourceT Source type of the value.
+ *
+ * @param arg Value to convert.
+ *
+ * @return The converted value.
+ *
+ * @throws type_cast_exception if the conversion fails.
+ *
+ * @details This function attempts to convert the input value using @ref try_type_cast. If the
+ * conversion succeeds, the result is returned. Otherwise, a @ref type_cast_exception is thrown.
+ */
+template<typename TargetT, typename SourceT>
+TargetT type_cast(const SourceT& arg)
+{
+    std::error_code ec;
+    TargetT res{};
+
+    if (try_type_cast(arg, res, &ec))
+    {
+        return res;
+    }
+
+    throw type_cast_exception(ec);
+}
+
+/**
+ * @brief Converts a value to the specified target type or returns a fallback.
+ *
+ * @tparam TargetT Target type of the conversion.
+ * @tparam SourceT Source type of the value.
+ * @tparam CallableT Callable type returning a fallback value.
+ *
+ * @param arg Value to convert.
+ * @param callabl Callable object invoked to produce a fallback value if the conversion fails.
+ *
+ * @return The converted value on success, or the result of the fallback callable otherwise.
+ *
+ * @details This function attempts to convert the input value using @ref try_type_cast. If the
+ * conversion succeeds, the result is returned. Otherwise, the provided callable is invoked and
+ * its result is returned.
+ */
+template<typename TargetT, typename SourceT, typename CallableT>
+requires std::invocable<CallableT> &&
+        std::convertible_to<std::invoke_result_t<CallableT>, TargetT>
+TargetT type_cast_or(const SourceT& arg, CallableT&& callabl)
+{
+    std::error_code ec;
+    TargetT res{};
+
+    if (try_type_cast(arg, res, &ec))
+    {
+        return res;
+    }
+
+    return static_cast<TargetT>(std::invoke(std::forward<CallableT>(callabl)));
+}
+
+#if defined(__cpp_lib_expected) && __cpp_lib_expected >= 202202L
+#include <expected>
+/**
+ * @brief Converts a value to the specified target type using std::expected.
+ *
+ * @tparam TargetT Target type of the conversion.
+ * @tparam SourceT Source type of the value.
+ *
+ * @param arg Value to convert.
+ *
+ * @return A @ref std::expected containing the converted value on success,
+ *         or a @ref std::error_code on failure.
+ *
+ * @details This function attempts to convert the input value using @ref try_type_cast. If the
+ * conversion succeeds, the result is returned. Otherwise, an unexpected value containing the
+ * error code is returned.
+ */
+template<typename TargetT, typename SourceT>
+std::expected<TargetT, std::error_code>
+type_cast_expected(const SourceT& arg)
+{
+    std::error_code ec;
+    TargetT res{};
+
+    if (try_type_cast(arg, res, &ec))
+    {
+        return res;
+    }
+
+    return std::unexpected(ec);
+}
 #endif
+
+}

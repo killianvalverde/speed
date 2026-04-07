@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -19,11 +19,12 @@
 
 /**
  * @file        directory_iteration.cpp
- * @brief       directory_iteration class methods definition.
+ * @brief       directory_iteration class implementation.
  * @author      Killian Valverde
  * @date        2024/10/15
  */
 
+#include "../stringutils/stringutils.hpp"
 #include "directory_iteration.hpp"
 
 namespace speed::filesystem {
@@ -61,7 +62,7 @@ directory_iteration::const_iterator::~const_iterator() noexcept
 directory_iteration::const_iterator::self_type& directory_iteration::const_iterator::operator ++()
 {
 start:
-    system_directory_entity_type& cur_dir_ent = directory_entity_stck_.top();
+    system_directory_entry_type& cur_dir_ent = directory_entity_stck_.top();
 
     if (!read_directory())
     {
@@ -148,7 +149,7 @@ bool directory_iteration::const_iterator::open_directory()
 bool directory_iteration::const_iterator::read_directory()
 {
     bool succss;
-    system_directory_entity_type& cur_dir_ent = directory_entity_stck_.top();
+    system_directory_entry_type& cur_dir_ent = directory_entity_stck_.top();
 
     do
     {
@@ -229,22 +230,6 @@ void directory_iteration::const_iterator::exit_directory()
     return composit_->case_insensitve_
             ? stringutils::match_wildcard_icase(pth.c_str(), wildcrd)
             : stringutils::match_wildcard(pth.c_str(), wildcrd);
-}
-
-void directory_iteration::update_regex()
-{
-    typename regex_type::flag_type flg;
-    
-    if (case_insensitve_)
-    {
-        flg = regex_type::ECMAScript | regex_type::icase;
-    }
-    else
-    {
-        flg = regex_type::ECMAScript;
-    }
-    
-    regex_to_mtch_.assign(regex_to_mtch_str_, flg);
 }
 
 }

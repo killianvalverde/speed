@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -29,9 +29,9 @@
 
 #include "algorithm/algorithm.hpp"
 #include "argparse/argparse.hpp"
+#include "concepts/concepts.hpp"
 #include "containers/containers.hpp"
-#include "errors/errors.hpp"
-#include "exceptions/exceptions.hpp"
+#include "exception/exception.hpp"
 #include "filesystem/filesystem.hpp"
 #include "iostream/iostream.hpp"
 #include "lowlevel/lowlevel.hpp"

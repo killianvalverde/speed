@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -18,116 +18,38 @@
  */
 
 /**
- * @file        exception.hpp
- * @brief       exception main header.
- * @author      Killian Valverde
- * @date        2016/08/19
+ * @file exception.hpp
+ * @brief Core header for exception utilities.
+ * @author Killian Valverde
+ * @date 2016-08-19
  */
 
-#ifndef SPEED_TYPE_CASTING_EXCEPTION_HPP
-#define SPEED_TYPE_CASTING_EXCEPTION_HPP
+#pragma once
 
 #include "detail/forward_declarations.hpp"
-#include "../exceptions/exceptions.hpp"
+#include "../exception/exception.hpp"
 
 namespace speed::type_casting {
 
 /**
- * @brief       Base class used to throw exceptions when a type casting fails.
+ * @brief Exception thrown on type casting failure.
+ *
+ * @details This exception is raised when a type casting operation fails.
+ * It extends @ref exception::source_location_exception to provide additional context such as
+ * source location and error code.
  */
-class exception : public exceptions::exception_base
+class type_cast_exception : public exception::source_location_exception
 {
 public:
     /**
-     * @brief       Get the message of the exception.
-     * @return      The exception message.
+     * @brief Constructs a type_cast_exception.
+     *
+     * @param ec Error code describing the failure.
      */
-    char const* what() const noexcept override
+    explicit type_cast_exception(std::error_code ec)
+            : source_location_exception("type_cast failed", ec)
     {
-        return "type casting exception";
-    }
-};
-
-/**
- * @brief       Class used to throw exceptions when somme undefined error has occured.
- */
-class conversion_fails_exception : public exception
-{
-public:
-    /**
-     * @brief       Get the message of the exception.
-     * @return      The exception message.
-     */
-    char const* what() const noexcept override
-    {
-        return "conversion fails exception";
-    }
-};
-
-/**
- * @brief       Class used to throw exceptions when a source value cannot be interpreted as target.
- */
-class invalid_syntax_exception : public exception
-{
-public:
-    /**
-     * @brief       Get the message of the exception.
-     * @return      The exception message.
-     */
-    char const* what() const noexcept override
-    {
-        return "invalid syntax exception";
-    }
-};
-
-/**
- * @brief       Class used to throw exceptions when an overflow range error occur.
- */
-class overflow_range_exception : public exception
-{
-public:
-    /**
-     * @brief       Get the message of the exception.
-     * @return      The exception message.
-     */
-    char const* what() const noexcept override
-    {
-        return "overflow range exception";
-    }
-};
-
-/**
- * @brief       Class used to throw exceptions when an underflow range error occur.
- */
-class underflow_range_exception : public exception
-{
-public:
-    /**
-     * @brief       Get the message of the exception.
-     * @return      The exception message.
-     */
-    char const* what() const noexcept override
-    {
-        return "underflow range exception";
-    }
-};
-
-/**
- * @brief       Class used to throw exceptions when an underflow range error occur.
- */
-class unknown_exception : public exception
-{
-public:
-    /**
-     * @brief       Get the message of the exception.
-     * @return      The exception message.
-     */
-    char const* what() const noexcept override
-    {
-        return "unknown exception";
     }
 };
 
 }
-
-#endif

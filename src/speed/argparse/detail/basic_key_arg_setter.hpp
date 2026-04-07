@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -40,7 +40,7 @@ namespace speed::argparse::detail {
  * @brief        Class allowing configuring a key argument.
  */
 template<typename AllocatorT, typename ActualT = std::false_type>
-class basic_key_arg_setter : virtual public type_traits::basic_crtp_base<
+class basic_key_arg_setter : virtual public type_traits::basic_crtp_base_t<
         basic_base_arg_setter, basic_key_arg_setter, ActualT, std::false_type, AllocatorT>
 {
 public:
@@ -58,11 +58,11 @@ public:
     using arg_parser_type = basic_arg_parser<AllocatorT>;
 
     /** Type that represents the class allowing configuring a base argument. */
-    using base_arg_setter_type = type_traits::basic_crtp_base<
+    using base_arg_setter_type = type_traits::basic_crtp_base_t<
             basic_base_arg_setter, basic_key_arg_setter, ActualT, std::false_type, AllocatorT>;
 
     /** Type that represents the actual type of the object. */
-    using self_type = type_traits::basic_crtp_self<
+    using self_type = type_traits::basic_crtp_self_t<
             basic_key_arg_setter, ActualT, std::false_type, AllocatorT>;
 
     /**

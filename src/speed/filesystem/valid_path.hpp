@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -49,7 +49,7 @@ public:
      * @param       err_code : If function fails it holds the platform-dependent error code.
      * @return      If function is successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] virtual bool is_valid(std::error_code* err_code = nullptr)
+    [[nodiscard]] virtual bool is_valid(std::error_code* err_code = nullptr) noexcept
     {
         if (access_mods_.is_not_empty() && file_typs_.is_not_empty())
         {
@@ -130,7 +130,7 @@ public:
      * @param       err_code : If function fails it holds the platform-dependent error code.
      * @return      If function is successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) override
+    [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) noexcept override
     {
         BaseT::set_access_modes(system::filesystem::access_modes::READ);
         return BaseT::is_valid(err_code);
@@ -152,7 +152,7 @@ public:
      * @param       err_code : If function fails it holds the platform-dependent error code.
      * @return      If function is successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) override
+    [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) noexcept override
     {
         BaseT::set_access_modes(system::filesystem::access_modes::WRITE);
         return BaseT::is_valid(err_code);
@@ -174,7 +174,7 @@ public:
      * @param       err_code : If function fails it holds the platform-dependent error code.
      * @return      If function is successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) override
+    [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) noexcept override
     {
         BaseT::set_access_modes(system::filesystem::access_modes::EXECUTE);
         return BaseT::is_valid(err_code);
@@ -196,7 +196,7 @@ public:
      * @param       err_code : If function fails it holds the platform-dependent error code.
      * @return      If function is successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) override
+    [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) noexcept override
     {
         BaseT::set_file_types(system::filesystem::file_types::REGULAR_FILE);
         return BaseT::is_valid(err_code);
@@ -218,7 +218,7 @@ public:
      * @param       err_code : If function fails it holds the platform-dependent error code.
      * @return      If function is successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) override
+    [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) noexcept override
     {
         BaseT::set_file_types(system::filesystem::file_types::DIRECTORY);
         return BaseT::is_valid(err_code);
@@ -241,11 +241,12 @@ public:
      * @param       err_code : If function fails it holds the platform-dependent error code.
      * @return      If function is successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) override
+    [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) noexcept override
     {
         BaseT::set_access_modes(system::filesystem::access_modes::WRITE);
         BaseT::set_file_types(system::filesystem::file_types::REGULAR_FILE);
-        
+
+        // TODO: Make this noexcept.
         if (!system::filesystem::access(BaseT::c_str(), system::filesystem::access_modes::EXISTS))
         {
             auto parent_pth = BaseT::parent_path();
@@ -279,7 +280,7 @@ public:
      * @param       err_code : If function fails it holds the platform-dependent error code.
      * @return      If function is successful true is returned, otherwise false is returned.
      */
-    [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) override
+    [[nodiscard]] bool is_valid(std::error_code* err_code = nullptr) noexcept override
     {
         BaseT::set_access_modes(system::filesystem::access_modes::WRITE);
         BaseT::set_file_types(system::filesystem::file_types::DIRECTORY);

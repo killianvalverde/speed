@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2025 Killian Valverde.
+ * Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -64,7 +64,7 @@ private:
     using stack_type = std::stack<T>;
 
     /** Directory entity type. */
-    using system_directory_entity_type = system::filesystem::directory_entity;
+    using system_directory_entry_type = system::filesystem::directory_entity;
 
 public:
     class const_iterator;
@@ -72,7 +72,7 @@ public:
     /**
      * @brief       Represents a single entry in a directory traversal.
      */
-    class directory_entity
+    class directory_entry
     {
     private:
         /** Directory entity type. */
@@ -192,7 +192,7 @@ public:
          * @param       directory_entity_stck : Stack containing directory entity type information.
          * @param       composit : Pointer to a directory iteration context.
          */
-        explicit directory_entity(
+        explicit directory_entry(
                 const std::filesystem::path& cur_fle_,
                 const stack_type<system_directory_entity_type>& directory_entity_stck,
                 const directory_iteration* composit
@@ -226,7 +226,7 @@ public:
         using self_type = const_iterator;
 
         /** The value encapsulated by the iterator. */
-        using value_type = directory_entity;
+        using value_type = directory_entry;
 
         /** Constructor with parameters. */
         explicit const_iterator(const directory_iteration* composit);
@@ -324,7 +324,7 @@ public:
         std::filesystem::path cur_fle_;
 
         /** Stack of directories entities used to explore recursivelly the filesystem. */
-        stack_type<system_directory_entity_type> directory_entity_stck_;
+        stack_type<system_directory_entry_type> directory_entity_stck_;
 
         /** Set of visited inodes to avoid infinite recursions in case of fs corruptions. */
         set_type<system::filesystem::inode_t> vistd_inos_;
@@ -355,6 +355,7 @@ public:
     explicit directory_iteration(PathT_&& root_pth)
             : root_pth_(std::forward<PathT_>(root_pth))
     {
+        // TODO: This shouldn't be necessary. (make_preferred)
         if (root_pth_.native().find(SPEED_ALT_PATH_SEPARATOR_CHAR) != string_type::npos)
         {
             root_pth_ = get_normalized_path(root_pth_);
@@ -554,7 +555,21 @@ private:
     /**
      * @brief       Updates the compiled regular expression used for matching.
      */
-    void update_regex();
+    void update_regex()
+    {
+        typename regex_type::flag_type flg;
+
+        if (case_insensitve_)
+        {
+            flg = regex_type::ECMAScript | regex_type::icase;
+        }
+        else
+        {
+            flg = regex_type::ECMAScript;
+        }
+
+        regex_to_mtch_.assign(regex_to_mtch_str_, flg);
+    }
 
 private:
     /** The root directory of the iteration. */
@@ -593,7 +608,7 @@ private:
     /** Specify whether resolve directory symbolic links during the iteration. */
     bool resolve_entries_symlnks_ = false;
 
-    friend class directory_entity;
+    friend class directory_entry;
     friend class const_iterator;
 };
 
