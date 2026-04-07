@@ -34,8 +34,8 @@ namespace speed::time {
  * @brief Base interface for clock implementations.
  *
  * This class defines a common interface for retrieving the current time.
- * Derived classes must implement the @ref get_time function to provide
- * a time value according to their specific clock source.
+ * Derived classes must implement the get_time function to provide a time value according to
+ * their specific clock source.
  */
 class clock_base
 {
@@ -48,8 +48,7 @@ public:
     /**
      * @brief Retrieves the current time.
      *
-     * @return A @ref system::time::time_specification representing
-     *         the current time of the clock.
+     * @return A speed::system::time::time_specification representing the current time of the clock.
      */
     [[nodiscard]] virtual system::time::time_value get_time() const noexcept = 0;
 };

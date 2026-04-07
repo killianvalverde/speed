@@ -34,9 +34,7 @@ namespace speed::time {
 /**
  * @brief CPU time clock implementation.
  *
- * This clock provides the amount of CPU time consumed by the current
- * process.
- *
+ * This clock provides the amount of CPU time consumed by the current process.
  * It is typically used for performance analysis and profiling.
  */
 class cpu_clock : public clock_base
@@ -45,8 +43,7 @@ public:
     /**
      * @brief Retrieves the current CPU time.
      *
-     * @return A @ref system::time::time_specification representing
-     *         the CPU time consumed.
+     * @return A speed::system::time::time_specification representing the CPU time consumed.
      */
     [[nodiscard]] system::time::time_value get_time() const noexcept override
     {

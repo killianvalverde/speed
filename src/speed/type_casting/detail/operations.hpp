@@ -278,14 +278,14 @@ bool try_type_cast(const char* arg, TargetT& res, std::error_code* err_code) noe
 // Non-narrow C-string --> numeric_value
 template<typename TargetT, typename CharT>
 requires (
-        type_traits::is_character_v<CharT> &&
-        !std::same_as<CharT, char> &&
-        (std::integral<TargetT> || std::floating_point<TargetT>)
+    type_traits::is_character_v<CharT> &&
+    !std::same_as<CharT, char> &&
+    (std::integral<TargetT> || std::floating_point<TargetT>)
 )
 bool try_type_cast(
-        const CharT* arg,
-        TargetT& res,
-        std::error_code* err_code
+    const CharT* arg,
+    TargetT& res,
+    std::error_code* err_code
 ) noexcept
 {
     using string_type = std::basic_string<char>;
@@ -310,9 +310,9 @@ bool try_type_cast(
 template<typename RepresentationT, typename PeriodT, typename CharT>
 requires (std::is_integral_v<RepresentationT>)
 bool try_type_cast(
-        const CharT* arg,
-        std::chrono::duration<RepresentationT, PeriodT>& res,
-        std::error_code* err_code
+    const CharT* arg,
+    std::chrono::duration<RepresentationT, PeriodT>& res,
+    std::error_code* err_code
 ) noexcept
 {
     RepresentationT rep;
@@ -329,9 +329,9 @@ bool try_type_cast(
 // Generic C-string --> std::basic_string
 template<typename CharT, typename CharTraitsT, typename AllocatorT>
 bool try_type_cast(
-        const CharT* arg,
-        std::basic_string<CharT, CharTraitsT, AllocatorT>& res,
-        std::error_code* err_code
+    const CharT* arg,
+    std::basic_string<CharT, CharTraitsT, AllocatorT>& res,
+    std::error_code* err_code
 ) noexcept
 {
     if (arg == nullptr)
@@ -360,9 +360,9 @@ bool try_type_cast(
 // C-string --> std::wstring
 template<typename CharTraitsT, typename AllocatorT>
 bool try_type_cast(
-        const char* arg,
-        std::basic_string<wchar_t, CharTraitsT, AllocatorT>& res,
-        std::error_code* err_code
+    const char* arg,
+    std::basic_string<wchar_t, CharTraitsT, AllocatorT>& res,
+    std::error_code* err_code
 ) noexcept
 {
     if (arg == nullptr)
@@ -382,9 +382,9 @@ bool try_type_cast(
 // Wide C-string --> std::string
 template<typename CharTraitsT, typename AllocatorT>
 bool try_type_cast(
-        const wchar_t* arg,
-        std::basic_string<char, CharTraitsT, AllocatorT>& res,
-        std::error_code* err_code
+    const wchar_t* arg,
+    std::basic_string<char, CharTraitsT, AllocatorT>& res,
+    std::error_code* err_code
 ) noexcept
 {
     if (arg == nullptr)
@@ -404,9 +404,9 @@ bool try_type_cast(
 // Generic C-string --> std::basic_regex (compatible)
 template<typename CharT, typename RegexTratisT>
 bool try_type_cast(
-        const CharT* arg,
-        std::basic_regex<CharT, RegexTratisT>& res,
-        std::error_code* err_code
+    const CharT* arg,
+    std::basic_regex<CharT, RegexTratisT>& res,
+    std::error_code* err_code
 ) noexcept
 {
     if (arg == nullptr)
@@ -440,9 +440,9 @@ bool try_type_cast(
 template<typename CharT, typename RegexCharT, typename RegexTraitsT>
 requires (!std::same_as<CharT, RegexCharT>)
 bool try_type_cast(
-        const CharT* arg,
-        std::basic_regex<RegexCharT, RegexTraitsT>& res,
-        std::error_code* err_code
+    const CharT* arg,
+    std::basic_regex<RegexCharT, RegexTraitsT>& res,
+    std::error_code* err_code
 ) noexcept
 {
     using string_type = std::basic_string<RegexCharT>;
@@ -485,9 +485,9 @@ bool try_type_cast(
 template<typename CharT>
 requires std::same_as<CharT, std::filesystem::path::value_type>
 bool try_type_cast(
-        const CharT* arg,
-        std::filesystem::path& res,
-        std::error_code* err_code
+    const CharT* arg,
+    std::filesystem::path& res,
+    std::error_code* err_code
 ) noexcept
 {
     if (arg == nullptr)
@@ -521,9 +521,9 @@ bool try_type_cast(
 template<typename CharT>
 requires (!std::same_as<CharT, std::filesystem::path::value_type>)
 bool try_type_cast(
-        const CharT* arg,
-        std::filesystem::path& res,
-        std::error_code* err_code
+    const CharT* arg,
+    std::filesystem::path& res,
+    std::error_code* err_code
 ) noexcept
 {
     using path_char_type = std::filesystem::path::value_type;
@@ -566,13 +566,13 @@ bool try_type_cast(
 // Generic C-string --> valid_path
 template<typename TargetT, typename CharT>
 requires (
-        type_traits::is_character_v<CharT> &&
-        std::derived_from<TargetT, filesystem::valid_path>
+    type_traits::is_character_v<CharT> &&
+    std::derived_from<TargetT, filesystem::valid_path>
 )
 bool try_type_cast(
-        const CharT* arg,
-        TargetT& res,
-        std::error_code* err_code
+    const CharT* arg,
+    TargetT& res,
+    std::error_code* err_code
 ) noexcept
 {
     if (arg == nullptr)
@@ -593,9 +593,9 @@ bool try_type_cast(
 template<typename TargetT, typename CharT, typename CharTraitsT>
 requires (type_traits::is_character_v<CharT>)
 bool try_type_cast(
-        std::basic_string_view<CharT, CharTraitsT> arg,
-        TargetT& res,
-        std::error_code* err_code
+    std::basic_string_view<CharT, CharTraitsT> arg,
+    TargetT& res,
+    std::error_code* err_code
 ) noexcept
 {
     if constexpr (std::same_as<CharTraitsT, std::char_traits<CharT>>)
@@ -626,9 +626,9 @@ bool try_type_cast(
 // std::filesystem::path --> TargetT
 template<typename TargetT>
 bool try_type_cast(
-        const std::filesystem::path& arg,
-        TargetT& res,
-        std::error_code* err_code
+    const std::filesystem::path& arg,
+    TargetT& res,
+    std::error_code* err_code
 ) noexcept
 {
     return try_type_cast(arg.c_str(), res, err_code);

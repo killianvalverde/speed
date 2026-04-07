@@ -57,25 +57,25 @@ namespace speed::system::time {
 class calendar_time
 {
 public:
-    /** @brief Type used to represent the year. */
+    /** Type used to represent the year. */
     using year_type = std::uint16_t;
 
-    /** @brief Type used to represent the month. */
+    /** Type used to represent the month. */
     using month_type = std::uint8_t;
 
-    /** @brief Type used to represent the day. */
+    /** Type used to represent the day. */
     using day_type = std::uint8_t;
 
-    /** @brief Type used to represent the hour. */
+    /** Type used to represent the hour. */
     using hour_type = std::uint8_t;
 
-    /** @brief Type used to represent the minute. */
+    /** Type used to represent the minute. */
     using minute_type = std::uint8_t;
 
-    /** @brief Type used to represent the second. */
+    /** Type used to represent the second. */
     using second_type = std::uint8_t;
 
-    /** @brief Type used to represent the millisecond. */
+    /** Type used to represent the millisecond. */
     using millisecond_type = std::uint16_t;
 
     /**
@@ -97,21 +97,21 @@ public:
      * No validation is performed on the provided values.
      */
     constexpr calendar_time(
-            year_type year,
-            month_type month,
-            day_type day,
-            hour_type hour,
-            minute_type minute,
-            second_type second,
-            millisecond_type millisecond
+        year_type year,
+        month_type month,
+        day_type day,
+        hour_type hour,
+        minute_type minute,
+        second_type second,
+        millisecond_type millisecond
     ) noexcept
-            : year_(year)
-            , month_(month)
-            , day_(day)
-            , hour_(hour)
-            , minute_(minute)
-            , second_(second)
-            , millisecond_(millisecond)
+        : year_(year)
+        , month_(month)
+        , day_(day)
+        , hour_(hour)
+        , minute_(minute)
+        , second_(second)
+        , millisecond_(millisecond)
     {
     }
 
@@ -316,25 +316,25 @@ public:
     }
     
 private:
-    /** @brief Year component. */
+    /** Year component. */
     year_type year_ = 1970;
 
-    /** @brief Month component. */
+    /** Month component. */
     month_type month_ = 1;
 
-    /** @brief Day component. */
+    /** Day component. */
     day_type day_ = 1;
 
-    /** @brief Hour component. */
+    /** Hour component. */
     hour_type hour_ = 0;
 
-    /** @brief Minute component. */
+    /** Minute component. */
     minute_type minute_ = 0;
 
-    /** @brief Second component. */
+    /** Second component. */
     second_type second_ = 0;
 
-    /** @brief Millisecond component. */
+    /** Millisecond component. */
     millisecond_type millisecond_ = 0;
 };
 

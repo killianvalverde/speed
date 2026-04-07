@@ -34,23 +34,23 @@ namespace detail {
 
 template<typename CharT, typename CharTraitsT, typename AllocatorT>
 bool try_type_cast(
-        const CharT* arg,
-        std::basic_string<CharT, CharTraitsT, AllocatorT>& res,
-        std::error_code* err_code
+    const CharT* arg,
+    std::basic_string<CharT, CharTraitsT, AllocatorT>& res,
+    std::error_code* err_code
 ) noexcept;
 
 template<typename CharTraitsT, typename AllocatorT>
 bool try_type_cast(
-        const char* arg,
-        std::basic_string<wchar_t, CharTraitsT, AllocatorT>& res,
-        std::error_code* err_code
+    const char* arg,
+    std::basic_string<wchar_t, CharTraitsT, AllocatorT>& res,
+    std::error_code* err_code
 ) noexcept;
 
 template<typename CharTraitsT, typename AllocatorT>
 bool try_type_cast(
-        const wchar_t* arg,
-        std::basic_string<char, CharTraitsT, AllocatorT>& res,
-        std::error_code* err_code
+    const wchar_t* arg,
+    std::basic_string<char, CharTraitsT, AllocatorT>& res,
+    std::error_code* err_code
 ) noexcept;
 
 }
@@ -63,7 +63,7 @@ TargetT type_cast(const SourceT&);
 
 template<typename TargetT, typename SourceT, typename InvocableT>
 requires std::invocable<InvocableT> &&
-        std::convertible_to<std::invoke_result_t<InvocableT>, TargetT>
+    std::convertible_to<std::invoke_result_t<InvocableT>, TargetT>
 TargetT type_cast_or(const SourceT& arg, InvocableT&& callabl);
 
 template<typename SourceT>

@@ -35,7 +35,7 @@ namespace speed::type_casting {
  * @brief Exception thrown on type casting failure.
  *
  * @details This exception is raised when a type casting operation fails.
- * It extends @ref exception::source_location_exception to provide additional context such as
+ * It extends speed::exception::source_location_exception to provide additional context such as
  * source location and error code.
  */
 class type_cast_exception : public exception::source_location_exception
@@ -47,7 +47,7 @@ public:
      * @param ec Error code describing the failure.
      */
     explicit type_cast_exception(std::error_code ec)
-            : source_location_exception("type_cast failed", ec)
+        : source_location_exception("type_cast failed", ec)
     {
     }
 };

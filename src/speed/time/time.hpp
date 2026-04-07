@@ -27,6 +27,7 @@
 #pragma once
 
 #include "basic_chrono.hpp"
+#include "clock_base.hpp"
 #include "cpu_clock.hpp"
 #include "monotonic_clock.hpp"
 

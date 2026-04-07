@@ -79,8 +79,8 @@ template <typename CharT>
 struct character_traits_of_helper<CharT*>
 {
     using type = std::enable_if_t<
-            is_character<CharT>::value,
-            std::char_traits<std::remove_cv_t<CharT>>>;
+        is_character<CharT>::value,
+        std::char_traits<std::remove_cv_t<CharT>>>;
 };
 
 template <typename T>

@@ -34,8 +34,8 @@ namespace speed::time {
 /**
  * @brief Monotonic clock implementation.
  *
- * This clock provides a monotonically increasing time value that is not
- * affected by system clock adjustments (e.g., manual changes or NTP updates).
+ * This clock provides a monotonically increasing time value that is not affected by system
+ * clock adjustments (e.g., manual changes or NTP updates).
  *
  * It is typically used for measuring time intervals and durations.
  */
@@ -45,8 +45,7 @@ public:
     /**
      * @brief Retrieves the current monotonic time.
      *
-     * @return A @ref system::time::time_specification representing
-     *         the current monotonic time.
+     * @return A speed::system::time::time_specification representing the current monotonic time.
      */
     [[nodiscard]] system::time::time_value get_time() const noexcept override
     {

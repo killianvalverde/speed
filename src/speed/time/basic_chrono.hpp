@@ -37,17 +37,17 @@ namespace speed::time {
 /**
  * @brief Utility for measuring elapsed time.
  *
- * @tparam ClockT Clock type used to retrieve time values.
- *
- * @details The clock type must inherit from @ref clock_base.
+ * The clock type must inherit from speed::time::clock_base.
  * The chrono operates with three states: READY, RUNNING, and STOPPED.
+ *
+ * @tparam ClockT Clock type used to retrieve time values.
  */
 template<typename ClockT>
 requires std::is_base_of_v<clock_base, ClockT>
 class basic_chrono
 {
 public:
-    /** @brief Type of the underlying clock. */
+    /** Type of the underlying clock. */
     using clock_type = ClockT;
 
 private:
@@ -133,7 +133,7 @@ public:
     /**
      * @brief Restarts the chrono.
      *
-     * Equivalent to calling @ref reset followed by @ref start.
+     * Equivalent to calling reset followed by start.
      */
     void restart() noexcept
     {
@@ -144,8 +144,7 @@ public:
     /**
      * @brief Retrieves the elapsed time.
      *
-     * @return A @ref system::time::time_specification representing
-     *         the elapsed time.
+     * @return A speed::system::time::time_specification representing the elapsed time.
      *
      * @note The returned value depends on the current state:
      * - RUNNING: current elapsed time
@@ -191,16 +190,16 @@ public:
     }
 
 private:
-    /** @brief Start time of the current measurement. */
+    /** Start time of the current measurement. */
     system::time::time_value start_tm_;
 
-    /** @brief Stored elapsed time when stopped. */
+    /** Stored elapsed time when stopped. */
     system::time::time_value elapsed_tm_;
 
-    /** @brief Current state of the chrono. */
+    /** Current state of the chrono. */
     chrono_states chrono_stt_ = chrono_states::READY;
 
-    /** @brief Clock instance used for time retrieval. */
+    /** Clock instance used for time retrieval. */
     clock_type clck_;
 };
 
@@ -213,15 +212,14 @@ private:
  *
  * @param os Output stream.
  * @param rhs Chrono instance.
- *
  * @return Reference to the output stream.
  *
  * @details The elapsed time is formatted as: seconds.nanoseconds (9 digits, zero-padded).
  */
 template<typename CharT, typename CharTraitsT, typename ClockT>
 std::basic_ostream<CharT, CharTraitsT>& operator <<(
-        std::basic_ostream<CharT, CharTraitsT>& os,
-        const basic_chrono<ClockT>& rhs
+    std::basic_ostream<CharT, CharTraitsT>& os,
+    const basic_chrono<ClockT>& rhs
 )
 {
     // TODO: Implement RAII for ostream state.
@@ -241,14 +239,14 @@ std::basic_ostream<CharT, CharTraitsT>& operator <<(
 /**
  * @brief Chrono type using a CPU clock.
  *
- * Measures elapsed CPU time using @ref cpu_clock.
+ * Measures elapsed CPU time using speed::time::cpu_clock.
  */
 using cpu_chrono = basic_chrono<cpu_clock>;
 
 /**
  * @brief Chrono type using a monotonic clock.
  *
- * Measures elapsed time using @ref monotonic_clock.
+ * Measures elapsed time using speed::time::monotonic_clock.
  */
 using monotonic_chrono = basic_chrono<monotonic_clock>;
 

@@ -39,7 +39,6 @@ namespace speed::system::time {
  *                      with the current monotonic time (seconds and nanoseconds).
  * @param[out] err_code Optional pointer to a std::error_code that will be set
  *                      in case of failure. If nullptr, errors are ignored.
- *
  * @return true if the time was successfully retrieved, false otherwise.
  */
 bool get_monotonic_time(time_value& time_val, std::error_code* err_code = nullptr) noexcept;
@@ -51,7 +50,6 @@ bool get_monotonic_time(time_value& time_val, std::error_code* err_code = nullpt
  *                      with the total CPU time (user + kernel) consumed by the process.
  * @param[out] err_code Optional pointer to a std::error_code that will be set
  *                      in case of failure. If nullptr, errors are ignored.
- *
  * @return true if the CPU time was successfully retrieved, false otherwise.
  */
 bool get_cpu_time(time_value& time_val, std::error_code* err_code = nullptr) noexcept;

@@ -42,8 +42,7 @@ bool get_monotonic_time(time_value& time_val, std::error_code* err_code) noexcep
         return false;
     }
 
-    time_val.set_seconds(ts.tv_sec)
-            .set_nanoseconds(ts.tv_nsec);
+    time_val.set_seconds(ts.tv_sec).set_nanoseconds(ts.tv_nsec);
 
     return true;
 }
@@ -58,8 +57,7 @@ bool get_cpu_time(time_value& time_val, std::error_code* err_code) noexcept
         return false;
     }
 
-    time_val.set_seconds(ts.tv_sec)
-            .set_nanoseconds(ts.tv_nsec);
+    time_val.set_seconds(ts.tv_sec).set_nanoseconds(ts.tv_nsec);
 
     return true;
 }

@@ -66,16 +66,16 @@ using allocator_of_t = allocator_of<T>::type;
  * @tparam ParameterTs Additional template parameters.
  */
 template<
-        template<typename...> class BaseT,
-        template<typename...> class DerivedT,
-        typename ActualT,
-        typename SentinelT,
-        typename... ParameterTs
+    template<typename...> class BaseT,
+    template<typename...> class DerivedT,
+    typename ActualT,
+    typename SentinelT,
+    typename... ParameterTs
 >
 using basic_crtp_base_t = std::conditional_t<
-        std::is_same_v<ActualT, SentinelT>,
-        BaseT<ParameterTs..., DerivedT<ParameterTs..., ActualT>>,
-        BaseT<ParameterTs..., ActualT>
+    std::is_same_v<ActualT, SentinelT>,
+    BaseT<ParameterTs..., DerivedT<ParameterTs..., ActualT>>,
+    BaseT<ParameterTs..., ActualT>
 >;
 
 /**
@@ -90,15 +90,15 @@ using basic_crtp_base_t = std::conditional_t<
  * @tparam ParameterTs Additional template parameters.
  */
 template<
-        template<typename...> class SelfT,
-        typename ActualT,
-        typename SentinelT,
-        typename... ParameterTs
+    template<typename...> class SelfT,
+    typename ActualT,
+    typename SentinelT,
+    typename... ParameterTs
 >
 using basic_crtp_self_t = std::conditional_t<
-        std::is_same_v<ActualT, SentinelT>,
-        SelfT<ParameterTs...>,
-        ActualT
+    std::is_same_v<ActualT, SentinelT>,
+    SelfT<ParameterTs...>,
+    ActualT
 >;
 
 /**
@@ -146,13 +146,13 @@ using character_type_of_t = character_type_of<T>::type;
  */
 template<typename T>
 struct is_character : std::disjunction<
-        std::is_same<std::remove_cv_t<T>, char>,
-        std::is_same<std::remove_cv_t<T>, unsigned char>,
-        std::is_same<std::remove_cv_t<T>, signed char>,
-        std::is_same<std::remove_cv_t<T>, wchar_t>,
-        std::is_same<std::remove_cv_t<T>, char8_t>,
-        std::is_same<std::remove_cv_t<T>, char16_t>,
-        std::is_same<std::remove_cv_t<T>, char32_t>
+    std::is_same<std::remove_cv_t<T>, char>,
+    std::is_same<std::remove_cv_t<T>, unsigned char>,
+    std::is_same<std::remove_cv_t<T>, signed char>,
+    std::is_same<std::remove_cv_t<T>, wchar_t>,
+    std::is_same<std::remove_cv_t<T>, char8_t>,
+    std::is_same<std::remove_cv_t<T>, char16_t>,
+    std::is_same<std::remove_cv_t<T>, char32_t>
 > {};
 
 /**
@@ -168,8 +168,8 @@ constexpr bool is_character_v = is_character<T>::value;
  */
 template<typename T>
 struct is_character_pointer : std::conjunction<
-        std::is_pointer<T>,
-        is_character<std::remove_pointer_t<T>>
+    std::is_pointer<T>,
+    is_character<std::remove_pointer_t<T>>
 > {};
 
 /**

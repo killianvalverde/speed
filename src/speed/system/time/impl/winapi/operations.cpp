@@ -48,7 +48,7 @@ bool get_monotonic_time(time_value& time_val, std::error_code* err_code) noexcep
     }
 
     time_val.set_seconds(static_cast<std::uint64_t>(count.QuadPart / freq.QuadPart))
-            .set_nanoseconds(count.QuadPart % freq.QuadPart * 1'000'000'000ULL / freq.QuadPart);
+        .set_nanoseconds(count.QuadPart % freq.QuadPart * 1'000'000'000ULL / freq.QuadPart);
 
     return true;
 }
@@ -74,7 +74,7 @@ bool get_cpu_time(time_value& time_val, std::error_code* err_code) noexcept
     const std::uint64_t total_100ns = filetime_to_uint64(user_tm) + filetime_to_uint64(kernel_tm);
 
     time_val.set_seconds(total_100ns / 10'000'000ULL)
-            .set_nanoseconds(total_100ns % 10'000'000ULL * 100);
+        .set_nanoseconds(total_100ns % 10'000'000ULL * 100);
 
     return true;
 }

@@ -51,14 +51,14 @@ namespace speed::system::time {
 class time_value
 {
 public:
-    /** @brief Type used to represent nanoseconds. */
+    /** Type used to represent nanoseconds. */
     using nanoseconds_type = std::uint64_t;
 
-    /** @brief Type used to represent seconds. */
+    /** Type used to represent seconds. */
     using seconds_type = std::uint64_t;
 
 private:
-    /** @brief Number of nanoseconds in one second. */
+    /** Number of nanoseconds in one second. */
     static constexpr std::uint64_t NSEC_PER_SEC = 1'000'000'000ULL;
 
 public:
@@ -76,8 +76,8 @@ public:
      * @note The resulting value is normalized so that nanoseconds is less than one second.
      */
     constexpr time_value(seconds_type sec, nanoseconds_type nsec) noexcept
-            : sec_(sec)
-            , nsec_(nsec)
+        : sec_(sec)
+        , nsec_(nsec)
     {
         balance_nseconds();
     }
@@ -268,10 +268,10 @@ private:
     }
     
 private:
-    /** @brief Number of seconds. */
+    /** Number of seconds. */
     seconds_type sec_ = 0;
 
-    /** @brief Number of nanoseconds. */
+    /** Number of nanoseconds. */
     nanoseconds_type nsec_ = 0;
 };
 
