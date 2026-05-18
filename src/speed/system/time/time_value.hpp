@@ -164,7 +164,7 @@ public:
             return *this;
         }
 
-        sec_  -= rhs.sec_;
+        sec_ -= rhs.sec_;
 
         if (nsec_ < rhs.nsec_)
         {
@@ -253,7 +253,7 @@ public:
         sec_ = sec;
         return *this;
     }
-    
+
 private:
     /**
      * @brief Normalizes the nanoseconds component.
@@ -266,7 +266,7 @@ private:
         sec_ += nsec_ / NSEC_PER_SEC;
         nsec_ %= NSEC_PER_SEC;
     }
-    
+
 private:
     /** Number of seconds. */
     seconds_type sec_ = 0;

@@ -314,7 +314,7 @@ public:
         millisecond_ = millisecond;
         return *this;
     }
-    
+
 private:
     /** Year component. */
     year_type year_ = 1970;

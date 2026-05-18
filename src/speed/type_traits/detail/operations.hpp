@@ -35,47 +35,47 @@
 /** @cond */
 namespace speed::type_traits::detail {
 
-template <typename T>
+template<typename T>
 struct allocator_of_helper
 {
 };
 
-template <typename CharT, typename CharTraitsT, typename AllocatorT>
+template<typename CharT, typename CharTraitsT, typename AllocatorT>
 struct allocator_of_helper<std::basic_string<CharT, CharTraitsT, AllocatorT>>
 {
     using type = AllocatorT;
 };
 
-template <typename CharT, typename CharTraitsT>
+template<typename CharT, typename CharTraitsT>
 struct allocator_of_helper<std::basic_string_view<CharT, CharTraitsT>>
 {
     using type = std::allocator<CharT>;
 };
 
-template <typename CharT>
+template<typename CharT>
 struct allocator_of_helper<CharT*>
 {
     using type = std::allocator<std::remove_cv_t<CharT>>;
 };
 
-template <typename T>
+template<typename T>
 struct character_traits_of_helper
 {
 };
 
-template <typename CharT, typename CharTraitsT, typename AllocatorT>
+template<typename CharT, typename CharTraitsT, typename AllocatorT>
 struct character_traits_of_helper<std::basic_string<CharT, CharTraitsT, AllocatorT>>
 {
     using type = CharTraitsT;
 };
 
-template <typename CharT, typename CharTraitsT>
+template<typename CharT, typename CharTraitsT>
 struct character_traits_of_helper<std::basic_string_view<CharT, CharTraitsT>>
 {
     using type = CharTraitsT;
 };
 
-template <typename CharT>
+template<typename CharT>
 struct character_traits_of_helper<CharT*>
 {
     using type = std::enable_if_t<
@@ -83,24 +83,24 @@ struct character_traits_of_helper<CharT*>
         std::char_traits<std::remove_cv_t<CharT>>>;
 };
 
-template <typename T>
+template<typename T>
 struct character_type_of_helper
 {
 };
 
-template <typename CharT, typename CharTraitsT, typename AllocatorT>
+template<typename CharT, typename CharTraitsT, typename AllocatorT>
 struct character_type_of_helper<std::basic_string<CharT, CharTraitsT, AllocatorT>>
 {
     using type = CharT;
 };
 
-template <typename CharT, typename CharTraitsT>
+template<typename CharT, typename CharTraitsT>
 struct character_type_of_helper<std::basic_string_view<CharT, CharTraitsT>>
 {
     using type = CharT;
 };
 
-template <typename CharT>
+template<typename CharT>
 struct character_type_of_helper<CharT*>
 {
     using type = std::enable_if_t<is_character<CharT>::value, std::remove_cv_t<CharT>>;
@@ -119,4 +119,5 @@ struct underlying_type_of_helper<T, true>
 };
 
 }
+
 /** @endcond */

@@ -104,7 +104,8 @@ TargetT type_cast(const SourceT& arg)
  * @return The converted value on success, or the result of the fallback callable otherwise.
  */
 template<typename TargetT, typename SourceT, typename CallableT>
-requires std::invocable<CallableT> && std::convertible_to<std::invoke_result_t<CallableT>, TargetT>
+    requires std::invocable<CallableT> &&
+        std::convertible_to<std::invoke_result_t<CallableT>, TargetT>
 TargetT type_cast_or(const SourceT& arg, CallableT&& callabl)
 {
     std::error_code ec;

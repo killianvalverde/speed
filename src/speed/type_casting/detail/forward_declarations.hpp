@@ -62,8 +62,8 @@ template<typename TargetT, typename SourceT>
 TargetT type_cast(const SourceT&);
 
 template<typename TargetT, typename SourceT, typename InvocableT>
-requires std::invocable<InvocableT> &&
-    std::convertible_to<std::invoke_result_t<InvocableT>, TargetT>
+    requires std::invocable<InvocableT> &&
+        std::convertible_to<std::invoke_result_t<InvocableT>, TargetT>
 TargetT type_cast_or(const SourceT& arg, InvocableT&& callabl);
 
 template<typename SourceT>

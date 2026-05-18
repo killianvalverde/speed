@@ -277,11 +277,9 @@ bool try_type_cast(const char* arg, TargetT& res, std::error_code* err_code) noe
 
 // Non-narrow C-string --> numeric_value
 template<typename TargetT, typename CharT>
-requires (
-    type_traits::is_character_v<CharT> &&
-    !std::same_as<CharT, char> &&
-    (std::integral<TargetT> || std::floating_point<TargetT>)
-)
+    requires (type_traits::is_character_v<CharT> &&
+        !std::same_as<CharT, char> &&
+        (std::integral<TargetT> || std::floating_point<TargetT>))
 bool try_type_cast(
     const CharT* arg,
     TargetT& res,
@@ -308,7 +306,7 @@ bool try_type_cast(
 
 // Generic C-string --> std::chrono::duration
 template<typename RepresentationT, typename PeriodT, typename CharT>
-requires (std::is_integral_v<RepresentationT>)
+    requires std::is_integral_v<RepresentationT>
 bool try_type_cast(
     const CharT* arg,
     std::chrono::duration<RepresentationT, PeriodT>& res,
@@ -438,7 +436,7 @@ bool try_type_cast(
 
 // Generic C-string --> std::basic_regex (!compatible)
 template<typename CharT, typename RegexCharT, typename RegexTraitsT>
-requires (!std::same_as<CharT, RegexCharT>)
+    requires (!std::same_as<CharT, RegexCharT>)
 bool try_type_cast(
     const CharT* arg,
     std::basic_regex<RegexCharT, RegexTraitsT>& res,
@@ -483,7 +481,7 @@ bool try_type_cast(
 
 // Generic C-string --> std::filesystem::path (compatible)
 template<typename CharT>
-requires std::same_as<CharT, std::filesystem::path::value_type>
+    requires std::same_as<CharT, std::filesystem::path::value_type>
 bool try_type_cast(
     const CharT* arg,
     std::filesystem::path& res,
@@ -519,7 +517,7 @@ bool try_type_cast(
 
 // Generic C-string --> std::filesystem::path (!compatible)
 template<typename CharT>
-requires (!std::same_as<CharT, std::filesystem::path::value_type>)
+    requires (!std::same_as<CharT, std::filesystem::path::value_type>)
 bool try_type_cast(
     const CharT* arg,
     std::filesystem::path& res,
@@ -565,10 +563,8 @@ bool try_type_cast(
 
 // Generic C-string --> valid_path
 template<typename TargetT, typename CharT>
-requires (
-    type_traits::is_character_v<CharT> &&
-    std::derived_from<TargetT, filesystem::valid_path>
-)
+    requires type_traits::is_character_v<CharT> &&
+        std::derived_from<TargetT, filesystem::valid_path>
 bool try_type_cast(
     const CharT* arg,
     TargetT& res,
@@ -591,7 +587,7 @@ bool try_type_cast(
 
 // std::basic_string_view --> TargetT
 template<typename TargetT, typename CharT, typename CharTraitsT>
-requires (type_traits::is_character_v<CharT>)
+    requires type_traits::is_character_v<CharT>
 bool try_type_cast(
     std::basic_string_view<CharT, CharTraitsT> arg,
     TargetT& res,

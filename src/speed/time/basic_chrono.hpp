@@ -43,7 +43,7 @@ namespace speed::time {
  * @tparam ClockT Clock type used to retrieve time values.
  */
 template<typename ClockT>
-requires std::is_base_of_v<clock_base, ClockT>
+    requires std::is_base_of_v<clock_base, ClockT>
 class basic_chrono
 {
 public:
