@@ -29,7 +29,7 @@
 
 #include <cstdint>
 
-#include "../stringutils/stringutils.hpp"
+#include "../strings/strings.hpp"
 #include "../type_traits/type_traits.hpp"
 
 namespace speed::cryptography {

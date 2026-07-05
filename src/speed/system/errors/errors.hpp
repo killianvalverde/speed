@@ -18,31 +18,30 @@
  */
 
 /**
- * @file        errors.hpp
- * @brief       system errors main header.
- * @author      Killian Valverde
- * @date        2023/10/10
+ * @file errors.hpp
+ * @brief Main header for system::errors submodule.
+ * @author Killian Valverde
+ * @date 2023-10-10
  */
 
-#ifndef SPEED_SYSTEM_ERRORS_ERRORS_HPP
-#define SPEED_SYSTEM_ERRORS_ERRORS_HPP
+#pragma once
 
 #include "operations.hpp"
 
 namespace speed::system {
 
 /**
- * @brief       Constains ressources to assist handling with function errors.
+ * @brief Utilities related to system errors operations.
  */
 namespace errors {}
 
 #ifndef SPEED_DISABLE_ALIAS
 /**
- * @brief       Constains ressources to assist handling with function errors.
+ * @brief Alias for speed::system::errors namespace.
+ *
+ * Define SPEED_DISABLE_ALIAS to disable this alias.
  */
 namespace err = errors;
 #endif
 
 }
-
-#endif

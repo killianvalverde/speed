@@ -41,7 +41,7 @@
 #include <utility>
 #include <vector>
 
-#include "../../type_casting/type_casting.hpp"
+#include "../../conversions/conversions.hpp"
 #include "type_traits.hpp"
 
 namespace speed::argparse::detail {
@@ -172,7 +172,7 @@ public:
             std::error_code* err_code = nullptr
     ) noexcept override
     {
-        return type_casting::try_type_cast(arg, *holdr_, err_code);
+        return conversions::try_convert(arg, *holdr_, err_code);
     }
 
 private:
@@ -219,7 +219,7 @@ public:
     ) noexcept override
     {
         auto& val = holdr_->at(idx_);
-        if (!type_casting::try_type_cast(arg, val, err_code))
+        if (!conversions::try_convert(arg, val, err_code))
         {
             return false;
         }
@@ -363,7 +363,7 @@ public:
     ) noexcept override
     {
         target_type val;
-        if (!type_casting::try_type_cast(arg, val, err_code))
+        if (!conversions::try_convert(arg, val, err_code))
         {
             return false;
         }
@@ -492,7 +492,7 @@ public:
     ) noexcept override
     {
         target_type val;
-        if (!type_casting::try_type_cast(arg, val, err_code))
+        if (!conversions::try_convert(arg, val, err_code))
         {
             return false;
         }
@@ -621,7 +621,7 @@ public:
     ) noexcept override
     {
         target_type val;
-        if (!type_casting::try_type_cast(arg, val, err_code))
+        if (!conversions::try_convert(arg, val, err_code))
         {
             return false;
         }
@@ -758,7 +758,7 @@ public:
     ) noexcept override
     {
         target_type val;
-        if (!type_casting::try_type_cast(arg, val, err_code))
+        if (!conversions::try_convert(arg, val, err_code))
         {
             return false;
         }
@@ -813,7 +813,7 @@ public:
     ) noexcept override
     {
         target_type val;
-        if (!type_casting::try_type_cast(arg, val, err_code))
+        if (!conversions::try_convert(arg, val, err_code))
         {
             return false;
         }
@@ -948,7 +948,7 @@ public:
     ) noexcept override
     {
         target_type val;
-        if (!type_casting::try_type_cast(arg, val, err_code))
+        if (!conversions::try_convert(arg, val, err_code))
         {
             return false;
         }
@@ -1087,7 +1087,7 @@ public:
     ) noexcept override
     {
         target_type val;
-        if (!type_casting::try_type_cast(arg, val, err_code))
+        if (!conversions::try_convert(arg, val, err_code))
         {
             return false;
         }
@@ -1219,7 +1219,7 @@ public:
     ) noexcept override
     {
         target_type val;
-        if (!type_casting::try_type_cast(arg, val, err_code))
+        if (!conversions::try_convert(arg, val, err_code))
         {
             return false;
         }
@@ -1288,7 +1288,7 @@ public:
     ) noexcept override
     {
         target_type val;
-        if (!type_casting::try_type_cast(arg, val, err_code))
+        if (!conversions::try_convert(arg, val, err_code))
         {
             return false;
         }
@@ -1362,7 +1362,7 @@ public:
     ) noexcept override
     {
         target_type val;
-        if (!type_casting::try_type_cast(arg, val, err_code))
+        if (!conversions::try_convert(arg, val, err_code))
         {
             return false;
         }

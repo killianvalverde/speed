@@ -18,31 +18,30 @@
  */
 
 /**
- * @file        codecs.hpp
- * @brief       system codecs main header.
- * @author      Killian Valverde
- * @date        2024/10/16
+ * @file codecs.hpp
+ * @brief Main header for system::codecs submodule.
+ * @author Killian Valverde
+ * @date 2024-10-16
  */
 
-#ifndef SPEED_SYSTEM_CODECS_CODECS_HPP
-#define SPEED_SYSTEM_CODECS_CODECS_HPP
+#pragma once
 
 #include "operations.hpp"
 
 namespace speed::system {
 
 /**
- * @brief       Contains utilities encoding and decoding.
+ * @brief Utilities related to system encoding and decoding operations.
  */
 namespace codecs {}
 
 #ifndef SPEED_DISABLE_ALIAS
 /**
- * @brief       Contains utilities encoding and decoding.
+ * @brief Alias for speed::system::codecs namespace.
+ *
+ * Define SPEED_DISABLE_ALIAS to disable this alias.
  */
 namespace cod = codecs;
 #endif
 
 }
-
-#endif

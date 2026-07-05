@@ -11,23 +11,22 @@ set(SPEED_HEADER_ONLY_TARGETS
     speed_argparse
     speed_concepts
     speed_containers
+    speed_conversions
+    speed_cryptography
+    speed_enums
     speed_exception
+    speed_filesystem
     speed_iostream
-    speed_lowlevel
     speed_math
     speed_memory
-    speed_safety
-    speed_scalars
-    speed_stringutils
+    speed_numerics
+    speed_strings
     speed_time
-    speed_type_casting
     speed_type_traits
     speed
 )
 
 set(SPEED_COMPILED_TARGETS
-    speed_cryptography
-    speed_filesystem
     speed_system
 )
 
@@ -36,51 +35,51 @@ set(SPEED_TARGETS
     ${SPEED_COMPILED_TARGETS}
 )
 
-foreach(target IN LISTS SPEED_HEADER_ONLY_TARGETS)
+foreach (target IN LISTS SPEED_HEADER_ONLY_TARGETS)
     add_library(${target} INTERFACE)
-endforeach()
+endforeach ()
 
-foreach(target IN LISTS SPEED_COMPILED_TARGETS)
+foreach (target IN LISTS SPEED_COMPILED_TARGETS)
     add_library(${target} STATIC)
-endforeach()
+endforeach ()
 
 # =========================
 # Namespaced Aliases
 # =========================
-foreach(target IN LISTS SPEED_TARGETS)
+foreach (target IN LISTS SPEED_TARGETS)
     string(REPLACE "speed_" "" short_name ${target})
 
     set_target_properties(${target} PROPERTIES EXPORT_NAME ${short_name})
 
-    if(NOT TARGET speed::${short_name})
+    if (NOT TARGET speed::${short_name})
         add_library(speed::${short_name} ALIAS ${target})
-    endif()
-endforeach()
+    endif ()
+endforeach ()
 
 # =========================
 # Target Compile Settings
 # =========================
-foreach(target IN LISTS SPEED_HEADER_ONLY_TARGETS)
+foreach (target IN LISTS SPEED_HEADER_ONLY_TARGETS)
     target_compile_features(${target} INTERFACE cxx_std_20)
-endforeach()
+endforeach ()
 
-foreach(target IN LISTS SPEED_COMPILED_TARGETS)
+foreach (target IN LISTS SPEED_COMPILED_TARGETS)
     target_compile_features(${target} PUBLIC cxx_std_20)
-endforeach()
+endforeach ()
 
-if(MSVC)
-    foreach(target IN LISTS SPEED_HEADER_ONLY_TARGETS)
+if (MSVC)
+    foreach (target IN LISTS SPEED_HEADER_ONLY_TARGETS)
         target_compile_options(${target} INTERFACE
             /utf-8 /EHsc /Zc:preprocessor /Zc:__cplusplus
         )
-    endforeach()
+    endforeach ()
 
-    foreach(target IN LISTS SPEED_COMPILED_TARGETS)
+    foreach (target IN LISTS SPEED_COMPILED_TARGETS)
         target_compile_options(${target} PUBLIC
             /utf-8 /EHsc /Zc:preprocessor /Zc:__cplusplus
         )
-    endforeach()
-endif()
+    endforeach ()
+endif ()
 
 # =========================
 # Target Sources
@@ -125,7 +124,7 @@ set(SPEED_ARGPARSE_HEADERS
     argparse/detail/type_traits.hpp
     argparse/argparse.hpp
     argparse/basic_arg_parser.hpp
-    argparse/exception.hpp
+    argparse/exceptions.hpp
 )
 
 set(SPEED_CONCEPTS_HEADERS
@@ -135,7 +134,7 @@ set(SPEED_CONCEPTS_HEADERS
 
 set(SPEED_CONTAINERS_HEADERS
     containers/containers.hpp
-    containers/exception.hpp
+    containers/exceptions.hpp
     containers/flags.hpp
     containers/iterator_base.hpp
     containers/static_cache.hpp
@@ -143,6 +142,8 @@ set(SPEED_CONTAINERS_HEADERS
 
 set(SPEED_CRYPTOGRAPHY_SOURCES
     cryptography/city_hash.cpp
+    cryptography/city_hash.hpp
+    cryptography/cryptography.hpp
 )
 
 set(SPEED_CRYPTOGRAPHY_HEADERS
@@ -150,9 +151,15 @@ set(SPEED_CRYPTOGRAPHY_HEADERS
     cryptography/city_hash.hpp
 )
 
+set(SPEED_ENUMS_HEADERS
+    enums/enums.hpp
+    enums/is_flag_enum.hpp
+    enums/operations.hpp
+)
+
 set(SPEED_EXCEPTION_HEADERS
-    exception/exception_base.hpp
-    exception/exception.hpp
+    exceptions/exception_base.hpp
+    exceptions/exception.hpp
 )
 
 set(SPEED_FILESYSTEM_SOURCES
@@ -176,11 +183,6 @@ set(SPEED_IOSTREAM_HEADERS
     iostream/tiostream.hpp
 )
 
-set(SPEED_LOWLEVEL_HEADERS
-    lowlevel/lowlevel.hpp
-    lowlevel/operations.hpp
-)
-
 set(SPEED_MATH_HEADERS
     math/math.hpp
     math/operations.hpp
@@ -191,93 +193,61 @@ set(SPEED_MEMORY_HEADERS
     memory/operations.hpp
 )
 
-set(SPEED_SAFETY_HEADERS
-    safety/exception.hpp
-    safety/operations.hpp
-    safety/safety.hpp
+set(SPEED_NUMERICS_HEADERS
+    numerics/detail/operations.hpp
+    numerics/exception.hpp
+    numerics/numerics.hpp
+    numerics/operations.hpp
 )
 
-set(SPEED_SCALARS_HEADERS
-    scalars/is_flag_enum.hpp
-    scalars/operations.hpp
-    scalars/scalars.hpp
+set(SPEED_STRINGS_HEADERS
+    strings/detail/forward_declarations.hpp
+    strings/operations.hpp
+    strings/strings.hpp
+    strings/tstring.hpp
 )
 
-set(SPEED_STRINGUTILS_HEADERS
-    stringutils/detail/forward_declarations.hpp
-    stringutils/operations.hpp
-    stringutils/stringutils.hpp
-    stringutils/tstring.hpp
-)
-
-if(WIN32)
+if (WIN32)
     set(SPEED_SYSTEM_SOURCES
-        system/detail/winapi/codecs/operations.cpp
-        system/detail/winapi/filesystem/operations.cpp
-        system/detail/winapi/process/operations.cpp
-        system/detail/winapi/terminal/operations.cpp
-        system/detail/winapi/time/operations.cpp
+        system/filesystem/impl/winapi/operations.cpp
+        system/process/impl/winapi/operations.cpp
+        system/terminal/impl/winapi/operations.cpp
         system/time/impl/winapi/operations.cpp
     )
-else()
+else ()
     set(SPEED_SYSTEM_SOURCES
-        system/detail/glibc/codecs/operations.cpp
-        system/detail/glibc/filesystem/operations.cpp
-        system/detail/glibc/process/operations.cpp
-        system/detail/glibc/terminal/operations.cpp
-        system/detail/glibc/time/operations.cpp
+        system/filesystem/impl/posix/operations.cpp
+        system/process/impl/posix/operations.cpp
+        system/terminal/impl/posix/operations.cpp
         system/time/impl/posix/operations.cpp
     )
-endif()
+endif ()
 
 set(SPEED_SYSTEM_HEADERS
     system/codecs/codecs.hpp
     system/codecs/operations.hpp
-    system/detail/detail.hpp
-    system/detail/glibc/codecs/codecs.hpp
-    system/detail/glibc/codecs/operations.hpp
-    system/detail/glibc/filesystem/filesystem.hpp
-    system/detail/glibc/filesystem/operations.hpp
-    system/detail/glibc/filesystem/types.hpp
-    system/detail/glibc/glibc.hpp
-    system/detail/glibc/process/operations.hpp
-    system/detail/glibc/process/process.hpp
-    system/detail/glibc/terminal/operations.hpp
-    system/detail/glibc/terminal/terminal.hpp
-    system/detail/glibc/time/operations.hpp
-    system/detail/glibc/time/time.hpp
-    system/detail/winapi/codecs/codecs.hpp
-    system/detail/winapi/codecs/operations.hpp
-    system/detail/winapi/filesystem/filesystem.hpp
-    system/detail/winapi/filesystem/operations.hpp
-    system/detail/winapi/filesystem/types.hpp
-    system/detail/winapi/process/operations.hpp
-    system/detail/winapi/process/process.hpp
-    system/detail/winapi/terminal/operations.hpp
-    system/detail/winapi/terminal/terminal.hpp
-    system/detail/winapi/time/operations.hpp
-    system/detail/winapi/time/time.hpp
-    system/detail/winapi/winapi.hpp
     system/errors/errors.hpp
     system/errors/operations.hpp
-    system/exception/exception.hpp
-    system/exception/exceptions.hpp
     system/filesystem/access_modes.hpp
-    system/filesystem/directory_entity.hpp
+    system/filesystem/directory_stream.hpp
     system/filesystem/file_types.hpp
     system/filesystem/filesystem.hpp
     system/filesystem/operations.hpp
+    system/filesystem/symlink_mode.hpp
+    system/filesystem/symlink_target_type.hpp
     system/filesystem/types.hpp
+    system/platform/detail/ntapi.hpp
+    system/platform/detail/utf8_main.hpp
     system/platform/compatibility.hpp
-    system/platform/crossplatform_unicode_main.hpp
     system/platform/platform.hpp
-    system/platform/select_api.hpp
+    system/process/execution_result.hpp
     system/process/operations.hpp
     system/process/process.hpp
     system/process/types.hpp
+    system/process/user_id.hpp
+    system/terminal/color.hpp
     system/terminal/operations.hpp
     system/terminal/terminal.hpp
-    system/terminal/text_attribute.hpp
     system/time/calendar_time.hpp
     system/time/operations.hpp
     system/time/time.hpp
@@ -293,12 +263,12 @@ set(SPEED_TIME_HEADERS
     time/time.hpp
 )
 
-set(SPEED_TYPE_CASTING_HEADERS
-    type_casting/detail/forward_declarations.hpp
-    type_casting/detail/operations.hpp
-    type_casting/exception.hpp
-    type_casting/operations.hpp
-    type_casting/type_casting.hpp
+set(SPEED_CONVERSIONS_HEADERS
+    conversions/detail/forward_declarations.hpp
+    conversions/detail/operations.hpp
+    conversions/exception.hpp
+    conversions/operations.hpp
+    conversions/conversions.hpp
 )
 
 set(SPEED_TYPE_TRAITS_HEADERS
@@ -313,24 +283,23 @@ set(SPEED_HEADERS
     ${SPEED_ARGPARSE_HEADERS}
     ${SPEED_CONTAINERS_HEADERS}
     ${SPEED_CRYPTOGRAPHY_HEADERS}
+    ${SPEED_ENUMS_HEADERS}
     ${SPEED_EXCEPTION_HEADERS}
     ${SPEED_FILESYSTEM_HEADERS}
     ${SPEED_IOSTREAM_HEADERS}
-    ${SPEED_LOWLEVEL_HEADERS}
     ${SPEED_MATH_HEADERS}
     ${SPEED_MEMORY_HEADERS}
-    ${SPEED_SAFETY_HEADERS}
-    ${SPEED_SCALARS_HEADERS}
-    ${SPEED_STRINGUTILS_HEADERS}
+    ${SPEED_NUMERICS_HEADERS}
+    ${SPEED_STRINGS_HEADERS}
     ${SPEED_SYSTEM_HEADERS}
     ${SPEED_TIME_HEADERS}
-    ${SPEED_TYPE_CASTING_HEADERS}
+    ${SPEED_CONVERSIONS_HEADERS}
     ${SPEED_TYPE_TRAITS_HEADERS}
     speed.hpp
     version.hpp
 )
 
-foreach(target IN LISTS SPEED_TARGETS)
+foreach (target IN LISTS SPEED_TARGETS)
     string(TOUPPER ${target} target_upper)
 
     set(src_var "${target_upper}_SOURCES")
@@ -338,37 +307,37 @@ foreach(target IN LISTS SPEED_TARGETS)
 
     set(all_files "")
 
-    if(DEFINED ${src_var})
+    if (DEFINED ${src_var})
         list(APPEND all_files ${${src_var}})
-    endif()
+    endif ()
 
-    if(DEFINED ${hdr_var})
+    if (DEFINED ${hdr_var})
         list(APPEND all_files ${${hdr_var}})
-    endif()
+    endif ()
 
-    if(all_files)
+    if (all_files)
         target_sources(${target} PRIVATE ${all_files})
-    else()
+    else ()
         message(WARNING "No sources or headers found for ${target}")
-    endif()
-endforeach()
+    endif ()
+endforeach ()
 
 # =========================
 # Usage Requirements
 # =========================
-foreach(target IN LISTS SPEED_HEADER_ONLY_TARGETS)
+foreach (target IN LISTS SPEED_HEADER_ONLY_TARGETS)
     target_include_directories(${target} INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     )
-endforeach()
+endforeach ()
 
-foreach(target IN LISTS SPEED_COMPILED_TARGETS)
+foreach (target IN LISTS SPEED_COMPILED_TARGETS)
     target_include_directories(${target} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     )
-endforeach()
+endforeach ()
 
 # =========================
 # Target Dependencies
@@ -376,10 +345,10 @@ endforeach()
 target_link_libraries(speed_argparse INTERFACE
     speed_containers
     speed_exception
-    speed_lowlevel
-    speed_stringutils
+    speed_numerics
+    speed_strings
     speed_system
-    speed_type_casting
+    speed_conversions
 )
 
 target_link_libraries(speed_concepts INTERFACE
@@ -392,45 +361,48 @@ target_link_libraries(speed_containers INTERFACE
     speed_type_traits
 )
 
-target_link_libraries(speed_cryptography PUBLIC
-    speed_stringutils
+target_link_libraries(speed_enums INTERFACE
+    speed_type_traits
 )
 
-target_link_libraries(speed_filesystem PUBLIC
+target_link_libraries(speed_cryptography INTERFACE
+    speed_strings
+)
+
+target_link_libraries(speed_filesystem INTERFACE
     speed_containers
-    speed_stringutils
+    speed_strings
     speed_system
-    speed_type_casting
+    speed_conversions
 )
 
 target_link_libraries(speed_iostream INTERFACE
     speed_system
 )
 
-target_link_libraries(speed_lowlevel INTERFACE
-    speed_exception
-    speed_type_traits
-)
-
-target_link_libraries(speed_stringutils INTERFACE
+target_link_libraries(speed_strings INTERFACE
     speed_type_traits
 )
 
 target_link_libraries(speed_system PUBLIC
     speed_cryptography
     speed_exception
-    speed_lowlevel
+    speed_numerics
 )
 
-if(CYGWIN)
+if (MSVC)
+    target_link_libraries(speed_system PRIVATE ntdll)
+endif ()
+
+if (CYGWIN)
     target_link_libraries(speed_system PRIVATE iconv)
-endif()
+endif ()
 
 target_link_libraries(speed_time INTERFACE
     speed_system
 )
 
-target_link_libraries(speed_type_casting INTERFACE
+target_link_libraries(speed_conversions INTERFACE
     speed_exception
     speed_filesystem
     speed_system
@@ -443,32 +415,31 @@ target_link_libraries(speed INTERFACE
     speed_concepts
     speed_containers
     speed_cryptography
+    speed_enums
     speed_exception
     speed_filesystem
     speed_iostream
-    speed_lowlevel
     speed_math
     speed_memory
-    speed_safety
-    speed_scalars
-    speed_stringutils
+    speed_numerics
+    speed_strings
     speed_system
     speed_time
-    speed_type_casting
+    speed_conversions
     speed_type_traits
 )
 
 # =========================
 # Target Properties
 # =========================
-foreach(target IN LISTS SPEED_COMPILED_TARGETS)
+foreach (target IN LISTS SPEED_COMPILED_TARGETS)
     set_target_properties(${target} PROPERTIES DEBUG_POSTFIX d)
-endforeach()
+endforeach ()
 
 # =========================
 # Installation
 # =========================
-if(PROJECT_IS_TOP_LEVEL)
+if (PROJECT_IS_TOP_LEVEL)
     include(CMakePackageConfigHelpers)
 
     install(TARGETS
@@ -507,4 +478,4 @@ if(PROJECT_IS_TOP_LEVEL)
         "${CMAKE_CURRENT_BINARY_DIR}/speedConfigVersion.cmake"
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/speed
     )
-endif()
+endif ()

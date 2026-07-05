@@ -24,13 +24,10 @@
  * @date 2017-01-08
  */
 
-#ifndef SPEED_SYSTEM_SYSTEM_HPP
-#define SPEED_SYSTEM_SYSTEM_HPP
+#pragma once
 
-#include "detail/detail.hpp"
 #include "codecs/codecs.hpp"
 #include "errors/errors.hpp"
-#include "exception/exceptions.hpp"
 #include "filesystem/filesystem.hpp"
 #include "platform/platform.hpp"
 #include "process/process.hpp"
@@ -56,5 +53,3 @@ namespace sys = system;
 #endif
 
 }
-
-#endif

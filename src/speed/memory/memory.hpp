@@ -18,31 +18,32 @@
  */
 
 /**
- * @file        memory.hpp
- * @brief       memory main header.
- * @author      Killian Valverde
- * @date        2024/10/10
+ * @file memory.hpp
+ * @brief Memory management facilities.
+ * @author Killian Valverde
+ * @date 2024-10-10
  */
 
-#ifndef SPEED_MEMORY_MEMORY_HPP
-#define SPEED_MEMORY_MEMORY_HPP
+#pragma once
 
+#include "allocator_deleter.hpp"
 #include "operations.hpp"
+#include "types.hpp"
 
 namespace speed {
 
 /**
- * @brief       Contains a set of resources to perform memory operations.
+ * @brief Memory management facilities.
  */
 namespace memory {}
 
 #ifndef SPEED_DISABLE_ALIAS
 /**
- * @brief       Contains a set of resources to perform memory operations.
+ * @brief Alias for speed::memory  namespace.
+ *
+ * Define SPEED_DISABLE_ALIAS to disable this alias.
  */
 namespace mem = memory;
 #endif
 
 }
-
-#endif

@@ -18,38 +18,36 @@
  */
 
 /**
- * @file        compatibility.hpp
- * @brief       compatibility header.
- * @author      Killian Valverde
- * @date        2024/10/11
+ * @file compatibility.hpp
+ * @brief Platform detection and compatibility macros.
+ * @author Killian Valverde
+ * @date 2024-10-11
  */
 
-#ifndef SPEED_SYSTEM_PLATFORM_COMPATIBILITY_HPP
-#define SPEED_SYSTEM_PLATFORM_COMPATIBILITY_HPP
+#pragma once
 
-#ifdef __unix__
-#undef _XOPEN_SOURCE
-#ifndef _GNU_SOURCE
+#if defined(__unix__) || defined(__APPLE__)
+
+#if defined(__linux__) || defined(__CYGWIN__)
 #define _GNU_SOURCE
+#else
+#define _XOPEN_SOURCE 700
 #endif
+
 #include <unistd.h>
-#ifdef __linux__
-#include <linux/version.h>
-#endif
-#define SPEED_GLIBC 1
+
+#define SPEED_POSIX 1
 #define SPEED_TMAIN main
 #define SPEED_EXIT_CODE_USAGE_ERROR 2
 #define SPEED_PATH_SEPARATOR_CHAR '/'
 #define SPEED_PATH_SEPARATOR_WCHAR L'/'
 #define SPEED_PATH_SEPARATOR_CSTR "/"
 #define SPEED_PATH_SEPARATOR_WCSTR L"/"
-#define SPEED_ALT_PATH_SEPARATOR_CHAR '\\'
-#define SPEED_ALT_PATH_SEPARATOR_WCHAR L'\\'
-#define SPEED_ALT_PATH_SEPARATOR_CSTR "\\"
-#define SPEED_ALT_PATH_SEPARATOR_WCSTR L"\\"
 #define SPEED_SHORTCUT_EXTENSION_CSTR ""
 #define SPEED_SHORTCUT_EXTENSION_WCSTR L""
+
 #elif defined(_WIN32)
+
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
@@ -59,11 +57,9 @@
 #ifdef min
 #undef min
 #endif
+
 #include <windows.h>
-#if !defined(_MSVC_TRADITIONAL) || _MSVC_TRADITIONAL
-#error "Traditional preprocessor not supported, use at least Visual Studio 2019" \
-       " version 16.5 with /Zc:preprocessor compiler switch"
-#endif
+
 #define SPEED_WINAPI 1
 #define SPEED_TMAIN wmain
 #define SPEED_EXIT_CODE_USAGE_ERROR 1
@@ -71,12 +67,10 @@
 #define SPEED_PATH_SEPARATOR_WCHAR L'\\'
 #define SPEED_PATH_SEPARATOR_CSTR "\\"
 #define SPEED_PATH_SEPARATOR_WCSTR L"\\"
-#define SPEED_ALT_PATH_SEPARATOR_CHAR '/'
-#define SPEED_ALT_PATH_SEPARATOR_WCHAR L'/'
-#define SPEED_ALT_PATH_SEPARATOR_CSTR "/"
-#define SPEED_ALT_PATH_SEPARATOR_WCSTR L"/"
 #define SPEED_SHORTCUT_EXTENSION_CSTR ".lnk"
 #define SPEED_SHORTCUT_EXTENSION_WCSTR L".lnk"
-#endif
+
+#else
+#error Unsupported platform
 
 #endif

@@ -18,619 +18,454 @@
  */
 
 /**
- * @file        operations.hpp
- * @brief       filesystem operations header.
- * @author      Killian Valverde
- * @date        2017/05/26
+ * @file operations.hpp
+ * @brief Core operations for the system::filesystem submodule.
+ * @author Killian Valverde
+ * @date 2017-05-26
  */
 
-#ifndef SPEED_SYSTEM_FILESYSTEM_OPERATIONS_HPP
-#define SPEED_SYSTEM_FILESYSTEM_OPERATIONS_HPP
+#pragma once
+
+#include "../platform/platform.hpp"
 
 #include <cstdint>
 
-#include "../platform/platform.hpp"
-#include "../detail/detail.hpp"
 #include "../process/process.hpp"
 #include "../time/time.hpp"
 #include "access_modes.hpp"
-#include "directory_entity.hpp"
+#include "directory_stream.hpp"
 #include "file_types.hpp"
+#include "symlink_mode.hpp"
+#include "symlink_target_type.hpp"
 #include "types.hpp"
 
 namespace speed::system::filesystem {
 
 /**
- * @brief       Checks the accessibility of a file with specified access modes.
- * @param       file_pth : The path to the file to check.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       access_mods : The access modes to test (e.g., read, write, execute).
- * @param       err_code : Optional pointer to an error code object to receive error details.
- * @return      `true` if the file can be accessed with the specified modes, otherwise `false`.
+ * @brief Closes an open directory stream.
+ *
+ * Releases all resources associated with the specified directory stream.
+ *
+ * @param directory_strm Directory stream to close.
+ * @param err_code Optional destination for error information.
+ * @return true if the directory stream was closed successfully; otherwise false.
  */
-inline bool access(
-        const path_char_t* file_pth,
-        bool resolve_symlnk,
-        access_modes access_mods,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::access, false, file_pth, resolve_symlnk, access_mods,
-            err_code);
-}
+bool close_directory(
+    directory_stream& directory_strm,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Change the current execution directory.
- * @param       directory_pth : The path of the new current directory.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Creates a directory.
+ *
+ * Creates a new directory at the specified path.
+ *
+ * @param directory_path Path of the directory to create.
+ * @param err_code Optional destination for error information.
+ * @return true if the directory was created successfully; otherwise false.
  */
-inline bool chdir(const path_char_t* directory_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::chdir, false, directory_pth, err_code);
-}
+bool create_directory(
+    const path_char_t* directory_path,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Checks whether the calling process can access the file path. If pathname is a
- *              symbolic link, it is dereferenced.
- * @param       file_pth : The file path.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       access_mods : Specifies the accessibility check(s) to be performed.
- * @param       file_typs : File types that the file must match with at least once.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      On success the true is returned, otherwise false is returned.
+ * @brief Creates a directory hierarchy.
+ *
+ * Creates all nonexistent directories contained in the specified path.
+ * Existing directory components are ignored.
+ *
+ * @param directory_path Path of the directory hierarchy to create.
+ * @param err_code Optional destination for error information.
+ * @return true if the directory hierarchy exists after the call; otherwise false.
  */
-inline bool check_file(
-        const path_char_t* file_pth,
-        bool resolve_symlnk,
-        access_modes access_mods,
-        file_types file_typs,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::check_file, false, file_pth, resolve_symlnk, access_mods,
-            file_typs, err_code);
-}
+bool create_directories(
+    const path_char_t* directory_path,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Closes the directory stream.
- * @param       directory_ent : The directory entity.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful a pointer to the directory is returned, otherwise nullptr
- *              is returned.
+ * @brief Creates an empty regular file.
+ *
+ * Fails if a filesystem object already exists at the specified path.
+ *
+ * @param regular_file_path Path of the regular file to create.
+ * @param err_code Optional destination for error information.
+ * @return true if the file was created successfully; otherwise false.
  */
-inline bool closedir(directory_entity& directory_ent, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::closedir, false, directory_ent, err_code);
-}
+bool create_regular_file(
+    const path_char_t* regular_file_path,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Check if a file exists.
- * @param       file_pth : The path of the file to check.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Creates a shortcut.
+ *
+ * Creates a platform-specific shortcut referring to the specified target.
+ *
+ * @param target_path Path of the target object.
+ * @param shortcut_path Path of the shortcut to create.
+ * @param err_code Optional destination for error information.
+ * @return true if the shortcut was created successfully; otherwise false.
  */
-inline bool file_exists(
-        const path_char_t* file_pth,
-        bool resolve_symlnk,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::file_exists, false, file_pth, resolve_symlnk, err_code);
-}
+bool create_shortcut(
+    const path_char_t* target_path,
+    const path_char_t* shortcut_path,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Get the inode number of the specified file.
- * @param       file_pth : The file to get the inode number.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      On success the inode number of the sepcified file is returned, otherwise -1 is
- *              returned.
+ * @brief Creates a symbolic link.
+ *
+ * @param target_path Path of the target object.
+ * @param link_path Path of the symbolic link to create.
+ * @param target_type Type of object referenced by the symbolic link.
+ * @param err_code Optional destination for error information.
+ * @return true if the symbolic link was created successfully; otherwise false.
  */
-inline inode_t get_file_inode(
-        const path_char_t* file_pth,
-        bool resolve_symlnk,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::get_file_inode, -1, file_pth, resolve_symlnk, err_code);
-}
+bool create_symlink(
+    const path_char_t* target_path,
+    const path_char_t* link_path,
+    symlink_target_type target_type,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Get the inode number of the specified file.
- * @param       directory_ent : The directory entity current file to get the inode number.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      On success the inode number of the sepcified file is returned, otherwise -1 is
- *              returned.
+ * @brief Checks whether a filesystem object exists.
+ *
+ * The behavior with respect to symbolic links is controlled by symlink_md.
+ *
+ * @param file_path Path of the filesystem object.
+ * @param symlink_md Symbolic link resolution mode.
+ * @param err_code Optional destination for error information.
+ * @return true if the filesystem object exists; otherwise false.
  */
-inline inode_t get_file_inode(
-        const directory_entity& directory_ent,
-        bool resolve_symlnk,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::get_file_inode, -1, directory_ent, resolve_symlnk,
-            err_code);
-}
+bool file_exists(
+    const path_char_t* file_path,
+    symlink_mode symlink_md,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Get the UID of the specified file.
- * @param       file_pth : The file to get the UID.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      On success the UID of the sepcified file is returned, otherwise -1 is returned.
+ * @brief Checks access permissions for a filesystem object.
+ *
+ * Determines whether the requested access modes are permitted for the
+ * specified filesystem object.
+ *
+ * @param file_path Path of the filesystem object.
+ * @param symlink_md Symbolic link resolution mode.
+ * @param access_mds Access modes to verify.
+ * @param err_code Optional destination for error information.
+ * @return true if all requested access modes are permitted; otherwise false.
  */
-inline process::uid_t get_file_uid(
-        const path_char_t* file_pth,
-        bool resolve_symlnk,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::get_file_uid, -1, file_pth, resolve_symlnk, err_code);
-}
+bool file_has_access(
+    const path_char_t* file_path,
+    symlink_mode symlink_md,
+    access_modes access_mds,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Get the GID of the specified file.
- * @param       file_pth : The file to get the GID.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      On success the GID of the sepcified file is returned, otherwise -1 is returned..
+ * @brief Checks whether a filesystem object satisfies the specified criteria.
+ *
+ * Verifies both file type and access requirements.
+ *
+ * @param file_path Path of the filesystem object.
+ * @param symlink_md Symbolic link resolution mode.
+ * @param access_mds Required access modes.
+ * @param file_ts Accepted file types.
+ * @param err_code Optional destination for error information.
+ * @return true if all specified requirements are satisfied; otherwise false.
  */
-inline process::gid_t get_file_gid(
-        const path_char_t* file_pth,
-        bool resolve_symlnk,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::get_file_gid, -1, file_pth, resolve_symlnk, err_code);
-}
+bool file_matches(
+    const path_char_t* file_path,
+    symlink_mode symlink_md,
+    access_modes access_mds,
+    file_types file_ts,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Get the size in bytes of a specified file path.
- * @param       file_pth : The path of the file to get the size.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      On success the file size in bytes in returned, otherwise -1 is returned.
+ * @brief Retrieves the inode identifier of a filesystem object.
+ *
+ * @param file_path Path of the filesystem object.
+ * @param symlink_md Symbolic link resolution mode.
+ * @param err_code Optional destination for error information.
+ * @return Inode identifier on success; otherwise an invalid inode value.
  */
-inline std::size_t get_file_size(
-        const path_char_t* file_pth,
-        bool resolve_symlnk,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::get_file_size, ~0ull, file_pth, resolve_symlnk, err_code);
-}
+inode_t get_file_inode(
+    const path_char_t* file_path,
+    symlink_mode symlink_md,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Get the modification time of the specified file.
- * @param       file_pth : The file to get the modification time.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       system_tme : The object in which store the modification time.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Retrieves the owner identifier of a filesystem object.
+ *
+ * @param file_path Path of the filesystem object.
+ * @param symlink_md Symbolic link resolution mode.
+ * @param err_code Optional destination for error information.
+ * @return User identifier of the owner on success; otherwise an empty user identifier.
  */
-inline bool get_modification_time(
-        const path_char_t* file_pth,
-        bool resolve_symlnk,
-        time::calendar_time& system_tme,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::get_modification_time, false, file_pth, resolve_symlnk,
-            system_tme, err_code);
-}
+process::user_id get_file_user_id(
+    const path_char_t* file_path,
+    symlink_mode symlink_md,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Get a temporal path.
- * @return      If function was successful a temporal path is returned otherwise a null pointer
- *              is returned.
+ * @brief Retrieves the size of a filesystem object.
+ *
+ * @param file_path Path of the filesystem object.
+ * @param symlink_md Symbolic link resolution mode.
+ * @param err_code Optional destination for error information.
+ * @return Size of the filesystem object in bytes on success; otherwise an invalid size value.
  */
-inline const path_char_t* get_temporal_path() noexcept
-{
-    return SPEED_SELECT_API(filesystem::get_temporal_path, nullptr);
-}
+file_size_t get_file_size(
+    const path_char_t* file_path,
+    symlink_mode symlink_md,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Checks if the given path corresponds to a block device.
- * @param       file_pth : Path to check.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Retrieves timestamps associated with a filesystem object.
+ *
+ * Any output pointer may be null.
+ *
+ * @param file_path Path of the filesystem object.
+ * @param symlink_md Symbolic link resolution mode.
+ * @param creation_time Receives the creation timestamp.
+ * @param last_access_time Receives the last-access timestamp.
+ * @param modification_time Receives the last-modification timestamp.
+ * @param err_code Optional destination for error information.
+ * @return true if the timestamps were retrieved successfully; otherwise false.
+ *
+ * @note Creation time may be unavailable on some platforms. In such cases, the creation
+ *       timestamp is cleared.
  */
-inline bool is_block_device(
-        const path_char_t* file_pth,
-        bool resolve_symlnk,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_block_device, false, file_pth, resolve_symlnk,
-            err_code);
-}
+bool get_file_times(
+    const path_char_t* file_path,
+    symlink_mode symlink_md,
+    time::calendar_time* creation_time,
+    time::calendar_time* last_access_time,
+    time::calendar_time* modification_time,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Checks if the given directory_entity corresponds to a block device.
- * @param       directory_ent : Directory entity to check.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Retrieves the system temporary directory path.
+ *
+ * @param err_code Optional destination for error information.
+ * @return Temporary directory path on success; otherwise an empty string.
  */
-inline bool is_block_device(
-        const directory_entity& directory_ent,
-        bool resolve_symlnk,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_block_device, false, directory_ent, resolve_symlnk,
-            err_code);
-}
+std::basic_string<path_char_t> get_temporary_path(std::error_code* err_code = nullptr) noexcept;
 
 /**
- * @brief       Checks if the given path corresponds to a character device.
- * @param       file_pth : Path to check.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Checks whether a filesystem object is a block device.
+ *
+ * @param file_path Path of the filesystem object.
+ * @param symlink_md Symbolic link resolution mode.
+ * @param err_code Optional destination for error information.
+ * @return true if the filesystem object is a block device; otherwise false.
  */
-inline bool is_character_device(
-        const path_char_t* file_pth,
-        bool resolve_symlnk,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_character_device, false, file_pth, resolve_symlnk,
-            err_code);
-}
+bool is_block_device(
+    const path_char_t* file_path,
+    symlink_mode symlink_md,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Checks if the given directory entity corresponds to a character device.
- * @param       directory_ent : Directory entity to check.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Checks whether a filesystem object is a character device.
+ *
+ * @param file_path Path of the filesystem object.
+ * @param symlink_md Symbolic link resolution mode.
+ * @param err_code Optional destination for error information.
+ * @return true if the filesystem object is a character device; otherwise false.
  */
-inline bool is_character_device(
-        const directory_entity& directory_ent,
-        bool resolve_symlnk,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_character_device, false, directory_ent, resolve_symlnk,
-            err_code);
-}
+bool is_character_device(
+    const path_char_t* file_path,
+    symlink_mode symlink_md,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Checks if the given path corresponds to a directory.
- * @param       file_pth : Path to check.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Checks whether a filesystem object is a directory.
+ *
+ * @param file_path Path of the filesystem object.
+ * @param symlink_md Symbolic link resolution mode.
+ * @param err_code Optional destination for error information.
+ * @return true if the filesystem object is a directory; otherwise false.
  */
-inline bool is_directory(
-        const path_char_t* file_pth,
-        bool resolve_symlnk,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_directory, false, file_pth, resolve_symlnk, err_code);
-}
+bool is_directory(
+    const path_char_t* file_path,
+    symlink_mode symlink_md,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Checks if the given path corresponds to a directory.
- * @param       directory_ent : The directory entity.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Checks whether a filesystem object matches one of the specified file types.
+ *
+ * @param file_path Path of the filesystem object.
+ * @param symlink_md Symbolic link resolution mode.
+ * @param file_ts Accepted file types.
+ * @param err_code Optional destination for error information.
+ * @return true if the filesystem object matches at least one specified file type; otherwise false.
  */
-inline bool is_directory(
-        const directory_entity& directory_ent,
-        bool resolve_symlnk,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_directory, false, directory_ent, resolve_symlnk,
-            err_code);
-}
+bool is_file_type(
+    const path_char_t* file_path,
+    symlink_mode symlink_md,
+    file_types file_ts,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Checks if the given path corresponds to a specified file type.
- * @param       file_pth : Path to check.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       file_typ : The specified file type. If more than one flag is set, the function will
- *              verify if at least one of the type is matching.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Checks whether a filesystem object is a pipe.
+ *
+ * @param file_path Path of the filesystem object.
+ * @param symlink_md Symbolic link resolution mode.
+ * @param err_code Optional destination for error information.
+ * @return true if the filesystem object is a pipe; otherwise false.
  */
-inline bool is_file_type(
-        const path_char_t* file_pth,
-        bool resolve_symlnk,
-        file_types file_typ,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_file_type, false, file_pth, resolve_symlnk, file_typ,
-            err_code);
-}
+bool is_pipe(
+    const path_char_t* file_path,
+    symlink_mode symlink_md,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Checks if the given path corresponds to a specified file type.
- * @param       directory_ent : The directory entity.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       file_typ : The specified file type. If more than one flag is set, the function will
- *              verify if at least one of the type is matching.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Checks whether a filesystem object is a regular file.
+ *
+ * @param file_path Path of the filesystem object.
+ * @param symlink_md Symbolic link resolution mode.
+ * @param err_code Optional destination for error information.
+ * @return true if the filesystem object is a regular file; otherwise false.
  */
-inline bool is_file_type(
-        const directory_entity& directory_ent,
-        bool resolve_symlnk,
-        file_types file_typ,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_file_type, false, directory_ent, resolve_symlnk,
-            file_typ, err_code);
-}
+bool is_regular_file(
+    const path_char_t* file_path,
+    symlink_mode symlink_md,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Checks if the given path corresponds to a named pipe.
- * @param       file_pth : Path to check.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Checks whether a filesystem object is a socket.
+ *
+ * @param file_path Path of the filesystem object.
+ * @param symlink_md Symbolic link resolution mode.
+ * @param err_code Optional destination for error information.
+ * @return true if the filesystem object is a socket; otherwise false.
  */
-inline bool is_pipe(
-        const path_char_t* file_pth,
-        bool resolve_symlnk,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_pipe, false, file_pth, resolve_symlnk, err_code);
-}
+bool is_socket(
+    const path_char_t* file_path,
+    symlink_mode symlink_md,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Checks if the given directory entity corresponds to a named pipe.
- * @param       directory_ent : Directory entity to check.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Checks whether a filesystem object is a symbolic link.
+ *
+ * @param file_path Path of the filesystem object.
+ * @param symlink_md Symbolic link resolution mode.
+ * @param err_code Optional destination for error information.
+ * @return true if the filesystem object is a symbolic link; otherwise false.
  */
-inline bool is_pipe(
-        const directory_entity& directory_ent,
-        bool resolve_symlnk,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_pipe, false, directory_ent, resolve_symlnk, err_code);
-}
+bool is_symlink(
+    const path_char_t* file_path,
+    symlink_mode symlink_md,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Checks if the given path corresponds to a regular file.
- * @param       file_pth : Path to check.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Opens a directory stream.
+ *
+ * @param directory_strm Receives the opened directory stream.
+ * @param directory_path Path of the directory to open.
+ * @param err_code Optional destination for error information.
+ * @return true if the directory was opened successfully; otherwise false.
  */
-inline bool is_regular_file(
-        const path_char_t* file_pth,
-        bool resolve_symlnk,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_regular_file, false, file_pth, resolve_symlnk,
-            err_code);
-}
+bool open_directory(
+    directory_stream& directory_strm,
+    const path_char_t* directory_path,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Checks if the given directory entity corresponds to a regular file.
- * @param       directory_ent : Directory entity to check.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Opens a child directory stream.
+ *
+ * Opens the directory referenced by the current entry of an existing directory stream.
+ *
+ * @param child Receives the opened child directory stream.
+ * @param parent Parent directory stream.
+ * @param err_code Optional destination for error information.
+ * @return true if the child directory was opened successfully; otherwise false.
  */
-inline bool is_regular_file(
-        const directory_entity& directory_ent,
-        bool resolve_symlnk,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_regular_file, false, directory_ent, resolve_symlnk,
-            err_code);
-}
+bool open_directory(
+    directory_stream& child,
+    const directory_stream& parent,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Checks if the given path corresponds to a socket.
- * @param       file_pth : Path to check.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Reads the next directory entry.
+ *
+ * Updates the public members of the specified directory stream with information describing
+ * the next entry.
+ *
+ * The "." and ".." entries are skipped.
+ *
+ * @param directory_strm Directory stream to read.
+ * @param err_code Optional destination for error information.
+ * @return true if an entry was read successfully; otherwise false.
+ *
+ * @note When false is returned, inspect err_code to distinguish end-of-directory from
+ *       an error condition.
  */
-inline bool is_socket(
-        const path_char_t* file_pth,
-        bool resolve_symlnk,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_socket, false, file_pth, resolve_symlnk, err_code);
-}
+bool read_directory(directory_stream& directory_strm, std::error_code* err_code = nullptr) noexcept;
 
 /**
- * @brief       Checks if the given directory entity corresponds to a socket.
- * @param       directory_ent : Directory entity to check.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Removes a directory.
+ *
+ * @param directory_path Path of the directory to remove.
+ * @param err_code Optional destination for error information.
+ * @return true if the directory was removed successfully; otherwise false.
  */
-inline bool is_socket(
-        const directory_entity& directory_ent,
-        bool resolve_symlnk,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_socket, false, directory_ent, resolve_symlnk, err_code);
-}
+bool remove_directory(
+    const path_char_t* directory_path,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Checks if the given path corresponds to a symlink.
- * @param       file_pth : Path to check.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Removes a filesystem object.
+ *
+ * Removes either a regular file or a directory.
+ *
+ * @param file_path Path of the filesystem object to remove.
+ * @param err_code Optional destination for error information.
+ * @return true if the filesystem object was removed successfully; otherwise false.
  */
-inline bool is_symlink(
-        const path_char_t* file_pth,
-        bool resolve_symlnk,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_symlink, false, file_pth, resolve_symlnk, err_code);
-}
+bool remove_path(const path_char_t* file_path, std::error_code* err_code = nullptr) noexcept;
 
 /**
- * @brief       Checks if the given directory entity corresponds to a symlink.
- * @param       directory_ent : Directory entity to check.
- * @param       resolve_symlnk : If `true`, symbolic links will be resolved before checking access.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Removes a regular file.
+ *
+ * @param regular_file_path Path of the regular file to remove.
+ * @param err_code Optional destination for error information.
+ * @return true if the regular file was removed successfully; otherwise false.
  */
-inline bool is_symlink(
-        const directory_entity& directory_ent,
-        bool resolve_symlnk,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::is_symlink, false, directory_ent, resolve_symlnk,
-            err_code);
-}
+bool remove_regular_file(
+    const path_char_t* regular_file_path,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Attempts to create a directory.
- * @param       directory_pth : The path of the new directory.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Changes the current working directory.
+ *
+ * @param directory_path Path of the new working directory.
+ * @param err_code Optional destination for error information.
+ * @return true if the current working directory was changed successfully; otherwise false.
  */
-inline bool mkdir(
-        const path_char_t* directory_pth,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::mkdir, false, directory_pth, err_code);
-}
-
-/**
- * @brief       Attemps to create a directory path.
- * @param       directory_pth : The path of directories to create.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
- */
-inline bool mkdir_recursively(
-        const path_char_t* directory_pth,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::mkdir_recursively, false, directory_pth, err_code);
-}
-
-/**
- * @brief       Opens a directory stream corresponding to the directory name, and returns a pointer
- *              to the directory stream.
- * @param       directory_ent : The directory entity.
- * @param       directory_pth : The path of the directory.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
- */
-inline bool opendir(
-        directory_entity& directory_ent,
-        const path_char_t* directory_pth,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::opendir, false, directory_ent, directory_pth, err_code);
-}
-
-/**
- * @brief       Read the next directory entry in the directory stream.
- * @param       directory_ent : The current directory entity.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
- */
-inline bool readdir(directory_entity& directory_ent, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::readdir, false, directory_ent, err_code);
-}
-
-/**
- * @brief       Delete the specified directory.
- * @param       directory_pth : The path of the directory to delete.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
- */
-inline bool rmdir(const path_char_t* directory_pth, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(filesystem::rmdir, false, directory_pth, err_code);
-}
-
-/**
- * @brief       Creates a shortcut stored at shortcut_pth that points at target_pth.
- * @param       target_pth : Path of the target.
- * @param       shortcut_pth : Path where the shortcut is stored including the file name.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
- */
-inline bool shortcut(
-        const path_char_t* target_pth,
-        const path_char_t* shortcut_pth,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::shortcut, false, target_pth, shortcut_pth, err_code);
-}
-
-/**
- * @brief       Creates a symbolic link named lnk_pth which contains the string trg.
- * @param       target_pth : The string to contain in the symlink.
- * @param       link_pth : The symbolilc link name.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
- */
-inline bool symlink(
-        const path_char_t* target_pth,
-        const path_char_t* link_pth,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::symlink, false, target_pth, link_pth, err_code);
-}
-
-/**
- * @brief       Attempts to create a regular file.
- * @param       regular_file_pth : The path of the new regular file.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
- */
-inline bool touch(
-        const path_char_t* regular_file_pth,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::touch, false, regular_file_pth, err_code);
-}
-
-/**
- * @brief       Delete the specified regular file.
- * @param       regular_file_pth : The path of the regular file to delete.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
- */
-inline bool unlink(
-        const path_char_t* regular_file_pth,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(filesystem::unlink, false, regular_file_pth, err_code);
-}
+bool set_current_directory(
+    const path_char_t* directory_path,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 }
-
-#endif

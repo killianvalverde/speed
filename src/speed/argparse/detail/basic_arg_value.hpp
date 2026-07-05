@@ -36,7 +36,7 @@
 #include "forward_declarations.hpp"
 #include "../../containers/containers.hpp"
 #include "../../system/system.hpp"
-#include "../../type_casting/type_casting.hpp"
+#include "../../conversions/conversions.hpp"
 #include "../basic_arg_parser.hpp"
 #include "arg_value_error_flags.hpp"
 #include "basic_type_caster.hpp"
@@ -181,7 +181,7 @@ public:
         {
             err_flgs_.set(arg_value_error_flags::WRONG_VALUE_ERROR);
 
-            if (err_code == type_casting::errc::ARITHMETIC_ERROR)
+            if (err_code == conversions::errc::ARITHMETIC_ERROR)
             {
                 err_message_ = "Invalid number";
             }
@@ -222,7 +222,7 @@ public:
     template<typename TargetT_>
     [[nodiscard]] TargetT_ as() const
     {
-        return type_casting::type_cast<TargetT_>(val_);
+        return conversions::convert<TargetT_>(val_);
     }
     
     /**
@@ -234,7 +234,7 @@ public:
     template<typename TargetT_, typename DefaultValueT_>
     [[nodiscard]] TargetT_ as(DefaultValueT_&& default_val) const noexcept
     {
-        return type_casting::type_cast<TargetT_>(val_, std::forward<DefaultValueT_>(default_val));
+        return conversions::type_cast<TargetT_>(val_, std::forward<DefaultValueT_>(default_val));
     }
     
     /**
@@ -245,7 +245,7 @@ public:
     template<typename TargetT_>
     bool try_as(TargetT_& res) const noexcept
     {
-        return type_casting::try_type_cast<TargetT_>(val_, res);
+        return conversions::try_type_cast<TargetT_>(val_, res);
     }
     
     /**

@@ -29,7 +29,7 @@
 
 #include <cstdint>
 
-#include "../../scalars/scalars.hpp"
+#include "../../enums/enums.hpp"
 
 namespace speed::argparse::detail {
 

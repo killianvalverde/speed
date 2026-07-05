@@ -18,35 +18,36 @@
  */
 
 /**
- * @file        filesystem.hpp
- * @brief       system filesystem main header.
- * @author      Killian Valverde
- * @date        2023/10/10
+ * @file filesystem.hpp
+ * @brief Main header for system::filesystem submodule.
+ * @author Killian Valverde
+ * @date 2023-10-10
  */
 
-#ifndef SPEED_SYSTEM_FILESYSTEM_FILESYSTEM_HPP
-#define SPEED_SYSTEM_FILESYSTEM_FILESYSTEM_HPP
+#pragma once
 
 #include "access_modes.hpp"
-#include "directory_entity.hpp"
+#include "directory_stream.hpp"
 #include "file_types.hpp"
 #include "operations.hpp"
+#include "symlink_mode.hpp"
+#include "symlink_target_type.hpp"
 #include "types.hpp"
 
 namespace speed::system {
 
 /**
- * @brief       Contains filesystem interaction resources.
+ * @brief Utilities related to filesystem operations.
  */
 namespace filesystem {}
 
 #ifndef SPEED_DISABLE_ALIAS
 /**
- * @brief       Contains filesystem interaction resources.
+ * @brief Alias for speed::system::filesystem namespace.
+ *
+ * Define SPEED_DISABLE_ALIAS to disable this alias.
  */
-namespace fsys = filesystem;
+namespace fs = filesystem;
 #endif
 
 }
-
-#endif

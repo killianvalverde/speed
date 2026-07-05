@@ -18,31 +18,33 @@
  */
 
 /**
- * @file        types.hpp
- * @brief       types header.
- * @author      Killian Valverde
- * @date        2024/11/02
+ * @file types.hpp
+ * @brief Filesystem type definitions.
+ * @author Killian Valverde
+ * @date 2024-11-02
  */
 
-#ifndef SPEED_SYSTEM_FILESYSTEM_TYPES_HPP
-#define SPEED_SYSTEM_FILESYSTEM_TYPES_HPP
-
-#include <cstdint>
+#pragma once
 
 #include "../platform/platform.hpp"
 
+#include <cstdint>
+#include <string>
+
 namespace speed::system::filesystem {
 
-/** Inode type. */
+/** Unsigned integer type used to represent file sizes. */
+using file_size_t = std::uint64_t;
+
+/** Filesystem object identifier. */
 using inode_t = std::uint64_t;
 
-/** Path character type. */
+/** Native filesystem path character type (char on POSIX, wchar_t on Windows). */
+using path_char_t =
 #ifdef SPEED_WINAPI
-using path_char_t = wchar_t;
+    wchar_t;
 #else
-using path_char_t = char;
+    char;
 #endif
 
 }
-
-#endif

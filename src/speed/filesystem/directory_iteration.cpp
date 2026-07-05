@@ -24,7 +24,7 @@
  * @date        2024/10/15
  */
 
-#include "../stringutils/stringutils.hpp"
+#include "../strings/strings.hpp"
 #include "directory_iteration.hpp"
 
 namespace speed::filesystem {
@@ -52,7 +52,7 @@ directory_iteration::const_iterator::~const_iterator() noexcept
 {
     while (!directory_entity_stck_.empty())
     {
-        system::filesystem::closedir(directory_entity_stck_.top());
+        system::filesystem::close_directory(directory_entity_stck_.top());
         directory_entity_stck_.pop();
     }
 
@@ -75,11 +75,11 @@ start:
     }
     else
     {
-        cur_fle_.replace_filename(cur_dir_ent.nme);
+        cur_fle_.replace_filename(cur_dir_ent.name);
 
         if (system::filesystem::is_directory(cur_dir_ent, composit_->resolve_directory_symlnks_))
         {
-            cur_dir_ /= cur_dir_ent.nme;
+            cur_dir_ /= cur_dir_ent.name;
 
             if (open_directory())
             {
@@ -132,7 +132,7 @@ bool directory_iteration::const_iterator::open_directory()
     cur_fle_ /= ".";
     directory_entity_stck_.emplace();
 
-    if (!system::filesystem::opendir(directory_entity_stck_.top(), cur_dir_.c_str()))
+    if (!system::filesystem::open_directory(directory_entity_stck_.top(), cur_dir_.c_str()))
     {
         exit_directory();
         return false;
@@ -153,17 +153,17 @@ bool directory_iteration::const_iterator::read_directory()
 
     do
     {
-        succss = system::filesystem::readdir(cur_dir_ent);
+        succss = system::filesystem::read_directory(cur_dir_ent);
     }
-    while (succss && (stringutils::cstr_compare(cur_dir_ent.nme, ".") == 0 ||
-                stringutils::cstr_compare(cur_dir_ent.nme, "..") == 0));
+    while (succss && (strings::cstr_compare(cur_dir_ent.name, ".") == 0 ||
+                strings::cstr_compare(cur_dir_ent.name, "..") == 0));
 
     return succss;
 }
 
 void directory_iteration::const_iterator::close_directory()
 {
-    system::filesystem::closedir(directory_entity_stck_.top());
+    system::filesystem::close_directory(directory_entity_stck_.top());
     exit_directory();
 }
 
@@ -218,8 +218,8 @@ void directory_iteration::const_iterator::exit_directory()
     const char_type* substr = composit_->substring_to_mtch_.c_str();
 
     return composit_->case_insensitve_
-            ? stringutils::cstr_find_substr_icase(pth.c_str(), substr)
-            : stringutils::cstr_find_substr(pth.c_str(), substr);
+            ? strings::cstr_find_substr_icase(pth.c_str(), substr)
+            : strings::cstr_find_substr(pth.c_str(), substr);
 }
 
 [[nodiscard]] bool directory_iteration::const_iterator::matches_wildcard() const
@@ -228,8 +228,8 @@ void directory_iteration::const_iterator::exit_directory()
     const char_type* wildcrd = composit_->wildcard_to_mtch_.c_str();
 
     return composit_->case_insensitve_
-            ? stringutils::match_wildcard_icase(pth.c_str(), wildcrd)
-            : stringutils::match_wildcard(pth.c_str(), wildcrd);
+            ? strings::match_wildcard_icase(pth.c_str(), wildcrd)
+            : strings::match_wildcard(pth.c_str(), wildcrd);
 }
 
 }

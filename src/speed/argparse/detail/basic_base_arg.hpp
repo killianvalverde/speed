@@ -34,9 +34,9 @@
 #include "forward_declarations.hpp"
 #include "../../containers/containers.hpp"
 #include "../../iostream/iostream.hpp"
-#include "../../safety/safety.hpp"
+#include "../../numerics/numerics.hpp"
 #include "../basic_arg_parser.hpp"
-#include "../exception.hpp"
+#include "../exceptions.hpp"
 #include "arg_error_flags.hpp"
 #include "arg_flags.hpp"
 
@@ -143,7 +143,7 @@ public:
             *presence_holdr_ = true;
         }
         
-        safety::try_addm(nr_occurrencs_, 1);
+        numerics::try_saturating_add(nr_occurrencs_, 1);
         return succss;
     }
     

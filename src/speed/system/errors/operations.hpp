@@ -18,14 +18,13 @@
  */
 
 /**
- * @file        operations.hpp
- * @brief       errors operations functions header.
- * @author      Killian Valverde
- * @date        2017/11/02
+ * @file operations.hpp
+ * @brief Core operations for the system::errors submodule.
+ * @author Killian Valverde
+ * @date 2017-11-02
  */
 
-#ifndef SPEED_SYSTEM_ERRORS_OPERATIONS_HPP
-#define SPEED_SYSTEM_ERRORS_OPERATIONS_HPP
+#pragma once
 
 #include <concepts>
 #include <system_error>
@@ -33,12 +32,18 @@
 namespace speed::system::errors {
 
 /**
- * @brief       Assign the value to the error_code if it is not null using a system category.
- * @param       val : The value to assign.
- * @param       err_code : The object that will contain the error.
+ * @brief Assigns a system-category error code.
+ *
+ * Assigns the specified integral error value to the output error code using
+ * `std::system_category()`. If `err_code` is `nullptr`, no action is performed.
+ *
+ * @tparam IntegralT Integral type containing the error value.
+ *
+ * @param val Error value to assign.
+ * @param err_code Pointer to the destination error code, or `nullptr`.
  */
-template <std::integral IntegralT>
-void assign_system_error_code(IntegralT val, std::error_code* err_code)
+template<std::integral IntegralT>
+void assign_system_error_code(IntegralT val, std::error_code* err_code) noexcept
 {
     if (err_code != nullptr)
     {
@@ -47,12 +52,18 @@ void assign_system_error_code(IntegralT val, std::error_code* err_code)
 }
 
 /**
- * @brief       Assign the value to the error_code if it is not null using a generic category.
- * @param       val : The value to assign.
- * @param       err_code : The object that will contain the error.
+ * @brief Assigns a generic-category error code.
+ *
+ * Assigns the specified integral error value to the output error code using
+ * `std::generic_category()`. If `err_code` is `nullptr`, no action is performed.
+ *
+ * @tparam IntegralT Integral type containing the error value.
+ *
+ * @param val Error value to assign.
+ * @param err_code Pointer to the destination error code, or `nullptr`.
  */
-template <std::integral IntegralT>
-void assign_generic_error_code(IntegralT val, std::error_code* err_code)
+template<std::integral IntegralT>
+void assign_generic_error_code(IntegralT val, std::error_code* err_code) noexcept
 {
     if (err_code != nullptr)
     {
@@ -60,7 +71,33 @@ void assign_generic_error_code(IntegralT val, std::error_code* err_code)
     }
 }
 
-inline void assign_errc(std::errc ec, std::error_code* err_code)
+/**
+ * @brief Assigns an errno-based error code.
+ *
+ * Assigns the specified errno value to the output error code using `std::generic_category()`.
+ * If `err_code` is `nullptr`, no action is performed.
+ *
+ * @tparam IntegralT Integral type containing the errno value.
+ *
+ * @param val errno value to assign.
+ * @param err_code Pointer to the destination error code, or `nullptr`.
+ */
+template<std::integral IntegralT>
+void assign_errno_error_code(IntegralT val, std::error_code* err_code) noexcept
+{
+    assign_generic_error_code(val, err_code);
+}
+
+/**
+ * @brief Assigns an error code from a standard error condition.
+ *
+ * Creates an error code corresponding to the specified `std::errc` value and assigns it to
+ * the output error code. If `err_code` is `nullptr`, no action is performed.
+ *
+ * @param ec Standard error condition.
+ * @param err_code Pointer to the destination error code, or `nullptr`.
+ */
+inline void assign_errc(std::errc ec, std::error_code* err_code) noexcept
 {
     if (err_code != nullptr)
     {
@@ -68,7 +105,16 @@ inline void assign_errc(std::errc ec, std::error_code* err_code)
     }
 }
 
-inline void assign_error_code(const std::error_code& ec_input, std::error_code* ec_output)
+/**
+ * @brief Copies an error code.
+ *
+ * Copies the specified error code into the output error code. If `ec_output` is `nullptr`,
+ * no action is performed.
+ *
+ * @param ec_input Source error code.
+ * @param ec_output Pointer to the destination error code, or `nullptr`.
+ */
+inline void assign_error_code(const std::error_code& ec_input, std::error_code* ec_output) noexcept
 {
     if (ec_output != nullptr)
     {
@@ -77,5 +123,3 @@ inline void assign_error_code(const std::error_code& ec_input, std::error_code* 
 }
 
 }
-
-#endif

@@ -34,7 +34,7 @@
 #include <iostream>
 
 #include "detail/forward_declarations.hpp"
-#include "../safety/safety.hpp"
+#include "../numerics/numerics.hpp"
 #include "../system/system.hpp"
 
 namespace speed::iostream {
@@ -222,7 +222,7 @@ std::basic_ostream<CharT, CharTraitsT>& print_wrapped(
                 ++len_to_next;
             } while (aux_str_it != strv.cend() && *aux_str_it != ' ');
 
-            safety::try_addm(len_to_next, current_line_len);
+            numerics::try_saturating_add(len_to_next, current_line_len);
             if (len_to_next > max_line_len)
             {
                 os << '\n';
@@ -259,7 +259,7 @@ std::basic_ostream<CharT, TraitsT>& set_default_text(
 )
 {
     system::terminal::set_foreground_text_attribute(
-            os, system::terminal::text_attribute::DEFAULT);
+            os, system::terminal::color::DEFAULT);
     return os;
 }
 
@@ -274,7 +274,7 @@ std::basic_ostream<CharT, TraitsT>& set_black_text(
 )
 {
     system::terminal::set_foreground_text_attribute(
-            os, system::terminal::text_attribute::BLACK);
+            os, system::terminal::color::BLACK);
     return os;
 }
 
@@ -289,7 +289,7 @@ std::basic_ostream<CharT, TraitsT>& set_red_text(
 )
 {
     system::terminal::set_foreground_text_attribute(
-            os, system::terminal::text_attribute::RED);
+            os, system::terminal::color::RED);
     return os;
 }
 
@@ -304,7 +304,7 @@ std::basic_ostream<CharT, TraitsT>& set_green_text(
 )
 {
     system::terminal::set_foreground_text_attribute(
-            os, system::terminal::text_attribute::GREEN);
+            os, system::terminal::color::GREEN);
     return os;
 }
 
@@ -319,7 +319,7 @@ std::basic_ostream<CharT, TraitsT>& set_brown_text(
 )
 {
     system::terminal::set_foreground_text_attribute(
-            os, system::terminal::text_attribute::BROWN);
+            os, system::terminal::color::BROWN);
     return os;
 }
 
@@ -334,7 +334,7 @@ std::basic_ostream<CharT, TraitsT>& set_blue_text(
 )
 {
     system::terminal::set_foreground_text_attribute(
-            os, system::terminal::text_attribute::BLUE);
+            os, system::terminal::color::BLUE);
     return os;
 }
 
@@ -349,7 +349,7 @@ std::basic_ostream<CharT, TraitsT>& set_purple_text(
 )
 {
     system::terminal::set_foreground_text_attribute(
-            os, system::terminal::text_attribute::PURPLE);
+            os, system::terminal::color::PURPLE);
     return os;
 }
 
@@ -364,7 +364,7 @@ std::basic_ostream<CharT, TraitsT>& set_cyan_text(
 )
 {
     system::terminal::set_foreground_text_attribute(
-            os, system::terminal::text_attribute::CYAN);
+            os, system::terminal::color::CYAN);
     return os;
 }
 
@@ -379,7 +379,7 @@ std::basic_ostream<CharT, TraitsT>& set_light_gray_text(
 )
 {
     system::terminal::set_foreground_text_attribute(
-            os, system::terminal::text_attribute::LIGHT_GRAY);
+            os, system::terminal::color::LIGHT_GRAY);
     return os;
 }
 
@@ -394,7 +394,7 @@ std::basic_ostream<CharT, TraitsT>& set_dark_gray_text(
 )
 {
     system::terminal::set_foreground_text_attribute(
-            os, system::terminal::text_attribute::GRAY);
+            os, system::terminal::color::GRAY);
     return os;
 }
 
@@ -409,7 +409,7 @@ std::basic_ostream<CharT, TraitsT>& set_light_red_text(
 )
 {
     system::terminal::set_foreground_text_attribute(
-            os, system::terminal::text_attribute::LIGHT_RED);
+            os, system::terminal::color::LIGHT_RED);
     return os;
 }
 
@@ -424,7 +424,7 @@ std::basic_ostream<CharT, TraitsT>& set_light_green_text(
 )
 {
     system::terminal::set_foreground_text_attribute(
-            os, system::terminal::text_attribute::LIGHT_GREEN);
+            os, system::terminal::color::LIGHT_GREEN);
     return os;
 }
 
@@ -439,7 +439,7 @@ std::basic_ostream<CharT, TraitsT>& set_yellow_text(
 )
 {
     system::terminal::set_foreground_text_attribute(
-            os, system::terminal::text_attribute::YELLOW);
+            os, system::terminal::color::YELLOW);
     return os;
 }
 
@@ -454,7 +454,7 @@ std::basic_ostream<CharT, TraitsT>& set_light_blue_text(
 )
 {
     system::terminal::set_foreground_text_attribute(
-            os, system::terminal::text_attribute::LIGHT_BLUE);
+            os, system::terminal::color::LIGHT_BLUE);
     return os;
 }
 
@@ -469,7 +469,7 @@ std::basic_ostream<CharT, TraitsT>& set_light_purple_text(
 )
 {
     system::terminal::set_foreground_text_attribute(
-            os, system::terminal::text_attribute::LIGHT_PURPLE);
+            os, system::terminal::color::LIGHT_PURPLE);
     return os;
 }
 
@@ -484,7 +484,7 @@ std::basic_ostream<CharT, TraitsT>& set_light_cyan_text(
 )
 {
     system::terminal::set_foreground_text_attribute(
-            os, system::terminal::text_attribute::LIGHT_CYAN);
+            os, system::terminal::color::LIGHT_CYAN);
     return os;
 }
 
@@ -499,7 +499,7 @@ std::basic_ostream<CharT, TraitsT>& set_white_text(
 )
 {
     system::terminal::set_foreground_text_attribute(
-            os, system::terminal::text_attribute::WHITE);
+            os, system::terminal::color::WHITE);
     return os;
 }
 

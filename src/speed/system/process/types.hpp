@@ -18,31 +18,19 @@
  */
 
 /**
- * @file        types.hpp
- * @brief       types header.
- * @author      Killian Valverde
- * @date        2024/11/01
+ * @file types.hpp
+ * @brief Type aliases for the system::process submodule.
+ * @author Killian Valverde
+ * @date 2024-11-01
  */
 
-#ifndef SPEED_SYSTEM_PROCESS_TYPES_HPP
-#define SPEED_SYSTEM_PROCESS_TYPES_HPP
+#pragma once
 
 #include <cstdint>
 
 namespace speed::system::process {
 
-/** PID type. */
+/** Type used to represent a process ID. */
 using pid_t = std::int64_t;
 
-/** PPID type. */
-using ppid_t = std::int64_t;
-
-/** UID type. */
-using uid_t = std::uint64_t;
-
-/** GID type. */
-using gid_t = std::uint64_t;
-
 }
-
-#endif

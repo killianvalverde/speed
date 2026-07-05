@@ -21,12 +21,13 @@
  * @file operations.cpp
  * @brief Core operations implementation for the system::time submodule.
  * @author Killian Valverde
- * @date 2017/10/18
+ * @date 2017-10-18
  */
 
-#include "../../operations.hpp"
-#include "../../../errors/errors.hpp"
 #include "../../../platform/platform.hpp"
+#include "../../operations.hpp"
+
+#include "../../../errors/errors.hpp"
 
 namespace speed::system::time {
 

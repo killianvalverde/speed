@@ -18,121 +18,79 @@
  */
 
 /**
- * @file        operations.hpp
- * @brief       process operations header.
- * @author      Killian Valverde
- * @date        2017/01/08
+ * @file operations.hpp
+ * @brief Core operations for the system::process submodule.
+ * @author Killian Valverde
+ * @date 2017-01-08
  */
 
-#ifndef SPEED_SYSTEM_PROCESS_OPERATIONS_HPP
-#define SPEED_SYSTEM_PROCESS_OPERATIONS_HPP
+#pragma once
 
-#include "../detail/detail.hpp"
-#include "../platform/platform.hpp"
-#include "../time/time.hpp"
+#include <system_error>
+
+#include "execution_result.hpp"
 #include "types.hpp"
+#include "user_id.hpp"
 
 namespace speed::system::process {
 
 /**
- * @brief       Executes a command line process and optionally retrieves its exit code, CPU time,
- *              and elapsed time.
- * @param       cmd : The command line string to execute.
- * @param       exit_cod : Optional pointer to an integer to receive the exit code of the process.
- *              If nullptr, the exit code is ignored.
- * @param       cpu_time_spec : Optional pointer to a time_specification object to receive the CPU
- *              time (user + kernel) consumed by the process. If nullptr, CPU time is not retrieved.
- * @param       elapsed_time_spec : Optional pointer to a time_specification object to receive the
- *              elapsed wall-clock time of the process execution. If nullptr, elapsed time is not
- *              retrieved.
- * @param       err_code : Optional pointer to a std::error_code object to receive error
- *              information if the execution fails. If nullptr, error information is discarded.
- * @return      true if the command was successfully executed and (if requested) exit code and
- *              times were retrieved. false if the process creation, execution, or information
- *              retrieval failed.
+ * @brief Execute a command in a child process and optionally collect its results.
+ *
+ * Spawns a child process to run the given command string, waits for it to complete,
+ * and optionally fills an execution_result with the exit code and timing information.
+ * Behaves similarly to the standard system() function but provides finer-grained control
+ * and result reporting. On POSIX systems, if the child process is terminated by a signal,
+ * the exit code is set to 128 + signal_number, following shell conventions. On both
+ * platforms, exit code -1 indicates an abnormal termination. Note that a `true` return
+ * does not imply the command succeeded — only that it was executed. Check res->exit_code
+ * for the command's own result.
+ *
+ * @param cmd The command string to execute. Leading whitespace is ignored. Must not be
+ *            null or empty.
+ * @param res Optional pointer to an execution_result that will be populated with the exit
+ *            code, user CPU time, kernel CPU time, and elapsed wall time. Pass nullptr if
+ *            not needed.
+ * @param err_code Optional pointer to a std::error_code that will be set on failure. Pass
+ *                 nullptr to ignore errors.
+ * @return `true` if the child process was successfully spawned and waited for, `false` otherwise.
  */
-inline bool execute(
-        const char* cmd,
-        int* exit_cod = nullptr,
-        time::time_value* cpu_time_spec = nullptr,
-        time::time_value* elapsed_time_spec = nullptr,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(process::execute, false, cmd, exit_cod, cpu_time_spec,
-            elapsed_time_spec, err_code);
-}
+bool execute(
+    const char* cmd,
+    execution_result* res = nullptr,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Get the PID of the current process.
- * @return      The PID of the current process.
+ * @brief Get the process ID of the calling process.
+ *
+ * @return The process ID of the calling process.
  */
-inline pid_t get_pid() noexcept
-{
-    return SPEED_SELECT_API(process::get_pid, -1);
-}
+pid_t get_pid() noexcept;
 
 /**
- * @brief       Get the PPID of the current process.
- * @return      The PPID of the current process.
+ * @brief Get the user ID of the calling process.
+ *
+ * On POSIX systems, returns the real user ID. On Windows, returns a 64-bit hash derived
+ * from the process token's SID, since Windows has no direct equivalent to a POSIX UID.
+ *
+ * @return The user ID of the calling process.
  */
-inline ppid_t get_ppid() noexcept
-{
-    return SPEED_SELECT_API(process::get_ppid, -1);
-}
+user_id get_uid() noexcept;
 
 /**
- * @brief       Get the UID of the current process.
- * @return      The UID of the current process.
+ * @brief Suspend the calling thread for the specified duration.
+ *
+ * Suspends execution for at least the given number of seconds and nanoseconds. The actual
+ * sleep duration may be longer due to system scheduling. On POSIX systems the sleep may be
+ * interrupted by a signal. On Windows the sleep is not interruptible.
+ *
+ * @param sec Number of seconds to sleep. Must not exceed the platform maximum.
+ * @param nsec Additional nanoseconds to sleep. Must be less than 1,000,000,000.
+ * @param err_code Optional pointer to a std::error_code that will be set on failure. Pass
+ *                 nullptr to ignore errors.
+ * @return `true` on success, `false` if the arguments are invalid or the sleep was interrupted.
  */
-inline uid_t get_uid() noexcept
-{
-    return SPEED_SELECT_API(process::get_uid, -1);
-}
-
-/**
- * @brief       Get the GID of the current process.
- * @return      The GID of the current process.
- */
-inline gid_t get_gid() noexcept
-{
-    return SPEED_SELECT_API(process::get_gid, -1);
-}
-
-/**
- * @brief       Suspends  the  execution  of the calling thread until either at least the time
- *              specified has elapsed, or the delivery of a signal that triggers the invocation of a
- *              handler in the calling thread or that terminates the process.
- * @param       sec : The number of seconds.
- * @param       nsec : The number of nano seconds.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
- */
-inline bool nanosleep(
-        std::uint64_t sec,
-        std::uint64_t nsec,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(process::nanosleep, false, sec, nsec, err_code);
-}
-
-/**
- * @brief       Suspends  the  execution  of the calling thread until either at least the time
- *              specified has elapsed, or the delivery of a signal that triggers the invocation of a
- *              handler in the calling thread or that terminates the process.
- * @param       time_spec : The time to suspend the execution.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
- */
-inline bool nanosleep(
-        const speed::system::time::time_value& time_spec,
-        std::error_code* err_code = nullptr
-) noexcept
-{
-    return nanosleep(time_spec.get_seconds(), time_spec.get_nanoseconds(), err_code);
-}
+bool nanosleep(std::uint64_t sec, std::uint64_t nsec, std::error_code* err_code = nullptr) noexcept;
 
 }
-
-#endif

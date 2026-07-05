@@ -18,46 +18,45 @@
  */
 
 /**
- * @file        access_modes.hpp
- * @brief       access_modes header.
- * @author      Killian Valverde
- * @date        2019/03/22
+ * @file access_modes.hpp
+ * @brief File access mode flags.
+ * @author Killian Valverde
+ * @date 2019-03-22
  */
 
-#ifndef SPEED_SYSTEM_FILESYSTEM_ACCESS_MODES_HPP
-#define SPEED_SYSTEM_FILESYSTEM_ACCESS_MODES_HPP
+#pragma once
 
 #include <cstdint>
 
-#include "../../scalars/scalars.hpp"
+#include "../../enums/enums.hpp"
 
 namespace speed::system::filesystem {
 
 /**
- * @brief       Represents the files access modes.
+ * @brief File access mode flags.
+ *
+ * Defines the access modes that can be queried or required for a filesystem object.
+ * Multiple values may be combined using bitwise operators.
  */
 enum class access_modes : std::uint8_t
 {
-    /** Any access mode. */
+    /** No access mode. */
     NIL = 0,
-    
-    /** The file exists. */
-    EXISTS = 0x1,
-    
-    /** Read is available. */
-    READ = 0x2,
-    
-    /** Write is available. */
-    WRITE = 0x4,
-    
-    /** Execute is available. */
-    EXECUTE = 0x8,
-    
-    /** All access modes. */
-    FULL = 0xF
+
+    /** Read access. */
+    READ = 0x1,
+
+    /** Write access. */
+    WRITE = 0x2,
+
+    /** Execute access. */
+    EXECUTE = 0x4,
+
+    /** Combination of all access mode flags. */
+    ALL = 0x7
 };
 
-/** Represents the files access modes. */
+/** Alias for access_modes. */
 using am_t = access_modes;
 
 }
@@ -67,5 +66,3 @@ template<>
 struct speed::scalars::is_flag_enum<speed::system::filesystem::access_modes>
         : std::true_type {};
 /** @endcond */
-
-#endif

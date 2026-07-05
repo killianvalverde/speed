@@ -159,7 +159,7 @@ public:
             return 0;
         }
 
-        return safety::addm(ky_.length(), 2);
+        return numerics::saturating_add(ky_.length(), 2);
     }
 
     /**
@@ -222,8 +222,8 @@ public:
             return;
         }
         
-        std::size_t current_id_len = safety::addm(ky_.length(), 2);
-        std::size_t total_id_len = safety::addm(short_kys_len, long_kys_len);
+        std::size_t current_id_len = numerics::saturating_add(ky_.length(), 2);
+        std::size_t total_id_len = numerics::saturating_add(short_kys_len, long_kys_len);
         std::size_t i;
         auto& os = base_arg_type::get_arg_parser().get_ostream();
     
@@ -242,8 +242,8 @@ public:
             }
         }
     
-        safety::try_addm(args_indent, total_id_len);
-        safety::try_addm(new_line_indent, args_indent);
+        numerics::try_saturating_add(args_indent, total_id_len);
+        numerics::try_saturating_add(new_line_indent, args_indent);
         
         base_arg_type::print_help_text(args_indent, max_line_len, new_line_indent);
     }

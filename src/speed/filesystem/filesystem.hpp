@@ -42,7 +42,7 @@ namespace filesystem {}
 /**
  * @brief       Contains filesystem interaction resources.
  */
-namespace fsys = filesystem;
+namespace fs = filesystem;
 #endif
 
 }

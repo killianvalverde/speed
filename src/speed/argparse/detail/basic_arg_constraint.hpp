@@ -34,7 +34,7 @@
 #include "forward_declarations.hpp"
 #include "../../containers/containers.hpp"
 #include "../basic_arg_parser.hpp"
-#include "../exception.hpp"
+#include "../exceptions.hpp"
 #include "arg_constraint_flags.hpp"
 #include "basic_base_arg.hpp"
 #include "basic_help_arg.hpp"
@@ -248,7 +248,7 @@ public:
     {
         const char* desc;
         std::size_t kys_len = 0;
-        std::size_t actual_kys_len = safety::addm(short_kys_len, long_kys_len);
+        std::size_t actual_kys_len = numerics::saturating_add(short_kys_len, long_kys_len);
         bool arg_printd = false;
         bool is_mutually_exclusiv = flgs_.is_set(arg_constraint_flags::MUTUALLY_EXCLUSIVE);
         bool is_one_or_more_requird = flgs_.is_set(arg_constraint_flags::ONE_OR_MORE_REQUIRED);
@@ -279,18 +279,18 @@ public:
             {
                 os << ", ";
                 bse_arg->print_name();
-                safety::try_addm(kys_len, bse_arg->get_name_length(), 2);
+                numerics::try_saturating_add(kys_len, bse_arg->get_name_length(), 2);
             }
             else
             {
                 bse_arg->print_name();
-                safety::try_addm(kys_len, bse_arg->get_name_length());
+                numerics::try_saturating_add(kys_len, bse_arg->get_name_length());
                 arg_printd = true;
             }
         }
 
         os << "  ";
-        safety::try_addm(kys_len, 2);
+        numerics::try_saturating_add(kys_len, 2);
         
         if (kys_len < actual_kys_len)
         {
@@ -302,8 +302,8 @@ public:
             kys_len = actual_kys_len;
         }
         
-        safety::try_addm(kys_len, args_indent);
-        safety::try_addm(new_line_indent, args_indent, actual_kys_len);
+        numerics::try_saturating_add(kys_len, args_indent);
+        numerics::try_saturating_add(new_line_indent, args_indent, actual_kys_len);
         
         iostream::print_wrapped(os, desc, max_line_len, new_line_indent, kys_len);
         os.put('\n');

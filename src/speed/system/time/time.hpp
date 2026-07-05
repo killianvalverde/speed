@@ -26,8 +26,8 @@
 
 #pragma once
 
-#include "operations.hpp"
 #include "calendar_time.hpp"
+#include "operations.hpp"
 #include "time_value.hpp"
 
 namespace speed::system {

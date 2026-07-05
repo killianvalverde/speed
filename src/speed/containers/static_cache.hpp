@@ -30,7 +30,7 @@
 #include <cstdlib>
 #include <functional>
 
-#include "exception.hpp"
+#include "exceptions.hpp"
 #include "flags.hpp"
 #include "iterator_base.hpp"
 

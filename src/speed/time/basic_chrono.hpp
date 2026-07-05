@@ -50,23 +50,6 @@ public:
     /** Type of the underlying clock. */
     using clock_type = ClockT;
 
-private:
-    /**
-    * @brief Enumeration representing the state of a chrono.
-    */
-    enum class chrono_states : std::uint8_t
-    {
-        /** Chrono is initialized and ready to start. */
-        READY,
-
-        /** Chrono is currently running. */
-        RUNNING,
-
-        /** Chrono has been stopped. */
-        STOPPED
-    };
-
-public:
     /**
      * @brief Starts the chrono.
      *
@@ -75,13 +58,13 @@ public:
      */
     void start() noexcept
     {
-        if (chrono_stt_ != chrono_states::READY)
+        if (stt_ != state::READY)
         {
             return;
         }
 
         start_tm_ = clck_.get_time();
-        chrono_stt_ = chrono_states::RUNNING;
+        stt_ = state::RUNNING;
     }
 
     /**
@@ -92,13 +75,13 @@ public:
      */
     void stop() noexcept
     {
-        if (chrono_stt_ != chrono_states::RUNNING)
+        if (stt_ != state::RUNNING)
         {
             return;
         }
 
         elapsed_tm_ = clck_.get_time() - start_tm_;
-        chrono_stt_ = chrono_states::STOPPED;
+        stt_ = state::STOPPED;
     }
 
     /**
@@ -109,13 +92,13 @@ public:
      */
     void resume() noexcept
     {
-        if (chrono_stt_ != chrono_states::STOPPED)
+        if (stt_ != state::STOPPED)
         {
             return;
         }
 
         start_tm_ = clck_.get_time() - elapsed_tm_;
-        chrono_stt_ = chrono_states::RUNNING;
+        stt_ = state::RUNNING;
     }
 
     /**
@@ -125,7 +108,7 @@ public:
      */
     void reset() noexcept
     {
-        chrono_stt_ = chrono_states::READY;
+        stt_ = state::READY;
         start_tm_.reset();
         elapsed_tm_.reset();
     }
@@ -153,11 +136,11 @@ public:
      */
     [[nodiscard]] system::time::time_value get_elapsed_time() const noexcept
     {
-        if (chrono_stt_ == chrono_states::RUNNING)
+        if (stt_ == state::RUNNING)
         {
             return clck_.get_time() - start_tm_;
         }
-        if (chrono_stt_ == chrono_states::STOPPED)
+        if (stt_ == state::STOPPED)
         {
             return elapsed_tm_;
         }
@@ -170,7 +153,7 @@ public:
      */
     [[nodiscard]] bool is_ready() const noexcept
     {
-        return chrono_stt_ == chrono_states::READY;
+        return stt_ == state::READY;
     }
 
     /**
@@ -178,7 +161,7 @@ public:
      */
     [[nodiscard]] bool is_running() const noexcept
     {
-        return chrono_stt_ == chrono_states::RUNNING;
+        return stt_ == state::RUNNING;
     }
 
     /**
@@ -186,10 +169,25 @@ public:
      */
     [[nodiscard]] bool is_stopped() const noexcept
     {
-        return chrono_stt_ == chrono_states::STOPPED;
+        return stt_ == state::STOPPED;
     }
 
 private:
+    /**
+    * @brief Enumeration representing the state of a chrono.
+    */
+    enum class state : std::uint8_t
+    {
+        /** Chrono is initialized and ready to start. */
+        READY,
+
+        /** Chrono is currently running. */
+        RUNNING,
+
+        /** Chrono has been stopped. */
+        STOPPED
+    };
+
     /** Start time of the current measurement. */
     system::time::time_value start_tm_;
 
@@ -197,7 +195,7 @@ private:
     system::time::time_value elapsed_tm_;
 
     /** Current state of the chrono. */
-    chrono_states chrono_stt_ = chrono_states::READY;
+    state stt_ = state::READY;
 
     /** Clock instance used for time retrieval. */
     clock_type clck_;
@@ -222,7 +220,7 @@ std::basic_ostream<CharT, CharTraitsT>& operator <<(
     const basic_chrono<ClockT>& rhs
 )
 {
-    // TODO: Implement RAII for ostream state.
+    // TODO(Killian): Implement RAII for ostream state.
     const system::time::time_value elapsed_tm = rhs.get_elapsed_time();
     auto old_fill = os.fill();
 

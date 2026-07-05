@@ -252,9 +252,9 @@ public:
             auto parent_pth = BaseT::parent_path();
             if (!parent_pth.empty())
             {
-                system::filesystem::mkdir_recursively(parent_pth.c_str());
+                system::filesystem::create_directories(parent_pth.c_str());
             }
-            if (!system::filesystem::touch(BaseT::c_str(), err_code))
+            if (!system::filesystem::create_regular_file(BaseT::c_str(), err_code))
             {
                 return false;
             }
@@ -287,7 +287,7 @@ public:
         
         if (!system::filesystem::access(BaseT::c_str(), system::filesystem::access_modes::EXISTS))
         {
-            if (!system::filesystem::mkdir_recursively(BaseT::c_str(), err_code))
+            if (!system::filesystem::create_directories(BaseT::c_str(), err_code))
             {
                 return false;
             }

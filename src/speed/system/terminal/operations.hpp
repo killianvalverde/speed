@@ -18,91 +18,124 @@
  */
 
 /**
- * @file        operations.hpp
- * @brief       terminal operations header.
- * @author      Killian Valverde
- * @date        2017/10/18
+ * @file operations.hpp
+ * @brief Core operations for the system::terminal submodule.
+ * @author Killian Valverde
+ * @date 2017-10-18
  */
 
-#ifndef SPEED_SYSTEM_TERMINAL_OPERATIONS_HPP
-#define SPEED_SYSTEM_TERMINAL_OPERATIONS_HPP
+#pragma once
 
-#include <cstdio>
-#include <iostream>
+#include <ostream>
 
-#include "../platform/platform.hpp"
-#include "text_attribute.hpp"
+#include "color.hpp"
 
 namespace speed::system::terminal {
 
 /**
- * @brief       Flush the input terminal buffer.
- * @param       input_strm : Terminal input stream.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Flushes the input buffer of a terminal stream.
+ *
+ * Removes all pending input events from the specified terminal input stream.
+ *
+ * @param input_stream Pointer to the input stream to flush.
+ * @param err_code Optional pointer to an error code object that receives error information
+ *                 if the operation fails.
+ * @return `true` if the input buffer was successfully flushed, otherwise `false`.
  */
-inline bool flush_input_terminal(::FILE* input_strm, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(terminal::flush_input_terminal, false, input_strm, err_code);
-}
+bool flush_input_terminal(FILE* input_stream, std::error_code* err_code = nullptr) noexcept;
 
 /**
- * @brief       Flush the output terminal buffer.
- * @param       output_strm : Terminal output stream.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If function was successful true is returned, otherwise false is returned.
+ * @brief Flushes the output buffer of a terminal stream.
+ *
+ * Forces any buffered output data to be written to the terminal.
+ *
+ * @param output_stream Pointer to the output stream to flush.
+ * @param err_code Optional pointer to an error code object that receives error information
+ *                 if the operation fails.
+ * @return `true` if the output buffer was successfully flushed, otherwise `false`.
  */
-inline bool flush_output_terminal(::FILE* output_strm, std::error_code* err_code = nullptr) noexcept
-{
-    return SPEED_SELECT_API(terminal::flush_output_terminal, false, output_strm, err_code);
-}
+bool flush_output_terminal(FILE* output_stream, std::error_code* err_code = nullptr) noexcept;
 
 /**
- * @brief       Print a message and pause de program execution until a key is pressed
- * @param       mess : The message to print before the pause process. If a null pointer is used
- *              there won't be a message printed.
- * @param       flush_input_term : Is it is true the input terminal buffer will be flused before the
- *              operation.
- * @param       err_code : If function fails it holds the platform-dependent error code.
- * @return      If the function was successful true is returned, otherwise false is returned.
+ * @brief Sets the background color of a narrow character output stream.
+ *
+ * Applies the specified background color to the console associated with the given output stream.
+ *
+ * @param os Output stream whose console background color will be modified.
+ * @param new_color Background color to apply.
+ * @param err_code Optional pointer to an error code object that receives error information
+ *                 if the operation fails.
+ * @return `true` if the background color was successfully applied, otherwise `false`.
  */
-inline bool kbhit(
-        const char *mess = nullptr,
-        bool flush_input_term = true,
-        std::error_code *err_code = nullptr
-) noexcept
-{
-    return SPEED_SELECT_API(terminal::kbhit, false, mess, flush_input_term, err_code);
-}
+bool set_background_color(
+    std::ostream& os,
+    color new_color,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Sets the foreground text attribute for a narrow-character output stream.
- * @param       os : The output stream (e.g., `std::cout`) to modify.
- * @param       text_attr : The text attribute to set.
- * @return      `true` if the attribute was successfully set, otherwise `false`.
+ * @brief Sets the background color of a wide character output stream.
+ *
+ * Applies the specified background color to the console associated with the given wide
+ * output stream.
+ *
+ * @param wos Wide output stream whose console background color will be modified.
+ * @param new_color Background color to apply.
+ * @param err_code Optional pointer to an error code object that receives error information
+ *                 if the operation fails.
+ * @return `true` if the background color was successfully applied, otherwise `false`.
  */
-inline bool set_foreground_text_attribute(
-        std::ostream& os,
-        text_attribute text_attr
-) noexcept
-{
-    return SPEED_SELECT_API(terminal::set_foreground_text_attribute, false, os, text_attr);
-}
+bool set_background_color(
+    std::wostream& wos,
+    color new_color,
+    std::error_code* err_code = nullptr
+) noexcept;
 
 /**
- * @brief       Sets the foreground text attribute for a wide-character output stream.
- * @param       wos The wide-character output stream to modify.
- * @param       text_attr The text attribute to set.
- * @return      `true` if the attribute was successfully set, otherwise `false`.
+ * @brief Sets the foreground color of a narrow character output stream.
+ *
+ * Applies the specified foreground color to the console associated with the given output stream.
+ *
+ * @param os Output stream whose console foreground color will be modified.
+ * @param new_color Foreground color to apply.
+ * @param err_code Optional pointer to an error code object that receives error information
+ *                 if the operation fails.
+ * @return `true` if the foreground color was successfully applied, otherwise `false`.
  */
-inline bool set_foreground_text_attribute(
-        std::wostream& wos,
-        text_attribute text_attr
-) noexcept
-{
-    return SPEED_SELECT_API(terminal::set_foreground_text_attribute, false, wos, text_attr);
-}
+bool set_foreground_color(
+    std::ostream& os,
+    color new_color,
+    std::error_code* err_code = nullptr
+) noexcept;
+
+/**
+ * @brief Sets the foreground color of a wide character output stream.
+ *
+ * Applies the specified foreground color to the console associated with the given wide
+ * output stream.
+ *
+ * @param wos Wide output stream whose console foreground color will be modified.
+ * @param new_color Foreground color to apply.
+ * @param err_code Optional pointer to an error code object that receives error information
+ *                 if the operation fails.
+ * @return `true` if the foreground color was successfully applied, otherwise `false`.
+ */
+bool set_foreground_color(
+    std::wostream& wos,
+    color new_color,
+    std::error_code* err_code = nullptr
+) noexcept;
+
+/**
+ * @brief Waits for a keyboard key press event.
+ *
+ * Blocks execution until a key press event is detected in the console input buffer.
+ *
+ * @param flush_input If `true`, the console input buffer is flushed before waiting for input.
+ * @param err_code Optional pointer to an error code object that receives error information if
+ *                 the operation fails.
+ * @return `true` if a key press event was detected, otherwise `false`.
+ */
+bool wait_for_key(bool flush_input = true, std::error_code* err_code = nullptr) noexcept;
 
 }
-
-#endif

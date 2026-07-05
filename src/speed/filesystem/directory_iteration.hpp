@@ -34,7 +34,7 @@
 
 #include "detail/forward_declarations.hpp"
 #include "../system/system.hpp"
-#include "../type_casting/type_casting.hpp"
+#include "../conversions/conversions.hpp"
 #include "operations.hpp"
 
 namespace speed::filesystem {
@@ -64,7 +64,7 @@ private:
     using stack_type = std::stack<T>;
 
     /** Directory entity type. */
-    using system_directory_entry_type = system::filesystem::directory_entity;
+    using system_directory_entry_type = system::filesystem::directory_stream;
 
 public:
     class const_iterator;
@@ -76,7 +76,7 @@ public:
     {
     private:
         /** Directory entity type. */
-        using system_directory_entity_type = system::filesystem::directory_entity;
+        using system_directory_entity_type = system::filesystem::directory_stream;
 
         /** Stack type used in the class. */
         template<typename T>
@@ -164,7 +164,7 @@ public:
          */
         [[nodiscard]] std::string get_utf8_path() const
         {
-            return type_casting::to_utf8(cur_fle_);
+            return conversions::to_utf8(cur_fle_);
         }
 
         /**
@@ -173,7 +173,7 @@ public:
          */
         [[nodiscard]] std::string get_utf8_filename() const
         {
-            return type_casting::to_utf8(cur_fle_.filename());
+            return conversions::to_utf8(cur_fle_.filename());
         }
 
         /**
@@ -182,7 +182,7 @@ public:
          */
         [[nodiscard]] std::string get_utf8_parent_path() const
         {
-            return type_casting::to_utf8(cur_fle_.parent_path());
+            return conversions::to_utf8(cur_fle_.parent_path());
         }
 
     private:
@@ -494,7 +494,7 @@ public:
     template<typename StringT_>
     directory_iteration& regex_to_match(StringT_&& regex_to_mtch)
     {
-        regex_to_mtch_str_ = type_casting::type_cast<string_type>(
+        regex_to_mtch_str_ = conversions::convert<string_type>(
                 std::forward<StringT_>(regex_to_mtch));
         
         update_regex();
@@ -531,7 +531,7 @@ public:
     template<typename StringT_>
     directory_iteration& substring_to_match(StringT_&& substring_to_mtch)
     {
-        substring_to_mtch_ = type_casting::type_cast<string_type>(
+        substring_to_mtch_ = conversions::convert<string_type>(
                 std::forward<StringT_>(substring_to_mtch));
         
         return *this;
@@ -545,7 +545,7 @@ public:
     template<typename StringT_>
     directory_iteration& wildcard_to_match(StringT_&& wildcard_to_mtch)
     {
-        wildcard_to_mtch_ = type_casting::type_cast<string_type>(
+        wildcard_to_mtch_ = conversions::convert<string_type>(
                 std::forward<StringT_>(wildcard_to_mtch));
         
         return *this;

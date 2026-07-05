@@ -27,7 +27,7 @@
 #ifndef SPEED_ARGPARSE_DETAIL_ARG_CONSTRAINT_FLAGS_HPP
 #define SPEED_ARGPARSE_DETAIL_ARG_CONSTRAINT_FLAGS_HPP
 
-#include "../../scalars/scalars.hpp"
+#include "../../enums/enums.hpp"
 
 namespace speed::argparse::detail {
 

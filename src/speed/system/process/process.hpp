@@ -18,32 +18,33 @@
  */
 
 /**
- * @file        process.hpp
- * @brief       system process main header.
- * @author      Killian Valverde
- * @date        2023/10/10
+ * @file process.hpp
+ * @brief Main header for system::process submodule.
+ * @author Killian Valverde
+ * @date 2023-10-10
  */
 
-#ifndef SPEED_SYSTEM_PROCESS_PROCESS_HPP
-#define SPEED_SYSTEM_PROCESS_PROCESS_HPP
+#pragma once
 
+#include "execution_result.hpp"
 #include "operations.hpp"
 #include "types.hpp"
+#include "user_id.hpp"
 
 namespace speed::system {
 
 /**
- * @brief       Contains resources for process interactions.
+ * @brief Utilities related to system process operations.
  */
 namespace process {}
 
 #ifndef SPEED_DISABLE_ALIAS
 /**
- * @brief       Contains resources for process interactions.
+ * @brief Alias for speed::system::process namespace.
+ *
+ * Define SPEED_DISABLE_ALIAS to disable this alias.
  */
 namespace proc = process;
 #endif
 
 }
-
-#endif

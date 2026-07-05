@@ -18,55 +18,59 @@
  */
 
 /**
- * @file        file_types.hpp
- * @brief       file_types header.
- * @author      Killian Valverde
- * @date        2019/03/22
+ * @file file_types.hpp
+ * @brief File type flags.
+ * @author Killian Valverde
+ * @date 2019-03-22
  */
 
-#ifndef SPEED_SYSTEM_FILESYSTEM_FILE_TYPES_HPP
-#define SPEED_SYSTEM_FILESYSTEM_FILE_TYPES_HPP
+#pragma once
 
 #include <cstdint>
 
-#include "../../scalars/scalars.hpp"
+#include "../../enums/enums.hpp"
 
 namespace speed::system::filesystem {
 
 /**
- * @brief       Represents a file type.
+ * @brief File type flags.
+ *
+ * Defines the types of filesystem objects.
+ * Multiple values may be combined using bitwise operators.
  */
 enum class file_types : std::uint8_t
 {
-    /** Any file type. */
+    /** No file type. */
     NIL = 0x0,
-    
+
     /** Block device. */
     BLOCK_DEVICE = 0x1,
-    
+
     /** Character device. */
     CHARACTER_DEVICE = 0x2,
-    
+
     /** Directory. */
     DIRECTORY = 0x4,
-    
+
     /** Regular file. */
     REGULAR_FILE = 0x8,
-    
-    /** Named pipe */
+
+    /** Named pipe (FIFO). */
     PIPE = 0x10,
-    
-    /** Named IPC socket. */
+
+    /** Socket. */
     SOCKET = 0x20,
-    
+
     /** Symbolic link. */
     SYMLINK = 0x40,
 
-    /** All the flags. */
+    /** Combination of all file type flags. */
     ALL = 0x7F
 };
 
-/** Represents the file types. */
+/**
+ * @brief Alias for file_types.
+ */
 using ft_t = file_types;
 
 }
@@ -76,5 +80,3 @@ template<>
 struct speed::scalars::is_flag_enum<speed::system::filesystem::file_types>
         : std::true_type {};
 /** @endcond */
-
-#endif

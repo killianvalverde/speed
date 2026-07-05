@@ -33,7 +33,7 @@
 
 #include "forward_declarations.hpp"
 #include "../basic_arg_parser.hpp"
-#include "../exception.hpp"
+#include "../exceptions.hpp"
 #include "arg_flags.hpp"
 #include "basic_arg_key.hpp"
 #include "basic_base_arg.hpp"
@@ -94,11 +94,11 @@ public:
 
             if (ky.is_prefix_long())
             {
-                safety::try_addm(long_kys_len_, ky.get_string_length(), 2);
+                numerics::try_saturating_add(long_kys_len_, ky.get_string_length(), 2);
             }
             else
             {
-                safety::try_addm(short_kys_len_, ky.get_string_length(), 2);
+                numerics::try_saturating_add(short_kys_len_, ky.get_string_length(), 2);
             }
         }
 
@@ -173,11 +173,11 @@ public:
 
             if (ky.is_prefix_long())
             {
-                safety::try_addm(long_kys_len_, ky.get_string_length(), 2);
+                numerics::try_saturating_add(long_kys_len_, ky.get_string_length(), 2);
             }
             else
             {
-                safety::try_addm(short_kys_len_, ky.get_string_length(), 2);
+                numerics::try_saturating_add(short_kys_len_, ky.get_string_length(), 2);
             }
         }
     }
@@ -331,7 +331,7 @@ public:
         if (n_args_printd < kys_.size() && n_args_printd > 0)
         {
             os << ", ";
-            safety::try_addm(current_ky_len, 2);
+            numerics::try_saturating_add(current_ky_len, 2);
         }
         
         if (current_ky_len < short_kys_len)
@@ -355,8 +355,8 @@ public:
             }
         }
     
-        safety::try_addm(args_indent, short_kys_len, long_kys_len);
-        safety::try_addm(new_line_indent, args_indent);
+        numerics::try_saturating_add(args_indent, short_kys_len, long_kys_len);
+        numerics::try_saturating_add(new_line_indent, args_indent);
         
         base_arg_type::print_help_text(args_indent, max_line_len, new_line_indent);
     }
@@ -383,15 +383,15 @@ public:
                 if (nr_args_printd > 0)
                 {
                     os << ", " << ky.get_string();
-                    safety::try_addm(cur_ky_len, ky.get_string_length(), 2);
+                    numerics::try_saturating_add(cur_ky_len, ky.get_string_length(), 2);
                 }
                 else
                 {
                     os << ky.get_string();
-                    safety::try_addm(cur_ky_len, ky.get_string_length());
+                    numerics::try_saturating_add(cur_ky_len, ky.get_string_length());
                 }
     
-                safety::try_addm(nr_args_printd, 1);
+                numerics::try_saturating_add(nr_args_printd, 1);
             }
         }
     }

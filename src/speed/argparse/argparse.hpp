@@ -28,7 +28,7 @@
 #define SPEED_ARGPARSE_ARGPARSE_HPP
 
 #include "basic_arg_parser.hpp"
-#include "exception.hpp"
+#include "exceptions.hpp"
 
 namespace speed {
 

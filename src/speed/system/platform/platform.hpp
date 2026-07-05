@@ -18,33 +18,32 @@
  */
 
 /**
- * @file        platform.hpp
- * @brief       system platform main header.
- * @author      Killian Valverde
- * @date        2023/10/10
+ * @file platform.hpp
+ * @brief Main header for system::platform submodule.
+ * @author Killian Valverde
+ * @date 2023-10-10
  */
 
-#ifndef SPEED_SYSTEM_PLATFORM_PLATFORM_HPP
-#define SPEED_SYSTEM_PLATFORM_PLATFORM_HPP
+#pragma once
 
 #include "compatibility.hpp"
-#include "crossplatform_unicode_main.hpp"
-#include "select_api.hpp"
+#include "detail/ntapi.hpp"
+#include "detail/utf8_main.hpp"
 
 namespace speed::system {
 
 /**
- * @brief       Contains utilities for compile-time introspection and modification.
+ * @brief Utilities related to system platform operations.
  */
 namespace platform {}
 
 #ifndef SPEED_DISABLE_ALIAS
 /**
- * @brief       Contains utilities for compile-time introspection and modification.
+ * @brief Alias for speed::system::platform namespace.
+ *
+ * Define SPEED_DISABLE_ALIAS to disable this alias.
  */
 namespace plat = platform;
 #endif
 
 }
-
-#endif

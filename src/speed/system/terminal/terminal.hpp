@@ -18,32 +18,31 @@
  */
 
 /**
- * @file        terminal.hpp
- * @brief       system terminal main header.
- * @author      Killian Valverde
- * @date        2023/10/10
+ * @file terminal.hpp
+ * @brief Main header for system::terminal submodule.
+ * @author Killian Valverde
+ * @date 2023-10-10
  */
 
-#ifndef SPEED_SYSTEM_TERMINAL_TERMINAL_HPP
-#define SPEED_SYSTEM_TERMINAL_TERMINAL_HPP
+#pragma once
 
+#include "color.hpp"
 #include "operations.hpp"
-#include "text_attribute.hpp"
 
 namespace speed::system {
 
 /**
- * @brief       Contains resources for interacting and customizing the terminal.
+ * @brief Utilities related to system terminal operations.
  */
 namespace terminal {}
 
 #ifndef SPEED_DISABLE_ALIAS
 /**
- * @brief       Contains resources for interacting and customizing the terminal.
+ * @brief Alias for speed::system::terminal namespace.
+ *
+ * Define SPEED_DISABLE_ALIAS to disable this alias.
  */
 namespace term = terminal;
 #endif
 
 }
-
-#endif

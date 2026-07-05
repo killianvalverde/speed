@@ -41,7 +41,7 @@ namespace type_traits {}
  *
  * Define SPEED_DISABLE_ALIAS to disable this alias.
  */
-namespace traits = type_traits;
+namespace tt = type_traits;
 #endif
 
 }

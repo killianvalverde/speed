@@ -57,11 +57,6 @@ public:
     /** Type used to represent seconds. */
     using seconds_type = std::uint64_t;
 
-private:
-    /** Number of nanoseconds in one second. */
-    static constexpr std::uint64_t NSEC_PER_SEC = 1'000'000'000ULL;
-
-public:
     /**
      * @brief Constructs a zero time value.
      */
@@ -255,6 +250,9 @@ public:
     }
 
 private:
+    /** Number of nanoseconds in one second. */
+    static constexpr std::uint64_t NSEC_PER_SEC = 1'000'000'000ULL;
+
     /**
      * @brief Normalizes the nanoseconds component.
      *

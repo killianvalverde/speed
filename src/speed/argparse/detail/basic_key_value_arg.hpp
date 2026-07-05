@@ -33,7 +33,7 @@
 
 #include "forward_declarations.hpp"
 #include "../basic_arg_parser.hpp"
-#include "../exception.hpp"
+#include "../exceptions.hpp"
 #include "arg_flags.hpp"
 #include "basic_arg_key.hpp"
 #include "basic_base_arg.hpp"
@@ -144,7 +144,7 @@ public:
             additional_len = usage_str_.length();
         }
 
-        return safety::addm(key_arg_type::get_long_keys_length(), additional_len);
+        return numerics::saturating_add(key_arg_type::get_long_keys_length(), additional_len);
     }
 
     /**
@@ -166,7 +166,7 @@ public:
             additional_len = usage_str_.length();
         }
 
-        return safety::addm(key_arg_type::get_short_keys_length(), additional_len);
+        return numerics::saturating_add(key_arg_type::get_short_keys_length(), additional_len);
     }
 
     /**
@@ -277,13 +277,13 @@ public:
         if (!key_arg_type::has_long_prefix_keys())
         {
             os << usage_str_;
-            safety::try_addm(current_id_len, usage_str_.length());
+            numerics::try_saturating_add(current_id_len, usage_str_.length());
         }
         
         if (n_args_printd < key_arg_type::get_keys_size() && n_args_printd > 0)
         {
             os << ", ";
-            safety::try_addm(current_id_len, 2);
+            numerics::try_saturating_add(current_id_len, 2);
         }
         
         if (current_id_len < short_kys_len)
@@ -302,7 +302,7 @@ public:
         if (key_arg_type::has_long_prefix_keys())
         {
             os << usage_str_;
-            safety::try_addm(current_id_len, usage_str_.length());
+            numerics::try_saturating_add(current_id_len, usage_str_.length());
         }
         
         if (current_id_len < long_kys_len)
@@ -313,8 +313,8 @@ public:
             }
         }
     
-        safety::try_addm(args_indent, short_kys_len, long_kys_len);
-        safety::try_addm(new_line_indent, args_indent);
+        numerics::try_saturating_add(args_indent, short_kys_len, long_kys_len);
+        numerics::try_saturating_add(new_line_indent, args_indent);
         
         base_arg_type::print_help_text(args_indent, max_line_len, new_line_indent);
     }

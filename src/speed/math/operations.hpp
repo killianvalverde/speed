@@ -27,43 +27,23 @@
 #ifndef SPEED_MATH_OPERATIONS_HPP
 #define SPEED_MATH_OPERATIONS_HPP
 
-#include <type_traits>
+#include <concepts>
 
 namespace speed::math {
 
-/**
- * @brief       Get the absolute number of a specified integral.
- * @param       val : The integral number to get the absolute number.
- * @return      The absolute number of the specified integral.
- */
-template<typename IntegralT>
-std::enable_if_t<
-        std::is_signed_v<IntegralT>,
-        IntegralT
->
-abs(IntegralT val) noexcept
+template<std::integral IntegralT>
+[[nodiscard]] constexpr std::make_unsigned_t<IntegralT> abs(IntegralT val) noexcept
 {
-    if (val < 0)
-    {
-        return val * -1;
-    }
-    
-    return val;
-}
+    using unsigned_t = std::make_unsigned_t<IntegralT>;
 
-/**
- * @brief       Get the absolute number of a specified integral.
- * @param       val : The integral number to get the absolute number.
- * @return      The absolute number of the specified integral.
- */
-template<typename IntegralT>
-std::enable_if_t<
-        std::is_unsigned_v<IntegralT>,
-        IntegralT
->
-abs(IntegralT val) noexcept
-{
-    return val;
+    if constexpr (std::unsigned_integral<IntegralT>)
+    {
+        return val;
+    }
+    else
+    {
+        return val < 0 ? unsigned_t(-(val + 1)) + 1 : unsigned_t(val);
+    }
 }
 
 }

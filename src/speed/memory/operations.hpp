@@ -18,39 +18,51 @@
  */
 
 /**
- * @file        operations.hpp
- * @brief       memory functions header.
- * @author      Killian Valverde
- * @date        2024/10/10
+ * @file operations.hpp
+ * @brief Allocator-aware memory management operations.
+ * @author Killian Valverde
+ * @date 2024-10-10
  */
 
-#ifndef SPEED_MEMORY_OPERATIONS_HPP
-#define SPEED_MEMORY_OPERATIONS_HPP
+#pragma once
 
 #include <memory>
 #include <utility>
 
+#include "allocator_deleter.hpp"
+#include "types.hpp"
+
 namespace speed::memory {
 
 /**
- * @brief       Allocate using an allocator and construct the object.
- * @param       alloc : Allocator used to allocate the memory.
- * @param       ptr : Pointer to object to allocate and construct.
- * @param       args : Arguments to forward to the constructor.
- * @return      The address of the allocated memory.
+ * @brief Allocates storage for an object and constructs it.
+ *
+ * Allocates memory for a single object of type ValueT using alloc and constructs the object
+ * with the provided arguments.
+ *
+ * If construction throws an exception, the allocated storage is released before the exception
+ * is propagated.
+ *
+ * @tparam ValueT Type of the object to allocate and construct.
+ * @tparam AllocatorT Allocator type used to allocate storage.
+ * @tparam ArgsT Types of the construction arguments.
+ *
+ * @param alloc Allocator used to allocate storage.
+ * @param args Arguments forwarded to the constructor of ValueT.
+ * @return Pointer to the constructed object.
  */
-template<typename ValueT, typename AllocatorT, typename... Ts>
-ValueT* allocate_and_construct(const AllocatorT& alloc, ValueT*& ptr, Ts&&... args)
+template<typename ValueT, typename AllocatorT, typename... ArgsT>
+[[nodiscard]] ValueT* allocate_and_construct(const AllocatorT& alloc, ArgsT&&... args)
 {
-    using allocator_traits_type = std::allocator_traits<AllocatorT>;
-    using value_allocator_type = typename allocator_traits_type::template rebind_alloc<ValueT>;
-    
+    using value_allocator_type = std::allocator_traits<AllocatorT>::template rebind_alloc<ValueT>;
+    using allocator_traits_type = std::allocator_traits<value_allocator_type>;
+
     value_allocator_type value_alloc(alloc);
-    ptr = allocator_traits_type::allocate(value_alloc, 1);
-    
+    ValueT* ptr = allocator_traits_type::allocate(value_alloc, 1);
+
     try
     {
-        allocator_traits_type::construct(value_alloc, ptr, std::forward<Ts>(args)...);
+        allocator_traits_type::construct(value_alloc, ptr, std::forward<ArgsT>(args)...);
     }
     catch (...)
     {
@@ -62,76 +74,58 @@ ValueT* allocate_and_construct(const AllocatorT& alloc, ValueT*& ptr, Ts&&... ar
 }
 
 /**
- * @brief       Allocates and constructs an object using a custom allocator.
- * @param       alloc : The allocator instance to use for allocating and constructing the object.
- * @param       args : The arguments to forward to the constructor of `T`.
- * @return      A `std::unique_ptr<T, std::function<void(T*)>>` that owns the allocated and
- *              constructed object,
- */
-template <typename ValueT, typename AllocatorT, typename... Ts>
-std::unique_ptr<ValueT> allocate_unique(
-        const AllocatorT& alloc,
-        Ts&&... args
-)
-{
-    using allocator_traits_type = std::allocator_traits<AllocatorT>;
-    using value_allocator_type = typename allocator_traits_type::template rebind_alloc<ValueT>;
-    
-    ValueT* ptr;
-    value_allocator_type value_alloc(alloc);
-    
-    allocate_and_construct(alloc, ptr, std::forward<Ts>(args)...);
-
-    // auto deleter = [value_alloc](ValueT* p) mutable {
-    //     std::allocator_traits<value_allocator_type>::destroy(value_alloc, p);
-    //     std::allocator_traits<value_allocator_type>::deallocate(value_alloc, p, 1);
-    // };
-
-    return std::unique_ptr<ValueT>(ptr);
-}
-
-/**
- * @brief       Construct the given object pointer.
- * @param       ptr : The pointer to the object to construct.
- * @param       args : Arguments to forward to the object constructor.
- * @return      Same pointer as the passed argument, but points to the newly constructed object.
- */
-template<typename ValueT, typename... Ts>
-ValueT* construct_at(ValueT* ptr, Ts&&... args)
-{
-    return ::new (static_cast<void*>(ptr)) ValueT(std::forward<Ts>(args)...);
-}
-
-/**
- * @brief       Destroy the object pointer by the pointer.
- * @param       ptr : Pointer to the object to destroy.
- */
-template<typename ValueT>
-void destroy_at(ValueT* ptr)
-{
-    if (ptr)
-    {
-        ptr->~ValueT();
-    }
-}
-
-/**
- * @brief       Destroy and deallocate using an allocator.
- * @param       alloc : Allocator used to deallocate.
- * @param       ptr : Pointer to object to destruct and deallocate.
+ * @brief Destroys an object and releases its storage.
+ *
+ * If ptr is not null, the object is destroyed and its storage is deallocated using alloc.
+ *
+ * @tparam ValueT Type of the object to destroy.
+ * @tparam AllocatorT Allocator type used to deallocate storage.
+ *
+ * @param alloc Allocator used to destroy and deallocate the object.
+ * @param ptr Pointer to the object to destroy.
  */
 template<typename ValueT, typename AllocatorT>
-void destroy_and_deallocate(const AllocatorT& alloc, ValueT* ptr)
+void destroy_and_deallocate(const AllocatorT& alloc, ValueT* ptr) noexcept
 {
-    using allocator_traits_type = std::allocator_traits<AllocatorT>;
-    using value_allocator_type = typename allocator_traits_type::template rebind_alloc<ValueT>;
-    
+    if (ptr == nullptr)
+    {
+        return;
+    }
+
+    using value_allocator_type = std::allocator_traits<AllocatorT>::template rebind_alloc<ValueT>;
+    using allocator_traits_type = std::allocator_traits<value_allocator_type>;
+
     value_allocator_type value_alloc(alloc);
-    
+
     allocator_traits_type::destroy(value_alloc, ptr);
     allocator_traits_type::deallocate(value_alloc, ptr, 1);
 }
 
+/**
+ * @brief Allocates, constructs, and returns an allocator-aware unique pointer.
+ *
+ * Allocates memory for a single object of type ValueT using alloc, constructs the object with
+ * the provided arguments, and returns an allocator_unique_ptr that automatically destroys and
+ * deallocates the object using the same allocator.
+ *
+ * @tparam ValueT Type of the object to allocate and construct.
+ * @tparam AllocatorT Allocator type used to allocate storage.
+ * @tparam ArgsT Types of the construction arguments.
+ *
+ * @param alloc Allocator used to allocate storage.
+ * @param args Arguments forwarded to the constructor of ValueT.
+ * @return An allocator-aware unique pointer managing the constructed object.
+ */
+template<typename ValueT, typename AllocatorT, typename... ArgsT>
+[[nodiscard]] allocator_unique_ptr<ValueT, AllocatorT> allocate_unique(
+    const AllocatorT& alloc,
+    ArgsT&&... args
+)
+{
+    return {
+        allocate_and_construct<ValueT>(alloc, std::forward<ArgsT>(args)...),
+        allocator_deleter<ValueT, AllocatorT>(alloc)
+    };
 }
 
-#endif
+}

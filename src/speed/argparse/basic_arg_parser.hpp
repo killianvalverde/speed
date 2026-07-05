@@ -39,7 +39,7 @@
 #include "detail/forward_declarations.hpp"
 #include "../containers/containers.hpp"
 #include "../memory/memory.hpp"
-#include "../stringutils/stringutils.hpp"
+#include "../strings/strings.hpp"
 #include "detail/arg_error_flags.hpp"
 #include "detail/arg_flags.hpp"
 #include "detail/arg_parser_error_flags.hpp"
@@ -1804,11 +1804,11 @@ private:
                 if (!ky_arg->is_flag_set(detail::arg_flags::TERMINAL) &&
                     !ky_arg->is_flag_set(detail::arg_flags::PKILL_AFTER_TRIGGERING))
                 {
-                    safety::try_addm(nr_options_bldr, 1);
+                    numerics::try_saturating_add(nr_options_bldr, 1);
                 }
                 else
                 {
-                    safety::try_addm(nr_term_not_always_requird, 1);
+                    numerics::try_saturating_add(nr_term_not_always_requird, 1);
                 }
             }
         }

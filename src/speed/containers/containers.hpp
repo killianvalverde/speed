@@ -27,7 +27,7 @@
 #ifndef SPEED_CONTAINERS_CONTAINERS_HPP
 #define SPEED_CONTAINERS_CONTAINERS_HPP
 
-#include "exception.hpp"
+#include "exceptions.hpp"
 #include "flags.hpp"
 #include "iterator_base.hpp"
 #include "static_cache.hpp"

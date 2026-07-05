@@ -31,7 +31,7 @@
 
 #include "../iostream/iostream.hpp"
 #include "../type_traits/type_traits.hpp"
-#include "exception.hpp"
+#include "exceptions.hpp"
 #include "iterator_base.hpp"
 
 namespace speed::containers {
