@@ -236,7 +236,7 @@ bool create_directories(const path_char_t* directory_path, std::error_code* err_
         }
         else if (path.size() >= 3 && path[1] == L':' && path[2] == L'\\')
         {
-            // Absolute path with drive letter: C:\
+            // Absolute path with drive letter: C:\;
             prefix_len = 3;
         }
 

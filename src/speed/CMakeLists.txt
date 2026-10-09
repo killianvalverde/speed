@@ -435,6 +435,10 @@ target_link_libraries(speed INTERFACE
 # =========================
 # Target Properties
 # =========================
+foreach (target IN LISTS SPEED_INTERFACE_TARGETS)
+    set_target_properties(${target} PROPERTIES VERIFY_INTERFACE_HEADER_SETS ON)
+endforeach ()
+
 foreach (target IN LISTS SPEED_COMPILED_TARGETS)
     set_target_properties(${target} PROPERTIES DEBUG_POSTFIX d)
 endforeach ()
