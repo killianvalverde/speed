@@ -6,7 +6,7 @@ include(GNUInstallDirs)
 # =========================
 # Target Definitions
 # =========================
-set(SPEED_HEADER_ONLY_TARGETS
+set(SPEED_INTERFACE_TARGETS
     speed_algorithm
     speed_argparse
     speed_concepts
@@ -23,19 +23,19 @@ set(SPEED_HEADER_ONLY_TARGETS
     speed_strings
     speed_time
     speed_type_traits
+    speed
 )
 
 set(SPEED_COMPILED_TARGETS
     speed_system
-    speed
 )
 
 set(SPEED_TARGETS
-    ${SPEED_HEADER_ONLY_TARGETS}
+    ${SPEED_INTERFACE_TARGETS}
     ${SPEED_COMPILED_TARGETS}
 )
 
-foreach (target IN LISTS SPEED_HEADER_ONLY_TARGETS)
+foreach (target IN LISTS SPEED_INTERFACE_TARGETS)
     add_library(${target} INTERFACE)
 endforeach ()
 
@@ -59,7 +59,7 @@ endforeach ()
 # =========================
 # Target Compile Settings
 # =========================
-foreach (target IN LISTS SPEED_HEADER_ONLY_TARGETS)
+foreach (target IN LISTS SPEED_INTERFACE_TARGETS)
     target_compile_features(${target} INTERFACE cxx_std_20)
 endforeach ()
 
@@ -68,7 +68,7 @@ foreach (target IN LISTS SPEED_COMPILED_TARGETS)
 endforeach ()
 
 if (MSVC)
-    foreach (target IN LISTS SPEED_HEADER_ONLY_TARGETS)
+    foreach (target IN LISTS SPEED_INTERFACE_TARGETS)
         target_compile_options(${target} INTERFACE
             /utf-8 /EHsc /Zc:preprocessor /Zc:__cplusplus
         )
@@ -138,6 +138,14 @@ set(SPEED_CONTAINERS_HEADERS
     containers/flags.hpp
     containers/iterator_base.hpp
     containers/static_cache.hpp
+)
+
+set(SPEED_CONVERSIONS_HEADERS
+    conversions/detail/forward_declarations.hpp
+    conversions/detail/operations.hpp
+    conversions/conversions.hpp
+    conversions/exception.hpp
+    conversions/operations.hpp
 )
 
 set(SPEED_CRYPTOGRAPHY_SOURCES
@@ -305,27 +313,23 @@ foreach (target IN LISTS SPEED_TARGETS)
     set(src_var "${target_upper}_SOURCES")
     set(hdr_var "${target_upper}_HEADERS")
 
-    set(all_files "")
-
     if (DEFINED ${src_var})
-        list(APPEND all_files ${${src_var}})
+        target_sources(${target} PRIVATE ${${src_var}})
     endif ()
 
     if (DEFINED ${hdr_var})
-        list(APPEND all_files ${${hdr_var}})
-    endif ()
-
-    if (all_files)
-        target_sources(${target} PRIVATE ${all_files})
-    else ()
-        message(WARNING "No sources or headers found for ${target}")
+        target_sources(${target} PUBLIC
+            FILE_SET HEADERS
+            BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/.."
+            FILES ${${hdr_var}}
+        )
     endif ()
 endforeach ()
 
 # =========================
 # Usage Requirements
 # =========================
-foreach (target IN LISTS SPEED_HEADER_ONLY_TARGETS)
+foreach (target IN LISTS SPEED_INTERFACE_TARGETS)
     target_include_directories(${target} INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
@@ -446,12 +450,8 @@ if (PROJECT_IS_TOP_LEVEL)
         EXPORT speedTargets
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-    )
-
-    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../speed
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-        FILES_MATCHING PATTERN "*.hpp"
     )
 
     install(EXPORT speedTargets
@@ -460,16 +460,16 @@ if (PROJECT_IS_TOP_LEVEL)
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/speed
     )
 
-    write_basic_package_version_file(
-        "${CMAKE_CURRENT_BINARY_DIR}/speedConfigVersion.cmake"
-        VERSION 0.6.0
-        COMPATIBILITY AnyNewerVersion
-    )
-
     configure_package_config_file(
         "${PROJECT_SOURCE_DIR}/cmake/speedConfig.cmake.in"
         "${CMAKE_CURRENT_BINARY_DIR}/speedConfig.cmake"
         INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/speed
+    )
+
+    write_basic_package_version_file(
+        "${CMAKE_CURRENT_BINARY_DIR}/speedConfigVersion.cmake"
+        VERSION 0.6.0
+        COMPATIBILITY AnyNewerVersion
     )
 
     install(FILES

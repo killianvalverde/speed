@@ -215,7 +215,7 @@ bool create_directories(const path_char_t* directory_path, std::error_code* err_
             }
             else if (path.size() >= 7 && path[5] == L':' && path[6] == L'\\')
             {
-                // \\?\C:\
+                // \\?\C:\;
                 prefix_len = 7;
             }
             else

@@ -38,7 +38,7 @@
 #define STATUS_NO_MORE_FILES ((NTSTATUS)0x80000006L)
 #endif
 
-extern "C" NTSYSCALLAPI NTSTATUS NTAPI NtOpenFile(
+extern "C" NTSTATUS NTAPI NtOpenFile(
     PHANDLE FileHandle,
     ACCESS_MASK DesiredAccess,
     POBJECT_ATTRIBUTES ObjectAttributes,
@@ -47,11 +47,11 @@ extern "C" NTSYSCALLAPI NTSTATUS NTAPI NtOpenFile(
     ULONG OpenOptions
 );
 
-extern "C" NTSYSCALLAPI NTSTATUS NTAPI NtClose(
+extern "C" NTSTATUS NTAPI NtClose(
     HANDLE Handle
 );
 
-extern "C" NTSYSCALLAPI NTSTATUS NTAPI NtQueryDirectoryFile(
+extern "C" NTSTATUS NTAPI NtQueryDirectoryFile(
     HANDLE FileHandle,
     HANDLE Event,
     PIO_APC_ROUTINE ApcRoutine,
@@ -65,7 +65,7 @@ extern "C" NTSYSCALLAPI NTSTATUS NTAPI NtQueryDirectoryFile(
     BOOLEAN RestartScan
 );
 
-extern "C" NTSYSCALLAPI ULONG NTAPI RtlNtStatusToDosError(
+extern "C" ULONG NTAPI RtlNtStatusToDosError(
     NTSTATUS Status
 );
 
