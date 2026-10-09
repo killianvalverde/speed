@@ -19,7 +19,7 @@
 
 /**
  * @file memory.hpp
- * @brief Memory management facilities.
+ * @brief Main header of the memory module.
  * @author Killian Valverde
  * @date 2024-10-10
  */
@@ -39,7 +39,7 @@ namespace memory {}
 
 #ifndef SPEED_DISABLE_ALIAS
 /**
- * @brief Alias for speed::memory  namespace.
+ * @brief Alias for speed::memory namespace.
  *
  * Define SPEED_DISABLE_ALIAS to disable this alias.
  */

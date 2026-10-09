@@ -63,6 +63,6 @@ using am_t = access_modes;
 
 /** @cond */
 template<>
-struct speed::scalars::is_flag_enum<speed::system::filesystem::access_modes>
+struct speed::enums::is_flag_enum<speed::system::filesystem::access_modes>
         : std::true_type {};
 /** @endcond */

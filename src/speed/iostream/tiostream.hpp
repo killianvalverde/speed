@@ -18,14 +18,13 @@
  */
 
 /**
- * @file        tiostream.hpp
- * @brief       tiostream header.
- * @author      Killian Valverde
- * @date        2026/03/15
+ * @file tiostream.hpp
+ * @brief Contains aliases to the standard streams that use the system's native character type.
+ * @author Killian Valverde
+ * @date 2026-03-15
  */
 
-#ifndef SPEED_IOSTREAM_TIOSTREAM_HPP
-#define SPEED_IOSTREAM_TIOSTREAM_HPP
+#pragma once
 
 #include <iostream>
 
@@ -60,5 +59,3 @@ inline std::ostream& tclog = std::clog;
 #endif
 
 }
-
-#endif

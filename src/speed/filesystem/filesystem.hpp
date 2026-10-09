@@ -18,14 +18,13 @@
  */
 
 /**
- * @file        filesystem.hpp
- * @brief       filesystem main header.
- * @author      Killian Valverde
- * @date        2018/11/25
+ * @file filesystem.hpp
+ * @brief Main header of the filesystem module.
+ * @author Killian Valverde
+ * @date 2018-11-25
  */
 
-#ifndef SPEED_FILESYSTEM_FILESYSTEM_HPP
-#define SPEED_FILESYSTEM_FILESYSTEM_HPP
+#pragma once
 
 #include "directory_iteration.hpp"
 #include "operations.hpp"
@@ -34,17 +33,17 @@
 namespace speed {
 
 /**
- * @brief       Contains filesystem interaction resources.
+ * @brief Contains filesystem interaction resources.
  */
 namespace filesystem {}
 
 #ifndef SPEED_DISABLE_ALIAS
 /**
- * @brief       Contains filesystem interaction resources.
+ * @brief Alias for speed::filesystem namespace.
+ *
+ * Define SPEED_DISABLE_ALIAS to disable this alias.
  */
 namespace fs = filesystem;
 #endif
 
 }
-
-#endif

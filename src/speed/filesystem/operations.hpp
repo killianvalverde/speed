@@ -18,32 +18,13 @@
  */
 
 /**
- * @file        operations.hpp
- * @brief       filesystem functions header.
- * @author      Killian Valverde
- * @date        2024/11/09
+ * @file operations.hpp
+ * @brief Provides utilities for filesystem operations.
+ * @author Killian Valverde
+ * @date 2024-11-09
  */
 
-#ifndef SPEED_FILESYSTEM_OPERATIONS_HPP
-#define SPEED_FILESYSTEM_OPERATIONS_HPP
+#pragma once
 
 namespace speed::filesystem {
-
-/**
- * @brief       Normalizes a filesystem path by replacing alternative slash characters.
- * @param       pth : The input filesystem path.
- * @return      A normalized filesystem path with consistent slash separators.
- */
-inline std::filesystem::path get_normalized_path(const std::filesystem::path& pth)
-{
-    auto path_str = pth.native();
-    
-    std::replace(path_str.begin(), path_str.end(), SPEED_ALT_PATH_SEPARATOR_CHAR,
-                 SPEED_PATH_SEPARATOR_CHAR);
-    
-    return {std::move(path_str)};
 }
-
-}
-
-#endif

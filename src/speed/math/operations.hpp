@@ -18,21 +18,34 @@
  */
 
 /**
- * @file        operations.hpp
- * @brief       math functions header.
- * @author      Killian Valverde
- * @date        2017/01/28
+ * @file operations.hpp
+ * @brief Contains generic mathematical operations on arithmetic types.
+ * @author Killian Valverde
+ * @date 2017-01-28
  */
 
-#ifndef SPEED_MATH_OPERATIONS_HPP
-#define SPEED_MATH_OPERATIONS_HPP
+#pragma once
 
 #include <concepts>
 
 namespace speed::math {
 
+/**
+ * @brief Computes the absolute value of an integer without overflow.
+ *
+ * Unlike `std::abs`, this function is well-defined for the minimum value of
+ * a signed type (e.g. `INT_MIN`), because the result is returned as the
+ * corresponding unsigned type, which can always represent it.
+ *
+ * @tparam IntegralT An integral type. Must not be `bool`, since
+ *                   `std::make_unsigned_t<bool>` is ill-formed.
+ *
+ * @param val The value whose absolute value is computed.
+ *
+ * @return The absolute value of val as `std::make_unsigned_t<IntegralT>`.
+ */
 template<std::integral IntegralT>
-[[nodiscard]] constexpr std::make_unsigned_t<IntegralT> abs(IntegralT val) noexcept
+[[nodiscard]] constexpr std::make_unsigned_t<IntegralT> absolute(IntegralT val) noexcept
 {
     using unsigned_t = std::make_unsigned_t<IntegralT>;
 
@@ -47,5 +60,3 @@ template<std::integral IntegralT>
 }
 
 }
-
-#endif

@@ -19,7 +19,7 @@
 
 /**
  * @file exception.hpp
- * @brief xxxxx
+ * @brief Contains the exception types thrown by the numerics module.
  * @author Killian Valverde
  * @date 2017-10-20
  */

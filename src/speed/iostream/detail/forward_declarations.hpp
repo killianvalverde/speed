@@ -18,29 +18,31 @@
  */
 
 /**
- * @file        forward_declarations.hpp
- * @brief       forward_declarations header.
- * @author      Killian Valverde
- * @date        2025/08/03
+ * @file forward_declarations.hpp
+ * @brief Internal forward declarations for the iostream module.
+ * @author Killian Valverde
+ * @date 2025-08-03
  */
 
-#ifndef SPEED_IOSTREAM_DETAIL_FORWARD_DECLARATIONS_HPP
-#define SPEED_IOSTREAM_DETAIL_FORWARD_DECLARATIONS_HPP
+#pragma once
 
 #include <iostream>
 
 namespace speed::iostream {
 
 template<typename CharT, typename TraitsT>
-std::basic_ostream<CharT, TraitsT>& set_default_text(
-        std::basic_ostream<CharT, TraitsT>& os
+std::basic_ostream<CharT, TraitsT>& set_background_default(
+    std::basic_ostream<CharT, TraitsT>& os
 );
 
 template<typename CharT, typename TraitsT>
-std::basic_ostream<CharT, TraitsT>& set_light_red_text(
-        std::basic_ostream<CharT, TraitsT>& os
+std::basic_ostream<CharT, TraitsT>& set_foreground_default(
+    std::basic_ostream<CharT, TraitsT>& os
+);
+
+template<typename CharT, typename TraitsT>
+std::basic_ostream<CharT, TraitsT>& set_foreground_bright_red(
+    std::basic_ostream<CharT, TraitsT>& os
 );
 
 }
-
-#endif

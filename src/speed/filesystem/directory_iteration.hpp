@@ -24,8 +24,7 @@
  * @date        2024/10/15
  */
 
-#ifndef SPEED_FILESYSTEM_DIRECTORY_ITERATION_HPP
-#define SPEED_FILESYSTEM_DIRECTORY_ITERATION_HPP
+#pragma once
 
 #include <filesystem>
 #include <regex>
@@ -39,54 +38,20 @@
 
 namespace speed::filesystem {
 
-/**
- * @brief       Class that configures and produce directories iterators.
- */
 class directory_iteration
 {
 public:
-    /** Character type used in the class. */
     using char_type = std::filesystem::path::value_type;
 
-    /** String type used in the class. */
     using string_type = std::filesystem::path::string_type;
 
-    /** Regex type used in the class. */
     using regex_type = std::basic_regex<char_type, std::regex_traits<char_type>>;
 
-private:
-    /** Set type used in the class. */
-    template<typename T>
-    using set_type = std::set<T, std::less<T>, std::allocator<T>>;
-    
-    /** Stack type used in the class. */
-    template<typename T>
-    using stack_type = std::stack<T>;
-
-    /** Directory entity type. */
-    using system_directory_entry_type = system::filesystem::directory_stream;
-
-public:
     class const_iterator;
 
-    /**
-     * @brief       Represents a single entry in a directory traversal.
-     */
     class directory_entry
     {
-    private:
-        /** Directory entity type. */
-        using system_directory_entity_type = system::filesystem::directory_stream;
-
-        /** Stack type used in the class. */
-        template<typename T>
-        using stack_type = std::stack<T>;
-
     public:
-        /**
-         * @brief       Checks whether the current entity is a directory.
-         * @return      true if the entity is a directory, false otherwise.
-         */
         [[nodiscard]] bool is_directory() const noexcept
         {
             if (composit_ == nullptr)
@@ -94,9 +59,7 @@ public:
                 return false;
             }
 
-            return system::filesystem::is_file_type(directory_entity_stck_.top(),
-                    composit_->resolve_entries_symlnks_,
-                    system::filesystem::file_types::DIRECTORY);
+            return directory_entity_stck_.top().type == system::filesystem::file_types::DIRECTORY;
         }
 
         /**
@@ -186,6 +149,11 @@ public:
         }
 
     private:
+        using system_directory_entity_type = system::filesystem::directory_stream;
+
+        template<typename T>
+        using stack_type = std::stack<T>;
+
         /**
          * @brief       Constructs a directory_entry object.
          * @param       cur_fle_ : The current filesystem path of the directory entry.
@@ -572,40 +540,36 @@ private:
     }
 
 private:
-    /** The root directory of the iteration. */
+    template<typename T>
+    using set_type = std::set<T, std::less<T>, std::allocator<T>>;
+    
+    template<typename T>
+    using stack_type = std::stack<T>;
+
+    using system_directory_entry_type = system::filesystem::directory_stream;
+    
     std::filesystem::path root_pth_;
     
-    /** Wildcard that all the iterated files have to match. */
     string_type substring_to_mtch_;
     
-    /** Wildcard that all the iterated files have to match. */
     string_type wildcard_to_mtch_;
 
-    /** Regex that all the iterated files have to match. */
     string_type regex_to_mtch_str_;
 
-    /** Regex that all the iterated files have to match. */
     regex_type regex_to_mtch_;
 
-    /** Maximum level of recursivity allowed. */
     std::uint64_t max_recursivity_levl_ = ~0ull;
 
-    /** Access mods that all the iterated files have to match. */
     system::filesystem::access_modes access_mods_ = system::filesystem::access_modes::NIL;
 
-    /** List of file types that are allowed to be iterated. */
     system::filesystem::file_types file_typs_ = system::filesystem::file_types::NIL;
     
-    /** Specify whether the regex will be case-sensitive. */
     bool case_insensitve_ = true;
     
-    /** Specify whether the inodes will be tracked. */
     bool inode_trackr_ = false;
 
-    /** Specify whether follow symbolic links during the iteration. */
     bool resolve_directory_symlnks_ = false;
 
-    /** Specify whether resolve directory symbolic links during the iteration. */
     bool resolve_entries_symlnks_ = false;
 
     friend class directory_entry;
@@ -613,5 +577,3 @@ private:
 };
 
 }
-
-#endif

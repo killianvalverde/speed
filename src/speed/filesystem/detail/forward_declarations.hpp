@@ -18,14 +18,13 @@
  */
 
 /**
- * @file        forward_declarations.hpp
- * @brief       forward_declarations header.
- * @author      Killian Valverde
- * @date        2024/10/15
+ * @file forward_declarations.hpp
+ * @brief Internal forward declarations for the filesystem module.
+ * @author Killian Valverde
+ * @date 2024-10-15
  */
 
-#ifndef SPEED_FILESYSTEM_DETAIL_FORWARD_DECLARATIONS_HPP
-#define SPEED_FILESYSTEM_DETAIL_FORWARD_DECLARATIONS_HPP
+#pragma once
 
 namespace speed::filesystem {
 
@@ -55,5 +54,3 @@ template<typename BaseT>
 class output_directory_path_decorator;
 
 }
-
-#endif

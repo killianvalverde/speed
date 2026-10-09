@@ -18,39 +18,40 @@
  */
 
 /**
- * @file        operations.hpp
- * @brief       operations functions header.
- * @author      Killian Valverde
- * @date        2016/08/24
+ * @file operations.hpp
+ * @brief Provides utilities for standard stream operations.
+ * @author Killian Valverde
+ * @date 2016-08-24
  */
 
-#ifndef SPEED_IOSTREAM_OPERATIONS_HPP
-#define SPEED_IOSTREAM_OPERATIONS_HPP
+#pragma once
 
-#include <cstdarg>
-#include <cstdio>
+#include <cstddef>
 #include <cstdlib>
-#include <cwchar>
 #include <iostream>
+#include <string_view>
+#include <type_traits>
 
 #include "detail/forward_declarations.hpp"
-#include "../numerics/numerics.hpp"
 #include "../system/system.hpp"
 
 namespace speed::iostream {
 
 /**
- * @brief       Get the current 'std::basic_ostream' object used to print CharT in standard error
- *              output.
- * @return      The current 'std::basic_ostream' object used to print CharT in standard error
- *              output.
+ * @brief Declares access to the standard error stream by character type.
+ * 
+ * @tparam CharT Character type of the requested stream.
+ * 
+ * @note The primary template is deleted. Only `char` and `wchar_t`
+ *       specializations are supported.
  */
 template<typename CharT>
-std::basic_ostream<CharT>& get_cerr() noexcept;
+std::basic_ostream<CharT>& get_cerr() noexcept = delete;
 
 /**
- * @brief       Get the current 'std::ostream' object used to print in standard error output.
- * @return      The current 'std::ostream' object used to print in standard error output.
+ * @brief Returns the narrow-character standard error stream.
+ * 
+ * @return Reference to `std::cerr`.
  */
 template<>
 constexpr std::ostream& get_cerr<char>() noexcept
@@ -59,8 +60,9 @@ constexpr std::ostream& get_cerr<char>() noexcept
 }
 
 /**
- * @brief       Get the current 'std::wostream' object used to print in standard error output.
- * @return      The current 'std::wostream' object used to print in standard error output.
+ * @brief Returns the wide-character standard error stream.
+ * 
+ * @return Reference to `std::wcerr`.
  */
 template<>
 constexpr std::wostream& get_cerr<wchar_t>() noexcept
@@ -69,15 +71,86 @@ constexpr std::wostream& get_cerr<wchar_t>() noexcept
 }
 
 /**
- * @brief       Get the current 'std::basic_ostream' object used to print CharT in standard output.
- * @return      The current 'std::basic_ostream' object used to print CharT in standard output.
+ * @brief Declares access to the standard input stream by character type.
+ * 
+ * @tparam CharT Character type of the requested stream.
+ * 
+ * @note The primary template is deleted. Only `char` and `wchar_t`
+ *       specializations are supported.
  */
 template<typename CharT>
-std::basic_ostream<CharT>& get_cout() noexcept;
+std::basic_istream<CharT>& get_cin() noexcept = delete;
 
 /**
- * @brief       Get the current 'std::ostream' object used to print in standard output.
- * @return      The current 'std::ostream' object used to print in standard output.
+ * @brief Returns the narrow-character standard input stream.
+ * 
+ * @return Reference to `std::cin`.
+ */
+template<>
+constexpr std::istream& get_cin<char>() noexcept
+{
+    return std::cin;
+}
+
+/**
+ * @brief Returns the wide-character standard input stream.
+ * 
+ * @return Reference to `std::wcin`.
+ */
+template<>
+constexpr std::wistream& get_cin<wchar_t>() noexcept
+{
+    return std::wcin;
+}
+
+/**
+ * @brief Declares access to the standard logging stream by character type.
+ * 
+ * @tparam CharT Character type of the requested stream.
+ * 
+ * @note The primary template is deleted. Only `char` and `wchar_t`
+ *       specializations are supported.
+ */
+template<typename CharT>
+std::basic_ostream<CharT>& get_clog() noexcept = delete;
+
+/**
+ * @brief Returns the narrow-character standard logging stream.
+ * 
+ * @return Reference to `std::clog`.
+ */
+template<>
+constexpr std::ostream& get_clog<char>() noexcept
+{
+    return std::clog;
+}
+
+/**
+ * @brief Returns the wide-character standard logging stream.
+ * 
+ * @return Reference to `std::wclog`.
+ */
+template<>
+constexpr std::wostream& get_clog<wchar_t>() noexcept
+{
+    return std::wclog;
+}
+
+/**
+ * @brief Declares access to the standard output stream by character type.
+ * 
+ * @tparam CharT Character type of the requested stream.
+ * 
+ * @note The primary template is deleted. Only `char` and `wchar_t`
+ *       specializations are supported.
+ */
+template<typename CharT>
+std::basic_ostream<CharT>& get_cout() noexcept = delete;
+
+/**
+ * @brief Returns the narrow-character standard output stream.
+ * 
+ * @return Reference to `std::cout`.
  */
 template<>
 constexpr std::ostream& get_cout<char>() noexcept
@@ -86,8 +159,9 @@ constexpr std::ostream& get_cout<char>() noexcept
 }
 
 /**
- * @brief       Get the current 'std::wostream' object used to print in standard output.
- * @return      The current 'std::wostream' object used to print in standard output.
+ * @brief Returns the wide-character standard output stream.
+ * 
+ * @return Reference to `std::wcout`.
  */
 template<>
 constexpr std::wostream& get_cout<wchar_t>() noexcept
@@ -96,9 +170,13 @@ constexpr std::wostream& get_cout<wchar_t>() noexcept
 }
 
 /**
- * @brief       Inserts a new-line character in the stream.
- * @param       os : Output stream object effected.
- * @return      Argument os.
+ * @brief Writes a newline to an output stream without flushing it.
+ * 
+ * @tparam CharT Character type of the stream.
+ * @tparam TraitsT Character traits type of the stream.
+ * 
+ * @param os Output stream to which the widened newline is written.
+ * @return Reference to @p os.
  */
 template<typename CharT, typename TraitsT>
 std::basic_ostream<CharT, TraitsT>& newl(std::basic_ostream<CharT, TraitsT>& os)
@@ -107,141 +185,106 @@ std::basic_ostream<CharT, TraitsT>& newl(std::basic_ostream<CharT, TraitsT>& os)
 }
 
 /**
- * @brief       Writes the C string pointed by format to the standard output (os). If format
- *              includes format specifiers (subsequences beginning with %), the additional arguments
- *              following format are formatted and inserted in the resulting string replacing their
- *              respective specifiers.
- * @param       formt : C string that contains the text to be written to os. It can optionally
- *              contain embedded format specifiers that are replaced by the values specified in
- *              subsequent additional arguments and formatted as requested.
- * @return      On success, the total number of characters written is returned. If a writing error
- *              occurs, the error indicator (ferror) is set and a negative number is returned. If a
- *              multibyte character encoding error occurs while writing wide characters, errno is
- *              set to EILSEQ and a negative number is returned.
+ * @brief Prints a color-highlighted error and terminates the process.
+ * 
+ * @tparam CharT Character type of the stream and message strings.
+ * @tparam TraitsT Character traits type of the stream and message strings.
+ * 
+ * @param os Output stream that receives the error message.
+ * @param name Name or label identifying the error source.
+ * @param message Text describing the error.
+ * @param exit_code Process exit status passed to `std::exit`.
  */
-inline int printf(const char* formt, ...) noexcept
-{
-    int dne;
-    va_list args;
-    va_start(args, formt);
-    dne = ::vfprintf(stdout, formt, args);
-    va_end(args);
-    return dne;
-}
-
-/**
- * @brief       Writes the C string pointed by format to the standard output (os). If format
- *              includes format specifiers (subsequences beginning with %), the additional arguments
- *              following format are formatted and inserted in the resulting string replacing their
- *              respective specifiers.
- * @param       formt : C string that contains the text to be written to os. It can optionally
- *              contain embedded format specifiers that are replaced by the values specified in
- *              subsequent additional arguments and formatted as requested.
- * @return      On success, the total number of characters written is returned. If a writing error
- *              occurs, the error indicator (ferror) is set and a negative number is returned. If a
- *              multibyte character encoding error occurs while writing wide characters, errno is
- *              set to EILSEQ and a negative number is returned.
- */
-inline int printf(const wchar_t* formt, ...) noexcept
-{
-    int dne;
-    va_list args;
-    va_start(args, formt);
-    dne = ::vfwprintf(stdout, formt, args);
-    va_end(args);
-    return dne;
-}
-
-/**
- * @brief       Prints a formatted error message in red text and terminates the program.
- * @param       os : The output stream where the error message will be printed.
- * @param       nme : The name or identifier of the error.
- * @param       messge : The detailed error message.
- * @param       exit_cod : The exit code with which the program will terminate.
- */
-template<typename CharT, typename CharTraitsT, typename StringT1, typename StringT2>
-void print_error_and_exit(
-        std::basic_ostream<CharT, CharTraitsT>& os,
-        const StringT1& nme,
-        const StringT2& messge,
-        int exit_cod
+template<typename CharT, typename TraitsT>
+[[noreturn]] void print_error_and_exit(
+    std::basic_ostream<CharT, TraitsT>& os,
+    std::type_identity_t<std::basic_string_view<CharT, TraitsT>> name,
+    std::type_identity_t<std::basic_string_view<CharT, TraitsT>> message,
+    int exit_code
 ) noexcept
 {
-    os << set_light_red_text << nme << ':' << ' '
-       << set_default_text << messge
-       << std::endl;
-    
-    exit(exit_cod);
+    try
+    {
+        os << set_light_red_text << name << ':' << ' '
+           << set_default_text << message
+           << std::endl;
+    }
+    catch (...)
+    {
+    }
+
+    std::exit(exit_code);
 }
 
 /**
- * @brief       Print a string wrapping if necessary.
- * @param       os : Ostrem used to print.
- * @param       str : Text to print.
- * @param       max_line_len : The maximum line length that will be printed.
- * @param       new_line_indent : The indentation used after a newline is printed.
- * @param       current_line_len : The current length of the current line.
- * @return
+ * @brief Writes text with line wrapping at spaces.
+ * 
+ * @tparam CharT Character type of the output stream and string view.
+ * @tparam TraitsT Character traits type of the stream and string view.
+ * 
+ * @param os Output stream to which text is written.
+ * @param strv Text to be written.
+ * @param max_line_length Preferred maximum line length in characters.
+ * @param new_line_indentation Number of spaces inserted after newlines; defaults to four.
+ * @param current_line_length Existing length of the current output line; defaults to zero.
+ * @return Reference to os.
  */
-template<typename CharT, typename CharTraitsT, typename StringT>
-std::basic_ostream<CharT, CharTraitsT>& print_wrapped(
-        std::basic_ostream<CharT, CharTraitsT>& os,
-        const StringT& str,
-        std::size_t max_line_len,
-        std::size_t new_line_indent,
-        std::size_t current_line_len = 0
+template<typename CharT, typename TraitsT>
+std::basic_ostream<CharT, TraitsT>& print_wrapped(
+    std::basic_ostream<CharT, TraitsT>& os,
+    std::type_identity_t<std::basic_string_view<CharT, TraitsT>> strv,
+    std::size_t max_line_length,
+    std::size_t new_line_indentation = 4,
+    std::size_t current_line_length = 0
 )
 {
-    using string_view_type = type_traits::string_view_of_t<StringT>;
-    using string_view_it_type = typename string_view_type::const_iterator;
-    
-    string_view_type strv = str;
-    string_view_it_type str_it;
-    string_view_it_type aux_str_it;
-    std::size_t len_to_next;
+    const CharT newline = os.widen('\n');
+    const CharT space = os.widen(' ');
 
-    for (str_it = strv.cbegin(); str_it != strv.cend(); ++str_it)
+    const auto write_new_line = [&]
     {
-        if (*str_it == '\n')
+        os.put(newline);
+
+        for (std::size_t i = 0; i < new_line_indentation && os; ++i)
         {
-            os << '\n';
-            for (std::size_t i = 0; i < new_line_indent; ++i)
-            {
-                os << ' ';
-            }
-            current_line_len = new_line_indent;
+            os.put(space);
         }
-        else if (*str_it == ' ')
+
+        current_line_length = new_line_indentation;
+    };
+
+    for (auto it = strv.cbegin(); it != strv.cend() && os; ++it)
+    {
+        if (*it == newline)
         {
-            aux_str_it = str_it;
-            len_to_next = 0;
+            write_new_line();
+            continue;
+        }
+
+        if (*it == space)
+        {
+            auto next = it;
+            std::size_t len_to_next = 0;
 
             do
             {
-                ++aux_str_it;
+                ++next;
                 ++len_to_next;
-            } while (aux_str_it != strv.cend() && *aux_str_it != ' ');
+            } while (next != strv.cend() && *next != space && *next != newline);
 
-            numerics::try_saturating_add(len_to_next, current_line_len);
-            if (len_to_next > max_line_len)
+            if (current_line_length >= max_line_length ||
+                len_to_next > max_line_length - current_line_length)
             {
-                os << '\n';
-                for (std::size_t i = 0; i < new_line_indent; ++i)
-                {
-                    os << ' ';
-                }
-                current_line_len = new_line_indent;
-            }
-            else
-            {
-                os << ' ';
-                ++current_line_len;
+                write_new_line();
+                continue;
             }
         }
-        else
+
+        os.put(*it);
+
+        if (current_line_length < max_line_length)
         {
-            os << *str_it;
-            ++current_line_len;
+            ++current_line_length;
         }
     }
 
@@ -249,260 +292,615 @@ std::basic_ostream<CharT, CharTraitsT>& print_wrapped(
 }
 
 /**
- * @brief       Set the default text in terminal.
- * @param       os : Ostream in which set the attribute.
- * @return      os is returned.
+ * @brief Sets the terminal background color to black.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal background color is updated.
+ * @return Reference to os, for use as a stream manipulator.
  */
 template<typename CharT, typename TraitsT>
-std::basic_ostream<CharT, TraitsT>& set_default_text(
-        std::basic_ostream<CharT, TraitsT>& os
+std::basic_ostream<CharT, TraitsT>& set_background_black(
+    std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(
-            os, system::terminal::color::DEFAULT);
+    system::terminal::set_background_text_attribute(os, system::terminal::color::BLACK);
     return os;
 }
 
 /**
- * @brief       Set black text in terminal.
- * @param       os : Ostream in which set the attribute.
- * @return      os is returned.
+ * @brief Sets the terminal background color to blue.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal background color is updated.
+ * @return Reference to os, for use as a stream manipulator.
  */
 template<typename CharT, typename TraitsT>
-std::basic_ostream<CharT, TraitsT>& set_black_text(
-        std::basic_ostream<CharT, TraitsT>& os
+std::basic_ostream<CharT, TraitsT>& set_background_blue(
+    std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(
-            os, system::terminal::color::BLACK);
+    system::terminal::set_background_text_attribute(os, system::terminal::color::BLUE);
     return os;
 }
 
 /**
- * @brief       Set red text in terminal.
- * @param       os : Ostream in which set the attribute.
- * @return      os is returned.
+ * @brief Sets the terminal background color to bright black.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal background color is updated.
+ * @return Reference to os, for use as a stream manipulator.
  */
 template<typename CharT, typename TraitsT>
-std::basic_ostream<CharT, TraitsT>& set_red_text(
-        std::basic_ostream<CharT, TraitsT>& os
+std::basic_ostream<CharT, TraitsT>& set_background_bright_black(
+    std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(
-            os, system::terminal::color::RED);
+    system::terminal::set_background_text_attribute(os, system::terminal::color::BRIGHT_BLACK);
     return os;
 }
 
 /**
- * @brief       Set green text in terminal.
- * @param       os : Ostream in which set the attribute.
- * @return      os is returned.
+ * @brief Sets the terminal background color to bright blue.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal background color is updated.
+ * @return Reference to os, for use as a stream manipulator.
  */
 template<typename CharT, typename TraitsT>
-std::basic_ostream<CharT, TraitsT>& set_green_text(
-        std::basic_ostream<CharT, TraitsT>& os
+std::basic_ostream<CharT, TraitsT>& set_background_bright_blue(
+    std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(
-            os, system::terminal::color::GREEN);
+    system::terminal::set_background_text_attribute(os, system::terminal::color::BRIGHT_BLUE);
     return os;
 }
 
 /**
- * @brief       Set brown text in terminal.
- * @param       os : Ostream in which set the attribute.
- * @return      os is returned.
+ * @brief Sets the terminal background color to bright cyan.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal background color is updated.
+ * @return Reference to os, for use as a stream manipulator.
  */
 template<typename CharT, typename TraitsT>
-std::basic_ostream<CharT, TraitsT>& set_brown_text(
-        std::basic_ostream<CharT, TraitsT>& os
+std::basic_ostream<CharT, TraitsT>& set_background_bright_cyan(
+    std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(
-            os, system::terminal::color::BROWN);
+    system::terminal::set_background_text_attribute(os, system::terminal::color::BRIGHT_CYAN);
     return os;
 }
 
 /**
- * @brief       Set blue text in terminal.
- * @param       os : Ostream in which set the attribute.
- * @return      os is returned.
+ * @brief Sets the terminal background color to bright green.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal background color is updated.
+ * @return Reference to os, for use as a stream manipulator.
  */
 template<typename CharT, typename TraitsT>
-std::basic_ostream<CharT, TraitsT>& set_blue_text(
-        std::basic_ostream<CharT, TraitsT>& os
+std::basic_ostream<CharT, TraitsT>& set_background_bright_green(
+    std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(
-            os, system::terminal::color::BLUE);
+    system::terminal::set_background_text_attribute(os, system::terminal::color::BRIGHT_GREEN);
     return os;
 }
 
 /**
- * @brief       Set purple text in terminal.
- * @param       os : Ostream in which set the attribute.
- * @return      os is returned.
+ * @brief Sets the terminal background color to bright magenta.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal background color is updated.
+ * @return Reference to os, for use as a stream manipulator.
  */
 template<typename CharT, typename TraitsT>
-std::basic_ostream<CharT, TraitsT>& set_purple_text(
-        std::basic_ostream<CharT, TraitsT>& os
+std::basic_ostream<CharT, TraitsT>& set_background_bright_magenta(
+    std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(
-            os, system::terminal::color::PURPLE);
+    system::terminal::set_background_text_attribute(os, system::terminal::color::BRIGHT_MAGENTA);
     return os;
 }
 
 /**
- * @brief       Set cyan text in terminal.
- * @param       os : Ostream in which set the attribute.
- * @return      os is returned.
+ * @brief Sets the terminal background color to bright red.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal background color is updated.
+ * @return Reference to os, for use as a stream manipulator.
  */
 template<typename CharT, typename TraitsT>
-std::basic_ostream<CharT, TraitsT>& set_cyan_text(
-        std::basic_ostream<CharT, TraitsT>& os
+std::basic_ostream<CharT, TraitsT>& set_background_bright_red(
+    std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(
-            os, system::terminal::color::CYAN);
+    system::terminal::set_background_text_attribute(os, system::terminal::color::BRIGHT_RED);
     return os;
 }
 
 /**
- * @brief       Set light gray text in terminal.
- * @param       os : Ostream in which set the attribute.
- * @return      os is returned.
+ * @brief Sets the terminal background color to bright white.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal background color is updated.
+ * @return Reference to os, for use as a stream manipulator.
  */
 template<typename CharT, typename TraitsT>
-std::basic_ostream<CharT, TraitsT>& set_light_gray_text(
-        std::basic_ostream<CharT, TraitsT>& os
+std::basic_ostream<CharT, TraitsT>& set_background_bright_white(
+    std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(
-            os, system::terminal::color::LIGHT_GRAY);
+    system::terminal::set_background_text_attribute(os, system::terminal::color::BRIGHT_WHITE);
     return os;
 }
 
 /**
- * @brief       Set dark gray text in terminal.
- * @param       os : Ostream in which set the attribute.
- * @return      os is returned.
+ * @brief Sets the terminal background color to bright yellow.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal background color is updated.
+ * @return Reference to os, for use as a stream manipulator.
  */
 template<typename CharT, typename TraitsT>
-std::basic_ostream<CharT, TraitsT>& set_dark_gray_text(
-        std::basic_ostream<CharT, TraitsT>& os
+std::basic_ostream<CharT, TraitsT>& set_background_bright_yellow(
+    std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(
-            os, system::terminal::color::GRAY);
+    system::terminal::set_background_text_attribute(os, system::terminal::color::BRIGHT_YELLOW);
     return os;
 }
 
 /**
- * @brief       Set light red text in terminal.
- * @param       os : Ostream in which set the attribute.
- * @return      os is returned.
+ * @brief Sets the terminal background color to cyan.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal background color is updated.
+ * @return Reference to os, for use as a stream manipulator.
  */
 template<typename CharT, typename TraitsT>
-std::basic_ostream<CharT, TraitsT>& set_light_red_text(
-        std::basic_ostream<CharT, TraitsT>& os
+std::basic_ostream<CharT, TraitsT>& set_background_cyan(
+    std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(
-            os, system::terminal::color::LIGHT_RED);
+    system::terminal::set_background_text_attribute(os, system::terminal::color::CYAN);
     return os;
 }
 
 /**
- * @brief       Set light green text in terminal.
- * @param       os : Ostream in which set the attribute.
- * @return      os is returned.
+ * @brief Resets the terminal background color to its default.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal background color is updated.
+ * @return Reference to os, for use as a stream manipulator.
  */
 template<typename CharT, typename TraitsT>
-std::basic_ostream<CharT, TraitsT>& set_light_green_text(
-        std::basic_ostream<CharT, TraitsT>& os
+std::basic_ostream<CharT, TraitsT>& set_background_default(
+    std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(
-            os, system::terminal::color::LIGHT_GREEN);
+    system::terminal::set_background_text_attribute(os, system::terminal::color::DEFAULT);
     return os;
 }
 
 /**
- * @brief       Set yellow text in terminal.
- * @param       os : Ostream in which set the attribute.
- * @return      os is returned.
+ * @brief Sets the terminal background color to green.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal background color is updated.
+ * @return Reference to os, for use as a stream manipulator.
  */
 template<typename CharT, typename TraitsT>
-std::basic_ostream<CharT, TraitsT>& set_yellow_text(
-        std::basic_ostream<CharT, TraitsT>& os
+std::basic_ostream<CharT, TraitsT>& set_background_green(
+    std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(
-            os, system::terminal::color::YELLOW);
+    system::terminal::set_background_text_attribute(os, system::terminal::color::GREEN);
     return os;
 }
 
 /**
- * @brief       Set light blue text in terminal.
- * @param       os : Ostream in which set the attribute.
- * @return      os is returned.
+ * @brief Sets the terminal background color to magenta.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal background color is updated.
+ * @return Reference to os, for use as a stream manipulator.
  */
 template<typename CharT, typename TraitsT>
-std::basic_ostream<CharT, TraitsT>& set_light_blue_text(
-        std::basic_ostream<CharT, TraitsT>& os
+std::basic_ostream<CharT, TraitsT>& set_background_magenta(
+    std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(
-            os, system::terminal::color::LIGHT_BLUE);
+    system::terminal::set_background_text_attribute(os, system::terminal::color::MAGENTA);
     return os;
 }
 
 /**
- * @brief       Set light purple text in terminal.
- * @param       os : Ostream in which set the attribute.
- * @return      os is returned.
+ * @brief Sets the terminal background color to red.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal background color is updated.
+ * @return Reference to os, for use as a stream manipulator.
  */
 template<typename CharT, typename TraitsT>
-std::basic_ostream<CharT, TraitsT>& set_light_purple_text(
-        std::basic_ostream<CharT, TraitsT>& os
+std::basic_ostream<CharT, TraitsT>& set_background_red(
+    std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(
-            os, system::terminal::color::LIGHT_PURPLE);
+    system::terminal::set_background_text_attribute(os, system::terminal::color::RED);
     return os;
 }
 
 /**
- * @brief       Set light cyan text in terminal.
- * @param       os : Ostream in which set the attribute.
- * @return      os is returned.
+ * @brief Sets the terminal background color to white.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal background color is updated.
+ * @return Reference to os, for use as a stream manipulator.
  */
 template<typename CharT, typename TraitsT>
-std::basic_ostream<CharT, TraitsT>& set_light_cyan_text(
-        std::basic_ostream<CharT, TraitsT>& os
+std::basic_ostream<CharT, TraitsT>& set_background_white(
+    std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(
-            os, system::terminal::color::LIGHT_CYAN);
+    system::terminal::set_background_text_attribute(os, system::terminal::color::WHITE);
     return os;
 }
 
 /**
- * @brief       Set white text in terminal.
- * @param       os : Ostream in which set the attribute.
- * @return      os is returned.
+ * @brief Sets the terminal background color to yellow.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal background color is updated.
+ * @return Reference to os, for use as a stream manipulator.
  */
 template<typename CharT, typename TraitsT>
-std::basic_ostream<CharT, TraitsT>& set_white_text(
-        std::basic_ostream<CharT, TraitsT>& os
+std::basic_ostream<CharT, TraitsT>& set_background_yellow(
+    std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(
-            os, system::terminal::color::WHITE);
+    system::terminal::set_background_text_attribute(os, system::terminal::color::YELLOW);
+    return os;
+}
+
+/**
+ * @brief Sets the terminal foreground color to black.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal foreground color is updated.
+ * @return Reference to os, for use as a stream manipulator.
+ */
+template<typename CharT, typename TraitsT>
+std::basic_ostream<CharT, TraitsT>& set_foreground_black(
+    std::basic_ostream<CharT, TraitsT>& os
+)
+{
+    system::terminal::set_foreground_text_attribute(os, system::terminal::color::BLACK);
+    return os;
+}
+
+/**
+ * @brief Sets the terminal foreground color to blue.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal foreground color is updated.
+ * @return Reference to os, for use as a stream manipulator.
+ */
+template<typename CharT, typename TraitsT>
+std::basic_ostream<CharT, TraitsT>& set_foreground_blue(
+    std::basic_ostream<CharT, TraitsT>& os
+)
+{
+    system::terminal::set_foreground_text_attribute(os, system::terminal::color::BLUE);
+    return os;
+}
+
+/**
+ * @brief Sets the terminal foreground color to bright black.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal foreground color is updated.
+ * @return Reference to os, for use as a stream manipulator.
+ */
+template<typename CharT, typename TraitsT>
+std::basic_ostream<CharT, TraitsT>& set_foreground_bright_black(
+    std::basic_ostream<CharT, TraitsT>& os
+)
+{
+    system::terminal::set_foreground_text_attribute(os, system::terminal::color::BRIGHT_BLACK);
+    return os;
+}
+
+/**
+ * @brief Sets the terminal foreground color to bright blue.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal foreground color is updated.
+ * @return Reference to os, for use as a stream manipulator.
+ */
+template<typename CharT, typename TraitsT>
+std::basic_ostream<CharT, TraitsT>& set_foreground_bright_blue(
+    std::basic_ostream<CharT, TraitsT>& os
+)
+{
+    system::terminal::set_foreground_text_attribute(os, system::terminal::color::BRIGHT_BLUE);
+    return os;
+}
+
+/**
+ * @brief Sets the terminal foreground color to bright cyan.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal foreground color is updated.
+ * @return Reference to os, for use as a stream manipulator.
+ */
+template<typename CharT, typename TraitsT>
+std::basic_ostream<CharT, TraitsT>& set_foreground_bright_cyan(
+    std::basic_ostream<CharT, TraitsT>& os
+)
+{
+    system::terminal::set_foreground_text_attribute(os, system::terminal::color::BRIGHT_CYAN);
+    return os;
+}
+
+/**
+ * @brief Sets the terminal foreground color to bright green.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * @param os Output stream whose terminal foreground color is updated.
+ * 
+ * @return Reference to os, for use as a stream manipulator.
+ */
+template<typename CharT, typename TraitsT>
+std::basic_ostream<CharT, TraitsT>& set_foreground_bright_green(
+    std::basic_ostream<CharT, TraitsT>& os
+)
+{
+    system::terminal::set_foreground_text_attribute(os, system::terminal::color::BRIGHT_GREEN);
+    return os;
+}
+
+/**
+ * @brief Sets the terminal foreground color to bright magenta.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal foreground color is updated.
+ * @return Reference to os, for use as a stream manipulator.
+ */
+template<typename CharT, typename TraitsT>
+std::basic_ostream<CharT, TraitsT>& set_foreground_bright_magenta(
+    std::basic_ostream<CharT, TraitsT>& os
+)
+{
+    system::terminal::set_foreground_text_attribute(os, system::terminal::color::BRIGHT_MAGENTA);
+    return os;
+}
+
+/**
+ * @brief Sets the terminal foreground color to bright red.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal foreground color is updated.
+ * @return Reference to os, for use as a stream manipulator.
+ */
+template<typename CharT, typename TraitsT>
+std::basic_ostream<CharT, TraitsT>& set_foreground_bright_red(
+    std::basic_ostream<CharT, TraitsT>& os
+)
+{
+    system::terminal::set_foreground_text_attribute(os, system::terminal::color::BRIGHT_RED);
+    return os;
+}
+
+/**
+ * @brief Sets the terminal foreground color to bright white.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal foreground color is updated.
+ * @return Reference to os, for use as a stream manipulator.
+ */
+template<typename CharT, typename TraitsT>
+std::basic_ostream<CharT, TraitsT>& set_foreground_bright_white(
+    std::basic_ostream<CharT, TraitsT>& os
+)
+{
+    system::terminal::set_foreground_text_attribute(os, system::terminal::color::BRIGHT_WHITE);
+    return os;
+}
+
+/**
+ * @brief Sets the terminal foreground color to bright yellow.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal foreground color is updated.
+ * @return Reference to os, for use as a stream manipulator.
+ */
+template<typename CharT, typename TraitsT>
+std::basic_ostream<CharT, TraitsT>& set_foreground_bright_yellow(
+    std::basic_ostream<CharT, TraitsT>& os
+)
+{
+    system::terminal::set_foreground_text_attribute(os, system::terminal::color::BRIGHT_YELLOW);
+    return os;
+}
+
+/**
+ * @brief Sets the terminal foreground color to cyan.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal foreground color is updated.
+ * @return Reference to os, for use as a stream manipulator.
+ */
+template<typename CharT, typename TraitsT>
+std::basic_ostream<CharT, TraitsT>& set_foreground_cyan(
+    std::basic_ostream<CharT, TraitsT>& os
+)
+{
+    system::terminal::set_foreground_text_attribute(os, system::terminal::color::CYAN);
+    return os;
+}
+
+/**
+ * @brief Resets the terminal foreground color to its default.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal foreground color is updated.
+ * @return Reference to os, for use as a stream manipulator.
+ */
+template<typename CharT, typename TraitsT>
+std::basic_ostream<CharT, TraitsT>& set_foreground_default(
+    std::basic_ostream<CharT, TraitsT>& os
+)
+{
+    system::terminal::set_foreground_text_attribute(os, system::terminal::color::DEFAULT);
+    return os;
+}
+
+/**
+ * @brief Sets the terminal foreground color to green.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal foreground color is updated.
+ * @return Reference to os, for use as a stream manipulator.
+ */
+template<typename CharT, typename TraitsT>
+std::basic_ostream<CharT, TraitsT>& set_foreground_green(
+    std::basic_ostream<CharT, TraitsT>& os
+)
+{
+    system::terminal::set_foreground_text_attribute(os, system::terminal::color::GREEN);
+    return os;
+}
+
+/**
+ * @brief Sets the terminal foreground color to magenta.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal foreground color is updated.
+ * @return Reference to os, for use as a stream manipulator.
+ */
+template<typename CharT, typename TraitsT>
+std::basic_ostream<CharT, TraitsT>& set_foreground_magenta(
+    std::basic_ostream<CharT, TraitsT>& os
+)
+{
+    system::terminal::set_foreground_text_attribute(os, system::terminal::color::MAGENTA);
+    return os;
+}
+
+/**
+ * @brief Sets the terminal foreground color to red.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal foreground color is updated.
+ * @return Reference to os, for use as a stream manipulator.
+ */
+template<typename CharT, typename TraitsT>
+std::basic_ostream<CharT, TraitsT>& set_foreground_red(
+    std::basic_ostream<CharT, TraitsT>& os
+)
+{
+    system::terminal::set_foreground_text_attribute(os, system::terminal::color::RED);
+    return os;
+}
+
+/**
+ * @brief Sets the terminal foreground color to white.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal foreground color is updated.
+ * @return Reference to os, for use as a stream manipulator.
+ */
+template<typename CharT, typename TraitsT>
+std::basic_ostream<CharT, TraitsT>& set_foreground_white(
+    std::basic_ostream<CharT, TraitsT>& os
+)
+{
+    system::terminal::set_foreground_text_attribute(os, system::terminal::color::WHITE);
+    return os;
+}
+
+/**
+ * @brief Sets the terminal foreground color to yellow.
+ * 
+ * @tparam CharT Character type of the output stream.
+ * @tparam TraitsT Character traits type of the output stream.
+ * 
+ * @param os Output stream whose terminal foreground color is updated.
+ * @return Reference to os, for use as a stream manipulator.
+ */
+template<typename CharT, typename TraitsT>
+std::basic_ostream<CharT, TraitsT>& set_foreground_yellow(
+    std::basic_ostream<CharT, TraitsT>& os
+)
+{
+    system::terminal::set_foreground_text_attribute(os, system::terminal::color::YELLOW);
     return os;
 }
 
 }
-
-#endif

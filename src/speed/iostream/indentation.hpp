@@ -18,138 +18,126 @@
  */
 
 /**
- * @file        indentation.hpp
- * @brief       indentation class header.
- * @author      Killian Valverde
- * @date        2018/01/10
+ * @file indentation.hpp
+ * @brief indentation class header.
+ * @author Killian Valverde
+ * @date 2018-01-10
  */
 
-#ifndef SPEED_IOSTREAM_BASIC_INDENTATION_HPP
-#define SPEED_IOSTREAM_BASIC_INDENTATION_HPP
+#pragma once
 
-#include <iostream>
+#include <algorithm>
+#include <cstddef>
+#include <ostream>
 
 namespace speed::iostream {
 
 /**
- * @brief       Class used to print indentation.
+ * @brief Stream manipulator that inserts a configurable number of spaces.
  */
 class indentation
 {
 public:
     /**
-     * @brief       Constructor with parameters.
-     * @param       tab_sz : The babulator size.
-      * @param      curr_sz : The current size of the indentation.
+     * @brief Constructs an indentation.
+     * 
+     * @param tab_sz The number of spaces added or removed by each increment or decrement.
+     * @param curr_sz The initial indentation width, in spaces.
      */
-    explicit indentation(std::size_t tab_sz = 4, std::size_t curr_sz = 0) noexcept
-            : tab_sz_(tab_sz)
-            , curr_sz_(curr_sz)
+    constexpr explicit indentation(std::size_t tab_sz = 4, std::size_t curr_sz = 0) noexcept
+        : tab_sz_(tab_sz)
+        , curr_sz_(curr_sz)
     {
     }
-    
+
     /**
-     * @brief       Increase the indentation by the tab size.
-     * @return      The object who call the method.
+     * @brief Increases the indentation by one step.
+     * 
+     * @return A reference to this object.
      */
-    indentation& operator ++() noexcept
+    constexpr indentation& operator++() noexcept
     {
         curr_sz_ += tab_sz_;
         return *this;
     }
-    
+
     /**
-     * @brief       Increase the indentation by the tab size.
-     * @return      The object who call the method.
+     * @brief Increases the indentation by one step.
+     * 
+     * @return A copy of this object as it was before the increment.
      */
-    indentation operator ++(int) noexcept
+    [[nodiscard]] constexpr indentation operator++(int) noexcept
     {
         indentation old_indent(*this);
-        curr_sz_ += tab_sz_;
-
+        ++*this;
         return old_indent;
     }
-    
-    /**
-     * @brief       Decrease the indentation by the tab size.
-     * @return      The object who call the method.
-     */
-    indentation& operator --() noexcept
-    {
-        if (curr_sz_ > tab_sz_)
-        {
-            curr_sz_ -= tab_sz_;
-        }
-        else
-        {
-            curr_sz_ = 0;
-        }
 
+    /**
+     * @brief Decreases the indentation by one step.
+     *
+     * The width never goes below zero: if the current width is smaller than one step, it is
+     * set to zero.
+     *
+     * @return A reference to this object.
+     */
+    constexpr indentation& operator--() noexcept
+    {
+        curr_sz_ -= std::min(curr_sz_, tab_sz_);
         return *this;
     }
 
     /**
-     * @brief       Decrease the indentation by the tab size.
-     * @return      The object who call the method.
+     * @brief Decreases the indentation by one step.
+     *
+     * The width never goes below zero: if the current width is smaller than one step, it is
+     * set to zero.
+     *
+     * @return A copy of this object as it was before the decrement.
      */
-    indentation operator --(int) noexcept
+    [[nodiscard]] constexpr indentation operator--(int) noexcept
     {
         indentation old_indent(*this);
-
-        if (curr_sz_ > tab_sz_)
-        {
-            curr_sz_ -= tab_sz_;
-        }
-        else
-        {
-            curr_sz_ = 0;
-        }
-
+        --*this;
         return old_indent;
     }
 
     /**
-     * @brief       Allows to use an object to print in standard output the value that constains the
-     *              indentation.
-     * @param       os : The object who call the function.
-     * @param       indent : The indent to print.
-     * @return      The object who call the function.
+     * @brief Writes the current indentation to an output stream.
+     *
+     * Writes as many spaces as the current indentation width. The space character is obtained
+     * through the stream's widen(), so it is correct for any character type. Writing stops
+     * early if the stream enters a failed state.
+     *
+     * @tparam CharT The character type of the stream.
+     * @tparam CharTraitsT The character traits type of the stream.
+     * 
+     * @param os The output stream to write to.
+     * @param indent The indentation to write.
+     * @return The output stream.
      */
-    template<typename CharT_, typename CharTraitsT_>
-    friend std::basic_ostream<CharT_, CharTraitsT_>& operator <<(
-            std::basic_ostream<CharT_, CharTraitsT_>& os,
-            const indentation& indent
-    );
+    template<typename CharT, typename CharTraitsT>
+    friend std::basic_ostream<CharT, CharTraitsT>& operator<<(
+        std::basic_ostream<CharT, CharTraitsT>& os,
+        const indentation& indent
+    )
+    {
+        const CharT space = os.widen(' ');
+
+        for (std::size_t i = 0; i < indent.curr_sz_ && os; ++i)
+        {
+            os.put(space);
+        }
+
+        return os;
+    }
 
 private:
-    /** The balulator size. */
+    /** The number of spaces added or removed by each increment or decrement. */
     std::size_t tab_sz_;
-    
-    /** The size of the current indentation. */
+
+    /** The current indentation width, in spaces. */
     std::size_t curr_sz_;
 };
 
-/**
- * @brief       Allows to use an object to print in standard output the value that constains the
- *              indentation.
- * @param       os : The object who call the function.
- * @param       indent : The indent to print.
- * @return      The object who call the function.
- */
-template<typename CharT, typename CharTraitsT>
-std::basic_ostream<CharT, CharTraitsT>& operator <<(
-        std::basic_ostream<CharT, CharTraitsT>& os,
-        const indentation& indent
-)
-{
-    for (std::size_t i = 0; i < indent.curr_sz_; i++)
-    {
-        os.put(' ');
-    }
-    
-    return os;
 }
-
-}
-
-#endif

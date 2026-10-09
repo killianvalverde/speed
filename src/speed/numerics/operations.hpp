@@ -106,7 +106,7 @@ template<std::integral IntegralT>
         10000000000000000000ULL
     };
 
-    const auto v = static_cast<std::uint64_t>(math::abs(val));
+    const auto v = static_cast<std::uint64_t>(math::absolute(val));
     if (v == 0)
     {
         return 1;

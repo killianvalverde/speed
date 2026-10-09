@@ -18,182 +18,281 @@
  */
 
 /**
- * @file        basic_ios_redirect.hpp
- * @brief       basic_ios_redirect class header.
- * @author      Killian Valverde
- * @date        2017/05/19
+ * @file basic_ios_redirect.hpp
+ * @brief Provides utilities for redirecting input and output streams.
+ * @author Killian Valverde
+ * @date 2017-05-19
  */
 
-#ifndef SPEED_IOSTREAM_BASIC_IOS_REDIRECT_HPP
-#define SPEED_IOSTREAM_BASIC_IOS_REDIRECT_HPP
+#pragma once
 
+#include <ios>
+#include <memory>
+#include <optional>
 #include <sstream>
+#include <string>
 
 #include "../memory/memory.hpp"
 
 namespace speed::iostream {
 
 /**
- * @brief       Class used to redirect an input/output stream buffer to another one.
+ * @brief Manages the redirection of a C++ stream buffer.
+ *
+ * Allows a stream to be redirected to an external stream buffer
+ * or an internally managed string buffer. The original stream buffer
+ * is automatically restored when the object is destroyed.
+ *
+ * @tparam CharT Character type used by the stream.
+ * @tparam TraitsT Character traits type.
+ * @tparam AllocatorT Allocator type used for internal string storage.
  */
 template<
-        typename CharT,
-        typename CharTraitsT = std::char_traits<CharT>,
-        typename AllocatorT = std::allocator<CharT>
+    typename CharT,
+    typename TraitsT = std::char_traits<CharT>,
+    typename AllocatorT = std::allocator<CharT>
 >
 class basic_ios_redirect
 {
 public:
-    /** Character type. */
+    /** Character type used by the stream. */
     using char_type = CharT;
-    
-    /** Character traits type, */
-    using char_traits_type = CharTraitsT;
-    
-    /** Allocator type. */
-    template<typename T>
-    using allocator_type = typename std::allocator_traits<AllocatorT>::template rebind_alloc<T>;
-    
-    /** Input/output stream type. */
-    using ios_type = std::basic_ios<char_type, char_traits_type>;
-    
-    /** Stream buffer type. */
-    using streambuf_type = std::basic_streambuf<char_type, char_traits_type>;
-    
-    /** String type. */
-    using string_type = std::basic_string<char_type, char_traits_type, allocator_type<char_type>>;
-    
-    /** String stream type. */
-    using stringstream_type = std::basic_stringstream<char_type, char_traits_type,
-            allocator_type<char_type>>;
+
+    /** Character traits type. */
+    using traits_type = TraitsT;
+
+    /** Allocator type used for internal string storage. */
+    using allocator_type =
+        typename std::allocator_traits<AllocatorT>::template rebind_alloc<char_type>;
+
+    /** Type of the managed stream interface. */
+    using ios_type = std::basic_ios<char_type, traits_type>;
+
+    /** Type of the stream buffer. */
+    using streambuf_type = std::basic_streambuf<char_type, traits_type>;
+
+    /** Type of the internal string buffer. */
+    using stringbuf_type = std::basic_stringbuf<char_type, traits_type, allocator_type>;
+
+    /** Type of the string used for internal storage. */
+    using string_type = std::basic_string<char_type, traits_type, allocator_type>;
+
+    /** Type of the string view used for internal storage. */
+    using string_view_type = std::basic_string_view<char_type, traits_type>;
 
     /**
-     * @brief       Constructor.
-     * @param       ios : Input/output stream whose buffer will be redirected.
+     * @brief Constructs a stream redirection manager.
+     *
+     * @param ios Stream interface to manage.
+     * @param allocator Allocator used for internal string storage.
      */
-    explicit basic_ios_redirect(ios_type& ios)
-            : ios_(&ios)
+    explicit basic_ios_redirect(
+        ios_type& ios,
+        const allocator_type& allocator = allocator_type()
+    )
+        : ios_(ios), allocator_(allocator)
     {
     }
-    
-    basic_ios_redirect(const basic_ios_redirect&) = delete;
-    
-    basic_ios_redirect(basic_ios_redirect&&) = delete;
-    
-    /**
-     * @brief       Destructor.
+
+    /** 
+     * @brief Copy construction is disabled. 
      */
-    ~basic_ios_redirect()
+    basic_ios_redirect(const basic_ios_redirect&) = delete;
+
+    /** 
+     * @brief Move construction is disabled. 
+     */
+    basic_ios_redirect(basic_ios_redirect&&) = delete;
+
+    /**
+     * @brief Destroys the manager and restores the original stream buffer.
+     */
+    ~basic_ios_redirect() noexcept
     {
         unredirect();
-        
-        if (stringstream_ != nullptr)
+    }
+
+    /** 
+     * @brief Copy assignment is disabled. 
+     */
+    basic_ios_redirect& operator=(const basic_ios_redirect&) = delete;
+
+     /** 
+      * @brief Move assignment is disabled. 
+      */
+    basic_ios_redirect& operator=(basic_ios_redirect&&) = delete;
+
+    /**
+     * @brief Redirects the managed stream to another stream buffer.
+     *
+     * Saves the original stream buffer on the first successful redirection. Subsequent calls 
+     * replace the current stream buffer without overwriting the original one.
+     *
+     * @param new_streambuf Stream buffer to redirect to.
+     */
+    void redirect(streambuf_type* new_streambuf)
+    {
+        auto* previous_streambuf = ios_.rdbuf();
+        const auto previous_state = ios_.rdstate();
+
+        try
         {
-            stringstream_alloc_.deallocate(stringstream_, 1);
-            stringstream_ = nullptr;
+            ios_.rdbuf(new_streambuf);
+        }
+        catch (...)
+        {
+            set_buffer_and_state_noexcept(previous_streambuf, previous_state);
+            throw;
+        }
+
+        if (!redirected_)
+        {
+            old_streambuf_ = previous_streambuf;
+            redirected_ = true;
         }
     }
-    
-    basic_ios_redirect& operator =(const basic_ios_redirect&) = delete;
-    
-    basic_ios_redirect& operator =(basic_ios_redirect&&) = delete;
-    
+
     /**
-     * @brief       Set a new stream buffer to use.
-     * @param       new_streambuf : New stream buffer to use.
-     */
-    void redirect(streambuf_type *new_streambuf)
-    {
-        unredirect();
-        old_streambuf_ = ios_->rdbuf(new_streambuf);
-    }
-    
-    /**
-     * @brief       Use the class embedded lazy stringstream to redirect the current input/output
-     *              stream buffer.
+     * @brief Redirects the managed stream to an internal string buffer.
+     *
+     * Creates the internal buffer if necessary, or clears its contents if it already exists, 
+     * before redirecting the stream.
      */
     void redirect_to_internal_stream()
     {
-        unredirect();
-        
-        if (stringstream_ == nullptr)
+        if (!internal_buffer_)
         {
-            stringstream_ = stringstream_alloc_.allocate(1);
+            internal_buffer_.emplace(std::ios_base::in | std::ios_base::out, allocator_);
+        }
+        else
+        {
+            internal_buffer_->str(string_type(allocator_));
         }
 
-        memory::construct_at(stringstream_);
-        stringstream_constructed_ = true;
-        
-        old_streambuf_ = ios_->rdbuf(stringstream_->rdbuf());
+        redirect(std::addressof(*internal_buffer_));
     }
-    
+
     /**
-     * @brief       Redirect the current stream buffer to the old one.
+     * @brief Restores the original stream buffer.
+     *
+     * Restores the buffer saved during the first redirection and resets the stream state to 
+     * std::ios_base::goodbit. Has no effect if the stream is not redirected.
      */
-    void unredirect()
+    void unredirect() noexcept
     {
-        if (old_streambuf_ != nullptr)
+        if (!redirected_)
         {
-            ios_->rdbuf(old_streambuf_);
-            old_streambuf_ = nullptr;
+            return;
         }
-        
-        if (stringstream_constructed_)
-        {
-            memory::destroy_at(stringstream_);
-            stringstream_constructed_ = false;
-        }
+
+        set_buffer_and_state_noexcept(
+            old_streambuf_, std::ios_base::goodbit);
+
+        old_streambuf_ = nullptr;
+        redirected_ = false;
     }
-    
+
     /**
-     * @brief       Get the embedded string stream buffer as a string.
-     * @return      The embedded string stream buffer as a string.
+     * @brief Checks whether the stream is currently redirected.
+     *
+     * @return true if redirection is active, false otherwise.
      */
-    string_type get_internal_string()
+    [[nodiscard]] bool is_redirected() const noexcept
     {
-        if (stringstream_constructed_)
-        {
-            return stringstream_->str();
-        }
-        
-        return string_type();
+        return redirected_;
     }
-    
+
     /**
-     * @brief       Clear the embedded string stream buffer.
+     * @brief Retrieves a non-owning view of the internal string buffer.
+     *
+     * @return A view of the captured text, or an empty view if the
+     *         internal buffer has not been created.
+     *
+     * @warning The returned view may be invalidated by subsequent
+     *          modifications to the internal buffer or its destruction.
+     */
+    [[nodiscard]] string_view_type get_internal_string_view() const noexcept
+    {
+        if (internal_buffer_)
+        {
+            return internal_buffer_->view();
+        }
+
+        return {};
+    }
+
+    /**
+     * @brief Clears the contents of the internal string buffer.
+     *
+     * If the managed stream currently uses the internal buffer, its error state is also cleared. 
+     * Has no effect if the internal buffer has not been created.
      */
     void clear_internal_stream()
     {
-        if (stringstream_constructed_)
+        if (!internal_buffer_)
         {
-            memory::destroy_at(stringstream_);
-            memory::construct_at(stringstream_);
+            return;
+        }
+
+        internal_buffer_->str(string_type(allocator_));
+
+        if (ios_.rdbuf() == std::addressof(*internal_buffer_))
+        {
+            ios_.clear();
         }
     }
 
 private:
-    /** Stringstream allocator. */
-    allocator_type<stringstream_type> stringstream_alloc_;
+    /**
+     * @brief Restores a stream buffer and stream state without propagating
+     * exceptions from restoring the exception mask.
+     *
+     * Temporarily disables stream exceptions, replaces the stream buffer, restores the requested 
+     * state, and attempts to restore the original exception mask.
+     *
+     * @param buffer Stream buffer to install.
+     * @param state Stream state to restore.
+     */
+    void set_buffer_and_state_noexcept(
+        streambuf_type* buffer,
+        std::ios_base::iostate state
+    ) noexcept
+    {
+        const auto exception_mask = ios_.exceptions();
 
-    /** Input/output stream to redirect. */
-    ios_type* ios_;
-    
-    /** Old stream buffer. */
+        ios_.exceptions(std::ios_base::goodbit);
+        ios_.rdbuf(buffer);
+        ios_.clear(state);
+
+        try
+        {
+            ios_.exceptions(exception_mask);
+        }
+        catch (...)
+        {
+        }
+    }
+
+    /** Reference to the managed stream interface. */
+    ios_type& ios_;
+
+    /** Allocator used for internal string storage. */
+    allocator_type allocator_;
+
+    /** Optional internal string buffer used for redirection. */
+    std::optional<stringbuf_type> internal_buffer_;
+
+    /** Original stream buffer saved during the first redirection. */
     streambuf_type* old_streambuf_ = nullptr;
-    
-    /** The embedded string stream. */
-    stringstream_type* stringstream_ = nullptr;
-    
-    /** Allows to know whether the embedded string stream has been constructed. */
-    bool stringstream_constructed_ = false;
+
+    /** Indicates whether the stream is currently redirected. */
+    bool redirected_ = false;
 };
 
-/** Class used to redirect an 8 bits input/output stream buffer to another one. */
+/** Stream redirection manager for narrow-character streams. */
 using ios_redirect = basic_ios_redirect<char>;
 
-/** Class used to redirect a 16 bits input/output stream buffer to another one. */
+/** Stream redirection manager for wide-character streams. */
 using wios_redirect = basic_ios_redirect<wchar_t>;
 
 }
-
-#endif

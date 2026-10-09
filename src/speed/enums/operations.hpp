@@ -27,5 +27,4 @@
 #pragma once
 
 namespace speed::enums {
-
 }

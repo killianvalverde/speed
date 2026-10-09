@@ -23,11 +23,11 @@ set(SPEED_HEADER_ONLY_TARGETS
     speed_strings
     speed_time
     speed_type_traits
-    speed
 )
 
 set(SPEED_COMPILED_TARGETS
     speed_system
+    speed
 )
 
 set(SPEED_TARGETS
@@ -385,7 +385,6 @@ target_link_libraries(speed_strings INTERFACE
 )
 
 target_link_libraries(speed_system PUBLIC
-    speed_cryptography
     speed_exception
     speed_numerics
 )

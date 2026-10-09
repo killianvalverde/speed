@@ -179,6 +179,23 @@ template<typename T>
 constexpr bool is_character_pointer_v = is_character_pointer<T>::value;
 
 /**
+ * @brief Checks whether a type is a stream character type.
+ *
+ * @tparam T The type to check.
+ */
+template<typename T>
+struct is_stream_character : std::disjunction<
+    std::is_same<T, char>,
+    std::is_same<T, wchar_t>
+> {};
+
+/**
+ * @brief Convenience variable template for is_stream_character.
+ */
+template<typename T>
+constexpr bool is_stream_character_v = is_stream_character<T>::value;
+
+/**
  * @brief Produces a std::basic_string_view type associated with a given type.
  *
  * The character type and traits are deduced using corresponding traits.

@@ -18,33 +18,30 @@
  */
 
 /**
- * @file        math.hpp
- * @brief       math main header.
- * @author      Killian Valverde
- * @date        2017/01/28
+ * @file math.hpp
+ * @brief Main header of the math module.
+ * @author Killian Valverde
+ * @date 2017-01-28
  */
 
-#ifndef SPEED_MATH_MATH_HPP
-#define SPEED_MATH_MATH_HPP
+#pragma once
 
 #include "operations.hpp"
 
 namespace speed {
 
 /**
- * @brief       Contains a set of resources to compute common mathematical operations and
- *              transformations.
+ * @brief Contains mathematical utilities and operations.
  */
 namespace math {}
 
 #ifndef SPEED_DISABLE_ALIAS
 /**
- * @brief       Contains a set of resources to compute common mathematical operations and
- *              transformations.
+ * @brief Alias for speed::math namespace.
+ *
+ * Define SPEED_DISABLE_ALIAS to disable this alias.
  */
 namespace mth = math;
 #endif
 
 }
-
-#endif

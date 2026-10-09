@@ -583,7 +583,7 @@ bool try_convert(
         return false;
     }
 
-    return res.is_valid(err_code);
+    return res.verify(err_code);
 }
 
 // std::basic_string_view --> TargetT

@@ -18,14 +18,13 @@
  */
 
 /**
- * @file        iostream.hpp
- * @brief       iostream main header.
- * @author      Killian Valverde
- * @date        2016/08/24
+ * @file iostream.hpp
+ * @brief Main header of the iostream module.
+ * @author Killian Valverde
+ * @date 2016-08-24
  */
 
-#ifndef SPEED_IOSTREAM_IOSTREAM_HPP
-#define SPEED_IOSTREAM_IOSTREAM_HPP
+#pragma once
 
 #include "basic_ios_redirect.hpp"
 #include "indentation.hpp"
@@ -35,17 +34,17 @@
 namespace speed {
 
 /**
- * @brief       Contains resources for input and output streams.
+ * @brief Contains resources for input and output streams.
  */
 namespace iostream {}
 
 #ifndef SPEED_DISABLE_ALIAS
 /**
- * @brief       Contains resources for input and output streams.
+ * @brief Alias for speed::iostream namespace.
+ *
+ * Define SPEED_DISABLE_ALIAS to disable this alias.
  */
 namespace ios = iostream;
 #endif
 
 }
-
-#endif

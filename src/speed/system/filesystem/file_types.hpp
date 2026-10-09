@@ -77,6 +77,6 @@ using ft_t = file_types;
 
 /** @cond */
 template<>
-struct speed::scalars::is_flag_enum<speed::system::filesystem::file_types>
+struct speed::enums::is_flag_enum<speed::system::filesystem::file_types>
         : std::true_type {};
 /** @endcond */
