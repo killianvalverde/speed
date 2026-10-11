@@ -33,10 +33,12 @@
 namespace speed::strings {
 
 /** Creates a string literal using the native character type of the current platform. */
+#if defined(SPEED_ENABLE_T)
 #ifdef _WIN32
-#define SPEED_T(x) L##x
+#define _T(x) L##x
 #else
-#define SPEED_T(x) x
+#define _T(x) x
+#endif
 #endif
 
 /** Native character type of the current platform. */

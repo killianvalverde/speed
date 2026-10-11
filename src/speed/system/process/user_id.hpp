@@ -141,7 +141,7 @@ public:
 #ifdef SPEED_WINAPI
         return native_.empty();
 #else
-        return native_ == std::numeric_limits<::pid_t>::max();
+        return native_ == std::numeric_limits<native_type>::max();
 #endif
     }
 
@@ -180,7 +180,7 @@ private:
 #ifdef SPEED_WINAPI
         {};
 #else
-    std::numeric_limits<::pid_t>::max();
+    std::numeric_limits<native_type>::max();
 #endif
 };
 

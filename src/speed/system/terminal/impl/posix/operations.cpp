@@ -182,7 +182,7 @@ bool set_background_color(std::wostream& wos, color new_color, std::error_code* 
     return set_color(wos, color_target::BACKGROUND, new_color, err_code);
 }
 
-bool wait_for_key(bool flush_input_term, std::error_code* err_code) noexcept
+bool wait_for_key(bool flush_input, std::error_code* err_code) noexcept
 {
     termios old_termios;
     termios new_termios;
@@ -206,7 +206,7 @@ bool wait_for_key(bool flush_input_term, std::error_code* err_code) noexcept
     new_termios = old_termios;
     new_termios.c_lflag &= ~(ICANON | ECHO);
 
-    if (flush_input_term && !flush_input_terminal(stdin, err_code))
+    if (flush_input && !flush_input_terminal(stdin, err_code))
     {
         return false;
     }

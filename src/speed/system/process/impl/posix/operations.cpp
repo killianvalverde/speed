@@ -33,6 +33,7 @@
 #include <fcntl.h>
 #include <sys/resource.h>
 #include <sys/wait.h>
+#include <time.h>
 
 #include "../../../errors/errors.hpp"
 

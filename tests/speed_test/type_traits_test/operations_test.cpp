@@ -126,6 +126,7 @@ TEST(type_traits_is_character, identifies_character_types_correctly)
 {
     EXPECT_TRUE(speed::type_traits::is_character_v<char>);
     EXPECT_TRUE(speed::type_traits::is_character_v<wchar_t>);
+    EXPECT_TRUE(speed::type_traits::is_character_v<char8_t>);
     EXPECT_TRUE(speed::type_traits::is_character_v<char16_t>);
     EXPECT_TRUE(speed::type_traits::is_character_v<char32_t>);
 
@@ -142,6 +143,17 @@ TEST(type_traits_is_character_pointer, identifies_character_pointers_correctly)
     EXPECT_FALSE(speed::type_traits::is_character_pointer_v<char>);
     EXPECT_FALSE(speed::type_traits::is_character_pointer_v<char[]>);
     EXPECT_FALSE(speed::type_traits::is_character_pointer_v<char*&>);
+}
+
+TEST(type_traits_is_stream_character, identifies_stream_characters_correctly)
+{
+    EXPECT_TRUE(speed::type_traits::is_stream_character_v<char>);
+    EXPECT_TRUE(speed::type_traits::is_stream_character_v<wchar_t>);
+
+    EXPECT_FALSE(speed::type_traits::is_stream_character_v<char8_t>);
+    EXPECT_FALSE(speed::type_traits::is_stream_character_v<char16_t>);
+    EXPECT_FALSE(speed::type_traits::is_stream_character_v<char32_t>);
+    EXPECT_FALSE(speed::type_traits::is_stream_character_v<int>);
 }
 
 TEST(type_traits_string_view_of, transforms_to_string_view_correctly)

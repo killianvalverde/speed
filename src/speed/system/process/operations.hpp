@@ -69,12 +69,14 @@ bool execute(
 pid_t get_pid() noexcept;
 
 /**
- * @brief Get the user ID of the calling process.
+ * @brief Retrieves the user identifier of the calling process.
  *
- * On POSIX systems, returns the real user ID. On Windows, returns a 64-bit hash derived
- * from the process token's SID, since Windows has no direct equivalent to a POSIX UID.
+ * On Windows, returns the Security Identifier (SID) of the process user token.
+ * On POSIX systems, returns the real user ID (UID) of the calling process.
+ * The identifier is returned as a platform-independent user_id object.
  *
- * @return The user ID of the calling process.
+ * @return The user identifier of the calling process, or an empty user_id if
+ *         the identifier could not be retrieved.
  */
 user_id get_uid() noexcept;
 

@@ -48,90 +48,90 @@ void busy_wait_for(Duration duration)
 
 TEST(time_cpu_chrono, initial_sets_ready_and_elapsed_time_is_null)
 {
-    speed::time::cpu_chrono cpu_chron;
+    speed::time::cpu_chrono chrono;
     
-    auto tme = cpu_chron.get_elapsed_time();
+    auto elapsed_time = chrono.get_elapsed_time();
     
-    ASSERT_TRUE(cpu_chron.is_ready());
-    ASSERT_TRUE(tme.is_zero());
+    ASSERT_TRUE(chrono.is_ready());
+    ASSERT_TRUE(elapsed_time.is_zero());
 }
 
 TEST(time_cpu_chrono, start_sets_running_and_elapsed_time_increases)
 {
-    speed::time::cpu_chrono cpu_chrn;
+    speed::time::cpu_chrono chrono;
 
-    cpu_chrn.start();
+    chrono.start();
 
-    ASSERT_TRUE(cpu_chrn.is_running());
+    ASSERT_TRUE(chrono.is_running());
 
     busy_wait_for(std::chrono::milliseconds(20));
-    auto tme = cpu_chrn.get_elapsed_time();
+    auto elapsed_time = chrono.get_elapsed_time();
 
-    ASSERT_FALSE(tme.is_zero());
+    ASSERT_FALSE(elapsed_time.is_zero());
 }
 
 TEST(time_cpu_chrono, stop_sets_stopped_and_freezes_elapsed_time)
 {
-    speed::time::cpu_chrono cpu_chron;
+    speed::time::cpu_chrono chrono;
 
-    cpu_chron.start();
+    chrono.start();
     busy_wait_for(std::chrono::milliseconds(20));
 
-    auto time_before_stop = cpu_chron.get_elapsed_time();
+    auto time_before_stop = chrono.get_elapsed_time();
     ASSERT_FALSE(time_before_stop.is_zero());
 
-    cpu_chron.stop();
-    ASSERT_TRUE(cpu_chron.is_stopped());
+    chrono.stop();
+    ASSERT_TRUE(chrono.is_stopped());
 
-    auto time_after_stop_1 = cpu_chron.get_elapsed_time();
+    auto time_after_stop_1 = chrono.get_elapsed_time();
     busy_wait_for(std::chrono::milliseconds(20));
-    auto time_after_stop_2 = cpu_chron.get_elapsed_time();
+    auto time_after_stop_2 = chrono.get_elapsed_time();
 
     ASSERT_FALSE(time_after_stop_1.is_zero());
     ASSERT_EQ(time_after_stop_1, time_after_stop_2);
 
-    cpu_chron.stop();
-    ASSERT_TRUE(cpu_chron.is_stopped());
+    chrono.stop();
+    ASSERT_TRUE(chrono.is_stopped());
 }
 
 TEST(time_cpu_chrono, resume_sets_running_and_elapsed_time_continues)
 {
-    speed::time::cpu_chrono cpu_chron;
+    speed::time::cpu_chrono chrono;
 
-    cpu_chron.start();
-    cpu_chron.stop();
-    ASSERT_TRUE(cpu_chron.is_stopped());
-    auto time_stopped = cpu_chron.get_elapsed_time();
+    chrono.start();
+    chrono.stop();
+    ASSERT_TRUE(chrono.is_stopped());
+    auto time_stopped = chrono.get_elapsed_time();
 
-    cpu_chron.resume();
-    ASSERT_TRUE(cpu_chron.is_running());
+    chrono.resume();
+    ASSERT_TRUE(chrono.is_running());
 
     busy_wait_for(std::chrono::milliseconds(20));
-    auto time_resumed = cpu_chron.get_elapsed_time();
+    auto time_resumed = chrono.get_elapsed_time();
 
     ASSERT_GT(time_resumed, time_stopped);
 }
 
 TEST(time_cpu_chrono, restard_sets_running_and_elapsed_time_resets)
 {
-    speed::time::cpu_chrono cpu_chron;
+    speed::time::cpu_chrono chrono;
 
-    cpu_chron.start();
+    chrono.start();
     busy_wait_for(std::chrono::milliseconds(50));
 
-    cpu_chron.stop();
-    ASSERT_TRUE(cpu_chron.is_stopped());
-    auto time_stopped = cpu_chron.get_elapsed_time();
+    chrono.stop();
+    ASSERT_TRUE(chrono.is_stopped());
+    auto time_stopped = chrono.get_elapsed_time();
 
-    cpu_chron.restart();
-    busy_wait_for(std::chrono::milliseconds(20));
-    ASSERT_TRUE(cpu_chron.is_running());
+    chrono.restart();
+    busy_wait_for(std::chrono::milliseconds(30));
+    ASSERT_TRUE(chrono.is_running());
 
-    auto time_after_restart = cpu_chron.get_elapsed_time();
+    auto time_after_restart = chrono.get_elapsed_time();
     ASSERT_FALSE(time_after_restart.is_zero());
     ASSERT_LT(time_after_restart, time_stopped);
 
-    busy_wait_for(std::chrono::milliseconds(20));
-    auto time_later = cpu_chron.get_elapsed_time();
+    busy_wait_for(std::chrono::milliseconds(30));
+    auto time_later = chrono.get_elapsed_time();
     ASSERT_GT(time_later, time_after_restart);
 }

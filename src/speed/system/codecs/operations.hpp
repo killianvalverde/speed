@@ -77,7 +77,9 @@ bool convert_utf8_to_wstring(
 #ifdef SPEED_WINAPI
     try
     {
-        int destination_length = MultiByteToWideChar(CP_UTF8, 0, source, -1, nullptr, 0);
+        int destination_length = MultiByteToWideChar(
+            CP_UTF8, MB_ERR_INVALID_CHARS, source, -1, nullptr, 0);
+
         if (destination_length == 0)
         {
             errors::assign_system_error_code(GetLastError(), err_code);
@@ -109,7 +111,10 @@ bool convert_utf8_to_wstring(
     return false;
 #else
     constexpr std::size_t wchar_t_sz = sizeof(wchar_t);
-    constexpr const char* encoding = sizeof(wchar_t) == 4 ? "UTF-32LE" : "UTF-16LE";
+    // TODO(Killian): Support big endian architectures.
+    constexpr const char* encoding = sizeof(wchar_t) == 4
+        ? static_cast<const char*>("UTF-32LE")
+        : static_cast<const char*>("UTF-16LE");
 
     iconv_t conv_desc = (iconv_t)-1;
     std::size_t source_length;
@@ -240,7 +245,9 @@ bool convert_wstring_to_utf8(
 
     return false;
 #else
-    constexpr const char* encoding = sizeof(wchar_t) == 4 ? "UTF-32LE" : "UTF-16LE";
+    constexpr const char* encoding = sizeof(wchar_t) == 4
+        ? static_cast<const char*>("UTF-32LE")
+        : static_cast<const char*>("UTF-16LE");
     constexpr std::size_t wchar_t_sz = sizeof(wchar_t);
     constexpr std::size_t max_utf8_bytes_per_codepoint = 4;
 

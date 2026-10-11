@@ -29,9 +29,13 @@
 #if defined(__unix__) || defined(__APPLE__)
 
 #if defined(__linux__) || defined(__CYGWIN__)
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #else
+#ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 700
+#endif
 #endif
 
 #include <unistd.h>
