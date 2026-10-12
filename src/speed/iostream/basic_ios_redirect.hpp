@@ -32,12 +32,13 @@
 #include <sstream>
 #include <string>
 
-#include "../memory/memory.hpp"
-
 namespace speed::iostream {
 
+// TODO(Killian): This class may need to be 2 classes. There is 2 main responsibilities embedded.
+//  Even tho, I think the only thing we need is to be able to redirect to the internal buffer.
+//  The other feature will never be used.
 /**
- * @brief Manages the redirection of a C++ stream buffer.
+ * @brief Manages the redirection of a stream buffer.
  *
  * Allows a stream to be redirected to an external stream buffer
  * or an internally managed string buffer. The original stream buffer
@@ -62,8 +63,7 @@ public:
     using traits_type = TraitsT;
 
     /** Allocator type used for internal string storage. */
-    using allocator_type =
-        typename std::allocator_traits<AllocatorT>::template rebind_alloc<char_type>;
+    using allocator_type = std::allocator_traits<AllocatorT>::template rebind_alloc<char_type>;
 
     /** Type of the managed stream interface. */
     using ios_type = std::basic_ios<char_type, traits_type>;

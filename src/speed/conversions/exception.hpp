@@ -35,10 +35,8 @@ namespace speed::conversions {
  * @brief Exception thrown on type conversions failure.
  *
  * @details This exception is raised when a type conversion operation fails.
- * It extends speed::exceptions::source_location_exception to provide additional context such as
- * source location and error code.
  */
-class exception : public exceptions::source_location_exception
+class exception : public exceptions::error_code_exception
 {
 public:
     /**
@@ -47,7 +45,7 @@ public:
      * @param ec Error code describing the failure.
      */
     explicit exception(std::error_code ec)
-        : source_location_exception("conversion failed", ec)
+        : error_code_exception("conversion failed", ec)
     {
     }
 };

@@ -36,24 +36,12 @@
 namespace speed::exceptions {
 
 /**
- * @brief       Base class for all custom exceptions in the library.
- */
-class exception_base
-{
-public:
-    /**
-     * @brief       Virtual destructor.
-     */
-    virtual ~exception_base() = default;
-};
-
-/**
  * @brief       Base class for logic-related exceptions. Represents errors in the program logic
  *              such as invalid arguments, violated preconditions, or inconsistent internal state.
  *              These exceptions typically indicate bugs in the code and are not meant to be
  *              recovered from at runtime.
  */
-class logic_exception_base : public std::logic_error, public exception_base
+class logic_exception_base : public std::logic_error
 {
 public:
     /**
@@ -68,7 +56,7 @@ public:
  *              These exceptions are typically recoverable and should be handled appropriately by
  *              the caller.
  */
-class runtime_exception_base : public std::runtime_error, public exception_base
+class runtime_exception_base : public std::runtime_error
 {
 public:
     /**
@@ -286,9 +274,9 @@ protected:
 
         msg += " [";
         msg += loc.file_name();
-        msg += ":";
+        msg += ':';
         msg += std::to_string(loc.line());
-        msg += "]";
+        msg += ']';
 
         return msg;
     }

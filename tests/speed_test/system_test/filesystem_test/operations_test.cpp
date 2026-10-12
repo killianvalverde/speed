@@ -61,7 +61,7 @@ public:
         std_fs::remove_all(path_, err_code);
     }
 
-    std_fs::path path(const std_fs::path& relative = {}) const
+    [[nodiscard]] std_fs::path path(const std_fs::path& relative = {}) const
     {
         return path_ / relative;
     }

@@ -43,7 +43,7 @@ namespace time {}
  *
  * Define SPEED_DISABLE_ALIAS to disable this alias.
  */
-namespace tm = time;
+namespace tme = time;
 #endif
 
 }

@@ -205,8 +205,8 @@ template<typename CharT, typename TraitsT>
 {
     try
     {
-        os << set_light_red_text << name << ':' << ' '
-           << set_default_text << message
+        os << set_foreground_bright_red << name << ':' << ' '
+           << set_foreground_default << message
            << std::endl;
     }
     catch (...)
@@ -233,7 +233,7 @@ template<typename CharT, typename TraitsT>
 std::basic_ostream<CharT, TraitsT>& print_wrapped(
     std::basic_ostream<CharT, TraitsT>& os,
     std::type_identity_t<std::basic_string_view<CharT, TraitsT>> strv,
-    std::size_t max_line_length,
+    std::size_t max_line_length = 80,
     std::size_t new_line_indentation = 4,
     std::size_t current_line_length = 0
 )
@@ -305,7 +305,7 @@ std::basic_ostream<CharT, TraitsT>& set_background_black(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_background_text_attribute(os, system::terminal::color::BLACK);
+    system::terminal::set_background_color(os, system::terminal::color::BLACK);
     return os;
 }
 
@@ -323,7 +323,7 @@ std::basic_ostream<CharT, TraitsT>& set_background_blue(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_background_text_attribute(os, system::terminal::color::BLUE);
+    system::terminal::set_background_color(os, system::terminal::color::BLUE);
     return os;
 }
 
@@ -341,7 +341,7 @@ std::basic_ostream<CharT, TraitsT>& set_background_bright_black(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_background_text_attribute(os, system::terminal::color::BRIGHT_BLACK);
+    system::terminal::set_background_color(os, system::terminal::color::BRIGHT_BLACK);
     return os;
 }
 
@@ -359,7 +359,7 @@ std::basic_ostream<CharT, TraitsT>& set_background_bright_blue(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_background_text_attribute(os, system::terminal::color::BRIGHT_BLUE);
+    system::terminal::set_background_color(os, system::terminal::color::BRIGHT_BLUE);
     return os;
 }
 
@@ -377,7 +377,7 @@ std::basic_ostream<CharT, TraitsT>& set_background_bright_cyan(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_background_text_attribute(os, system::terminal::color::BRIGHT_CYAN);
+    system::terminal::set_background_color(os, system::terminal::color::BRIGHT_CYAN);
     return os;
 }
 
@@ -395,7 +395,7 @@ std::basic_ostream<CharT, TraitsT>& set_background_bright_green(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_background_text_attribute(os, system::terminal::color::BRIGHT_GREEN);
+    system::terminal::set_background_color(os, system::terminal::color::BRIGHT_GREEN);
     return os;
 }
 
@@ -413,7 +413,7 @@ std::basic_ostream<CharT, TraitsT>& set_background_bright_magenta(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_background_text_attribute(os, system::terminal::color::BRIGHT_MAGENTA);
+    system::terminal::set_background_color(os, system::terminal::color::BRIGHT_MAGENTA);
     return os;
 }
 
@@ -431,7 +431,7 @@ std::basic_ostream<CharT, TraitsT>& set_background_bright_red(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_background_text_attribute(os, system::terminal::color::BRIGHT_RED);
+    system::terminal::set_background_color(os, system::terminal::color::BRIGHT_RED);
     return os;
 }
 
@@ -449,7 +449,7 @@ std::basic_ostream<CharT, TraitsT>& set_background_bright_white(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_background_text_attribute(os, system::terminal::color::BRIGHT_WHITE);
+    system::terminal::set_background_color(os, system::terminal::color::BRIGHT_WHITE);
     return os;
 }
 
@@ -467,7 +467,7 @@ std::basic_ostream<CharT, TraitsT>& set_background_bright_yellow(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_background_text_attribute(os, system::terminal::color::BRIGHT_YELLOW);
+    system::terminal::set_background_color(os, system::terminal::color::BRIGHT_YELLOW);
     return os;
 }
 
@@ -485,7 +485,7 @@ std::basic_ostream<CharT, TraitsT>& set_background_cyan(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_background_text_attribute(os, system::terminal::color::CYAN);
+    system::terminal::set_background_color(os, system::terminal::color::CYAN);
     return os;
 }
 
@@ -503,7 +503,7 @@ std::basic_ostream<CharT, TraitsT>& set_background_default(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_background_text_attribute(os, system::terminal::color::DEFAULT);
+    system::terminal::set_background_color(os, system::terminal::color::DEFAULT);
     return os;
 }
 
@@ -521,7 +521,7 @@ std::basic_ostream<CharT, TraitsT>& set_background_green(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_background_text_attribute(os, system::terminal::color::GREEN);
+    system::terminal::set_background_color(os, system::terminal::color::GREEN);
     return os;
 }
 
@@ -539,7 +539,7 @@ std::basic_ostream<CharT, TraitsT>& set_background_magenta(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_background_text_attribute(os, system::terminal::color::MAGENTA);
+    system::terminal::set_background_color(os, system::terminal::color::MAGENTA);
     return os;
 }
 
@@ -557,7 +557,7 @@ std::basic_ostream<CharT, TraitsT>& set_background_red(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_background_text_attribute(os, system::terminal::color::RED);
+    system::terminal::set_background_color(os, system::terminal::color::RED);
     return os;
 }
 
@@ -575,7 +575,7 @@ std::basic_ostream<CharT, TraitsT>& set_background_white(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_background_text_attribute(os, system::terminal::color::WHITE);
+    system::terminal::set_background_color(os, system::terminal::color::WHITE);
     return os;
 }
 
@@ -593,7 +593,7 @@ std::basic_ostream<CharT, TraitsT>& set_background_yellow(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_background_text_attribute(os, system::terminal::color::YELLOW);
+    system::terminal::set_background_color(os, system::terminal::color::YELLOW);
     return os;
 }
 
@@ -611,7 +611,7 @@ std::basic_ostream<CharT, TraitsT>& set_foreground_black(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(os, system::terminal::color::BLACK);
+    system::terminal::set_foreground_color(os, system::terminal::color::BLACK);
     return os;
 }
 
@@ -629,7 +629,7 @@ std::basic_ostream<CharT, TraitsT>& set_foreground_blue(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(os, system::terminal::color::BLUE);
+    system::terminal::set_foreground_color(os, system::terminal::color::BLUE);
     return os;
 }
 
@@ -647,7 +647,7 @@ std::basic_ostream<CharT, TraitsT>& set_foreground_bright_black(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(os, system::terminal::color::BRIGHT_BLACK);
+    system::terminal::set_foreground_color(os, system::terminal::color::BRIGHT_BLACK);
     return os;
 }
 
@@ -665,7 +665,7 @@ std::basic_ostream<CharT, TraitsT>& set_foreground_bright_blue(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(os, system::terminal::color::BRIGHT_BLUE);
+    system::terminal::set_foreground_color(os, system::terminal::color::BRIGHT_BLUE);
     return os;
 }
 
@@ -683,7 +683,7 @@ std::basic_ostream<CharT, TraitsT>& set_foreground_bright_cyan(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(os, system::terminal::color::BRIGHT_CYAN);
+    system::terminal::set_foreground_color(os, system::terminal::color::BRIGHT_CYAN);
     return os;
 }
 
@@ -701,7 +701,7 @@ std::basic_ostream<CharT, TraitsT>& set_foreground_bright_green(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(os, system::terminal::color::BRIGHT_GREEN);
+    system::terminal::set_foreground_color(os, system::terminal::color::BRIGHT_GREEN);
     return os;
 }
 
@@ -719,7 +719,7 @@ std::basic_ostream<CharT, TraitsT>& set_foreground_bright_magenta(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(os, system::terminal::color::BRIGHT_MAGENTA);
+    system::terminal::set_foreground_color(os, system::terminal::color::BRIGHT_MAGENTA);
     return os;
 }
 
@@ -737,7 +737,7 @@ std::basic_ostream<CharT, TraitsT>& set_foreground_bright_red(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(os, system::terminal::color::BRIGHT_RED);
+    system::terminal::set_foreground_color(os, system::terminal::color::BRIGHT_RED);
     return os;
 }
 
@@ -755,7 +755,7 @@ std::basic_ostream<CharT, TraitsT>& set_foreground_bright_white(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(os, system::terminal::color::BRIGHT_WHITE);
+    system::terminal::set_foreground_color(os, system::terminal::color::BRIGHT_WHITE);
     return os;
 }
 
@@ -773,7 +773,7 @@ std::basic_ostream<CharT, TraitsT>& set_foreground_bright_yellow(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(os, system::terminal::color::BRIGHT_YELLOW);
+    system::terminal::set_foreground_color(os, system::terminal::color::BRIGHT_YELLOW);
     return os;
 }
 
@@ -791,7 +791,7 @@ std::basic_ostream<CharT, TraitsT>& set_foreground_cyan(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(os, system::terminal::color::CYAN);
+    system::terminal::set_foreground_color(os, system::terminal::color::CYAN);
     return os;
 }
 
@@ -809,7 +809,7 @@ std::basic_ostream<CharT, TraitsT>& set_foreground_default(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(os, system::terminal::color::DEFAULT);
+    system::terminal::set_foreground_color(os, system::terminal::color::DEFAULT);
     return os;
 }
 
@@ -827,7 +827,7 @@ std::basic_ostream<CharT, TraitsT>& set_foreground_green(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(os, system::terminal::color::GREEN);
+    system::terminal::set_foreground_color(os, system::terminal::color::GREEN);
     return os;
 }
 
@@ -845,7 +845,7 @@ std::basic_ostream<CharT, TraitsT>& set_foreground_magenta(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(os, system::terminal::color::MAGENTA);
+    system::terminal::set_foreground_color(os, system::terminal::color::MAGENTA);
     return os;
 }
 
@@ -863,7 +863,7 @@ std::basic_ostream<CharT, TraitsT>& set_foreground_red(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(os, system::terminal::color::RED);
+    system::terminal::set_foreground_color(os, system::terminal::color::RED);
     return os;
 }
 
@@ -881,7 +881,7 @@ std::basic_ostream<CharT, TraitsT>& set_foreground_white(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(os, system::terminal::color::WHITE);
+    system::terminal::set_foreground_color(os, system::terminal::color::WHITE);
     return os;
 }
 
@@ -899,7 +899,7 @@ std::basic_ostream<CharT, TraitsT>& set_foreground_yellow(
     std::basic_ostream<CharT, TraitsT>& os
 )
 {
-    system::terminal::set_foreground_text_attribute(os, system::terminal::color::YELLOW);
+    system::terminal::set_foreground_color(os, system::terminal::color::YELLOW);
     return os;
 }
 

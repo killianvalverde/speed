@@ -565,7 +565,7 @@ bool try_convert(
 // Generic C-string --> valid_path
 template<typename TargetT, typename CharT>
     requires type_traits::is_character_v<CharT> &&
-        std::derived_from<TargetT, filesystem::valid_path>
+        std::derived_from<TargetT, filesystem::validatable_path>
 bool try_convert(
     const CharT* arg,
     TargetT& res,
@@ -578,12 +578,28 @@ bool try_convert(
         return false;
     }
 
-    if (!try_convert(arg, static_cast<std::filesystem::path&>(res), err_code))
+    TargetT aux_path;
+
+    if (!try_convert(arg, static_cast<std::filesystem::path&>(aux_path), err_code))
     {
         return false;
     }
 
-    return res.verify(err_code);
+    if constexpr (std::derived_from<TargetT, filesystem::detail::output_path_tag>)
+    {
+        if (!aux_path.ensure_exists(err_code))
+        {
+            return false;
+        }
+    }
+
+    if (!aux_path.is_valid(err_code))
+    {
+        return false;
+    }
+
+    res = std::move(aux_path);
+    return true;
 }
 
 // std::basic_string_view --> TargetT
@@ -597,6 +613,7 @@ bool try_convert(
 {
     if constexpr (std::same_as<CharTraitsT, std::char_traits<CharT>>)
     {
+        // TODO(Killian): This may be too risky.
         if (!arg.empty() && arg.data()[arg.size()] == CharT('\0'))
         {
             return try_convert(arg.data(), res, err_code);

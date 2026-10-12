@@ -28,7 +28,7 @@
 
 #include "directory_iteration.hpp"
 #include "operations.hpp"
-#include "valid_path.hpp"
+#include "validatable_path.hpp"
 
 namespace speed {
 

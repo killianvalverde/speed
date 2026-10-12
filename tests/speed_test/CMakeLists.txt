@@ -46,22 +46,27 @@ set(SPEED_CONTAINERS_TEST_SOURCE_FILES
     containers_test/static_cache_test.cpp
 )
 
+set(SPEED_CONVERSIONS_TEST_SOURCE_FILES
+    conversions_test/operations_test.cpp
+)
+
 set(SPEED_FILESYSTEM_TEST_SOURCE_FILES
-    filesystem_test/directory_iteration_test.cpp
-    filesystem_test/valid_path_test.cpp
+    filesystem_test/validatable_path_test.cpp
 )
 
 set(SPEED_IOSTREAM_TEST_SOURCE_FILES
+    iostream_test/basic_ios_redirect_test.cpp
     iostream_test/indentation_test.cpp
+    iostream_test/operations_test.cpp
 )
 
 set(SPEED_MATH_TEST_SOURCE_FILES
     math_test/operations_test.cpp
 )
 
-set(SPEED_LOWLEVEL_TEST_SOURCE_FILES
-    lowlevel_test/enum_bitwise_operators_test.cpp
-    lowlevel_test/operations_test.cpp
+set(SPEED_MEMORY_TEST_SOURCE_FILES
+    memory_test/allocator_deleter_test.cpp
+    memory_test/operations_test.cpp
 )
 
 set(SPEED_NUMERICS_TEST_SOURCE_FILES
@@ -90,11 +95,6 @@ set(SPEED_TIME_TEST_SOURCE_FILES
     time_test/monotonic_chrono_test.cpp
 )
 
-set(SPEED_TYPE_CASTING_TEST_SOURCE_FILES
-    type_casting_test/operations.cpp
-    type_casting_test/type_cast_test.cpp
-)
-
 set(SPEED_TYPE_TRAITS_TEST_SOURCE_FILES
     type_traits_test/operations_test.cpp
 )
@@ -103,15 +103,15 @@ set(SPEED_TEST_SOURCE_FILES
 #    ${SPEED_ALGORITHM_TEST_SOURCE_FILES}
 #    ${SPEED_ARGPARSE_TEST_SOURCE_FILES}
 #    ${SPEED_CONTAINERS_TEST_SOURCE_FILES}
-#    ${SPEED_FILESYSTEM_TEST_SOURCE_FILES}
-#    ${SPEED_IOSTREAM_TEST_SOURCE_FILES}
+    ${SPEED_CONVERSIONS_TEST_SOURCE_FILES}
+    ${SPEED_FILESYSTEM_TEST_SOURCE_FILES}
+    ${SPEED_IOSTREAM_TEST_SOURCE_FILES}
     ${SPEED_MATH_TEST_SOURCE_FILES}
-#    ${SPEED_LOWLEVEL_TEST_SOURCE_FILES}
+    ${SPEED_MEMORY_TEST_SOURCE_FILES}
     ${SPEED_NUMERICS_TEST_SOURCE_FILES}
     ${SPEED_STRINGS_TEST_SOURCE_FILES}
     ${SPEED_SYSTEM_TEST_SOURCE_FILES}
     ${SPEED_TIME_TEST_SOURCE_FILES}
-#    ${SPEED_TYPE_CASTING_TEST_SOURCE_FILES}
     ${SPEED_TYPE_TRAITS_TEST_SOURCE_FILES}
 )
 
@@ -121,12 +121,13 @@ set(SPEED_TEST_SOURCE_FILES
 #add_speed_test(speed_algorithm_test algorithm "${SPEED_ALGORITHM_TEST_SOURCE_FILES}")
 #add_speed_test(speed_argparse_test argparse "${SPEED_ARGPARSE_TEST_SOURCE_FILES}")
 #add_speed_test(speed_containers_test containers "${SPEED_CONTAINERS_TEST_SOURCE_FILES}")
-#add_speed_test(speed_filesystem_test filesystem "${SPEED_FILESYSTEM_TEST_SOURCE_FILES}")
-#add_speed_test(speed_iostream_test iostream "${SPEED_IOSTREAM_TEST_SOURCE_FILES}")
-#add_speed_test(speed_lowlevel_test lowlevel "${SPEED_LOWLEVEL_TEST_SOURCE_FILES}")
-#add_speed_test(speed_type_casting_test type_casting "${SPEED_TYPE_CASTING_TEST_SOURCE_FILES}")
+#add_speed_test(speed_filesystem_test filesystem "${SPEED_FILESYSTEM_TEST_SOURCE_FI
 
+add_speed_test(speed_conversions_test "${SPEED_CONVERSIONS_TEST_SOURCE_FILES}")
+add_speed_test(speed_filesystem_test "${SPEED_FILESYSTEM_TEST_SOURCE_FILES}")
+add_speed_test(speed_iostream_test "${SPEED_IOSTREAM_TEST_SOURCE_FILES}")
 add_speed_test(speed_math_test "${SPEED_MATH_TEST_SOURCE_FILES}")
+add_speed_test(speed_memory_test "${SPEED_MEMORY_TEST_SOURCE_FILES}")
 add_speed_test(speed_numerics_test "${SPEED_NUMERICS_TEST_SOURCE_FILES}")
 add_speed_test(speed_strings_test "${SPEED_STRINGS_TEST_SOURCE_FILES}")
 add_speed_test(speed_system_test "${SPEED_SYSTEM_TEST_SOURCE_FILES}")

@@ -29,6 +29,8 @@
 
 #include "speed/time/time.hpp"
 
+namespace tme = speed::time;
+
 template <typename Duration>
 void busy_wait_for(Duration duration)
 {
@@ -48,7 +50,7 @@ void busy_wait_for(Duration duration)
 
 TEST(time_cpu_chrono, initial_sets_ready_and_elapsed_time_is_null)
 {
-    speed::time::cpu_chrono chrono;
+    tme::cpu_chrono chrono;
     
     auto elapsed_time = chrono.get_elapsed_time();
     
@@ -58,7 +60,7 @@ TEST(time_cpu_chrono, initial_sets_ready_and_elapsed_time_is_null)
 
 TEST(time_cpu_chrono, start_sets_running_and_elapsed_time_increases)
 {
-    speed::time::cpu_chrono chrono;
+    tme::cpu_chrono chrono;
 
     chrono.start();
 
@@ -72,7 +74,7 @@ TEST(time_cpu_chrono, start_sets_running_and_elapsed_time_increases)
 
 TEST(time_cpu_chrono, stop_sets_stopped_and_freezes_elapsed_time)
 {
-    speed::time::cpu_chrono chrono;
+    tme::cpu_chrono chrono;
 
     chrono.start();
     busy_wait_for(std::chrono::milliseconds(20));
@@ -96,7 +98,7 @@ TEST(time_cpu_chrono, stop_sets_stopped_and_freezes_elapsed_time)
 
 TEST(time_cpu_chrono, resume_sets_running_and_elapsed_time_continues)
 {
-    speed::time::cpu_chrono chrono;
+    tme::cpu_chrono chrono;
 
     chrono.start();
     chrono.stop();
@@ -114,7 +116,7 @@ TEST(time_cpu_chrono, resume_sets_running_and_elapsed_time_continues)
 
 TEST(time_cpu_chrono, restard_sets_running_and_elapsed_time_resets)
 {
-    speed::time::cpu_chrono chrono;
+    tme::cpu_chrono chrono;
 
     chrono.start();
     busy_wait_for(std::chrono::milliseconds(50));

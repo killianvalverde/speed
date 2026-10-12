@@ -18,78 +18,170 @@
  */
 
 /**
- * @file        indentation_test.cpp
- * @brief       indentation unit test.
- * @author      Killian Valverde
- * @date        2018/06/09
+ * @file indentation_test.cpp
+ * @brief Unit tests for the indentation class.
+ * @author Killian Valverde
+ * @date 2018-06-09
  */
 
+#include <sstream>
 #include <gtest/gtest.h>
 
 #include "speed/iostream/iostream.hpp"
 
-TEST(iostream_indentation, operator_pre_increment)
-{
-    speed::iostream::indentation indent(2, 0);
-    speed::iostream::ios_redirect ios_redirect(std::cout);
-    std::string expected_result("  \n    \n      \n");
+namespace ios = speed::iostream;
 
-    ios_redirect.redirect_to_internal_stream();
-    
-    std::cout << ++indent << speed::iostream::newl;
-    std::cout << ++indent << speed::iostream::newl;
-    std::cout << ++indent << speed::iostream::newl;
-    
-    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_result);
+TEST(iostream_indentation, default_constructor)
+{
+    ios::indentation indent;
+    std::ostringstream stream;
+
+    stream << indent << "Hello";
+
+    EXPECT_EQ(stream.str(), "Hello");
 }
 
-TEST(iostream_indentation, operator_post_increment)
+TEST(iostream_indentation, custom_initial_indentation)
 {
-    speed::iostream::indentation indent(2, 0);
-    speed::iostream::ios_redirect ios_redirect(std::cout);
-    std::string expected_result("\n  \n    \n");
+    ios::indentation indent(4, 8);
+    std::ostringstream stream;
 
-    ios_redirect.redirect_to_internal_stream();
-    
-    std::cout << indent++ << speed::iostream::newl;
-    std::cout << indent++ << speed::iostream::newl;
-    std::cout << indent++ << speed::iostream::newl;
-    
-    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_result);
+    stream << indent << "Hello";
+
+    EXPECT_EQ(stream.str(), "        Hello");
 }
 
-TEST(iostream_indentation, operator_pre_decrement)
+TEST(iostream_indentation, prefix_increment)
 {
-    speed::iostream::indentation indent(2, 0);
-    speed::iostream::ios_redirect ios_redirect(std::cout);
-    std::string expected_result("  \n    \n      \n    \n  \n\n");
+    ios::indentation indent;
+    std::ostringstream stream;
 
-    ios_redirect.redirect_to_internal_stream();
-    
-    std::cout << ++indent << speed::iostream::newl;
-    std::cout << ++indent << speed::iostream::newl;
-    std::cout << ++indent << speed::iostream::newl;
-    std::cout << --indent << speed::iostream::newl;
-    std::cout << --indent << speed::iostream::newl;
-    std::cout << --indent << speed::iostream::newl;
-    
-    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_result);
+    ++indent;
+    stream << indent << "First\n";
+
+    ++indent;
+    stream << indent << "Second\n";
+
+    EXPECT_EQ(stream.str(), "    First\n        Second\n");
 }
 
-TEST(iostream_indentation, operator_post_decrement)
+TEST(iostream_indentation, postfix_increment)
 {
-    speed::iostream::indentation indent(2, 0);
-    speed::iostream::ios_redirect ios_redirect(std::cout);
-    std::string expected_result("\n  \n    \n      \n    \n  \n");
+    ios::indentation indent;
+    std::ostringstream stream;
 
-    ios_redirect.redirect_to_internal_stream();
-    
-    std::cout << indent++ << speed::iostream::newl;
-    std::cout << indent++ << speed::iostream::newl;
-    std::cout << indent++ << speed::iostream::newl;
-    std::cout << indent-- << speed::iostream::newl;
-    std::cout << indent-- << speed::iostream::newl;
-    std::cout << indent-- << speed::iostream::newl;
-    
-    EXPECT_TRUE(ios_redirect.get_internal_string() == expected_result);
+    const auto previous = indent++;
+
+    stream << previous << "Before\n";
+    stream << indent << "After\n";
+
+    EXPECT_EQ(stream.str(), "Before\n    After\n");
 }
+
+TEST(iostream_indentation, prefix_decrement)
+{
+    ios::indentation indent(4, 8);
+    std::ostringstream stream;
+
+    --indent;
+    stream << indent << "First\n";
+
+    --indent;
+    stream << indent << "Second\n";
+
+    EXPECT_EQ(stream.str(), "    First\nSecond\n");
+}
+
+TEST(iostream_indentation, postfix_decrement)
+{
+    ios::indentation indent(4, 8);
+    std::ostringstream stream;
+
+    const auto previous = indent--;
+
+    stream << previous << "Before\n";
+    stream << indent << "After\n";
+
+    EXPECT_EQ(stream.str(), "        Before\n    After\n");
+}
+
+TEST(iostream_indentation, decrement_clamps_to_zero)
+{
+    ios::indentation indent(4, 2);
+    std::ostringstream stream;
+
+    --indent;
+    stream << indent << "First\n";
+
+    --indent;
+    stream << indent << "Second\n";
+
+    EXPECT_EQ(stream.str(), "First\nSecond\n");
+}
+
+TEST(iostream_indentation, custom_indentation_step)
+{
+    ios::indentation indent(2);
+    std::ostringstream stream;
+
+    ++indent;
+    stream << indent << "First\n";
+
+    ++indent;
+    stream << indent << "Second\n";
+
+    --indent;
+    stream << indent << "Third\n";
+
+    EXPECT_EQ(stream.str(), "  First\n    Second\n  Third\n");
+}
+
+TEST(iostream_indentation, supports_wide_character_stream)
+{
+    ios::indentation indent(4, 4);
+    std::wostringstream stream;
+
+    stream << indent << L"Hello World";
+
+    EXPECT_EQ(stream.str(), L"    Hello World");
+}
+
+TEST(iostream_indentation, formats_nested_output)
+{
+    ios::indentation indent(4);
+    std::ostringstream stream;
+
+    stream << indent << "root\n";
+
+    ++indent;
+    stream << indent << "child\n";
+
+    ++indent;
+    stream << indent << "grandchild\n";
+
+    --indent;
+    stream << indent << "child\n";
+
+    --indent;
+    stream << indent << "root\n";
+
+    EXPECT_EQ(
+        stream.str(),
+        "root\n"
+        "    child\n"
+        "        grandchild\n"
+        "    child\n"
+        "root\n"
+    );
+}
+
+static_assert([]()
+{
+    ios::indentation indent(4);
+
+    ++indent;
+    ++indent;
+    --indent;
+
+    return ((void)indent++ , true);
+}());

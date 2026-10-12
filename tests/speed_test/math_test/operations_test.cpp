@@ -28,17 +28,19 @@
 
 #include "speed/math/math.hpp"
 
+namespace mth = speed::math;
+
 TEST(math_absolute, returns_magnitude_as_unsigned)
 {
-    EXPECT_EQ(speed::math::absolute(0), 0u);
-    EXPECT_EQ(speed::math::absolute(42), 42u);
-    EXPECT_EQ(speed::math::absolute(-42), 42u);
-    EXPECT_EQ(speed::math::absolute(-1), 1u);
+    EXPECT_EQ(mth::absolute(0), 0u);
+    EXPECT_EQ(mth::absolute(42), 42u);
+    EXPECT_EQ(mth::absolute(-42), 42u);
+    EXPECT_EQ(mth::absolute(-1), 1u);
 
-    EXPECT_EQ(speed::math::absolute(INT32_MAX), static_cast<uint32_t>(INT32_MAX));
-    EXPECT_EQ(speed::math::absolute(INT32_MIN), uint32_t{INT32_MAX} + 1);
-    EXPECT_EQ(speed::math::absolute(INT64_MIN), uint64_t{INT64_MAX} + 1);
+    EXPECT_EQ(mth::absolute(INT32_MAX), static_cast<uint32_t>(INT32_MAX));
+    EXPECT_EQ(mth::absolute(INT32_MIN), uint32_t{INT32_MAX} + 1);
+    EXPECT_EQ(mth::absolute(INT64_MIN), uint64_t{INT64_MAX} + 1);
 
-    EXPECT_EQ(speed::math::absolute(42u), 42u);
-    EXPECT_EQ(speed::math::absolute(UINT64_MAX), UINT64_MAX);
+    EXPECT_EQ(mth::absolute(42u), 42u);
+    EXPECT_EQ(mth::absolute(UINT64_MAX), UINT64_MAX);
 }

@@ -40,7 +40,8 @@ foreach (target IN LISTS SPEED_INTERFACE_TARGETS)
 endforeach ()
 
 foreach (target IN LISTS SPEED_COMPILED_TARGETS)
-    add_library(${target} STATIC)
+    add_library(${target} STATIC
+        filesystem/detail/validatable_path.hpp)
 endforeach ()
 
 # =========================
@@ -179,7 +180,7 @@ set(SPEED_FILESYSTEM_HEADERS
     filesystem/directory_iteration.hpp
     filesystem/filesystem.hpp
     filesystem/operations.hpp
-    filesystem/valid_path.hpp
+    filesystem/validatable_path.hpp
 )
 
 set(SPEED_IOSTREAM_HEADERS
@@ -269,14 +270,6 @@ set(SPEED_TIME_HEADERS
     time/cpu_clock.hpp
     time/monotonic_clock.hpp
     time/time.hpp
-)
-
-set(SPEED_CONVERSIONS_HEADERS
-    conversions/detail/forward_declarations.hpp
-    conversions/detail/operations.hpp
-    conversions/exception.hpp
-    conversions/operations.hpp
-    conversions/conversions.hpp
 )
 
 set(SPEED_TYPE_TRAITS_HEADERS

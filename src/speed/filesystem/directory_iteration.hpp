@@ -1,579 +1,579 @@
-/* speed - Generic C++ library.
- * Copyright (C) 2015-2026 Killian Valverde.
- *
- * This file is part of speed.
- *
- * speed is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * speed is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with speed. If not, see <http://www.gnu.org/licenses/>.
- */
-
-/**
- * @file        directory_iteration.hpp
- * @brief       directory_iteration class header.
- * @author      Killian Valverde
- * @date        2024/10/15
- */
-
-#pragma once
-
-#include <filesystem>
-#include <regex>
-#include <set>
-#include <stack>
-
-#include "detail/forward_declarations.hpp"
-#include "../system/system.hpp"
-#include "../conversions/conversions.hpp"
-#include "operations.hpp"
-
-namespace speed::filesystem {
-
-class directory_iteration
-{
-public:
-    using char_type = std::filesystem::path::value_type;
-
-    using string_type = std::filesystem::path::string_type;
-
-    using regex_type = std::basic_regex<char_type, std::regex_traits<char_type>>;
-
-    class const_iterator;
-
-    class directory_entry
-    {
-    public:
-        [[nodiscard]] bool is_directory() const noexcept
-        {
-            if (composit_ == nullptr)
-            {
-                return false;
-            }
-
-            return directory_entity_stck_.top().type == system::filesystem::file_types::DIRECTORY;
-        }
-
-        /**
-         * @brief       Checks whether the current entity is a regular file.
-         * @return      true if the entity is a regular file, false otherwise.
-         */
-        [[nodiscard]] bool is_regular_file() const noexcept
-        {
-            if (composit_ == nullptr)
-            {
-                return false;
-            }
-
-            return system::filesystem::is_file_type(directory_entity_stck_.top(),
-                    composit_->resolve_entries_symlnks_,
-                    system::filesystem::file_types::REGULAR_FILE);
-        }
-
-        /**
-         * @brief       Checks whether the current entity is a symbolic link.
-         * @return      true if the entity is a symbolic link, false otherwise.
-         */
-        [[nodiscard]] bool is_symlink_file() const noexcept
-        {
-            if (composit_ == nullptr)
-            {
-                return false;
-            }
-
-            return system::filesystem::is_file_type(directory_entity_stck_.top(),
-                    composit_->resolve_entries_symlnks_,
-                    system::filesystem::file_types::SYMLINK);
-        }
-
-        /**
-         * @brief       Gets the filesystem path of the directory entry.
-         * @return      const std::filesystem::path& The current entry path.
-         */
-        [[nodiscard]] const std::filesystem::path& get_path() const noexcept
-        {
-            return cur_fle_;
-        }
-
-        /**
-         * @brief Retrieves the filename component of the current path.
-         * @return std::filesystem::path The filename part of the current path.
-         */
-        [[nodiscard]] std::filesystem::path get_filename() const
-        {
-            return cur_fle_.filename();
-        }
-
-        /**
-         * @brief Retrieves the parent directory of the current path.
-         * @return std::filesystem::path The parent path of the current path.
-         */
-        [[nodiscard]] std::filesystem::path get_parent_path() const
-        {
-            return cur_fle_.parent_path();
-        }
-
-        /**
-         * @brief       Gets the UTF-8 encoded string representation of the path.
-         * @return      std::string UTF-8 encoded representation of the path.
-         */
-        [[nodiscard]] std::string get_utf8_path() const
-        {
-            return conversions::to_utf8(cur_fle_);
-        }
-
-        /**
-         * @brief Retrieves the filename component of the current path as a UTF-8 string.
-         * @return std::string The UTF-8 encoded filename.
-         */
-        [[nodiscard]] std::string get_utf8_filename() const
-        {
-            return conversions::to_utf8(cur_fle_.filename());
-        }
-
-        /**
-         * @brief Retrieves the parent directory of the current path as a UTF-8 string.
-         * @return std::string The UTF-8 encoded parent path.
-         */
-        [[nodiscard]] std::string get_utf8_parent_path() const
-        {
-            return conversions::to_utf8(cur_fle_.parent_path());
-        }
-
-    private:
-        using system_directory_entity_type = system::filesystem::directory_stream;
-
-        template<typename T>
-        using stack_type = std::stack<T>;
-
-        /**
-         * @brief       Constructs a directory_entry object.
-         * @param       cur_fle_ : The current filesystem path of the directory entry.
-         * @param       directory_entity_stck : Stack containing directory entity type information.
-         * @param       composit : Pointer to a directory iteration context.
-         */
-        explicit directory_entry(
-                const std::filesystem::path& cur_fle_,
-                const stack_type<system_directory_entity_type>& directory_entity_stck,
-                const directory_iteration* composit
-        )
-                : cur_fle_(cur_fle_)
-                , directory_entity_stck_(directory_entity_stck)
-                , composit_(composit)
-        {
-        }
-
-    private:
-        /** Reference to the iterator current file path. */
-        const std::filesystem::path& cur_fle_;
-
-        /** Reference to the iterator directory entity stack. */
-        const stack_type<system_directory_entity_type>& directory_entity_stck_;
-
-        /** Pointer to the composite object. */
-        const directory_iteration* composit_;
-
-        friend class const_iterator;
-    };
-
-    /**
-     * @brief       Class that represents const iterators.
-     */
-    class const_iterator
-    {
-    public:
-        /** The class itself. */
-        using self_type = const_iterator;
-
-        /** The value encapsulated by the iterator. */
-        using value_type = directory_entry;
-
-        /** Constructor with parameters. */
-        explicit const_iterator(const directory_iteration* composit);
-
-        /** Destructor. */
-        ~const_iterator() noexcept;
-
-        /**
-         * @brief       Move to the forward node.
-         * @return      A reference to an iterator pointing the current node.
-         */
-        self_type& operator ++();
-
-        /**
-         * @brief       Allows knowing whether the two iterators are the same.
-         * @param       rhs : The value to compare.
-         * @return      If function was successful true is returned, otherwise false is returned.
-         */
-        bool operator ==(const self_type& rhs) const noexcept;
-
-        /**
-         * @brief       Get the reference of the current node value.
-         * @return      The reference of the current node value.
-         */
-        const value_type& operator *() const noexcept
-        {
-            return directory_ent_;
-        }
-
-        /**
-         * @brief       Get the address of the current node value.
-         * @return      The address of the current node value.
-         */
-        const value_type* operator ->() const noexcept
-        {
-            return &directory_ent_;
-        }
-
-        /**
-         * @brief       Allows knowing whether the iterator is past-the-end or not.
-         * @return      If function was successful true is returned, otherwise false is returned.
-         */
-        [[nodiscard]] bool end() const noexcept
-        {
-            return end_;
-        }
-
-    private:
-        /**
-         * @brief       Tries to open the current directory.
-         * @return      If function was successful true is returned, otherwise false is returned.
-         */
-        bool open_directory();
-
-        /**
-         * @brief       Tries to read the next entry in the current directory.
-         * @return      If function was successful true is returned, otherwise false is returned.
-         */
-        bool read_directory();
-
-        /**
-         * @brief       Close and exit the current directory.
-         */
-        void close_directory();
-
-        /**
-         * @brief       Exit the current directory.
-         */
-        void exit_directory();
-
-        /**
-         * @brief       Check if the current file is valid.
-         * @return      If function was successful true is returned, otherwise false is returned.
-         */
-        [[nodiscard]] bool is_file_valid();
-        
-        /**
-         * @brief       Checks whether the current file name contains the configured substring.
-         * @return      true if the substring is found in the current file name, false otherwise.
-         */
-        [[nodiscard]] bool find_substr() const;
-
-        /**
-         * @brief       Checks whether the current file name matches the configured wildcard
-         *              pattern.
-         * @return      true if the file name matches the wildcard pattern, false otherwise.
-         */
-        [[nodiscard]] bool matches_wildcard() const;
-
-    private:
-        /** Current directory. */
-        std::filesystem::path cur_dir_;
-
-        /** Current file. */
-        std::filesystem::path cur_fle_;
-
-        /** Stack of directories entities used to explore recursivelly the filesystem. */
-        stack_type<system_directory_entry_type> directory_entity_stck_;
-
-        /** Set of visited inodes to avoid infinite recursions in case of fs corruptions. */
-        set_type<system::filesystem::inode_t> vistd_inos_;
-
-        /** Pointer to the composite object. */
-        const directory_iteration* composit_;
-
-        /** Current level of recursivity. */
-        std::uint64_t current_recursivity_levl_ = 0;
-
-        /** Represents whether the iteration is finished. */
-        bool end_ = false;
-
-        /** Returned value by the iterator. */
-        value_type directory_ent_;
-    };
-
-    /**
-     * @brief       Constructor with parameters.
-     * @param       root_pth : Path where to do the iteration.
-     */
-    template<
-            typename PathT_,
-            typename = std::enable_if_t<
-                    !std::is_base_of<directory_iteration, std::decay_t<PathT_>>::value
-            >
-    >
-    explicit directory_iteration(PathT_&& root_pth)
-            : root_pth_(std::forward<PathT_>(root_pth))
-    {
-        // TODO: This shouldn't be necessary. (make_preferred)
-        if (root_pth_.native().find(SPEED_ALT_PATH_SEPARATOR_CHAR) != string_type::npos)
-        {
-            root_pth_ = get_normalized_path(root_pth_);
-        }
-    }
-
-    /**
-     * @brief       Get a const iterator for the first file.
-     * @return      A const iterator for the first file.
-     */
-    [[nodiscard]] const_iterator begin() const noexcept
-    {
-        return const_iterator(this);
-    }
-
-    /**
-     * @brief       Get a const iterator to the past-the-end file.
-     * @return      A const iterator to the past-the-end file.
-     */
-    [[nodiscard]] const_iterator end() const noexcept
-    {
-        return const_iterator(nullptr);
-    }
-
-    /**
-     * @brief       Get a const iterator for the first file.
-     * @return      A const iterator for the first file.
-     */
-    [[nodiscard]] const_iterator cbegin() const noexcept
-    {
-        return const_iterator(this);
-    }
-
-    /**
-     * @brief       Get a const iterator to the past-the-end file.
-     * @return      A const iterator to the past-the-end file.
-     */
-    [[nodiscard]] const_iterator cend() const noexcept
-    {
-        return const_iterator(nullptr);
-    }
-
-    /**
-     * @brief       Specify the access modes that the files are mandatory to have.
-     * @param       access_mods : Access modes that the files are mandatory to have.
-     * @return      The object who call the method.
-     */
-    directory_iteration& access_modes(system::filesystem::access_modes access_mods) noexcept
-    {
-        access_mods_ = access_mods;
-        return *this;
-    }
-    
-    /**
-     * @brief       Ensures the stored root path is absolute, optionally resolving symlinks.
-     * @param       enabl : Whether to enforce absolute/canonical form of the path.
-     * @return      Reference to the current `directory_iteration` instance (`*this`), allowing
-     *              method chaining.
-     */
-    directory_iteration& absolute(bool enabl)
-    {
-        if (enabl)
-        {
-            try
-            {
-                root_pth_ = std::filesystem::canonical(root_pth_);
-            }
-            catch (...)
-            {
-                root_pth_ = std::filesystem::absolute(root_pth_);
-            }
-        }
-        
-        return *this;
-    }
-
-    /**
-     * @brief       Sets the case sensitivity option for directory iteration.
-     * @param       enabl : `true` to enable case-sensitive matching, `false` for case-insensitive
-     *              matching.
-     * @return      The object who call the method.
-     */
-    directory_iteration& case_insensitive(bool enabl)
-    {
-        if (case_insensitve_ != enabl)
-        {
-            case_insensitve_ = enabl;
-            
-            if (!regex_to_mtch_str_.empty())
-            {
-                update_regex();
-            }
-        }
-        
-        return *this;
-    }
-
-    /**
-     * @brief       Specify the file types that will be considered during the iteration.
-     * @param       file_typs : File types that will be considered during the iteration.
-     * @return      The object who call the method.
-     */
-    directory_iteration& file_types(system::filesystem::file_types file_typs) noexcept
-    {
-        file_typs_ = file_typs;
-        return *this;
-    }
-    
-    /**
-     * @brief       Enables or disables inode tracking to prevent duplicate file entries.
-     * @param       enabl : Set to `true` to enable inode tracking, or `false` to disable it.
-     * @return      The object who call the method.
-     */
-    directory_iteration& inode_tracking(bool enabl) noexcept
-    {
-        inode_trackr_ = enabl;
-        return *this;
-    }
-
-    /**
-     * @brief       Specify the level of recursivity that.
-     * @param       recursivity_levl : Access modes that the files are mandatory to have.
-     * @return      The object who call the method.
-     */
-    directory_iteration& recursivity_level(std::uint64_t recursivity_levl) noexcept
-    {
-        max_recursivity_levl_ = recursivity_levl;
-        return *this;
-    }
-
-    /**
-     * @brief       Specify the regex that all the file names have to match.
-     * @param       regex_to_mtch : Regex string that all the file names have to match.
-     * @return      The object who call the method.
-     */
-    template<typename StringT_>
-    directory_iteration& regex_to_match(StringT_&& regex_to_mtch)
-    {
-        regex_to_mtch_str_ = conversions::convert<string_type>(
-                std::forward<StringT_>(regex_to_mtch));
-        
-        update_regex();
-        return *this;
-    }
-
-    /**
-     * @brief       Specify wether or not the directory symbolic links will be resolved.
-     * @param       enabl : If true the directories symbolic links will be followed.
-     * @return      The object who call the method.
-     */
-    directory_iteration& resolve_directory_symlinks(bool enabl) noexcept
-    {
-        resolve_directory_symlnks_ = enabl;
-        return *this;
-    }
-
-    /**
-     * @brief       Specify wether or not the entries symbolic links will be resolved.
-     * @param       enabl : If true the entries symbolic links will be resolved.
-     * @return      The object who call the method.
-     */
-    directory_iteration& resolve_entries_symlinks(bool enabl) noexcept
-    {
-        resolve_entries_symlnks_ = enabl;
-        return *this;
-    }
-
-    /**
-     * @brief       Specify the substring that all the file names must have.
-     * @param       substring_to_mtch : Wildcard string that all the file names have to match.
-     * @return      The object who call the method.
-     */
-    template<typename StringT_>
-    directory_iteration& substring_to_match(StringT_&& substring_to_mtch)
-    {
-        substring_to_mtch_ = conversions::convert<string_type>(
-                std::forward<StringT_>(substring_to_mtch));
-        
-        return *this;
-    }
-
-    /**
-     * @brief       Specify the wildcard that all the file names have to match.
-     * @param       wildcard_to_mtch : Wildcard string that all the file names have to match.
-     * @return      The object who call the method.
-     */
-    template<typename StringT_>
-    directory_iteration& wildcard_to_match(StringT_&& wildcard_to_mtch)
-    {
-        wildcard_to_mtch_ = conversions::convert<string_type>(
-                std::forward<StringT_>(wildcard_to_mtch));
-        
-        return *this;
-    }
-    
-private:
-    /**
-     * @brief       Updates the compiled regular expression used for matching.
-     */
-    void update_regex()
-    {
-        typename regex_type::flag_type flg;
-
-        if (case_insensitve_)
-        {
-            flg = regex_type::ECMAScript | regex_type::icase;
-        }
-        else
-        {
-            flg = regex_type::ECMAScript;
-        }
-
-        regex_to_mtch_.assign(regex_to_mtch_str_, flg);
-    }
-
-private:
-    template<typename T>
-    using set_type = std::set<T, std::less<T>, std::allocator<T>>;
-    
-    template<typename T>
-    using stack_type = std::stack<T>;
-
-    using system_directory_entry_type = system::filesystem::directory_stream;
-    
-    std::filesystem::path root_pth_;
-    
-    string_type substring_to_mtch_;
-    
-    string_type wildcard_to_mtch_;
-
-    string_type regex_to_mtch_str_;
-
-    regex_type regex_to_mtch_;
-
-    std::uint64_t max_recursivity_levl_ = ~0ull;
-
-    system::filesystem::access_modes access_mods_ = system::filesystem::access_modes::NIL;
-
-    system::filesystem::file_types file_typs_ = system::filesystem::file_types::NIL;
-    
-    bool case_insensitve_ = true;
-    
-    bool inode_trackr_ = false;
-
-    bool resolve_directory_symlnks_ = false;
-
-    bool resolve_entries_symlnks_ = false;
-
-    friend class directory_entry;
-    friend class const_iterator;
-};
-
-}
+// /* speed - Generic C++ library.
+//  * Copyright (C) 2015-2026 Killian Valverde.
+//  *
+//  * This file is part of speed.
+//  *
+//  * speed is free software: you can redistribute it and/or modify
+//  * it under the terms of the GNU General Public License as published by
+//  * the Free Software Foundation, either version 3 of the License, or
+//  * (at your option) any later version.
+//  *
+//  * speed is distributed in the hope that it will be useful,
+//  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  * GNU General Public License for more details.
+//  *
+//  * You should have received a copy of the GNU General Public License
+//  * along with speed. If not, see <http://www.gnu.org/licenses/>.
+//  */
+//
+// /**
+//  * @file        directory_iteration.hpp
+//  * @brief       directory_iteration class header.
+//  * @author      Killian Valverde
+//  * @date        2024/10/15
+//  */
+//
+// #pragma once
+//
+// #include <filesystem>
+// #include <regex>
+// #include <set>
+// #include <stack>
+//
+// #include "detail/forward_declarations.hpp"
+// #include "../system/system.hpp"
+// #include "../conversions/conversions.hpp"
+// #include "operations.hpp"
+//
+// namespace speed::filesystem {
+//
+// class directory_iteration
+// {
+// public:
+//     using char_type = std::filesystem::path::value_type;
+//
+//     using string_type = std::filesystem::path::string_type;
+//
+//     using regex_type = std::basic_regex<char_type, std::regex_traits<char_type>>;
+//
+//     class const_iterator;
+//
+//     class directory_entry
+//     {
+//     public:
+//         [[nodiscard]] bool is_directory() const noexcept
+//         {
+//             if (composit_ == nullptr)
+//             {
+//                 return false;
+//             }
+//
+//             return directory_entity_stck_.top().type == system::filesystem::file_types::DIRECTORY;
+//         }
+//
+//         /**
+//          * @brief       Checks whether the current entity is a regular file.
+//          * @return      true if the entity is a regular file, false otherwise.
+//          */
+//         [[nodiscard]] bool is_regular_file() const noexcept
+//         {
+//             if (composit_ == nullptr)
+//             {
+//                 return false;
+//             }
+//
+//             return system::filesystem::is_file_type(directory_entity_stck_.top(),
+//                     composit_->resolve_entries_symlnks_,
+//                     system::filesystem::file_types::REGULAR_FILE);
+//         }
+//
+//         /**
+//          * @brief       Checks whether the current entity is a symbolic link.
+//          * @return      true if the entity is a symbolic link, false otherwise.
+//          */
+//         [[nodiscard]] bool is_symlink_file() const noexcept
+//         {
+//             if (composit_ == nullptr)
+//             {
+//                 return false;
+//             }
+//
+//             return system::filesystem::is_file_type(directory_entity_stck_.top(),
+//                     composit_->resolve_entries_symlnks_,
+//                     system::filesystem::file_types::SYMLINK);
+//         }
+//
+//         /**
+//          * @brief       Gets the filesystem path of the directory entry.
+//          * @return      const std::filesystem::path& The current entry path.
+//          */
+//         [[nodiscard]] const std::filesystem::path& get_path() const noexcept
+//         {
+//             return cur_fle_;
+//         }
+//
+//         /**
+//          * @brief Retrieves the filename component of the current path.
+//          * @return std::filesystem::path The filename part of the current path.
+//          */
+//         [[nodiscard]] std::filesystem::path get_filename() const
+//         {
+//             return cur_fle_.filename();
+//         }
+//
+//         /**
+//          * @brief Retrieves the parent directory of the current path.
+//          * @return std::filesystem::path The parent path of the current path.
+//          */
+//         [[nodiscard]] std::filesystem::path get_parent_path() const
+//         {
+//             return cur_fle_.parent_path();
+//         }
+//
+//         /**
+//          * @brief       Gets the UTF-8 encoded string representation of the path.
+//          * @return      std::string UTF-8 encoded representation of the path.
+//          */
+//         [[nodiscard]] std::string get_utf8_path() const
+//         {
+//             return conversions::to_utf8(cur_fle_);
+//         }
+//
+//         /**
+//          * @brief Retrieves the filename component of the current path as a UTF-8 string.
+//          * @return std::string The UTF-8 encoded filename.
+//          */
+//         [[nodiscard]] std::string get_utf8_filename() const
+//         {
+//             return conversions::to_utf8(cur_fle_.filename());
+//         }
+//
+//         /**
+//          * @brief Retrieves the parent directory of the current path as a UTF-8 string.
+//          * @return std::string The UTF-8 encoded parent path.
+//          */
+//         [[nodiscard]] std::string get_utf8_parent_path() const
+//         {
+//             return conversions::to_utf8(cur_fle_.parent_path());
+//         }
+//
+//     private:
+//         using system_directory_entity_type = system::filesystem::directory_stream;
+//
+//         template<typename T>
+//         using stack_type = std::stack<T>;
+//
+//         /**
+//          * @brief       Constructs a directory_entry object.
+//          * @param       cur_fle_ : The current filesystem path of the directory entry.
+//          * @param       directory_entity_stck : Stack containing directory entity type information.
+//          * @param       composit : Pointer to a directory iteration context.
+//          */
+//         explicit directory_entry(
+//                 const std::filesystem::path& cur_fle_,
+//                 const stack_type<system_directory_entity_type>& directory_entity_stck,
+//                 const directory_iteration* composit
+//         )
+//                 : cur_fle_(cur_fle_)
+//                 , directory_entity_stck_(directory_entity_stck)
+//                 , composit_(composit)
+//         {
+//         }
+//
+//     private:
+//         /** Reference to the iterator current file path. */
+//         const std::filesystem::path& cur_fle_;
+//
+//         /** Reference to the iterator directory entity stack. */
+//         const stack_type<system_directory_entity_type>& directory_entity_stck_;
+//
+//         /** Pointer to the composite object. */
+//         const directory_iteration* composit_;
+//
+//         friend class const_iterator;
+//     };
+//
+//     /**
+//      * @brief       Class that represents const iterators.
+//      */
+//     class const_iterator
+//     {
+//     public:
+//         /** The class itself. */
+//         using self_type = const_iterator;
+//
+//         /** The value encapsulated by the iterator. */
+//         using value_type = directory_entry;
+//
+//         /** Constructor with parameters. */
+//         explicit const_iterator(const directory_iteration* composit);
+//
+//         /** Destructor. */
+//         ~const_iterator() noexcept;
+//
+//         /**
+//          * @brief       Move to the forward node.
+//          * @return      A reference to an iterator pointing the current node.
+//          */
+//         self_type& operator ++();
+//
+//         /**
+//          * @brief       Allows knowing whether the two iterators are the same.
+//          * @param       rhs : The value to compare.
+//          * @return      If function was successful true is returned, otherwise false is returned.
+//          */
+//         bool operator ==(const self_type& rhs) const noexcept;
+//
+//         /**
+//          * @brief       Get the reference of the current node value.
+//          * @return      The reference of the current node value.
+//          */
+//         const value_type& operator *() const noexcept
+//         {
+//             return directory_ent_;
+//         }
+//
+//         /**
+//          * @brief       Get the address of the current node value.
+//          * @return      The address of the current node value.
+//          */
+//         const value_type* operator ->() const noexcept
+//         {
+//             return &directory_ent_;
+//         }
+//
+//         /**
+//          * @brief       Allows knowing whether the iterator is past-the-end or not.
+//          * @return      If function was successful true is returned, otherwise false is returned.
+//          */
+//         [[nodiscard]] bool end() const noexcept
+//         {
+//             return end_;
+//         }
+//
+//     private:
+//         /**
+//          * @brief       Tries to open the current directory.
+//          * @return      If function was successful true is returned, otherwise false is returned.
+//          */
+//         bool open_directory();
+//
+//         /**
+//          * @brief       Tries to read the next entry in the current directory.
+//          * @return      If function was successful true is returned, otherwise false is returned.
+//          */
+//         bool read_directory();
+//
+//         /**
+//          * @brief       Close and exit the current directory.
+//          */
+//         void close_directory();
+//
+//         /**
+//          * @brief       Exit the current directory.
+//          */
+//         void exit_directory();
+//
+//         /**
+//          * @brief       Check if the current file is valid.
+//          * @return      If function was successful true is returned, otherwise false is returned.
+//          */
+//         [[nodiscard]] bool is_file_valid();
+//
+//         /**
+//          * @brief       Checks whether the current file name contains the configured substring.
+//          * @return      true if the substring is found in the current file name, false otherwise.
+//          */
+//         [[nodiscard]] bool find_substr() const;
+//
+//         /**
+//          * @brief       Checks whether the current file name matches the configured wildcard
+//          *              pattern.
+//          * @return      true if the file name matches the wildcard pattern, false otherwise.
+//          */
+//         [[nodiscard]] bool matches_wildcard() const;
+//
+//     private:
+//         /** Current directory. */
+//         std::filesystem::path cur_dir_;
+//
+//         /** Current file. */
+//         std::filesystem::path cur_fle_;
+//
+//         /** Stack of directories entities used to explore recursivelly the filesystem. */
+//         stack_type<system_directory_entry_type> directory_entity_stck_;
+//
+//         /** Set of visited inodes to avoid infinite recursions in case of fs corruptions. */
+//         set_type<system::filesystem::inode_t> vistd_inos_;
+//
+//         /** Pointer to the composite object. */
+//         const directory_iteration* composit_;
+//
+//         /** Current level of recursivity. */
+//         std::uint64_t current_recursivity_levl_ = 0;
+//
+//         /** Represents whether the iteration is finished. */
+//         bool end_ = false;
+//
+//         /** Returned value by the iterator. */
+//         value_type directory_ent_;
+//     };
+//
+//     /**
+//      * @brief       Constructor with parameters.
+//      * @param       root_pth : Path where to do the iteration.
+//      */
+//     template<
+//             typename PathT_,
+//             typename = std::enable_if_t<
+//                     !std::is_base_of<directory_iteration, std::decay_t<PathT_>>::value
+//             >
+//     >
+//     explicit directory_iteration(PathT_&& root_pth)
+//             : root_pth_(std::forward<PathT_>(root_pth))
+//     {
+//         // TODO: This shouldn't be necessary. (make_preferred)
+//         if (root_pth_.native().find(SPEED_ALT_PATH_SEPARATOR_CHAR) != string_type::npos)
+//         {
+//             root_pth_ = get_normalized_path(root_pth_);
+//         }
+//     }
+//
+//     /**
+//      * @brief       Get a const iterator for the first file.
+//      * @return      A const iterator for the first file.
+//      */
+//     [[nodiscard]] const_iterator begin() const noexcept
+//     {
+//         return const_iterator(this);
+//     }
+//
+//     /**
+//      * @brief       Get a const iterator to the past-the-end file.
+//      * @return      A const iterator to the past-the-end file.
+//      */
+//     [[nodiscard]] const_iterator end() const noexcept
+//     {
+//         return const_iterator(nullptr);
+//     }
+//
+//     /**
+//      * @brief       Get a const iterator for the first file.
+//      * @return      A const iterator for the first file.
+//      */
+//     [[nodiscard]] const_iterator cbegin() const noexcept
+//     {
+//         return const_iterator(this);
+//     }
+//
+//     /**
+//      * @brief       Get a const iterator to the past-the-end file.
+//      * @return      A const iterator to the past-the-end file.
+//      */
+//     [[nodiscard]] const_iterator cend() const noexcept
+//     {
+//         return const_iterator(nullptr);
+//     }
+//
+//     /**
+//      * @brief       Specify the access modes that the files are mandatory to have.
+//      * @param       access_mods : Access modes that the files are mandatory to have.
+//      * @return      The object who call the method.
+//      */
+//     directory_iteration& access_modes(system::filesystem::access_modes access_mods) noexcept
+//     {
+//         access_mods_ = access_mods;
+//         return *this;
+//     }
+//
+//     /**
+//      * @brief       Ensures the stored root path is absolute, optionally resolving symlinks.
+//      * @param       enabl : Whether to enforce absolute/canonical form of the path.
+//      * @return      Reference to the current `directory_iteration` instance (`*this`), allowing
+//      *              method chaining.
+//      */
+//     directory_iteration& absolute(bool enabl)
+//     {
+//         if (enabl)
+//         {
+//             try
+//             {
+//                 root_pth_ = std::filesystem::canonical(root_pth_);
+//             }
+//             catch (...)
+//             {
+//                 root_pth_ = std::filesystem::absolute(root_pth_);
+//             }
+//         }
+//
+//         return *this;
+//     }
+//
+//     /**
+//      * @brief       Sets the case sensitivity option for directory iteration.
+//      * @param       enabl : `true` to enable case-sensitive matching, `false` for case-insensitive
+//      *              matching.
+//      * @return      The object who call the method.
+//      */
+//     directory_iteration& case_insensitive(bool enabl)
+//     {
+//         if (case_insensitve_ != enabl)
+//         {
+//             case_insensitve_ = enabl;
+//
+//             if (!regex_to_mtch_str_.empty())
+//             {
+//                 update_regex();
+//             }
+//         }
+//
+//         return *this;
+//     }
+//
+//     /**
+//      * @brief       Specify the file types that will be considered during the iteration.
+//      * @param       file_typs : File types that will be considered during the iteration.
+//      * @return      The object who call the method.
+//      */
+//     directory_iteration& file_types(system::filesystem::file_types file_typs) noexcept
+//     {
+//         file_typs_ = file_typs;
+//         return *this;
+//     }
+//
+//     /**
+//      * @brief       Enables or disables inode tracking to prevent duplicate file entries.
+//      * @param       enabl : Set to `true` to enable inode tracking, or `false` to disable it.
+//      * @return      The object who call the method.
+//      */
+//     directory_iteration& inode_tracking(bool enabl) noexcept
+//     {
+//         inode_trackr_ = enabl;
+//         return *this;
+//     }
+//
+//     /**
+//      * @brief       Specify the level of recursivity that.
+//      * @param       recursivity_levl : Access modes that the files are mandatory to have.
+//      * @return      The object who call the method.
+//      */
+//     directory_iteration& recursivity_level(std::uint64_t recursivity_levl) noexcept
+//     {
+//         max_recursivity_levl_ = recursivity_levl;
+//         return *this;
+//     }
+//
+//     /**
+//      * @brief       Specify the regex that all the file names have to match.
+//      * @param       regex_to_mtch : Regex string that all the file names have to match.
+//      * @return      The object who call the method.
+//      */
+//     template<typename StringT_>
+//     directory_iteration& regex_to_match(StringT_&& regex_to_mtch)
+//     {
+//         regex_to_mtch_str_ = conversions::convert<string_type>(
+//                 std::forward<StringT_>(regex_to_mtch));
+//
+//         update_regex();
+//         return *this;
+//     }
+//
+//     /**
+//      * @brief       Specify wether or not the directory symbolic links will be resolved.
+//      * @param       enabl : If true the directories symbolic links will be followed.
+//      * @return      The object who call the method.
+//      */
+//     directory_iteration& resolve_directory_symlinks(bool enabl) noexcept
+//     {
+//         resolve_directory_symlnks_ = enabl;
+//         return *this;
+//     }
+//
+//     /**
+//      * @brief       Specify wether or not the entries symbolic links will be resolved.
+//      * @param       enabl : If true the entries symbolic links will be resolved.
+//      * @return      The object who call the method.
+//      */
+//     directory_iteration& resolve_entries_symlinks(bool enabl) noexcept
+//     {
+//         resolve_entries_symlnks_ = enabl;
+//         return *this;
+//     }
+//
+//     /**
+//      * @brief       Specify the substring that all the file names must have.
+//      * @param       substring_to_mtch : Wildcard string that all the file names have to match.
+//      * @return      The object who call the method.
+//      */
+//     template<typename StringT_>
+//     directory_iteration& substring_to_match(StringT_&& substring_to_mtch)
+//     {
+//         substring_to_mtch_ = conversions::convert<string_type>(
+//                 std::forward<StringT_>(substring_to_mtch));
+//
+//         return *this;
+//     }
+//
+//     /**
+//      * @brief       Specify the wildcard that all the file names have to match.
+//      * @param       wildcard_to_mtch : Wildcard string that all the file names have to match.
+//      * @return      The object who call the method.
+//      */
+//     template<typename StringT_>
+//     directory_iteration& wildcard_to_match(StringT_&& wildcard_to_mtch)
+//     {
+//         wildcard_to_mtch_ = conversions::convert<string_type>(
+//                 std::forward<StringT_>(wildcard_to_mtch));
+//
+//         return *this;
+//     }
+//
+// private:
+//     /**
+//      * @brief       Updates the compiled regular expression used for matching.
+//      */
+//     void update_regex()
+//     {
+//         typename regex_type::flag_type flg;
+//
+//         if (case_insensitve_)
+//         {
+//             flg = regex_type::ECMAScript | regex_type::icase;
+//         }
+//         else
+//         {
+//             flg = regex_type::ECMAScript;
+//         }
+//
+//         regex_to_mtch_.assign(regex_to_mtch_str_, flg);
+//     }
+//
+// private:
+//     template<typename T>
+//     using set_type = std::set<T, std::less<T>, std::allocator<T>>;
+//
+//     template<typename T>
+//     using stack_type = std::stack<T>;
+//
+//     using system_directory_entry_type = system::filesystem::directory_stream;
+//
+//     std::filesystem::path root_pth_;
+//
+//     string_type substring_to_mtch_;
+//
+//     string_type wildcard_to_mtch_;
+//
+//     string_type regex_to_mtch_str_;
+//
+//     regex_type regex_to_mtch_;
+//
+//     std::uint64_t max_recursivity_levl_ = ~0ull;
+//
+//     system::filesystem::access_modes access_mods_ = system::filesystem::access_modes::NIL;
+//
+//     system::filesystem::file_types file_typs_ = system::filesystem::file_types::NIL;
+//
+//     bool case_insensitve_ = true;
+//
+//     bool inode_trackr_ = false;
+//
+//     bool resolve_directory_symlnks_ = false;
+//
+//     bool resolve_entries_symlnks_ = false;
+//
+//     friend class directory_entry;
+//     friend class const_iterator;
+// };
+//
+// }

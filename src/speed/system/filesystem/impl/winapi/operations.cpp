@@ -515,6 +515,11 @@ bool file_has_access(
         FILE_GENERIC_EXECUTE, FILE_ALL_ACCESS
     };
 
+    if (access_mds == access_modes::NIL)
+    {
+        return true;
+    }
+
     auto cleanup = [&]() noexcept
     {
         if (security_descriptor != nullptr)
@@ -870,11 +875,6 @@ bool is_file_type(
     std::error_code* err_code
 ) noexcept
 {
-    if (file_ts == file_types::NIL)
-    {
-        return true;
-    }
-
     // Character device
     if ((file_ts & file_types::CHARACTER_DEVICE) != file_types::NIL)
     {
@@ -896,6 +896,11 @@ bool is_file_type(
     if (!get_file_handle(file_path, symlink_md, 0, file_handle, err_code))
     {
         return false;
+    }
+    if (file_ts == file_types::NIL)
+    {
+        CloseHandle(file_handle);
+        return true;
     }
 
     // Block device

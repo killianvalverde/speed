@@ -1,5 +1,5 @@
 /* speed - Generic C++ library.
- * Copyright (C) 2015-2026 Killian Valverde.
+* Copyright (C) 2015-2026 Killian Valverde.
  *
  * This file is part of speed.
  *
@@ -18,19 +18,20 @@
  */
 
 /**
- * @file        valid_path_test.cpp
- * @brief       valid_path unit test.
- * @author      Killian Valverde
- * @date        2024/05/20
+ * @file validatable_path.hpp
+ * @brief Provides filesystem path validation details and access decorators.
+ * @author Killian Valverde
+ * @date 2026-10-12
  */
 
-#include <gtest/gtest.h>
+#pragma once
 
-#include "speed/filesystem/filesystem.hpp"
+/** @cond */
+namespace speed::filesystem::detail {
 
-TEST(filesystem_valid_path, basic)
+struct output_path_tag
 {
-    // std::error_code err_code;
-    // speed::filesystem::rw_regular_file_path rfle("./file.txt");
-    // EXPECT_TRUE(rfle.is_valid(&err_code));
+};
+
 }
+/** @endcond */

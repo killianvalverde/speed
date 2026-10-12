@@ -30,16 +30,16 @@ namespace speed::filesystem {
 
 class directory_iteration;
 
-class valid_path;
+class validatable_path;
 
 template<typename BaseT>
-class read_path_decorator;
+class readable_path_decorator;
 
 template<typename BaseT>
-class write_path_decorator;
+class writable_path_decorator;
 
 template<typename BaseT>
-class execute_path_decorator;
+class executable_path_decorator;
 
 template<typename BaseT>
 class regular_file_path_decorator;
