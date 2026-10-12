@@ -64,12 +64,8 @@ set(SPEED_LOWLEVEL_TEST_SOURCE_FILES
     lowlevel_test/operations_test.cpp
 )
 
-set(SPEED_SAFETY_TEST_SOURCE_FILES
-    safety_test/operations_test.cpp
-)
-
-set(SPEED_SCALARS_TEST_SOURCE_FILES
-    scalars_test/operations_test.cpp
+set(SPEED_NUMERICS_TEST_SOURCE_FILES
+    numerics_test/operations_test.cpp
 )
 
 set(SPEED_STRINGS_TEST_SOURCE_FILES
@@ -111,8 +107,7 @@ set(SPEED_TEST_SOURCE_FILES
 #    ${SPEED_IOSTREAM_TEST_SOURCE_FILES}
     ${SPEED_MATH_TEST_SOURCE_FILES}
 #    ${SPEED_LOWLEVEL_TEST_SOURCE_FILES}
-#    ${SPEED_SAFETY_TEST_SOURCE_FILES}
-#    ${SPEED_SCALARS_TEST_SOURCE_FILES}
+    ${SPEED_NUMERICS_TEST_SOURCE_FILES}
     ${SPEED_STRINGS_TEST_SOURCE_FILES}
     ${SPEED_SYSTEM_TEST_SOURCE_FILES}
     ${SPEED_TIME_TEST_SOURCE_FILES}
@@ -129,11 +124,10 @@ set(SPEED_TEST_SOURCE_FILES
 #add_speed_test(speed_filesystem_test filesystem "${SPEED_FILESYSTEM_TEST_SOURCE_FILES}")
 #add_speed_test(speed_iostream_test iostream "${SPEED_IOSTREAM_TEST_SOURCE_FILES}")
 #add_speed_test(speed_lowlevel_test lowlevel "${SPEED_LOWLEVEL_TEST_SOURCE_FILES}")
-#add_speed_test(speed_safety_test safety "${SPEED_SAFETY_TEST_SOURCE_FILES}")
-#add_speed_test(speed_scalars_test scalars "${SPEED_SCALARS_TEST_SOURCE_FILES}")
 #add_speed_test(speed_type_casting_test type_casting "${SPEED_TYPE_CASTING_TEST_SOURCE_FILES}")
 
 add_speed_test(speed_math_test "${SPEED_MATH_TEST_SOURCE_FILES}")
+add_speed_test(speed_numerics_test "${SPEED_NUMERICS_TEST_SOURCE_FILES}")
 add_speed_test(speed_strings_test "${SPEED_STRINGS_TEST_SOURCE_FILES}")
 add_speed_test(speed_system_test "${SPEED_SYSTEM_TEST_SOURCE_FILES}")
 add_speed_test(speed_time_test "${SPEED_TIME_TEST_SOURCE_FILES}")

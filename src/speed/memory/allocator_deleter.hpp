@@ -47,8 +47,7 @@ public:
     using value_type = ValueT;
 
     /** Allocator rebound to value_type. */
-    using allocator_type = typename std::allocator_traits<
-        AllocatorT>::template rebind_alloc<ValueT>;
+    using allocator_type = std::allocator_traits<AllocatorT>::template rebind_alloc<ValueT>;
 
     /**
      * @brief Constructs an allocator-aware deleter.
